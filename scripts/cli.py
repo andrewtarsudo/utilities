@@ -1,16 +1,29 @@
+# -*- coding: utf-8 -*-
 from operator import attrgetter
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
-from click.core import Argument, Command, Context, Group, Parameter
+from click.core import Argument, Command, Context, Group, Option, Parameter
 from click.decorators import group, help_option, option
+from click.exceptions import UsageError
 from click.formatting import HelpFormatter
 from click.globals import get_current_context
-from click.termui import pause, style
+from click.termui import pause
 from click.utils import echo
 from loguru import logger
 
 from __version__ import __version__
-from constants import PRESS_ENTER_KEY, args_help_dict
+from common.constants import args_help_dict, HELP, PRESS_ENTER_KEY
+
+COL_SPACING: int = 3
+COL_MAX: int = 39
+MAX_CONTENT_WIDTH: int = 100
+TERMINAL_WIDTH: int = 100
+
+SEPARATOR: str = "-" * MAX_CONTENT_WIDTH
+
+
+def underscore_to_dash(value: str, *, prefix: bool = True):
+    return f'{int(prefix) * "--"}{value.replace("_", "-")}'
 
 
 def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
@@ -26,8 +39,10 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
 
             if param.type.name != "boolean":
                 _metavar: str = f" {param.make_metavar()}"
+
             elif param.name not in ("version", "help"):
-                _metavar: str = f"/--no-{param.name}"
+                _metavar: str = f"/--no-{underscore_to_dash(param.name, prefix=False)}"
+
             else:
                 _metavar: str = ""
 
@@ -39,14 +54,9 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
             args.append(_param)
 
     args_str: str = " ".join(args) if args else ""
+    opts_str: str = "\n".join(opts) if opts else ""
 
-    if cmd.name == "translate":
-        opts_str: str = "\n".join(opts) if opts else ""
-        formatter.write(f"Использование:\n{ctx.command_path}{args_str}\n{opts_str}\n")
-
-    else:
-        opts_str: str = " ".join(opts) if opts else ""
-        formatter.write(f"Использование:\n{ctx.command_path} {args_str}{opts_str}\n")
+    formatter.write(f"Использование:\n{ctx.command_path} {args_str}\n{opts_str}\n")
 
 
 def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
@@ -79,13 +89,12 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
                 rows.append(rv)
 
         else:
-            rows.append(("-h, --help", "Вывести справочную информацию на экран и завершить работу"))
+            rows.append(("-h, --help", HELP))
 
     if rows:
         with formatter.section("Опции"):
-            opt_names: list[str] = [item[0] for item in rows]
-            col_spacing: int = 30 - max(map(len, opt_names))
-            col_max: int = 80
+            col_spacing: int = COL_SPACING
+            col_max: int = COL_MAX
             formatter.write_dl(rows, col_max, col_spacing)
 
 
@@ -100,32 +109,14 @@ def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter
 
     if commands != dict():
         with formatter.section("Подкоманды"):
-            sub_names: list[str] = [sub.name for sub in commands.values() if not sub.hidden]
-
             rows: list[tuple[str, str]] = [
-                (sub.name, sub.help) for sub in sorted(commands.values(), key=attrgetter("name")) if not sub.hidden]
-            col_spacing: int = 30 - max(map(len, sub_names))
-            col_max: int = 80
+                (sub.name, sub.help)
+                for sub in sorted(commands.values(), key=attrgetter("name"))
+                if not sub.hidden]
+            col_spacing: int = COL_SPACING
+            col_max: int = COL_MAX
 
             formatter.write_dl(rows, col_max, col_spacing)
-
-
-# noinspection PyTypeChecker
-def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
-    args: list[Argument] = [param for param in cmd.get_params(ctx) if param.param_type_name == "argument"]
-
-    if args:
-        args_names: list[str] = [arg.name for arg in args]
-        keys: list[str] = [item.removesuffix(".exe") for item in ctx.command_path.split(" ")]
-
-        rows: list[tuple[str, str]] = [
-            (arg.name, args_help_dict.get_multiple_keys(keys=keys).get(arg.name)) for arg in args]
-        col_spacing: int = 30 - max(map(len, args_names))
-        col_max: int = 80
-
-        with formatter.section("Аргументы"):
-            formatter.write_dl(rows, col_max, col_spacing)
-    return
 
 
 def format_help(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
@@ -136,8 +127,28 @@ def format_help(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     format_epilog(cmd, ctx, formatter)
 
 
+# noinspection PyTypeChecker
+def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
+    args: list[Argument] = [
+        param for param in cmd.get_params(ctx)
+        if param.param_type_name == "argument"]
+
+    if args:
+        keys: list[str] = [item.removesuffix(".exe") for item in ctx.command_path.split(" ")]
+        rows: list[tuple[str, str]] = [
+            (arg.name, args_help_dict.get_multiple_keys(keys=keys).get(arg.name)) for arg in args]
+
+        col_spacing: int = COL_MAX - max(map(len, map(attrgetter("name"), args))) + 1
+        col_max: int = COL_MAX
+
+        with formatter.section("Аргументы"):
+            formatter.write_dl(rows, col_max, col_spacing)
+
+    return
+
+
 def get_help(cmd: Command, ctx: Context) -> str:
-    formatter = ctx.make_formatter()
+    formatter: HelpFormatter = ctx.make_formatter()
     format_help(cmd, ctx, formatter)
     return formatter.getvalue().rstrip("\n")
 
@@ -149,16 +160,15 @@ def recursive_help(cmd: Command, parent: Context = None, lines: Iterable[str] = 
     else:
         lines: list[str] = [*lines]
 
-    ctx: Context = Context(cmd, info_name=cmd.name, parent=parent, color=True)
+    ctx: Context = Context(
+        cmd,
+        info_name=cmd.name,
+        parent=parent,
+        color=True,
+        terminal_width=TERMINAL_WIDTH,
+        max_content_width=MAX_CONTENT_WIDTH)
 
-    if cmd.name == "translate":
-        lines.append(style(get_help(cmd, ctx), fg="green", bold=True))
-
-    else:
-        lines.append(get_help(cmd, ctx))
-
-    lines.append("-" * 80)
-    lines.append("\n")
+    lines.append(f"{get_help(cmd, ctx)}\n{SEPARATOR}\n\n")
     commands: dict[str, Command] = getattr(cmd, "commands", dict())
 
     for sub in commands.values():
@@ -168,6 +178,7 @@ def recursive_help(cmd: Command, parent: Context = None, lines: Iterable[str] = 
     return "\n".join(lines)
 
 
+# noinspection PyUnusedLocal
 def print_version(ctx: Context, param: Parameter, value: Any):
     if not value or ctx.resilient_parsing:
         return
@@ -178,6 +189,11 @@ def print_version(ctx: Context, param: Parameter, value: Any):
 
 
 class APIGroup(Group):
+    def __init__(self, **attrs: Any):
+        kwargs: dict[str, bool] = {"invoke_without_command": True, "chain": False}
+        attrs.update(kwargs)
+        super().__init__(**attrs)
+
     def format_help(self, ctx: Context, formatter: HelpFormatter) -> None:
         self.format_usage(ctx, formatter)
         self.format_help_text(ctx, formatter)
@@ -186,33 +202,21 @@ class APIGroup(Group):
         self.format_epilog(ctx, formatter)
 
         if hasattr(self, "commands"):
-            lines: tuple[str, ...] = ("-" * 80, "\n")
-            formatter.write("\n".join(lines))
+            formatter.write(f"{SEPARATOR}\n\n")
 
-            del lines
-
-            command_names: list[str] = [*self.commands.keys()]
-
-            if "translate" in command_names:
-                command_names.sort()
-                index: int = command_names.index("translate")
-                translate: str = command_names.pop(index)
-                command_names.insert(0, translate)
-
-            for command_name in command_names:
+            for command_name in sorted(self.commands):
                 command: Command = self.commands.get(command_name)
 
                 if not command.hidden:
                     formatter.write(recursive_help(command, ctx))
 
-            del command_names
-
     def format_usage(self, ctx: Context, formatter: HelpFormatter) -> None:
         format_usage(self, ctx, formatter)
 
     def get_usage(self, ctx: Context) -> str:
-        formatter = ctx.make_formatter()
-        format_usage(self, ctx, formatter)
+        formatter: HelpFormatter = ctx.make_formatter()
+        self.format_usage(ctx, formatter)
+
         return formatter.getvalue().rstrip("\n")
 
     def format_options(self, ctx: Context, formatter: HelpFormatter) -> None:
@@ -226,10 +230,42 @@ class APIGroup(Group):
         format_args(self, ctx, formatter)
 
 
+class MutuallyExclusiveOption(Option):
+    def __init__(self, *args, **kwargs):
+        self.mutually_exclusive: set[str] = set(kwargs.pop("mutually_exclusive", []))
+
+        _help: str = kwargs.get("help", "")
+
+        if self.mutually_exclusive:
+            exclusive_options: str = ", ".join(map(underscore_to_dash, self.mutually_exclusive))
+
+            _: dict[str, str] = {
+                "help": f"{_help}\nПримечание. Аргумент не может использоваться одновременно с {exclusive_options}"}
+            kwargs.update(_)
+
+        super().__init__(*args, **kwargs)
+
+    def handle_parse_result(
+            self,
+            ctx: Context,
+            opts: Mapping[str, Any],
+            args: Iterable[str]) -> tuple[Any, list[str]]:
+        if self.mutually_exclusive.intersection(opts) and self.name in opts:
+            exclusive_options: str = ", ".join(map(underscore_to_dash, self.mutually_exclusive))
+
+            raise UsageError(
+                f"Ошибка в задании команды: `{self.name}` не может использоваться одновременно с "
+                f"`{exclusive_options}`."
+            )
+
+        else:
+            args: list[str] = [*args]
+            return super().handle_parse_result(ctx, opts, args)
+
+
 @group(
     cls=APIGroup,
-    help="""Скрипт для работы с Yandex Translate API""",
-    invoke_without_command=True)
+    help="""Набор скриптов для технических писателей""")
 @option(
     "-v", "--version",
     is_flag=True,
@@ -239,7 +275,7 @@ class APIGroup(Group):
     callback=print_version)
 @help_option(
     "-h", "--help",
-    help="Вывести справочную информацию на экран и завершить работу",
+    help=HELP,
     is_eager=True)
 def command_line_interface(**kwargs):
     ctx: Context = get_current_context()
@@ -247,7 +283,7 @@ def command_line_interface(**kwargs):
     ctx.obj = dict(**kwargs)
 
     if ctx.invoked_subcommand is None:
-        echo("Не указана ни одна из доступных команд. Для вызова справки используйте опцию -h или --help")
+        echo("Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help")
         pause(PRESS_ENTER_KEY)
         ctx.exit(0)
 

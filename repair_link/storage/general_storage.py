@@ -148,23 +148,27 @@ class GeneralStorage:
 
         """
         _unique_md: list[str] = unique(
-            iter(self.parent_name(_)
-                 for _ in iglob("**/_index.md", root_dir=self._root_dir, recursive=True)))
+            iter(
+                self.parent_name(_)
+                for _ in iglob("**/_index.md", root_dir=self._root_dir, recursive=True)))
 
         _unique_adoc: list[str] = unique(
-            iter(self.parent_name(_)
-                 for _ in iglob("**/_index.adoc", root_dir=self._root_dir, recursive=True)))
+            iter(
+                self.parent_name(_)
+                for _ in iglob("**/_index.adoc", root_dir=self._root_dir, recursive=True)))
 
         _unique: list[str] = [*_unique_md, *_unique_adoc]
 
         _unique_parents_md: list[str] = unique(
-            iter(f"{self.grandparent_name(_)}/{self.parent_name(_)}"
-                 for _ in iglob("**/_index.md", root_dir=self._root_dir, recursive=True))
+            iter(
+                f"{self.grandparent_name(_)}/{self.parent_name(_)}"
+                for _ in iglob("**/_index.md", root_dir=self._root_dir, recursive=True))
         )
 
         _unique_parents_adoc: list[str] = unique(
-            iter(f"{self.grandparent_name(_)}/{self.parent_name(_)}"
-                 for _ in iglob("**/_index.adoc", root_dir=self._root_dir, recursive=True))
+            iter(
+                f"{self.grandparent_name(_)}/{self.parent_name(_)}"
+                for _ in iglob("**/_index.adoc", root_dir=self._root_dir, recursive=True))
         )
 
         _unique_parents: list[str] = [*_unique_parents_md, *_unique_parents_adoc]
@@ -195,23 +199,27 @@ class GeneralStorage:
 
         """
         _unique_md: list[str] = unique(
-            iter(self.parent_name(_)
-                 for _ in iglob("**/index.md", root_dir=self._root_dir, recursive=True)))
+            iter(
+                self.parent_name(_)
+                for _ in iglob("**/index.md", root_dir=self._root_dir, recursive=True)))
 
         _unique_adoc: list[str] = unique(
-            iter(self.parent_name(_)
-                 for _ in iglob("**/index.adoc", root_dir=self._root_dir, recursive=True)))
+            iter(
+                self.parent_name(_)
+                for _ in iglob("**/index.adoc", root_dir=self._root_dir, recursive=True)))
 
         _unique: list[str] = [*_unique_md, *_unique_adoc]
 
         _unique_parents_md: list[str] = unique(
-            iter(f"{self.grandparent_name(_)}/{self.parent_name(_)}"
-                 for _ in iglob("**/index.md", root_dir=self._root_dir, recursive=True))
+            iter(
+                f"{self.grandparent_name(_)}/{self.parent_name(_)}"
+                for _ in iglob("**/index.md", root_dir=self._root_dir, recursive=True))
         )
 
         _unique_parents_adoc: list[str] = unique(
-            iter(f"{self.grandparent_name(_)}/{self.parent_name(_)}"
-                 for _ in iglob("**/index.adoc", root_dir=self._root_dir, recursive=True))
+            iter(
+                f"{self.grandparent_name(_)}/{self.parent_name(_)}"
+                for _ in iglob("**/index.adoc", root_dir=self._root_dir, recursive=True))
         )
 
         _unique_parents: list[str] = [*_unique_parents_md, *_unique_parents_adoc]
@@ -242,24 +250,28 @@ class GeneralStorage:
 
         """
         _unique_md: list[str] = unique(
-            iter(self.join_path(_).stem for _ in iglob("**/*.md", root_dir=self._root_dir, recursive=True)
-                 if not self.join_path(_).stem.endswith("index")))
+            iter(
+                self.join_path(_).stem for _ in iglob("**/*.md", root_dir=self._root_dir, recursive=True)
+                if not self.join_path(_).stem.endswith("index")))
 
         _unique_adoc: list[str] = unique(
-            iter(self.join_path(_).stem for _ in iglob("**/*.adoc", root_dir=self._root_dir, recursive=True)
-                 if not self.join_path(_).stem.endswith("index")))
+            iter(
+                self.join_path(_).stem for _ in iglob("**/*.adoc", root_dir=self._root_dir, recursive=True)
+                if not self.join_path(_).stem.endswith("index")))
 
         _unique: list[str] = [*_unique_md, *_unique_adoc]
 
         _unique_parents_md: list[str] = unique(
-            iter(f"{self.join_path(_).parent.name}/{self.join_path(_).stem}"
-                 for _ in iglob("**/*.md", root_dir=self._root_dir, recursive=True)
-                 if not self.join_path(_).stem.endswith("index")))
+            iter(
+                f"{self.join_path(_).parent.name}/{self.join_path(_).stem}"
+                for _ in iglob("**/*.md", root_dir=self._root_dir, recursive=True)
+                if not self.join_path(_).stem.endswith("index")))
 
         _unique_parents_adoc: list[str] = unique(
-            iter(f"{self.join_path(_).parent.name}/{self.join_path(_).stem}"
-                 for _ in iglob("**/*.adoc", root_dir=self._root_dir, recursive=True)
-                 if not self.join_path(_).stem.endswith("index")))
+            iter(
+                f"{self.join_path(_).parent.name}/{self.join_path(_).stem}"
+                for _ in iglob("**/*.adoc", root_dir=self._root_dir, recursive=True)
+                if not self.join_path(_).stem.endswith("index")))
 
         _unique_parents: list[str] = [*_unique_parents_md, *_unique_parents_adoc]
 

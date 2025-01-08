@@ -12,7 +12,6 @@ from repair_link.dir_file.dir_file import TextFile
 from repair_link.dir_file.file_dict import FileDict
 from repair_link.general.const import StrPath, ADOC_EXTENSION, MD_EXTENSION, result_file_path, log_folder, FileLanguage, \
     prepare_logging
-from repair_link.general.custom_logger import configure_custom_logging
 from repair_link.general.errors import InvalidStorageAttributeError, InvalidFileDictAttributeError
 from repair_link.general.link import Link
 from repair_link.inspector.internal_link_inspector import internal_inspector
@@ -198,13 +197,9 @@ if __name__ == '__main__':
 
     _input_user: InputUser | None = parse_command_line()
 
-    if not bool(_input_user):
-        from repair_link.user_interaction.gui import get_input_user
-
-        _input_user: InputUser | None = get_input_user()
-
     if _input_user is None:
         logger.remove()
         rmtree(log_folder, True)
+
     else:
         link_repair(_input_user)

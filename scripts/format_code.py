@@ -1,31 +1,26 @@
 # -*- coding: utf-8 -*-
-from argparse import ArgumentError, ArgumentParser, Namespace, ONE_OR_MORE, SUPPRESS
 from pathlib import Path
-from re import Match, finditer
+from re import finditer, Match
 from typing import Iterable
 
+from click.core import Context
+from click.decorators import help_option, option, pass_context
+from click.termui import pause
+from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
-_MAX_LENGTH: int = 84
-STOP: str = "Нажмите любую клавишу для завершения скрипта ...\n"
-NAME: str = Path(__file__).parent.name
+from common.constants import HELP, PRESS_ENTER_KEY
+from common.functions import get_files
+from scripts.cli import APIGroup, command_line_interface
+
+MAX_LENGTH: int = 84
 
 
-def check_path_file(path: str | Path):
-    path: Path = Path(path).expanduser().resolve()
-
-    if not path.exists():
-        logger.error(f"Путь {path} не существует")
-        raise FileNotFoundError
-
-    if not path.is_file():
-        logger.error(f"Путь {path} указывает не на директорию")
-        raise IsADirectoryError
-
-    return
-
-
-def split(line: str, start: int = 0, length: int = _MAX_LENGTH, split_lines: Iterable[str] = None) -> list[str] | None:
+def split(
+        line: str,
+        start: int = 0,
+        length: int = MAX_LENGTH,
+        split_lines: Iterable[str] = None) -> list[str] | None:
     if split_lines is None:
         split_lines: list[str] = []
     else:
@@ -74,98 +69,103 @@ def split(line: str, start: int = 0, length: int = _MAX_LENGTH, split_lines: Ite
         return split_lines
 
 
-def fix_code_length(file: str | Path, length: int = _MAX_LENGTH):
-    check_path_file(file)
+@command_line_interface.command(
+    "format-code",
+    cls=APIGroup,
+    help="Команда для форматирования блоков кода",
+    invoke_without_command=True)
+@option(
+    "-f", "--file", "files",
+    type=ClickPath(
+        exists=True,
+        file_okay=True,
+        readable=True,
+        resolve_path=True,
+        allow_dash=False,
+        dir_okay=False),
+    help="Файл для обработки.\nМожет использоваться несколько раз",
+    multiple=True,
+    required=False,
+    metavar="<FILE> ... <FILE>",
+    default=None
+)
+@option(
+    "-d", "--dir", "directory",
+    type=ClickPath(
+        exists=True,
+        file_okay=False,
+        resolve_path=True,
+        allow_dash=False,
+        dir_okay=True),
+    help="Директория для обработки",
+    multiple=False,
+    required=False,
+    metavar="<DIR>",
+    default=None
+)
+@option(
+    "--recursive/--no-recursive",
+    type=BOOL,
+    is_flag=True,
+    help="Флаг рекурсивного поиска файлов.\bПо умолчанию: True",
+    show_default=True,
+    required=False,
+    default=True)
+@option(
+    "-l", "--length",
+    type=INT,
+    help=f"Максимальная длина строки.\bПо умолчанию: {MAX_LENGTH}",
+    multiple=False,
+    required=False,
+    metavar="<LEN>",
+    default=MAX_LENGTH)
+@help_option(
+    "-h", "--help",
+    help=HELP,
+    is_eager=True)
+@pass_context
+def format_code_command(
+        ctx: Context,
+        files: Iterable[str | Path] = None,
+        directory: str | Path = None,
+        recursive: bool = True,
+        length: int = MAX_LENGTH):
+    files: list[str | Path] | None = get_files(files, directory, recursive)
 
-    with open(file, "r", encoding="utf-8", errors="ignore") as fr:
-        _content: str = fr.read()
-
-    _result: list[str] = []
-
-    for code in finditer("`{3}\S*\n(.*?)\n`{3}", _content):
-        lines: list[str] = code.group(1).splitlines()
-
-        for line in lines:
-            _: list[str] = split(line, length=length)
-            _result.append("\n".join(_))
-
-    with open(file, "w", encoding="utf-8", errors="ignore") as fw:
-        fw.write("\n\n".join(_result))
-
-
-def parse():
-    # specify the cli options
-    arg_parser: ArgumentParser = ArgumentParser(
-        prog="format_code",
-        usage=f"py {NAME} [ -h/--help | -v/--version ] <FILE> .. <FILE> [ -l/--length <LENGTH> ]",
-        description="Форматирование кода для удобного отображения в PDF",
-        epilog="",
-        add_help=False,
-        allow_abbrev=False,
-        exit_on_error=False
-    )
-
-    arg_parser.add_argument(
-        "files",
-        action="extend",
-        nargs=ONE_OR_MORE,
-        default=SUPPRESS,
-        help="Файлы для обработки"
-    )
-
-    arg_parser.add_argument(
-        "-l", "--length",
-        action="store",
-        type=int,
-        default=_MAX_LENGTH,
-        help="Максимальная длина строки",
-        dest="length"
-    )
-
-    arg_parser.add_argument(
-        "-v", "--version",
-        action="version",
-        version="1.0.0",
-        help="Показать версию скрипта и завершить работу"
-    )
-
-    arg_parser.add_argument(
-        "-h", "--help",
-        action="help",
-        default=SUPPRESS,
-        help="Показать справку и завершить работу"
-    )
-
-    # parse the user input
-    try:
-        args: Namespace = arg_parser.parse_args()
-
-        if hasattr(args, "help") or hasattr(args, "version"):
-            input(STOP)
-            exit(0)
-
-    except ArgumentError as exc:
-        print(f"{exc.__class__.__name__}, {exc.argument_name}\n{exc.message}")
-        print("Ошибка 1")
-        input(STOP)
-        exit(1)
-
-    except KeyboardInterrupt:
-        print("Ошибка 2")
-        input("Работа скрипта остановлена пользователем ...")
-        exit(2)
-
-    else:
-        return args
-
-
-if __name__ == '__main__':
-    ns: Namespace = parse()
-
-    files: list[str] = getattr(ns, "files", list())
-    length: int = getattr(ns, "length")
+    if files is None:
+        pause(PRESS_ENTER_KEY)
+        ctx.exit(0)
 
     for file in files:
-        fix_code_length(file, length)
+        try:
+            with open(file, "r", encoding="utf-8", errors="ignore") as fr:
+                _content: str = fr.read()
 
+            _result: list[str] = []
 
+            for code in finditer("`{3}\S*\n(.*?)\n`{3}", _content):
+                lines: list[str] = code.group(1).splitlines()
+
+                for line in lines:
+                    _: list[str] = split(line, length=length)
+                    _result.append("\n".join(_))
+
+            with open(file, "w", encoding="utf-8", errors="ignore") as fw:
+                fw.write("\n\n".join(_result))
+
+            logger.info(f"Файл {file.name} успешно обработан")
+
+        except PermissionError:
+            logger.error(f"Недостаточно прав для чтения/записи в файл {file.name}")
+            continue
+
+        except RuntimeError:
+            logger.error(f"Истекло время чтения/записи файл {file.name}")
+            continue
+
+        except OSError as e:
+            logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+            continue
+
+    pause(PRESS_ENTER_KEY)
+    ctx.exit(0)

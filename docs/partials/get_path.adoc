@@ -1,0 +1,12 @@
+. Выбрать файл и ПКМ вызвать меню.
+. В меню выбрать *menu:Copy Path/Reference[]*.
++
+.Меню Copy Path/Reference
+image::copy_path_reference.png[align="center"]
++
+. В дополнительном окне выбрать *menu:Path From Content Root[]*.
++
+.Меню Path From Content Root
+image::path_from_content_root.png[align="center"]
++
+. Нужный путь будет добавлен в буфер обмена.

@@ -8,19 +8,16 @@ from repair_link.general.const import PATTERN
 from repair_link.general.errors import FixerNoLinkError, InvalidHashCharIndexError
 
 
+# noinspection PyUnresolvedReferences
 class LinkFixer:
-    """
-    The instance to fix links.
+    """Class to represent the instance to fix links.
 
-    Attributes
-    ----------
-    _text_file : TextFile or None
-        The file in the directory.
-
+    :param text_file: The file in the directory.
+    :type text_file: TextFile or None
     """
 
     def __init__(self):
-        self._text_file: TextFile | None = None
+        self.text_file: TextFile | None = None
 
     def __repr__(self):
         return f"{self.__class__.__name__}"
@@ -40,51 +37,42 @@ class LinkFixer:
             return NotImplemented
 
     def __iter__(self):
-        return self._text_file.iter_links()
+        return self.text_file.iter_links()
 
     def __bool__(self):
-        return self._text_file is not None
+        return self.text_file is not None
 
     @property
     def text_file(self):
-        return self._text_file
+        return self.text_file
 
     @text_file.setter
     def text_file(self, value):
-        self._text_file = value
+        self.text_file = value
 
     def _validate(self):
-        """
-        Inspecting if the file is specified.
-
-        """
+        """Inspects if the file is specified."""
         if not bool(self):
             logger.error("Не задан файл")
             raise FixerNoLinkError
 
     def _fix_whitespaces(self):
-        """
-        Fixing errors when the link has whitespaces.
-
-        """
+        """Fixes errors when the link has whitespaces."""
         for link in iter(self):
             _: str = link.link.link_to
 
             if " " in _:
-                self._text_file.update_line(link.index, _, _.replace(" ", ""))
+                self.text_file.update_line(link.index, _, _.replace(" ", ""))
                 logger.warning(
-                    f"В файле {self._text_file.rel_path} некорректная ссылка:\n"
+                    f"В файле {self.text_file.rel_path} некорректная ссылка:\n"
                     f"{_}\n"
                     f"Строка: {link.index}", result=True)
 
-        if self._text_file.is_changed is False:
-            logger.debug(f"file {self._text_file.rel_path}, no whitespaces to fix")
+        if self.text_file.is_changed is False:
+            logger.debug(f"file {self.text_file.rel_path}, no whitespaces to fix")
 
     def _fix_missing_slashes_after_dots(self):
-        """
-        Fixing errors when the link has double dots with no slash followed.
-
-        """
+        """Fixes errors when the link has double dots with no slash followed."""
 
         def add_slash(match: Match):
             return f"{match.group(1)}/{match.group(2)}"
@@ -94,21 +82,18 @@ class LinkFixer:
 
             for _m in finditer(PATTERN, _):
                 if _m:
-                    self._text_file.update_line(link.index, _, sub(PATTERN, add_slash, _))
-                    self._text_file.is_changed = True
+                    self.text_file.update_line(link.index, _, sub(PATTERN, add_slash, _))
+                    self.text_file.is_changed = True
                     logger.warning(
-                        f"В файле {self._text_file.rel_path} некорректная ссылка:\n"
+                        f"В файле {self.text_file.rel_path} некорректная ссылка:\n"
                         f"{_}\n"
                         f"Строка: {link.index}", result=True)
 
-        if self._text_file.is_changed is False:
-            logger.debug(f"file {self._text_file.rel_path}, no missing slashes to fix")
+        if self.text_file.is_changed is False:
+            logger.debug(f"file {self.text_file.rel_path}, no missing slashes to fix")
 
     def _fix_missing_slashes_before_hash(self):
-        """
-        Fixing errors when the link has an anchor with no slash before.
-
-        """
+        """Fixes errors when the link has an anchor with no slash before."""
         for link in iter(self):
             _: str = link.link.link_to
 
@@ -117,7 +102,7 @@ class LinkFixer:
 
                 if index < -1:
                     logger.error(
-                        f"Позиция # в файле {self._text_file.rel_path} в ссылке {_} определена как {index}, "
+                        f"Позиция # в файле {self.text_file.rel_path} в ссылке {_} определена как {index}, "
                         f"что некорректно")
                     raise InvalidHashCharIndexError
 
@@ -126,24 +111,21 @@ class LinkFixer:
                     continue
 
                 elif _[index] != "/":
-                    self._text_file.update_line(link.index, _, _.replace("#", "/#"))
-                    self._text_file.is_changed = True
+                    self.text_file.update_line(link.index, _, _.replace("#", "/#"))
+                    self.text_file.is_changed = True
                     logger.warning(
-                        f"В файле {self._text_file.rel_path} некорректная ссылка:\n"
+                        f"В файле {self.text_file.rel_path} некорректная ссылка:\n"
                         f"{_}\n"
                         f"Строка: {link.index}", result=True)
 
                 else:
                     continue
 
-        if self._text_file.is_changed is False:
-            logger.debug(f"file {self._text_file.rel_path}, no missing slashes to fix")
+        if self.text_file.is_changed is False:
+            logger.debug(f"file {self.text_file.rel_path}, no missing slashes to fix")
 
     def fix_links(self):
-        """
-        Fixing errors and updating the text.
-
-        """
+        """Fixes errors and updating the text."""
         self._validate()
         self._fix_whitespaces()
         self._fix_missing_slashes_after_dots()

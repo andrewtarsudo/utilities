@@ -7,7 +7,31 @@ from loguru import logger
 
 from repair_link.dir_file.dir_file import TextFile, DirFile
 from repair_link.general.const import StrPath, ADOC_EXTENSION, MD_EXTENSION
-from repair_link.dir_file.text_file import get_file
+from repair_link.dir_file.text_file import AsciiDocFile, MdFile
+
+
+def get_file(root_dir: StrPath, full_path: StrPath) -> MdFile | AsciiDocFile:
+    """
+    Specifying the type of the file.
+
+    Attributes
+    ----------
+    root_dir : str or Path
+        The path to the directory.
+    full_path : str or Path
+        The absolute path to the file.
+
+    Returns
+    -------
+    MdFile or AsciiDocFile
+        The specified file according to the extension.
+
+    """
+    if full_path.suffix == MD_EXTENSION:
+        return MdFile(root_dir, full_path)
+
+    elif full_path.suffix == ADOC_EXTENSION:
+        return AsciiDocFile(root_dir, full_path)
 
 
 class FileDict:

@@ -11,31 +11,12 @@ from warnings import simplefilter
 
 from loguru import logger
 
-from translation_api.constants import _DEBUG, _NORMAL
-
-# ---------- General constants ---------- #
-_error_head: str = "\n-------------------------------------------------\n"
-_error_tail: str = "\n-------------------------------------------------\n"
-_warning_head: str = "!!! "
-_warning_tail: str = " !!!\n"
-_critical_head: str = "\n-------------------------------------------------\n"
-_critical_tail: str = "\n-------------------------------------------------\n"
-# ---------- General constants ---------- #
-
-
 HandlerType: Type[str] = Literal["stream", "file_rotating", "result_file"]
 LoggingLevel: Type[str] = Literal["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"]
 ColorLevel: Type[str] = Literal["red", "fg #FF7518", "green", "magenta", "light-green", "cyan"]
 StyleLevel: Type[str] = Literal["bold", "italic", "underline", "normal"]
 
-_COLORED_FORMAT: str = " | ".join(
-    ("<green>{time:DD-MMM-YYYY HH:mm:ss}</green>::<level>{level.name}</level>",
-     "<cyan>{module}</cyan>::<cyan>{function}</cyan>",
-     "<cyan>{file.name}</cyan>::<cyan>{name}</cyan>::<cyan>{line}</cyan>",
-     "\n<level>{message}</level>"))
-_USER_FORMAT: str = "{message}\n"
-
-__all__ = ["configure_custom_logging"]
+__all__ = ["custom_logging"]
 
 
 class LevelColorStyle(NamedTuple):
@@ -157,6 +138,14 @@ class LoggerConfiguration:
         The logger handlers.
 
     """
+    DEBUG: Path = Path.cwd().joinpath("_logs/translation_api_debug.log")
+    NORMAL: Path = Path("~/Desktop/_logs/translation_api_debug.log").expanduser().resolve()
+    _COLORED_FORMAT: str = " | ".join(
+        ("<green>{time:DD-MMM-YYYY HH:mm:ss}</green>::<level>{level.name}</level>",
+         "<cyan>{module}</cyan>::<cyan>{function}</cyan>",
+         "<cyan>{file.name}</cyan>::<cyan>{name}</cyan>::<cyan>{line}</cyan>",
+         "\n<level>{message}</level>"))
+    _USER_FORMAT: str = "{message}\n"
 
     def __init__(
             self,
@@ -173,9 +162,9 @@ class LoggerConfiguration:
     @property
     def log_folder(self) -> Path:
         if self._is_debug:
-            return _DEBUG.parent
+            return self.__class__.DEBUG.parent
         else:
-            return _NORMAL.parent
+            return self.__class__.NORMAL.parent
 
     def stream_handler(self) -> dict[str, Any] | None:
         """
@@ -188,7 +177,7 @@ class LoggerConfiguration:
             return {
                 "sink": sysout,
                 "level": _logging_level,
-                "format": _USER_FORMAT,
+                "format": self.__class__._USER_FORMAT,
                 "colorize": True,
                 "filter": _to_stream,
                 "backtrace": False,
@@ -210,7 +199,7 @@ class LoggerConfiguration:
             return {
                 "sink": _log_path,
                 "level": _logging_level,
-                "format": _COLORED_FORMAT,
+                "format": self.__class__._COLORED_FORMAT,
                 "colorize": False,
                 "diagnose": True,
                 "backtrace": True,
@@ -224,7 +213,7 @@ class LoggerConfiguration:
             return
 
 
-def configure_custom_logging(name: str, *, is_debug: bool = False):
+def custom_logging(name: str, *, is_debug: bool = False):
     """
     Specifying the logging decorator.
 

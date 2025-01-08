@@ -111,6 +111,7 @@ class TextFile(DirFile):
         try:
             with open(self._full_path, "r+", encoding="utf-8") as f:
                 self._content = f.readlines()
+
             __flag = True
 
         except UnicodeDecodeError as exc:
@@ -185,60 +186,37 @@ class TextFile(DirFile):
         return iter(self._anchors)
 
     def iter_links(self) -> Iterator[FileLinkItem]:
-        """
-        Iteration of the links in the text file.
+        """Iterates of the links in the text file.
 
-        Returns
-        -------
-        Iterator[FileLinkItem]
-            The link item iterator.
-
+        :return: The link item iterator.
+        :rtype: Iterator[FileLinkItem]
         """
         return iter(self._links)
 
     def _iter_internal_links(self) -> Iterator[_InternalLink]:
-        """
-        Iteration of the internal links in the text file.
+        """Iterates of the internal links in the text file.
 
-        Returns
-        -------
-        Iterator[_InternalLink]
-            The internal link item iterator.
-
+        :return: The internal link item iterator.
+        :rtype: Iterator[_InternalLink]
         """
         return iter(self._internal_links)
 
     def iter_internal_link_anchors(self) -> Iterator[str]:
-        """
-        Iteration of the internal link anchors in the text file.
+        """Iterates the internal link anchors in the text file.
 
-        Returns
-        -------
-        Iterator[str]
-            The internal link anchor iterator.
-
+        :return: The internal link anchor iterator.
+        :rtype: Iterator[str]
         """
         return iter(_.anchor for _ in self._iter_internal_links())
 
     def get_internal_links(self, anchor: str | None) -> tuple[_InternalLink, ...] | None:
-        """
-        Getting the internal links having the specified anchor.
+        """Gets the internal links having the specified anchor.
 
-        Parameters
-        ----------
-        anchor : str or None
-            The anchor to find.
-
-        Returns
-        -------
-        tuple[_InternalLink] or None
-            The internal links.
-
-        Raises
-        ------
-        InternalLinkAnchorError
-            If the anchor is found in neither internal link anchors.
-
+        :param anchor: The anchor to find.
+        :type anchor: str or None
+        :return: The internal links.
+        :rtype: tuple[_InternalLink] or None
+        :raises: InternalLinkAnchorError if the anchor is found in neither internal link anchors.
         """
         if anchor is None:
             return
@@ -303,43 +281,25 @@ class TextFile(DirFile):
 
     @property
     def language(self) -> FileLanguage:
-        """
-        Specifies the file language.
-
-        Returns
-        -------
-        FileLanguage
-            The file language.
-        """
+        """Specifies the file language."""
         if ".en" in self.full_path.suffixes or self.full_path.stem.endswith("_en"):
             return FileLanguage.EN
+
         else:
             return FileLanguage.RU
 
     def set_links(self):
-        """
-        Specifying the links in the text file.
-
-        """
+        """Specifies the links in the text file."""
         raise NotImplementedError
 
     def set_internal_links(self):
-        """
-        Specifying the internal links in the text file.
-
-        """
+        """Specifies the internal links in the text file."""
         raise NotImplementedError
 
     def set_anchors(self):
-        """
-        Specifying the anchors in the text file.
-
-        """
+        """Specifies the anchors in the text file."""
         raise NotImplementedError
 
     def set_imagesdir(self):
-        """
-        Specifying the 'imagesdir' value if given.
-
-        """
+        """Specifies the 'imagesdir' value if given."""
         pass

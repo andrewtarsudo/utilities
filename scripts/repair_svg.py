@@ -1,138 +1,125 @@
 # -*- coding: utf-8 -*-
-from argparse import ArgumentError, ArgumentParser, Namespace, ONE_OR_MORE, SUPPRESS
 from pathlib import Path
-from re import DOTALL, MULTILINE, Pattern, compile, sub
+from re import DOTALL, MULTILINE, sub
 from typing import Iterable
 
-from click.decorators import help_option
+from click import echo, option
+from click.core import Context
+from click.decorators import help_option, pass_context
+from click.termui import pause
+from click.types import BOOL, Path as ClickPath
+from loguru import logger
 
-from cli import APIGroup, command_line_interface
-from constants import HELP
-
-NAME: str = Path(__file__).name
-PRESS_ENTER_KEY: str = "\nНажмите ENTER, чтобы завершить работу скрипта ..."
-
-
-def repair_svg(paths: Iterable[str | Path]):
-    FOREIGN_OBJECT: Pattern = compile("<foreignObject.*?</foreignObject>", DOTALL | MULTILINE)
-    TEXT: Pattern = compile(
-        "<a\s?transform=\"translate(0,-5)\"\s?xlink:href=\"https://www.drawio.com/doc/faq/svg-export-text-problems"
-        "\".*?</a>", DOTALL | MULTILINE)
-    FEATURES: Pattern = compile(
-        "<g>\s?<g\s?requiredFeatures=\"http://www.w3.org/TR/SVG11/feature#Extensibility\"/>\s?</g>", DOTALL | MULTILINE)
-
-    for path in paths:
-        path: Path = Path(path).expanduser().resolve()
-
-        if not path.exists(follow_symlinks=True):
-            print("Указан не существующий файл")
-            print("Ошибка 2")
-            continue
-
-        elif not path.is_file():
-            print("Путь указывает не на файл")
-            print("Ошибка 3")
-            continue
-
-        elif path.suffix != ".svg":
-            print("Указанный файл имеет расширение не SVG")
-            print("Ошибка 4")
-            continue
-
-        else:
-            try:
-                with open(path, "rb") as fr:
-                    svg: str = fr.read().decode()
-
-                svg: str = sub(TEXT, "", svg)
-                svg: str = sub(FOREIGN_OBJECT, "", svg)
-                svg: str = sub(FEATURES, "", svg)
-                svg: str = svg.replace("switch>", "g>")
-
-                with open(path, "wb") as fw:
-                    fw.write(svg.encode())
-
-            except PermissionError:
-                print(f"Недостаточно прав для записи в файл {path}")
-                print("Ошибка 5")
-                continue
-
-            except RuntimeError:
-                print(f"Истекло время чтения/записи файл {path}")
-                print("Ошибка 6")
-                continue
-
-            except OSError as e:
-                print(f"Ошибка {e.__class__.__name__}: {e.strerror}")
-                print("Ошибка 7")
-                continue
+from common.constants import HELP, PRESS_ENTER_KEY
+from common.functions import get_files
+from scripts.cli import APIGroup, command_line_interface
 
 
-if __name__ == '__main__':
-    arg_parser: ArgumentParser = ArgumentParser(
-        prog="repair_svg",
-        usage=f"py {NAME} [ -h/--help | -v/--version ] <PATH> <PATH>",
-        description="Исправление файла SVG для корректного отображения",
-        epilog="",
-        add_help=False,
-        allow_abbrev=False,
-        exit_on_error=False
-    )
-
-    arg_parser.add_argument(
-        action="extend",
-        type=str,
-        nargs=ONE_OR_MORE,
-        default=None,
-        help="Путь до SVG-файла. Может быть абсолютным или относительным",
-        dest="paths"
-    )
-
-    arg_parser.add_argument(
-        "-v", "--version",
-        action="version",
-        version="1.0.0",
-        help="Показать версию скрипта и завершить работу"
-    )
-
-    arg_parser.add_argument(
-        "-h", "--help",
-        action="help",
-        default=SUPPRESS,
-        help="Показать справку и завершить работу"
-    )
-
-    try:
-        args: Namespace = arg_parser.parse_args()
-
-        if hasattr(args, "help") or hasattr(args, "version"):
-            input(PRESS_ENTER_KEY)
-            exit(0)
-
-    except ArgumentError as e:
-        print(f"{e.__class__.__name__}, {e.argument_name}\n{e.message}")
-        print("Ошибка 1")
-        input(PRESS_ENTER_KEY)
-        exit(1)
-
-    except KeyboardInterrupt:
-        print("Ошибка -1")
-        print("Работа скрипта остановлена пользователем ...")
-        exit(-1)
-
-    else:
-        paths: list[str] = getattr(args, "paths")
-
-
-@command_line_interface.group(
-    name="repair-svg",
+@command_line_interface.command(
+    "repair-svg",
     cls=APIGroup,
+    help="Команда для исправления файлов SVG",
     invoke_without_command=True)
+@option(
+    "-f", "--file", "files",
+    type=ClickPath(
+        exists=True,
+        file_okay=True,
+        readable=True,
+        resolve_path=True,
+        allow_dash=False,
+        dir_okay=False),
+    help="Файл для обработки.\nМожет использоваться несколько раз",
+    multiple=True,
+    required=False,
+    metavar="<FILE> ... <FILE>",
+    default=None
+)
+@option(
+    "-d", "--dir", "directory",
+    type=ClickPath(
+        exists=True,
+        file_okay=False,
+        resolve_path=True,
+        allow_dash=False,
+        dir_okay=True),
+    help="Директория для обработки",
+    multiple=False,
+    required=False,
+    metavar="<DIR>",
+    default=None
+)
+@option(
+    "--recursive/--no-recursive",
+    type=BOOL,
+    is_flag=True,
+    help="Флаг рекурсивного поиска файлов.\nПо умолчанию: True",
+    show_default=True,
+    required=False,
+    default=True)
 @help_option(
     "-h", "--help",
     help=HELP,
     is_eager=True)
-def repair_svg_command():
-    """"""
+@pass_context
+def repair_svg_command(
+        ctx: Context,
+        files: Iterable[str | Path] = None,
+        directory: str | Path = None,
+        recursive: bool = True):
+    files: list[str | Path] | None = get_files(files, directory, recursive)
 
+    if files is None:
+        pause(PRESS_ENTER_KEY)
+        ctx.exit(0)
 
+    FOREIGN_OBJECT: str = "<foreignObject.*?</foreignObject>"
+    TEXT: str = (
+        "<a\s?transform=\"translate(0,-5)\"\s?xlink:href=\"https://www.drawio.com/doc/faq/svg-export-text-problems"
+        "\".*?</a>")
+    FEATURES: str = "<g>\s?<g\s?requiredFeatures=\"http://www.w3.org/TR/SVG11/feature#Extensibility\"/>\s?</g>"
+
+    for file in files:
+        file: Path = Path(file).expanduser().resolve()
+
+        if not file.exists(follow_symlinks=True):
+            echo(f"Указан не существующий файл {file}")
+            continue
+
+        elif not file.is_file():
+            echo(f"Путь {file} указывает не на файл")
+            continue
+
+        elif file.suffix != ".svg":
+            echo(f"Указанный файл {file.name} имеет расширение не SVG")
+            continue
+
+        else:
+            try:
+                with open(file, "rb") as fr:
+                    svg: str = fr.read().decode()
+
+                svg: str = sub(TEXT, "", svg, flags=DOTALL | MULTILINE)
+                svg: str = sub(FOREIGN_OBJECT, "", svg, flags=DOTALL | MULTILINE)
+                svg: str = sub(FEATURES, "", svg, flags=DOTALL | MULTILINE)
+                svg: str = svg.replace("switch>", "g>")
+
+                with open(file, "wb") as fw:
+                    fw.write(svg.encode())
+
+                logger.info(f"Файл {file.name} успешно обработан")
+
+            except PermissionError:
+                logger.error(f"Недостаточно прав для чтения/записи в файл {file.name}")
+                continue
+
+            except RuntimeError:
+                logger.error(f"Истекло время чтения/записи файл {file.name}")
+                continue
+
+            except OSError as e:
+                logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+                continue
+
+    pause(PRESS_ENTER_KEY)
+    ctx.exit(0)

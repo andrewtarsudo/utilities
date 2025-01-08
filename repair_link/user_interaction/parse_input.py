@@ -5,9 +5,10 @@ from sys import platform
 
 from loguru import logger
 
+from common.constants import PRESS_ENTER_KEY
+from common.custom_logger import custom_logging
 from repair_link.general.const import prog, version
-from repair_link.general.custom_logger import configure_custom_logging
-from repair_link.user_interaction.const import InputUser, PRESS_ENTER_KEY
+from repair_link.user_interaction.const import InputUser
 
 _python: str = "python3" if not platform.startswith("win") else "py"
 usage: str = (
@@ -79,7 +80,7 @@ else:
 
 
 @logger.catch
-@configure_custom_logging("link_repair")
+@custom_logging("link_repair")
 def parse_command_line() -> InputUser | None:
     """
     The generation of the user input parser.
@@ -204,10 +205,10 @@ def parse_command_line() -> InputUser | None:
             return input_user
 
     except ArgumentError as exc:
-        logger.critical(f"{exc.__class__.__name__}, {exc.argument_name}\n{exc.message}")
+        logger.error(f"{exc.__class__.__name__}, {exc.argument_name}\n{exc.message}")
         input(PRESS_ENTER_KEY)
         exit(-1)
 
     except KeyboardInterrupt:
-        logger.critical("Работа программы прекращена")
+        logger.error("Работа программы прекращена")
         exit(-2)

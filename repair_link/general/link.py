@@ -23,16 +23,12 @@ class _LinkType(Enum):
 
 class Link(NamedTuple):
     # noinspection PyUnresolvedReferences
-    """
-    The link from the file leading to the other file in the same directory.
+    """Class to represent the link from the file leading to the other file in the same directory.
 
-    Attributes
-    ----------
-    from_file : str or Path
-        The path to the file containing the link.
-    link_to : str
-        The text of the link given in curly brackets.
-
+    :param from_file: The path to the file containing the link.
+    :type from_file: str or Path
+    :param link_to: The text of the link given in curly brackets.
+    :type link_to: str
     """
     from_file: StrPath
     link_to: str
@@ -47,10 +43,7 @@ class Link(NamedTuple):
         return "#" in self.link_to
 
     def origin_destination_path(self) -> Path:
-        """
-        The origin path to the destination file from the link.
-
-        """
+        """Gets the origin path to the destination file from the link."""
         if self.from_type in (_LinkType.DIRINDEX_TYPE, _LinkType.DIR_INDEX_TYPE):
             _real_link_to_file: str = f"../{self.link_to_file}"
 
@@ -61,46 +54,30 @@ class Link(NamedTuple):
 
     @property
     def anchor(self) -> str | None:
-        """
-        The anchor from the link if any.
-
-        """
+        """Gets the anchor from the link if any."""
         return self.link_to.rsplit("#", 1)[-1].removesuffix("/") if bool(self) else None
 
     @property
     def stem(self) -> str:
-        """
-        The origin stem of the path to the destination file from the link.
-
-        """
+        """Gets the origin stem of the path to the destination file from the link."""
         return self.origin_destination_path().name.removesuffix(MD_EXTENSION).removesuffix(ADOC_EXTENSION)
 
     @property
     def parent_stem(self) -> str:
-        """
-        The stem of the destination file parent from the link.
-
-        """
+        """Gets the stem of the destination file parent from the link."""
         return self.origin_destination_path().parent.name
 
     @property
     def grandparent_stem(self) -> str:
-        """
-        The stem of the destination file grandparent from the link.
-
-        """
+        """Gets the stem of the destination file grandparent from the link."""
         return self.origin_destination_path().parent.parent.name
 
     @property
     def from_type(self) -> _LinkType:
-        """
-        The category of the link.
+        """Gets the category of the link.
 
-        Returns
-        -------
-        _LinkType
-            The type of the link based on the extension and index/_index files.
-
+        :rtype: _LinkType
+        :return: The type of the link based on the extension and index/_index files.
         """
         if self.from_file.suffix not in (MD_EXTENSION, ADOC_EXTENSION):
             return _LinkType.IMAGE_TYPE
@@ -116,34 +93,20 @@ class Link(NamedTuple):
 
     @property
     def link_to_file(self) -> str:
-        """
-        The link to the file with no anchor.
-
-        """
+        """Gets the link to the file with no anchor."""
         return self.link_to.rsplit("#", 1)[0].removesuffix("/") if bool(self) else self.link_to.removesuffix("/")
 
     @property
     def is_component(self) -> bool:
-        """
-        The flag of the original file to be in the 'components' directory.
-
-        Returns
-        -------
-        bool
-
-        """
+        """Gets the flag of the original file to be in the 'components' directory."""
         return "components" in self.from_file.parts
 
     @property
     def component_name(self) -> str | None:
-        """
-        The name of the component the file is located in.
+        """Gets the name of the component the file is located in.
 
-        Returns
-        -------
-        str or None
-            The component name if any, otherwise, None.
-
+        :return: The component name if any, otherwise, None.
+        :rtype: str or None
         """
         if self.is_component:
             _: tuple[str, ...] = self.from_file.parts

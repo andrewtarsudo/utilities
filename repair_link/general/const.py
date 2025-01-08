@@ -16,10 +16,6 @@ ADOC_EXTENSION: str = ".adoc"
 _parent_path: Path = Path.home().joinpath("Desktop")
 log_folder: Path = _parent_path.joinpath("_logs/")
 result_file_path: Path = Path.cwd().joinpath(f"results.txt")
-_error_head: str = "---------- Не исправлено автоматически ----------\n"
-_error_tail: str = "\n-------------------------------------------------\n"
-_warning_head: str = "! "
-_warning_tail: str = " !\n"
 prog: str = "link_repair"
 version: str = f"{prog}, {_version()} prod"
 # ---------- General constants ---------- #

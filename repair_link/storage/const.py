@@ -9,18 +9,11 @@ from repair_link.general.const import StrPath
 
 
 def unique(values: Iterable[Any] = None) -> list[Any]:
-    """
-    Getting unique values from the iterable instance.
+    """Gets unique values from the iterable instance.
 
-    Parameters
-    ----------
-    values : Iterable, default=None
-
-    Returns
-    -------
-    tuple
-        The unique values.
-
+    :type values: Iterable, default=None
+    :return: The unique values.
+    :rtype: list
     """
     if values is None:
         logger.info("Перечень значений для поиска уникальных пуст")

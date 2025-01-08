@@ -1,0 +1,193 @@
+= Руководство для list_files.py
+:experimental:
+:icons: font
+:source-highlighter: rouge
+:imagesdir: images
+:figure-caption: Рисунок
+:stylesdir: ../css
+:stylesheet: default.css
+:nofooter:
+:toc: auto
+:toc-title: Содержание
+
+tl;dr Чтобы запустить, необходимо выполнить в командной строке:
+
+[source,shell]
+----
+$ py list_files.py <path_to_project>/content/common
+----
+
+== Описание
+
+Скрипт выводит все файлы, находящиеся в директории.
+
+В результате отображается список всех файлов, удовлетворяющих требованиям фильтра.
+
+[source,console]
+----
+Файлы в директории C:\Users\tarasov-a\PycharmProjects\Protei_MME\content\common\logging\:
+- content/common/logging/edr/connect.en.adoc
+- content/common/logging/edr/dedicated_bearer.en.adoc
+- content/common/logging/edr/diam.en.adoc
+- content/common/logging/edr/enodeb.en.adoc
+- content/common/logging/edr/error_code.en.adoc
+- content/common/logging/edr/gtp_c.en.adoc
+- content/common/logging/edr/gtp_c_overload.en.adoc
+- content/common/logging/edr/http.en.adoc
+- content/common/logging/edr/irat_handover.en.adoc
+- content/common/logging/edr/lte_handover.en.adoc
+- content/common/logging/edr/paging.en.adoc
+- content/common/logging/edr/reject.en.adoc
+- content/common/logging/edr/s1ap.en.adoc
+- content/common/logging/edr/s1ap_context.en.adoc
+- content/common/logging/edr/s1ap_overload.en.adoc
+- content/common/logging/edr/sgsap.en.adoc
+- content/common/logging/edr/sgsap_overload.en.adoc
+- content/common/logging/edr/tau.en.adoc
+- content/common/logging/edr/_index.en.adoc
+- content/common/logging/_index.en.adoc
+----
+
+== Для чего нужно?
+
+Изначально скрипт написан для удобства создания файла `PDF_*.yml`, необходимого для генерации PDF. +
+Однако возможно использовать и для любых других целей, задав соответствующие опции.
+
+== Как запустить?
+
+Запускается так же, как и любые другие скрипты:
+
+[source,shell]
+----
+$ py <path/to/list_files.py> <OPTIONS> // <1> <2>
+----
+
+<1> path/to/list_files.py -- путь до скрипта `list_files.py`
+<2> OPTIONS -- опции скрипта
+
+=== Опции скрипта
+
+NOTE: Здесь предполагается, что скрипт находится в директории, откуда запускается, +
+т.е. `<path/to/list_files.py>` -> `list_files.py`.
+
+[source,console]
+----
+Использование: py list_files.py ROOT_DIR
+[ -d/--ignored-dirs DIRNAME | --all-dirs ]
+[ -e/--extensions 'EXTENSION EXTENSION' | --all-ext ]
+[ -f/--ignored-files FILE | --all-files ]
+[ -l/--language LANGUAGE | --all-langs ]
+[ -p/--prefix PREFIX ]
+[ --hidden/--no-hidden ]
+[ --recursive/--no-recursive ]
+[ -v/--version ]
+[ -h/--help ]
+
+Вывод файлов в директории
+
+Обязательные параметры:
+  root_dir              Путь до директории.
+                        По умолчанию: текущая директория.
+
+Опциональные параметры:
+  -d [IGNORED_DIRS ...], --ignore-dirs [IGNORED_DIRS ...]
+                        Перечень игнорируемых директорий.
+                        Может использоваться несколько раз.
+                        По умолчанию: _temp_folder, _temp_storage, private.
+  --all-dirs            Флаг обработки всех директорий.
+                        По умолчанию: False.
+  -e [EXTENSIONS], --extensions [EXTENSIONS]
+                        Обрабатываемые типы файлов.
+                        Задаются перечислением, разделяемые пробелом.
+                        По умолчанию: md adoc.
+  --all-ext             Флаг обработки всех файлов.
+                        По умолчанию: True.
+  -f [IGNORED_FILES ...], --ignore-files [IGNORED_FILES ...]
+                        Перечень игнорируемых файлов.
+                        Может использоваться несколько раз.
+                        По умолчанию: README, _check_list.
+  --all-files           Флаг обработки всех файлов.
+                        По умолчанию: False.
+  -l [LANGUAGE], --language [LANGUAGE]
+                        Язык файлов.
+                        По умолчанию: ''.
+  --all-langs           Флаг обработки файлов всех языков.
+                        По умолчанию: True.
+  -p [PREFIX], --prefix [PREFIX]
+                        Префикс, добавляемый к названиям файлов.
+                        По умолчанию: ''.
+  --hidden, --no-hidden
+                        Флаг поиска скрытых файлов.
+                        По умолчанию: False.
+  --recursive, --no-recursive
+                        Флаг рекурсивного поиска файлов.
+                        По умолчанию: True.
+  -v, --version         Показать версию скрипта и завершить работу.
+  -h, --help            Показать справку и завершить работу.
+----
+
+* [[dirs]]`--all-dirs` -- флаг обработки всех директорий.
+По умолчанию: False.
+Взаимоисключает опцию <<d,-d/--ignore-dirs>>.
+* [[ext]]`--all-ext` -- флаг обработки всех файлов.
+По умолчанию: False.
+Взаимоисключает опцию <<e,-e/--extensions>>.
+* [[files]]`--all-files` -- флаг обработки всех файлов.
+По умолчанию: False.
+Взаимоисключает опцию <<f,-f/--ignore-files>>.
+* [[langs]]`--all-langs` -- флаг обработки файлов всех языков.
+По умолчанию: True.
+Взаимоисключает опцию <<l,-l/--language>>.
+* [[d]]`-d`/`--ignore-dirs` -- название директории, которую необходимо проигнорировать.
+Для задания набора значений опцию можно использовать несколько раз.
+По умолчанию: `_temp_folder, private`.
+Взаимоисключает опцию <<dirs,--all-dirs>>.
+* [[e]]`-e`/`--extensions` -- набор искомых расширений файла в виде строки.
+Для задания нескольких значений необходимо указать их, разделяя пробелом, при этом заключить все значения в кавычки.
+По умолчанию: `"md adoc"`.
+Взаимоисключает опцию <<ext,--all-ext>>.
+* [[f]]`-f`/`--ignore-files` -- название файла, которое необходимо проигнорировать.
+Для задания набора значений опцию можно использовать несколько раз.
+По умолчанию: `README, _check_list`.
+Взаимоисключает опцию <<files,--all-files>>.
+* [[l]]`-l`/`--language` -- аббревиатура языка из двух букв, требуемого для файлов.
+По умолчанию: `ru`.
+Взаимоисключает опцию <<langs,--all-langs>>.
+* `-p`/`--prefix` -- префикс, добавляемый к началу пути до файла.
+По умолчанию: ``.
+* `--hidden` | `--no-hidden` -- флаг поиска скрытых файлов.
+По умолчанию: `--no-hidden`.
+* `--recursive` | `--no-recursive` -- флаг рекурсивного поиска файлов.
+По умолчанию: `--recursive`.
+* `-v`/`--version` -- отображение версии скрипта и завершение работы скрипта.
+Не сочетается ни с какими другими опциями.
+* `-h`/`--help` -- отображение справочной информации и завершение работы скрипта.
+Не сочетается ни с какими другими опциями.
+
+=== Как использовать?
+
+NOTE: Хотя `ROOT_DIR` является обязательным параметром, его можно опустить, если файл скрипта находится в той же директории, что и требуемая.
+
+Если директория не указана, то будет использоваться та, из которой был вызван скрипт в командной строке.
+
+Поэтому предлагается следующее решение как самое простое:
+
+. Загрузить скрипт по https://gitlab.com/tech_writers_protei/scripts/-/raw/main/scripts/list_files.py[ссылке].
+. Перенести его в ту же директорию, где находятся все проекты `PycharmProjects` или `IdeaProjects`.
++
+NOTE: Как правило, это директория `С:\Users\<login>\`.
++
+. При необходимости проверить YAML-файл в проекте, воспользоваться встроенной консолью IDE.
++
+.Иконка консоли
+image::find_console.png[align="center",width=960]
++
+.Консоль в IDE
+image::console_ide.png[align="center",width=960]
++
+. Перейти в директорию проекта, если текущее местоположение от него отличается, с помощью команды `cd`.
+. В консоли указать команду `py ..\list_files.py`.
+
+TIP: Чтобы удобно и быстро получить путь до файла, можно выполнить следующие шаги:
+
+include::partials/get_path.adoc[]

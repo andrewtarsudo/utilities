@@ -92,60 +92,45 @@ class AnchorInspector:
 
     @property
     def dict_en_files(self) -> dict[TextFile, list[str]]:
-        """
-        The files in English.
+        """Gets the files in English.
 
-        Returns
-        -------
-        dict[TextFile, list[str]]
-            The dictionary of English files and their anchors.
-
+        :return: The dictionary of English files and their anchors.
+        :rtype: dict[TextFile, list[str]]
         """
         return {k: v for k, v in self._dict_anchors.items() if k.language == FileLanguage.EN}
 
     def _get_files(self, language: FileLanguage) -> dict[TextFile, list[str]]:
-        """
-        Internal method to get only necessary files.
+        """Gets only necessary files.
 
-        Attributes
-        ----------
-        language : FileLanguage
-            The language of the text files.
-
-        Returns
-        -------
-        dict[TextFile, list[str]]
-            The dictionary of the text files and their anchors.
-
+        :param language: The language of the text files.
+        :type language: FileLanguage
+        :return: The dictionary of the text files and their anchors.
+        :rtype: dict[TextFile, list[str]]
         """
         if language == FileLanguage.RU:
             return self.dict_ru_files
+
         elif language == FileLanguage.EN:
             return self.dict_en_files
+
         else:
             return self._dict_anchors
 
     def _find_files(self, anchor: str, language: FileLanguage) -> list[TextFile]:
-        """
-        Finds the files having the specified anchor.
+        """Finds the files having the specified anchor.
 
-        Attributes
-        ----------
-        anchor : str
-            The anchor to find in the files.
-
-        Returns
-        -------
-        list[str]
-            The list of files having the specified anchor.
-
+        :param anchor: The anchor to find in the files.
+        :type anchor: str
+        :return: The list of files having the specified anchor.
+        :rtype: list[str]
         """
         return [k for k, v in self._get_files(language).items() if anchor in v]
 
     def inspect_inside_file(self, language: FileLanguage):
-        """
-        Inspects anchors inside each file.
+        """Inspects anchors inside each file.
 
+        :param language: The language of the file.
+        :type language: FileLanguage
         """
         for file, anchors in self._get_files(language).items():
             counter: Counter[str] = Counter(anchors)
@@ -161,21 +146,20 @@ class AnchorInspector:
                     result=True)
 
     def all_anchors(self, language: FileLanguage) -> list[str]:
-        """
-        Gets all anchors.
+        """Gets all anchors.
 
-        Returns
-        -------
-        list[str]
-            The list of all anchors in all files.
-
+        :param language: The language of the file.
+        :type language: FileLanguage
+        :return: The list of all anchors in all files.
+        :rtype: list[str]
         """
         return [anchor for k, v in self._get_files(language).items() for anchor in v]
 
     def inspect_all_files(self, language: FileLanguage):
-        """
-        Inspects anchors through all files.
+        """Inspects anchors through all files.
 
+        :param language: The language of the file.
+        :type language: FileLanguage
         """
         counter: Counter = Counter(self.all_anchors(language))
         _invalid_anchors: list[str] = [k for k, v in counter.items() if v > 1]
@@ -193,6 +177,7 @@ class AnchorInspector:
                 for file in self._find_files(_invalid_anchor, language):
                     _from: str = _invalid_anchor
 
+                    file: TextFile
                     if file not in self._dict_changes:
                         self._dict_changes[file] = []
 

@@ -1,0 +1,215 @@
+# -*- coding: utf-8 -*-
+from bisect import bisect_left, bisect
+from pathlib import Path
+from typing import Iterable
+
+from loguru import logger
+from more_itertools import pairwise, flatten
+
+from terms.const import _header_pattern, read_lines_file
+from terms.custom_exceptions import AsciiDocFileTableRowIndexError, InvalidTermIndexError, EmptyFileError
+from terms.table import TableItem, _Term, TableCellCoordinate
+
+
+class AsciiDocTableTerms:
+    def __init__(self, lines: Iterable[str] = None):
+        self._content: list[str] = [*lines]
+        self._items: dict[TableCellCoordinate, TableItem] = dict()
+        self._dict_terms: dict[str, tuple[_Term, ...]] = dict()
+        self._header: list[str] = []
+        self._dict_positions: dict[str, int | list[int]] = dict()
+
+    @classmethod
+    def from_file(cls, file_path: str | Path):
+        _content: list[str] = read_lines_file(file_path)
+
+        if not _content or len(_content) < 6:
+            raise EmptyFileError
+
+        lines: list[str] = _content[6:-1]
+        return cls(lines)
+
+    def __str__(self):
+        return f"{self._content}"
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}>({self._items.items()})"
+
+    def set_terms(self):
+        _: list[_Term] = [_Term(*self._get_row_item(row_index)) for row_index in range(self.max_row)]
+        _dict_proxy: dict[str, list[_Term]] = dict()
+
+        for term in _:
+            term_short: str = term.short
+
+            if term_short not in _dict_proxy:
+                _dict_proxy[term_short] = []
+
+            _dict_proxy[term_short].append(term)
+
+        _dict_terms: dict[str, tuple[_Term, ...]] = {k.upper(): (*v,) for k, v in _dict_proxy.items()}
+        self._dict_terms.update(**_dict_terms)
+        logger.debug("Terms are parsed")
+        return
+
+    def __getitem__(self, item):
+        if isinstance(item, str):
+            return self._binary_search(item.upper())
+
+        elif isinstance(item, int):
+            _term_short: str | None = self._index_to_key(item)
+
+            if _term_short is not None:
+                return self._dict_terms.get(_term_short)
+
+            else:
+                logger.error(f"Термин с индексом {item} не найден")
+                raise InvalidTermIndexError
+
+        else:
+            logger.debug(f"Термин {item} не найден")
+            return _Term(),
+
+    def get(self, item):
+        return self.__getitem__(item)
+
+    def __contains__(self, item):
+        if isinstance(item, str):
+            return item in self._dict_terms
+
+        else:
+            return False
+
+    def __len__(self):
+        return len(self._dict_terms)
+
+    def __iter__(self):
+        return iter(self._dict_terms)
+
+    @property
+    def _keys(self):
+        return list(iter(self))
+
+    def _index_to_key(self, index: int | None):
+        return self._keys[index] if index is not None else None
+
+    def terms_short(self) -> tuple[str, ...]:
+        return tuple(map(lambda x: x.upper(), self._dict_terms.keys()))
+
+    def _binary_search(
+            self,
+            search_value: str,
+            min_index: int = 0,
+            max_index: int = None) -> tuple[_Term, ...]:
+        """
+        Specifies the binary search to accelerate the common one.
+
+        :param str search_value: the value to search
+        :param int min_index: the lower bound, default = 0
+        :param max_index: the higher bound, default = len(values)
+        :return: the searched value position in the list if the value is in the list.
+        :rtype: tuple[_Term, ...]
+        """
+        if max_index is None:
+            max_index: int = len(self)
+
+        _index: int = bisect_left(self._keys, search_value, min_index, max_index)
+        _term_short: str = self._index_to_key(_index)
+
+        if _index != max_index and _term_short == search_value:
+            return self._dict_terms.get(_term_short)
+
+        else:
+            return _Term()
+
+    def _get_row_item(self, row_index: int) -> list[str | None]:
+        return [v.text for v in self._get_row(row_index)]
+
+    def _get_row(self, row_index: int) -> list[TableItem]:
+        if row_index > self.max_row:
+            logger.error(f"Индекс строки {row_index} превышает максимально возможное значение")
+            raise AsciiDocFileTableRowIndexError
+
+        else:
+            return [v for k, v in self._items.items() if k.row_index == row_index]
+
+    @property
+    def max_row(self) -> int:
+        return max(_.row_index for _ in self._items.keys())
+
+    def _find_header(self) -> int:
+        for index, line in enumerate(iter(self._content)):
+            if _header_pattern.fullmatch(line):
+                return index
+
+        else:
+            return 2
+
+    def complete(self):
+        header_line: str = self._content[self._find_header()]
+        _: list[str] = header_line.split("|")
+        self._header = [line.strip() for line in _ if line]
+
+        _empty: list[int] = [index for index, line in enumerate(self._content) if not line]
+
+        for row_index, (_from, _to) in enumerate(pairwise(_empty[1:-1])):
+            lines: list[str] = [content.strip("\n") for content in self._content[_from + 1:_to]]
+            _: list[str] = "".join(lines).split("|")
+
+            for column_index, text in enumerate(_[1:]):
+                _key: TableCellCoordinate = TableCellCoordinate(row_index, column_index)
+                _value: TableItem = TableItem(row_index, column_index, text.strip("|"))
+                self._items[_key] = _value
+
+        logger.debug(f"Dictionary of the {self.__class__.__name__} class has been initialized")
+        return
+
+    @property
+    def dict_terms(self):
+        return self._dict_terms
+
+    def set_dict_positions(self):
+        term: _Term
+        for index, term in enumerate(flatten(self._dict_terms.values())):
+            if (_short := term.short) not in self._dict_positions.keys():
+                self._dict_positions[_short] = []
+            self._dict_positions[_short].append(index)
+
+        for k, v in self._dict_positions.items():
+            if len(v) == 1:
+                self._dict_positions[k] = v[0]
+
+        return
+
+    def dict_positions(self):
+        return self._dict_positions
+
+    def _get_first(self, item: str):
+        values: int | list[int] | None = self._dict_positions.get(item)
+
+        if isinstance(values, int):
+            return values
+
+        elif isinstance(values, list):
+            return values[0]
+
+        else:
+            return None
+
+    def get_positions(self, short: str) -> int | list[int] | None:
+        if short in self._keys:
+            return self._dict_positions.get(short)
+
+        else:
+            logger.error(f"Термин {short} не найден")
+            return None
+
+    def find_position(self, short: str):
+        if short in self._keys:
+            return self._get_first(short)
+
+        else:
+            return bisect(self._keys, short)
+
+    def find_item_before(self, short):
+        return self.get(self.find_position(short))

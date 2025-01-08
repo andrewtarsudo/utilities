@@ -94,19 +94,12 @@ class InternalLinkInspector:
             raise FileInvalidTypeError
 
     def modified_anchor(self, anchor: str) -> str | None:
-        """
-        The possible modified original anchor.
+        """Gets the possible modified original anchor.
 
-        Attributes
-        ----------
-        anchor : str
-            The original anchor from the link.
-
-        Returns
-        -------
-        str
-            The modified anchor found in the file.
-
+        :param anchor: The original anchor from the link.
+        :type anchor: str
+        :return: The modified anchor found in the file.
+        :rtype: str
         """
         for _modified_anchor in _iter_internal_options(anchor):
             if _modified_anchor in self._text_file.iter_anchors():
@@ -116,36 +109,25 @@ class InternalLinkInspector:
 
     @property
     def _dir_file_anchors(self) -> set[str]:
-        """
-        The anchors in the file.
+        """Gets anchors in the file.
 
-        Returns
-        -------
-        set[str]
-            The found anchors in the file as is.
-
+        :return: The found anchors in the file as is.
+        :rtype: set[str]
         """
         return set(self._text_file.iter_anchors())
 
     def _missing_anchors(self) -> set[str]:
-        """
-        The anchors that are not found in the file.
+        """Gets the anchors not found in the file.
 
-        Returns
-        -------
-        set[str]
-            The bad internal links in the file.
-
+        :return: The bad internal links in the file.
+        :rtype: set[str]
         """
         _link_anchors: set[str] = set(self._text_file.iter_internal_link_anchors())
 
         return _link_anchors.difference(self._dir_file_anchors)
 
     def inspect_links(self):
-        """
-        The validation and update of the internal links.
-
-        """
+        """Validates and updates the internal links."""
         if not self._missing_anchors():
             logger.debug("All internal links and anchors are valid")
             return

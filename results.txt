@@ -1,0 +1,18 @@
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:204 - invoke
+2025-01-06 02:31:59.340 | INFO     | scripts.cli:resolve_command:205 - args=['list-files', '--recursive', './scripts/']
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:214 - cmd_name='list-files'
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <Argument root_dir>
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <MutuallyExclusiveOption ignored_dirs>
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <MutuallyExclusiveOption all_dirs>
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <MutuallyExclusiveOption ignored_files>
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <MutuallyExclusiveOption all_files>
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <MutuallyExclusiveOption extensions>
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <MutuallyExclusiveOption all_extensions>
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <MutuallyExclusiveOption language>
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <MutuallyExclusiveOption all_languages>
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <MutuallyExclusiveOption prefix>
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <Option hidden>
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <Option recursive>
+2025-01-06 02:31:59.340 | ERROR    | scripts.cli:resolve_command:217 - <HelpOption help>
+2025-01-06 02:31:59.340 | DEBUG    | scripts.cli:command_line_interface:353 - Команда: __main__.py
+

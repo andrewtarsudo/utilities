@@ -1,0 +1,7 @@
+# -*- coding: utf-8 -*-
+
+validate-yaml:
+  yaml_file: "Путь до файла PDF_*.yml"
+
+list-files:
+  root_dir: "Путь до директории.\nПо умолчанию: текущая директория"

@@ -5,16 +5,12 @@ from repair_link.general.link import Link
 
 
 class _InternalLink(NamedTuple):
-    """
-    The link to the anchor in the same file.
+    """Class to represent the link to the anchor in the same file.
 
-    Attributes
-    ----------
-    index : int
-        The index of the line in the file.
-    anchor : str
-        The anchor in the link.
-
+    :param index: The index of the line in the file.
+    :type index: int
+    :param anchor: The anchor in the link.
+    :type anchor: str
     """
     index: int
     anchor: str

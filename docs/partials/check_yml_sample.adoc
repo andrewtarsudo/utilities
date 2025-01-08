@@ -1,0 +1,12 @@
+[source#green-bg,console]
+----
+127 content/common/logging/stat/MME_s11_Interface.md.......................OK // <1>
+----
+
+[source#red-bg,console]
+----
+132 content/common/logging/stat/MME_interface.md.......................NOT OK // <2>
+----
+
+<1> Путь корректный, файл по такому пути найден
+<2> Путь некорректный, файл по такому пути не найден

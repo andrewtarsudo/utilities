@@ -1,332 +1,307 @@
 # -*- coding: utf-8 -*-
-from argparse import ArgumentError, ArgumentParser, BooleanOptionalAction, Namespace, OPTIONAL, RawTextHelpFormatter, \
-    SUPPRESS
+from collections.abc import Iterable
 from glob import iglob
 from pathlib import Path
 
+from click.core import Context
+from click.decorators import argument, help_option, option, pass_context
+from click.termui import pause
+from click.types import BOOL, Path as ClickPath, STRING
+from click.utils import echo
+
+from common.constants import HELP, PRESS_ENTER_KEY
+from scripts.cli import APIGroup, command_line_interface, MutuallyExclusiveOption
+
 NAME: str = Path(__file__).name
-STOP: str = "\nНажмите любую клавишу для завершения скрипта ...\n"
 
 
-def parse():
-    arg_parser: ArgumentParser = ArgumentParser(
-        prog="list_files",
-        usage=f"py {NAME} <ROOT_DIR>"
-              f" [ -d/--ignored-dirs <DIRNAME> | --all-dirs ]"
-              f" [ -e/--extensions '<EXTENSION> <EXTENSION>' | --all-ext ]"
-              f" [ -f/--ignored-files <FILE> | --all-files ]"
-              f" [ -l/--language <LANGUAGE> | --all-langs ]"
-              f" [ -p/--prefix <PREFIX> ]"
-              f" [ --hidden/--no-hidden ]"
-              f" [ --recursive/--no-recursive ]"
-              f" [ -v/--version ] [ -h/--help ]",
-        description="Вывод файлов в директории",
-        epilog="",
-        add_help=False,
-        allow_abbrev=False,
-        exit_on_error=False,
-        formatter_class=RawTextHelpFormatter
-    )
-
-    arg_parser.add_argument(
-        action="store",
-        nargs=OPTIONAL,
-        type=str,
-        default=None,
-        help="Путь до директории.\nПо умолчанию: текущая директория.",
-        dest="root_dir"
-    )
-
-    _dirs = arg_parser.add_mutually_exclusive_group()
-
-    _dirs.add_argument(
-        "-d", "--ignore-dirs",
-        action="extend",
-        default=SUPPRESS,
-        required=False,
-        help="Перечень игнорируемых директорий.\nМожет использоваться несколько раз.\n"
-             "По умолчанию: _temp_folder, _temp_storage, private.",
-        dest="ignored_dirs"
-    )
-
-    _dirs.add_argument(
-        "--all-dirs",
-        action="store_true",
-        default=SUPPRESS,
-        help="Флаг обработки всех директорий.\nПо умолчанию: False.",
-        dest="all_dirs"
-    )
-
-    _suffixes = arg_parser.add_mutually_exclusive_group()
-
-    _suffixes.add_argument(
-        "-e", "--extensions",
-        action="store",
-        default=SUPPRESS,
-        required=False,
-        help="Обрабатываемые типы файлов.\nЗадаются перечислением, разделяемые пробелом.\n"
-             "По умолчанию: md adoc.",
-        dest="extensions"
-    )
-
-    _suffixes.add_argument(
-        "--all-ext",
-        action="store_true",
-        default=SUPPRESS,
-        help="Флаг обработки всех файлов.\nПо умолчанию: True.",
-        dest="all_extensions"
-    )
-
-    _files = arg_parser.add_mutually_exclusive_group()
-
-    _files.add_argument(
-        "-f", "--ignore-files",
-        action="extend",
-        default=SUPPRESS,
-        required=False,
-        help="Перечень игнорируемых файлов.\nМожет использоваться несколько раз.\n"
-             "По умолчанию: README, _check_list.",
-        dest="ignored_files"
-    )
-
-    _files.add_argument(
-        "--all-files",
-        action="store_true",
-        default=SUPPRESS,
-        help="Флаг обработки всех файлов.\nПо умолчанию: False.",
-        dest="all_files"
-    )
-
-    _languages = arg_parser.add_mutually_exclusive_group()
-
-    _languages.add_argument(
-        "-l", "--language",
-        action="store",
-        nargs=OPTIONAL,
-        default=SUPPRESS,
-        required=False,
-        help="Язык файлов.\nПо умолчанию: ''.",
-        dest="language"
-    )
-
-    _languages.add_argument(
-        "--all-langs",
-        action="store_true",
-        default=SUPPRESS,
-        help="Флаг обработки файлов всех языков.\nПо умолчанию: True.",
-        dest="all_languages"
-    )
-
-    arg_parser.add_argument(
-        "-p", "--prefix",
-        action="store",
-        default=SUPPRESS,
-        required=False,
-        help="Префикс, добавляемый к названиям файлов.\nПо умолчанию: ''.",
-        dest="prefix"
-    )
-
-    arg_parser.add_argument(
-        "--hidden",
-        action=BooleanOptionalAction,
-        default=SUPPRESS,
-        required=False,
-        help="Флаг поиска скрытых файлов.\nПо умолчанию: False.",
-        dest="include_hidden"
-    )
-
-    arg_parser.add_argument(
-        "--recursive",
-        action=BooleanOptionalAction,
-        default=SUPPRESS,
-        required=False,
-        help="Флаг рекурсивного поиска файлов.\nПо умолчанию: True.",
-        dest="recursive"
-    )
-
-    arg_parser.add_argument(
-        "-v", "--version",
-        action="version",
-        version="1.0.0",
-        help="Показать версию скрипта и завершить работу."
-    )
-
-    arg_parser.add_argument(
-        "-h", "--help",
-        action="help",
-        default=SUPPRESS,
-        help="Показать справку и завершить работу."
-    )
-
-    try:
-        args: Namespace = arg_parser.parse_args()
-
-        if hasattr(args, "help") or hasattr(args, "version"):
-            input(STOP)
-            return
-
-    except ArgumentError as exc:
-        print(f"\n{exc.__class__.__name__}, {exc.argument_name}\n{exc.message}")
-        input(STOP)
-        exit(1)
-
-    except KeyboardInterrupt:
-        input("\nРабота скрипта остановлена пользователем ...")
-        exit(2)
-
-    else:
-        return args
-
-
-def get_value(namespace: Namespace, attribute: str):
-    return getattr(namespace, attribute, None)
-
-
-def get_files(
-        root_dir: str | Path = None, *,
-        extensions: str = None,
-        all_extensions: bool | None = None,
-        ignored_files: list[str] = None,
-        all_files: bool | None = None,
-        ignored_dirs: list[str] = None,
-        all_dirs: bool | None = None,
-        recursive: bool = None,
-        include_hidden: bool = None,
-        language: str = None,
-        all_languages: bool | None = None,
-        prefix: str = None):
-
-    if root_dir is None:
-        root_dir: Path = Path.cwd()
-
-    else:
-        root_dir: Path = Path(root_dir).resolve()
+@command_line_interface.command(
+    "list-files",
+    cls=APIGroup,
+    help="Команда для вывода файлов в директории",
+    context_settings={"ignore_unknown_options": True},
+    invoke_without_command=True)
+@argument(
+    "root_dir",
+    type=ClickPath(
+        exists=True,
+        file_okay=False,
+        resolve_path=True,
+        path_type=Path,
+        dir_okay=True),
+    default=Path.cwd(),
+    nargs=1,
+    required=True,
+    is_eager=True
+)
+@option(
+    "-d", "--ignored-dirs", "ignored_dirs",
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["all_dirs"],
+    type=list[str],
+    help="Перечень игнорируемых директорий. Может использоваться несколько раз.\nПо умолчанию: _temp_folder, "
+         "_temp_storage, private",
+    multiple=True,
+    required=False,
+    metavar="<DIR> ... <DIR>",
+    show_default=True,
+    default=["_temp_folder", "_temp_storage", "private"]
+)
+@option(
+    "--all-dirs", "all_dirs",
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["ignored_dirs"],
+    type=BOOL,
+    help="Флаг обработки всех директорий.\nПо умолчанию: False",
+    multiple=False,
+    required=False,
+    show_default=True,
+    metavar="",
+    default=False
+)
+@option(
+    "-f", "--ignored-files", "ignored_files",
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["all_files"],
+    type=list[str],
+    help="Перечень игнорируемых файлов. Может использоваться несколько раз.\nПо умолчанию: README, _check_list",
+    multiple=True,
+    required=False,
+    metavar="<FILE> ... <FILE>",
+    show_default=True,
+    default=["README", "_check_list"]
+)
+@option(
+    "--all-files", "all_files",
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["ignored_files"],
+    type=BOOL,
+    help="Флаг обработки всех файлов.\nПо умолчанию: False",
+    multiple=False,
+    required=False,
+    show_default=True,
+    metavar="",
+    default=False
+)
+@option(
+    "-e", "--extensions", "extensions",
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["all_extensions"],
+    type=STRING,
+    help="Обрабатываемые типы файлов. Задаются перечислением, разделяемые пробелом.\nПо умолчанию: md adoc",
+    multiple=False,
+    required=False,
+    metavar="\"<EXT> ... <EXT>\"",
+    show_default=True,
+    default="md adoc"
+)
+@option(
+    "--all-ext", "all_extensions",
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["extensions"],
+    type=BOOL,
+    help="Флаг обработки файлов всех расширений.\nПо умолчанию: False",
+    multiple=False,
+    required=False,
+    show_default=True,
+    metavar="",
+    default=False
+)
+@option(
+    "-l", "--language", "language",
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["all_languages"],
+    type=STRING,
+    help="Язык файлов.\nПо умолчанию: \"\", все файлы независимо от языка",
+    multiple=False,
+    required=False,
+    metavar="<LANG>",
+    show_default=True,
+    default=""
+)
+@option(
+    "--all-langs", "all_languages",
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["language"],
+    type=BOOL,
+    help="Флаг обработки файлов всех языков.\nПо умолчанию: True",
+    multiple=False,
+    required=False,
+    show_default=True,
+    metavar="",
+    default=True
+)
+@option(
+    "-p", "--prefix", "prefix",
+    cls=MutuallyExclusiveOption,
+    type=STRING,
+    help="Префикс, добавляемый к названиям файлов.\nПо умолчанию: - content/common/",
+    multiple=False,
+    required=False,
+    metavar="<PFX>",
+    show_default=True,
+    default="- content/common/"
+)
+@option(
+    "--hidden/--no-hidden",
+    type=BOOL,
+    is_flag=True,
+    help="Флаг поиска скрытых файлов.\nПо умолчанию: False",
+    show_default=True,
+    required=False,
+    metavar="",
+    default=False)
+@option(
+    "--recursive/--no-recursive",
+    type=BOOL,
+    is_flag=True,
+    help="\Флаг рекурсивного поиска файлов.\nПо умолчанию: True",
+    show_default=True,
+    required=False,
+    metavar="",
+    default=True)
+@help_option(
+    "-h", "--help",
+    help=HELP,
+    is_eager=True)
+@pass_context
+def list_files_command(
+        ctx: Context,
+        root_dir: Path,
+        ignored_dirs: Iterable[str] = None,
+        all_dirs: bool = False,
+        ignored_files: Iterable[str] = None,
+        all_files: bool = False,
+        extensions: str = "md adoc",
+        all_extensions: bool = False,
+        language: str = "",
+        all_languages: bool = True,
+        prefix: str = "- content/common/",
+        hidden: bool = False,
+        recursive: bool = True,
+        auxiliary: bool = False):
+    ctx.params["root_dir"] = root_dir
 
     if extensions is None and all_extensions is None:
-        _parsed_extensions: list[str] = [".md", ".adoc"]
+        extensions: list[str] = [".md", ".adoc"]
 
     elif extensions is None:
-        _parsed_extensions: list[str] = []
+        extensions: list[str] = []
 
     elif all_extensions is None:
-        _parsed_extensions: list[str] = [
+        extensions: list[str] = [
             f".{extension.removeprefix('.')}"
             for extension in extensions.strip().split(" ")]
 
     else:
-        _parsed_extensions: list[str] = []
+        extensions: list[str] = []
+
+    ctx.params["extensions"] = extensions
 
     if ignored_files is None and all_files is None:
-        _parsed_ignored_files: list[str] = ["README", "_check_list"]
+        ignored_files: list[str] = ["README", "_check_list"]
 
     elif ignored_files is None or not ignored_files or ignored_files == [""]:
-        _parsed_ignored_files: list[str] = []
+        ignored_files: list[str] = []
 
     elif all_files is None and all_files is False:
-        _parsed_ignored_files: list[str] = [
+        ignored_files: list[str] = [
             ignored_file.split(".")[-1] for ignored_file in ignored_files]
 
     else:
-        _parsed_ignored_files: list[str] = []
+        ignored_files: list[str] = []
+
+    ctx.params["ignored_files"] = ignored_files
 
     if ignored_dirs is None and all_dirs is None:
-        _parsed_ignored_dirs: list[str] = ["_temp_folder", "private", "_temp_storage"]
+        ignored_dirs: list[str] = ["_temp_folder", "private", "_temp_storage"]
 
     elif ignored_dirs is None or not ignored_dirs or ignored_dirs == [""]:
-        _parsed_ignored_dirs: list[str] = []
+        ignored_dirs: list[str] = []
 
     elif all_dirs is None and all_dirs is False:
-        _parsed_ignored_dirs: list[str] = ignored_dirs
+        ignored_dirs: list[str] = [*ignored_dirs]
 
     else:
-        _parsed_ignored_dirs: list[str] = []
+        ignored_dirs: list[str] = []
 
-    if recursive is None:
-        recursive: bool = True
-
-    if include_hidden is None:
-        include_hidden: bool = False
+    ctx.params["ignored_dirs"] = ignored_dirs
+    ctx.params["recursive"] = recursive
+    ctx.params["hidden"] = hidden
 
     if language is None or language.lower() == "ru" or all_languages is True:
-        _parsed_language: str = ""
+        language: str = ""
 
     else:
-        _parsed_language: str = language.lower()
+        language: str = language.lower()
 
-    root_dir: Path = Path(root_dir)
+    ctx.params["language"] = language
 
     if prefix is None:
         grandparent, parent = root_dir.parts[-2], root_dir.parts[-1]
 
         if (grandparent, parent) == ("content", "common"):
             prefix: str = "- content/common/"
+
         else:
             prefix: str = ""
 
-    _results: list[str] = []
+    ctx.params["prefix"] = prefix
+    ctx.params["auxiliary"] = auxiliary
+
+    ctx.invoke(list_files_core)
+
+
+@pass_context
+def list_files_core(ctx: Context):
+    root_dir: Path = ctx.params["root_dir"]
+
+    ignored_dirs: list[str] = ctx.params["ignored_dirs"]
+    ignored_files: list[str] = ctx.params["ignored_files"]
+
+    extensions: list[str] = ctx.params["extensions"]
+    language: str = ctx.params["language"]
+    prefix: str = ctx.params["prefix"]
+
+    recursive: bool = ctx.params["recursive"]
+    include_hidden: bool = ctx.params["hidden"]
+
+    auxiliary: bool = ctx.params["auxiliary"]
+
+    results: list[str] = []
 
     for item in iglob(
-            "**/*", root_dir=Path(root_dir).resolve(), recursive=recursive, include_hidden=include_hidden):
-        _: Path = Path(root_dir).joinpath(item)
+            "*",
+            root_dir=root_dir,
+            recursive=recursive,
+            include_hidden=include_hidden):
+        _: Path = root_dir.joinpath(item)
 
         if _.is_dir():
             continue
 
-        elif any(part in _parsed_ignored_dirs for part in _.parts) or _.name in _parsed_ignored_dirs:
+        elif any(part in ignored_dirs for part in _.parts) or _.name in ignored_dirs:
             continue
 
-        elif _.stem in _parsed_ignored_files:
+        elif _.stem in ignored_files:
             continue
 
-        elif _parsed_extensions != [] and _.suffix not in _parsed_extensions:
+        elif extensions != [] and _.suffix not in extensions:
             continue
 
-        elif _parsed_language and not _.stem.endswith(_parsed_language):
+        elif language and not _.stem.endswith(language):
             continue
 
-        elif not _parsed_language and len(_.suffixes) > 1:
+        elif not language and len(_.suffixes) > 1:
             continue
 
         else:
-            _results.append(f"{prefix}{Path(item).as_posix()}")
+            results.append(f"{prefix}{Path(item).as_posix()}")
 
-    _results.sort()
-    return _results
+    if not auxiliary:
+        echo("\n".join(results))
+        pause(PRESS_ENTER_KEY)
+        ctx.exit(0)
 
-
-if __name__ == '__main__':
-    ns: Namespace = parse()
-    _root_dir: str = get_value(ns, "root_dir")
-    _extensions: str = get_value(ns, "extensions")
-    _all_extensions: bool = get_value(ns, "all_extensions")
-    _ignored_files: list[str] = get_value(ns, "ignored_files")
-    _all_files: bool = get_value(ns, "all_files")
-    _ignored_dirs: list[str] = get_value(ns, "ignored_dirs")
-    _all_dirs: bool = get_value(ns, "all_dirs")
-    _recursive: bool = get_value(ns, "recursive")
-    _include_hidden: bool = get_value(ns, "include_hidden")
-    _language: str = get_value(ns, "language")
-    _all_languages: bool = get_value(ns, "all_languages")
-    _prefix: str = get_value(ns, "prefix")
-
-    _files_str: str = "\n".join(
-        get_files(
-            _root_dir,
-            extensions=_extensions,
-            all_extensions=_all_extensions,
-            ignored_files=_ignored_files,
-            all_files=_all_files,
-            ignored_dirs=_ignored_dirs,
-            all_dirs=_all_dirs,
-            recursive=_recursive,
-            include_hidden=_include_hidden,
-            language=_language,
-            all_languages=_all_languages,
-            prefix=_prefix))
-
-    if _root_dir is None:
-        _root_dir: Path = Path.cwd()
-
-    print(f"\nФайлы в директории {Path(_root_dir).resolve()}:\n{_files_str}")
-    input(STOP)
-    exit()
+    else:
+        return results

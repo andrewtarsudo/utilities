@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
-from argparse import ArgumentError, ArgumentParser, Namespace, OPTIONAL, SUPPRESS
 from io import UnsupportedOperation
 from os import system
 from pathlib import Path
 from sys import platform
-from typing import Any, Iterable, Mapping, get_args, get_origin
+from typing import Any, get_args, get_origin, Iterable, Mapping
 
+from click import Context, pause
+from click.decorators import argument, help_option, option, pass_context
+from click.types import BOOL, Path as ClickPath
+from loguru import logger
 from yaml import safe_load
+
+from common.constants import FAIL_COLOR, NORMAL_COLOR, PASS_COLOR, HELP, PRESS_ENTER_KEY
+from common.functions import file_reader, ReaderMode
+from scripts.cli import APIGroup, command_line_interface
 
 _SETTINGS_NAMES: tuple[str, ...] = (
     "settings", "Settings"
@@ -15,21 +22,16 @@ _RIGHTS_NAMES: tuple[str, ...] = (
     "rights", "Rights"
 )
 
-STOP: str = "Нажмите любую клавишу для завершения скрипта ...\n"
 NAME: str = Path(__file__).name
-
-_FAIL_: str = '\033[41m'
-_PASS_: str = '\033[42m'
-_NORMAL_: str = '\033[0m'
 
 _DICT_RESULTS: dict[bool, dict[str, str]] = {
     True: {
         "status": "OK",
-        "color": _PASS_
+        "color": PASS_COLOR
     },
     False: {
         "status": "NOT OK",
-        "color": _FAIL_
+        "color": FAIL_COLOR
     }
 }
 
@@ -43,35 +45,23 @@ def determine_key(item: Mapping, keys: Iterable[str]):
         return None
 
 
-def read_yaml(path: str | Path):
-    try:
-        with open(path, "r", encoding="utf-8", errors="ignore") as f:
-            content: dict[str, Any] = safe_load(f)
+def inspect_settings(
+        content: Mapping[str, Any],
+        verbose: bool,
+        warnings: Iterable[str] = None,
+        messages: Iterable[str] = None):
+    if warnings is None:
+        warnings: list[str] = []
 
-        return content
+    else:
+        warnings: list[str] = [*warnings]
 
-    except FileNotFoundError:
-        input(f"Файл {path} не найден. Ошибка 6")
-        exit(6)
+    if messages is None:
+        messages: list[str] = []
 
-    except PermissionError:
-        input(f"Недостаточно прав для записи в файл {path}. Ошибка 7")
-        exit(7)
+    else:
+        messages: list[str] = [*messages]
 
-    except RuntimeError:
-        input(f"Истекло время записи в файл {path}. Ошибка 8")
-        exit(8)
-
-    except UnsupportedOperation:
-        input(f"Не поддерживаемая операция с файлом {path}. Ошибка 9")
-        exit(9)
-
-    except OSError as e:
-        input(f"Ошибка {e.__class__.__name__}: {e.strerror}\nОшибка -1")
-        exit(-1)
-
-
-def inspect_settings(content: Mapping[str, Any], verbose: bool):
     if all(key not in content for key in iter(_SETTINGS_NAMES)):
         messages.append("Отсутствует раздел с параметрами 'Settings'")
 
@@ -97,10 +87,28 @@ def inspect_settings(content: Mapping[str, Any], verbose: bool):
                     __is_ok: bool = False
 
         if __is_ok and verbose:
-            print("Раздел settings задана корректно")
+            messages.append("Раздел settings задана корректно")
+
+    return warnings, messages
 
 
-def inspect_legal(content: Mapping[str, Any], verbose: bool):
+def inspect_legal(
+        content: Mapping[str, Any],
+        verbose: bool,
+        warnings: Iterable[str] = None,
+        messages: Iterable[str] = None):
+    if warnings is None:
+        warnings: list[str] = []
+
+    else:
+        warnings: list[str] = [*warnings]
+
+    if messages is None:
+        messages: list[str] = []
+
+    else:
+        messages: list[str] = [*messages]
+
     if all(key not in content for key in iter(_RIGHTS_NAMES)):
         warnings.append("Отсутствует раздел с юридической информацией 'Rights'")
 
@@ -181,10 +189,28 @@ def inspect_legal(content: Mapping[str, Any], verbose: bool):
                 __is_ok: bool = False
 
         if __is_ok and verbose:
-            print("Раздел Rights задан корректно")
+            messages.append("Раздел Rights задан корректно")
+
+    return warnings, messages
 
 
-def inspect_sections(content: Mapping[str, Any], verbose: bool):
+def inspect_sections(
+        content: Mapping[str, Any],
+        verbose: bool,
+        warnings: Iterable[str] = None,
+        messages: Iterable[str] = None):
+    if warnings is None:
+        warnings: list[str] = []
+
+    else:
+        warnings: list[str] = [*warnings]
+
+    if messages is None:
+        messages: list[str] = []
+
+    else:
+        messages: list[str] = [*messages]
+
     for name, section in content.items():
         if name in (*_SETTINGS_NAMES, *_RIGHTS_NAMES):
             continue
@@ -254,38 +280,16 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
                         __is_ok: bool = False
 
                 if __is_ok and verbose:
-                    print(f"Секция {name} задана корректно")
+                    messages.append(f"Секция {name} задана корректно")
+
+    return warnings, messages
 
 
-def read_lines(path: str | Path):
-    try:
-        with open(path, "r", encoding="utf-8", errors="ignore") as f:
-            _: list[str] = f.readlines()
-
-        return _
-
-    except FileNotFoundError:
-        input(f"Файл {path} не найден")
-        raise
-
-    except PermissionError:
-        input(f"Недостаточно прав для записи в файл {path}")
-        raise
-
-    except RuntimeError:
-        input(f"Истекло время записи в файл {path}")
-        raise
-
-    except UnsupportedOperation:
-        input(f"Не поддерживаемая операция с файлом {path}")
-        raise
-
-    except OSError as e:
-        input(f"Ошибка {e.__class__.__name__}: {e.strerror}")
-        raise
-
-
-def validate(root: str | Path, lines: Iterable[str], out: str | None = None, verbose: bool = False):
+def validate(
+        root: str | Path,
+        lines: Iterable[str],
+        out: str | None = None,
+        verbose: bool = False):
     paths: dict[Path, int] = {
         Path(root).joinpath(line.strip().removeprefix("- ")): index
         for index, line in enumerate(lines)
@@ -303,13 +307,10 @@ def validate(root: str | Path, lines: Iterable[str], out: str | None = None, ver
 
         _path: str = path.relative_to(root).as_posix()
 
-        _line = f"{_color}{line_no + 1:>3}  {_path:.<{max_length}}{_status:.>6}{_NORMAL_}"
+        _line = f"{_color}{line_no + 1:>3}  {_path:.<{max_length}}{_status:.>6}{NORMAL_COLOR}"
         _lines.append(_line)
 
-        if verbose:
-            print(_line)
-
-        elif _status == "NOT OK":
+        if verbose or _status == "NOT OK":
             print(_line)
 
     if out is not None and out:
@@ -319,101 +320,85 @@ def validate(root: str | Path, lines: Iterable[str], out: str | None = None, ver
         with open(out, mode) as f:
             f.write(
                 "\n".join(_lines).
-                replace(_PASS_, "").
-                replace(_FAIL_, "").
-                replace(_NORMAL_, ""))
+                replace(PASS_COLOR, "").
+                replace(FAIL_COLOR, "").
+                replace(NORMAL_COLOR, ""))
 
     return
 
 
-def parse():
-    arg_parser: ArgumentParser = ArgumentParser(
-        prog="validate_yaml_file",
-        usage=f"py {NAME} [ -h/--help | -v/--version ] <YAML_FILE> [ -o/--output <OUTPUT> ] [ --verbose ]",
-        description="Валидация YAML-файла для PDF",
-        epilog="",
-        add_help=False,
-        allow_abbrev=False,
-        exit_on_error=False
-    )
-
-    arg_parser.add_argument(
-        action="store",
-        nargs=OPTIONAL,
-        type=str,
-        default=None,
-        help="Путь до файла PDF_*.yml",
-        dest="yaml_file"
-    )
-
-    arg_parser.add_argument(
-        "-o", "--output",
-        action="store",
-        default=SUPPRESS,
-        required=False,
-        help="Файл для записи вывода",
-        dest="output"
-    )
-
-    arg_parser.add_argument(
-        "--verbose",
-        action="store_true",
-        default=False,
-        help="Флаг подробного вывода",
-        dest="verbose"
-    )
-
-    arg_parser.add_argument(
-        "-v", "--version",
-        action="version",
-        version="1.0.0",
-        help="Показать версию скрипта и завершить работу"
-    )
-
-    arg_parser.add_argument(
-        "-h", "--help",
-        action="help",
-        default=SUPPRESS,
-        help="Показать справку и завершить работу"
-    )
-
-    try:
-        args: Namespace = arg_parser.parse_args()
-
-        if hasattr(args, "help") or hasattr(args, "version"):
-            input(STOP)
-            exit(0)
-
-    except ArgumentError as exc:
-        print(f"{exc.__class__.__name__}, {exc.argument_name}\n{exc.message}")
-        print("Ошибка 1")
-        input(STOP)
-        exit(1)
-
-    except KeyboardInterrupt:
-        print("Ошибка 2")
-        input("Работа скрипта остановлена пользователем ...")
-        exit(2)
-
-    else:
-        return args
-
-
-def main():
-    ns: Namespace = parse()
-
+@command_line_interface.command(
+    "validate-yaml",
+    cls=APIGroup,
+    help="Команда для валидации YAML-файла, используемого при генерации PDF")
+@argument(
+    "yaml_file",
+    type=ClickPath(
+        exists=True,
+        file_okay=True,
+        readable=True,
+        resolve_path=True,
+        allow_dash=False,
+        dir_okay=False),
+    required=True,
+)
+@option(
+    "-o", "--output", "output",
+    type=ClickPath(
+        exists=False,
+        file_okay=True,
+        readable=True,
+        resolve_path=True,
+        allow_dash=True,
+        dir_okay=False),
+    help="Файл для записи вывода.\nПо умолчанию: вывод в консоль",
+    multiple=False,
+    required=False,
+    metavar="<FILE>",
+    default=None
+)
+@option(
+    "--verbose/--no-verbose",
+    type=BOOL,
+    is_flag=True,
+    help="Флаг подробного вывода.\nПо умолчанию: False",
+    show_default=True,
+    required=False,
+    default=False)
+@help_option(
+    "-h", "--help",
+    help=HELP,
+    is_eager=True)
+@pass_context
+def validate_yaml_command(ctx: Context, yaml_file: str | Path, output: str | Path = None, verbose: bool = False):
     if platform.startswith("win"):
         system("color")
 
-    yaml_file: str = getattr(ns, "yaml_file")
-    output: str | None = getattr(ns, "output", None)
-    verbose: bool = getattr(ns, "verbose", False)
+    try:
+        with open(yaml_file, "r", encoding="utf-8", errors="ignore") as f:
+            content: dict[str, Any] = safe_load(f)
 
-    content: dict[str, Any] = read_yaml(yaml_file)
+    except FileNotFoundError:
+        logger.error(f"Файл {yaml_file} не найден")
 
-    inspect_settings(content, verbose)
-    inspect_legal(content, verbose)
-    inspect_sections(content, verbose)
+    except PermissionError:
+        logger.error(f"Недостаточно прав для чтения файла {yaml_file}")
+
+    except RuntimeError:
+        logger.error(f"Истекло время чтения файла {yaml_file}")
+
+    except UnsupportedOperation:
+        logger.error(f"Не поддерживаемая операция с файлом {yaml_file}")
+
+    except OSError as e:
+        logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+
+    warnings: list[str] = []
+    messages: list[str] = []
+
+    warnings, messages = inspect_settings(content, verbose, warnings, messages)
+    warnings, messages = inspect_legal(content, verbose, warnings, messages)
+    warnings, messages = inspect_sections(content, verbose, warnings, messages)
 
     if warnings or messages:
         print("Предупреждения:")
@@ -423,13 +408,9 @@ def main():
     elif not verbose:
         print("В файле проблемы не обнаружены")
 
-    lines: list[str] = read_lines(yaml_file)
+    lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
 
     validate(Path(yaml_file).resolve().parent, lines, output, verbose)
 
-
-if __name__ == '__main__':
-    warnings: list[str] = []
-    messages: list[str] = []
-
-    main()
+    pause(PRESS_ENTER_KEY)
+    ctx.exit(0)

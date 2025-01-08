@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from re import findall, finditer, Pattern, search, Match, compile
+from re import compile, findall, finditer, Match, Pattern, search
 
 from loguru import logger
 
-from repair_link.dir_file.dir_file import TextFile, FileLinkItem, _InternalLink
-from repair_link.general.const import StrPath, md_file_pattern, IGNORED_LINKS, ascii_doc_file_pattern, ADOC_EXTENSION, \
-    MD_EXTENSION, prepare_logging, Boundary
+from repair_link.dir_file.dir_file import _InternalLink, FileLinkItem, TextFile
+from repair_link.general.const import ascii_doc_file_pattern, Boundary, IGNORED_LINKS, md_file_pattern, prepare_logging, \
+    StrPath
 from repair_link.general.link import Link
 
 
@@ -183,27 +183,3 @@ class AsciiDocFile(TextFile):
             f"File {self.rel_path}, "
             f"internal links:\n{prepare_logging(_.anchor for _ in self._iter_internal_links())}")
         return
-
-
-def get_file(root_dir: StrPath, full_path: StrPath) -> MdFile | AsciiDocFile:
-    """
-    Specifying the type of the file.
-
-    Attributes
-    ----------
-    root_dir : str or Path
-        The path to the directory.
-    full_path : str or Path
-        The absolute path to the file.
-
-    Returns
-    -------
-    MdFile or AsciiDocFile
-        The specified file according to the extension.
-
-    """
-    if full_path.suffix == MD_EXTENSION:
-        return MdFile(root_dir, full_path)
-
-    elif full_path.suffix == ADOC_EXTENSION:
-        return AsciiDocFile(root_dir, full_path)

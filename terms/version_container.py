@@ -1,0 +1,142 @@
+# -*- coding: utf-8 -*-
+from collections import Counter
+from pathlib import Path
+from typing import NamedTuple
+
+from loguru import logger
+
+from terms.const import _temp_version, _temp_terms_version, read_file
+from terms.custom_exceptions import InvalidVersionError
+
+
+class Version(NamedTuple):
+    day: int | str
+    month: int | str
+    year: int | str
+
+    def __str__(self):
+        return f"{self.day}.{self.month}.{self.year}"
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}>({self.day}.{self.month}.{self.year})"
+
+    def __key(self) -> tuple[str, ...]:
+        return f"{self.day}", f"{self.month}", f"{self.year}"
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        elif self.__key() == ("0", "0", "0"):
+            return False
+
+        else:
+            return self.__key() == other.__key()
+
+    def __ne__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        elif self.__key() == ("0", "0", "0"):
+            return True
+
+        else:
+            return self.__key() != other.__key()
+
+    def __bool__(self):
+        return str(self) == "0.0.0"
+
+    @classmethod
+    def from_string(cls, line: str):
+        if not line:
+            return cls(0, 0, 0)
+
+        elif Counter(line).get(".") != 2:
+            logger.error(f"Версия должна иметь вид: day.month.year, но получено {line}")
+            raise InvalidVersionError
+
+        else:
+            day, month, year = line.split(".")
+            return cls(day, month, year)
+
+
+class VersionContainer:
+    def __init__(self):
+        self._version_file: Path = Path(_temp_version)
+        self._basic_version_file: Path = Path(_temp_terms_version)
+
+        self._version: Version | None = None
+        self._version_basic: Version | None = None
+
+    def __str__(self):
+        return f"<{self.__class__.__name__}>"
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}> version={self._version}, version_basic={self._version_basic}"
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return True
+
+        else:
+            return NotImplemented
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            return False
+
+        else:
+            return NotImplemented
+
+    @property
+    def version(self):
+        return self._version
+
+    @version.setter
+    def version(self, value):
+        if isinstance(value, Version):
+            self._version = value
+
+        elif isinstance(value, str):
+            try:
+                _version: Version = Version.from_string(value)
+
+            except InvalidVersionError:
+                raise
+
+            else:
+                self._version = _version
+
+        else:
+            logger.error(f"Значение {value} должно быть типа Version или str, но получено {type(value)}")
+            raise TypeError
+
+    @property
+    def version_basic(self):
+        return self._version_basic
+
+    @version_basic.setter
+    def version_basic(self, value):
+        if isinstance(value, Version):
+            self._version_basic = value
+
+        elif isinstance(value, str):
+            try:
+                _version: Version = Version.from_string(value)
+
+            except InvalidVersionError:
+                raise
+
+            else:
+                self._version_basic = _version
+
+        else:
+            logger.error(f"Значение {value} должно быть типа Version или str, но получено {type(value)}")
+            raise TypeError
+
+    def __bool__(self):
+        return self._version == self._version_basic
+
+    def set_version_basic(self):
+        line: str = read_file(self._basic_version_file)
+        self._version_basic = Version.from_string(line)
