@@ -2,6 +2,7 @@
 from operator import attrgetter
 from typing import Any, Iterable, Mapping
 
+# noinspection PyProtectedMember
 from click.core import Argument, Command, Context, Group, Option, Parameter
 from click.decorators import group, help_option, option
 from click.exceptions import UsageError
@@ -13,9 +14,10 @@ from loguru import logger
 
 from __version__ import __version__
 from common.constants import args_help_dict, HELP, PRESS_ENTER_KEY
+from common.custom_logger import custom_logging
 
 COL_SPACING: int = 3
-COL_MAX: int = 39
+COL_MAX: int = 38
 MAX_CONTENT_WIDTH: int = 100
 TERMINAL_WIDTH: int = 100
 
@@ -136,18 +138,21 @@ def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
     if args:
         keys: list[str] = [item.removesuffix(".exe") for item in ctx.command_path.split(" ")]
         rows: list[tuple[str, str]] = [
-            (arg.name, args_help_dict.get_multiple_keys(keys=keys).get(arg.name)) for arg in args]
+            (arg.name, args_help_dict.get_multiple_keys(keys=keys).get(arg.name))
+            for arg in args]
 
-        col_spacing: int = COL_MAX - max(map(len, map(attrgetter("name"), args))) + 1
+        col_spacing: int = COL_MAX - max(map(len, map(attrgetter("name"), args)))
+        echo(f"{col_spacing=}")
         col_max: int = COL_MAX
 
         with formatter.section("Аргументы"):
             formatter.write_dl(rows, col_max, col_spacing)
 
-    return
-
 
 def get_help(cmd: Command, ctx: Context) -> str:
+    ctx.max_content_width = MAX_CONTENT_WIDTH
+    ctx.terminal_width = TERMINAL_WIDTH
+
     formatter: HelpFormatter = ctx.make_formatter()
     format_help(cmd, ctx, formatter)
     return formatter.getvalue().rstrip("\n")
@@ -277,10 +282,14 @@ class MutuallyExclusiveOption(Option):
     "-h", "--help",
     help=HELP,
     is_eager=True)
+@logger.catch
+@custom_logging("cli", is_debug=True)
 def command_line_interface(**kwargs):
     ctx: Context = get_current_context()
     ctx.ensure_object(dict)
     ctx.obj = dict(**kwargs)
+
+    echo(ctx.command_path)
 
     if ctx.invoked_subcommand is None:
         echo("Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help")

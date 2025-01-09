@@ -1,13 +1,51 @@
 # -*- coding: utf-8 -*-
-import os.path as p
+from pathlib import Path
 from re import sub
 from typing import Iterable
 
+from click.core import Context
+from click.decorators import option, pass_context
+from click.types import BOOL
 from loguru import logger
 
+from scripts.cli import APIGroup, command_line_interface
 from terms.ascii_doc_table_terms import AsciiDocTableTerms
-from terms.const import StrNone, State, _interceptors, separator
+from terms.const import _interceptors, separator, State, StrNone
 from terms.table import _Term
+
+_SOURCES: Path = Path(__file__).parent.joinpath("sources")
+HELP_FILE: Path = _SOURCES.joinpath("help.txt")
+README_FILE: Path = _SOURCES.joinpath("readme.txt")
+SAMPLES_FILE: Path = _SOURCES.joinpath("samples.txt")
+
+
+def _print_dictionary(terms: Iterable[_Term]) -> str:
+    return "\n".join(list(map(lambda x: x.formatted(), terms)))
+
+
+def _print_help() -> str:
+    with open(HELP_FILE, "rb+") as help_doc:
+        help_text: bytes = help_doc.read()
+
+    return help_text.decode(encoding="utf8")
+
+
+def _print_short(table_terms: AsciiDocTableTerms) -> str:
+    return ", ".join(table_terms.terms_short())
+
+
+def _print_readme() -> str:
+    with open(README_FILE, "rb+") as readme_doc:
+        readme_text: bytes = readme_doc.read()
+
+    return readme_text.decode(encoding="utf8")
+
+
+def _print_samples() -> str:
+    with open(SAMPLES_FILE, "rb+") as samples_doc:
+        samples_text: bytes = samples_doc.read()
+
+    return samples_text.decode(encoding="utf8")
 
 
 class LineParser:
@@ -86,9 +124,9 @@ class UserInputParser:
         _specified_actions: dict[tuple[str, str], str] = {
             ("-f", "--full"): self._print_dictionary(),
             ("-a", "--all"): self._print_short(),
-            ("-r", "--readme"): self._print_readme(),
-            ("-s", "--samples"): self._print_samples(),
-            ("-h", "--help"): self._print_help()
+            ("-r", "--readme"): _print_readme(),
+            ("-s", "--samples"): _print_samples(),
+            ("-h", "--help"): _print_help()
         }
 
         return {_action: value for key, value in _specified_actions.items() for _action in key}
@@ -96,30 +134,8 @@ class UserInputParser:
     def _print_dictionary(self) -> str:
         return "\n".join(list(map(lambda x: x.formatted(), self._terms())))
 
-    @staticmethod
-    def src_file(file_name: str):
-        return p.join(p.dirname(p.dirname(p.abspath(__file__))), "sources", file_name)
-
-    def _print_help(self) -> str:
-        with open(self.src_file("help.txt"), "rb+") as help_doc:
-            help_text: bytes = help_doc.read()
-
-        return help_text.decode(encoding="utf8")
-
     def _print_short(self) -> str:
         return ", ".join(self._table_terms.terms_short())
-
-    def _print_readme(self) -> str:
-        with open(self.src_file("readme.txt"), "rb+") as readme_doc:
-            readme_text: bytes = readme_doc.read()
-
-        return readme_text.decode(encoding="utf8")
-
-    def _print_samples(self) -> str:
-        with open(self.src_file("samples.txt"), "rb+") as samples_doc:
-            samples_text: bytes = samples_doc.read()
-
-        return samples_text.decode(encoding="utf8")
 
     def handle_input(self, user_input: str = None):
         if not user_input or user_input is None:
@@ -183,3 +199,67 @@ class UserInputParser:
 
     def __iter__(self):
         return iter(self._table_terms.dict_terms.values())
+
+
+@command_line_interface.command(
+    "terms",
+    cls=APIGroup,
+    help="Команда для проверки наличия непереведенных слов",
+    invoke_without_command=True
+)
+@option(
+    "-a/--all",
+    type=BOOL,
+    help="Флаг вывода всех сокращений",
+    show_default=True,
+    required=False,
+    is_eager=True,
+    default=False)
+@option(
+    "-f/--full",
+    type=BOOL,
+    help="Флаг вывода всех сокращений с их расшифровками",
+    show_default=True,
+    required=False,
+    is_eager=True,
+    default=False)
+@option(
+    "-r/--readme",
+    type=BOOL,
+    help="Флаг вывода полного руководства",
+    show_default=True,
+    required=False,
+    is_eager=True,
+    default=False)
+@option(
+    "-s/--samples",
+    type=BOOL,
+    help="Флаг вывода примеров использования",
+    show_default=True,
+    required=False,
+    is_eager=True,
+    default=False)
+@option(
+    "--abbr",
+    type=BOOL,
+    help="Флаг вывода сокращения для добавления в файл Markdown.\nПо умолчанию: False",
+    show_default=True,
+    required=False,
+    default=False)
+@option(
+    "--ascii",
+    type=BOOL,
+    help="Флаг вывода сокращения для добавления в файл AsciiDoc.\nФормат: pass:q[<abbr title=""></abbr>]",
+    show_default=True,
+    required=False,
+    default=False)
+@pass_context
+def terms_command(
+        ctx: Context,
+        all_: bool = False,
+        full_: bool = False,
+        readme_: bool = False,
+        samples_: bool = False,
+        abbr_: bool = False,
+        ascii_: bool = False):
+    pass

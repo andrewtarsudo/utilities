@@ -21,7 +21,6 @@ LoggingLevel: Type[str] = Literal["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING"
 ColorLevel: Type[str] = Literal["red", "fg #ffffff", "green", "magenta", "light-green", "cyan"]
 StyleLevel: Type[str] = Literal["bold", "italic", "underline", "normal"]
 
-
 _WB_FORMAT: str = " | ".join(
     ("{time:DD-MMM-YYYY HH:mm:ss}::{level.name}",
      "{module}::{function}",

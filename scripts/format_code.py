@@ -107,14 +107,14 @@ def split(
     "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
-    help="Флаг рекурсивного поиска файлов.\bПо умолчанию: True",
+    help="Флаг рекурсивного поиска файлов. \n\n\bПо умолчанию: True",
     show_default=True,
     required=False,
     default=True)
 @option(
     "-l", "--length",
     type=INT,
-    help=f"Максимальная длина строки.\bПо умолчанию: {MAX_LENGTH}",
+    help=f"Максимальная длина строки. \n\bПо умолчанию: {MAX_LENGTH}",
     multiple=False,
     required=False,
     metavar="<LEN>",
@@ -143,7 +143,7 @@ def format_code_command(
 
             _result: list[str] = []
 
-            for code in finditer("`{3}\S*\n(.*?)\n`{3}", _content):
+            for code in finditer(r"`{3}\S*\n(.*?)\n`{3}", _content):
                 lines: list[str] = code.group(1).splitlines()
 
                 for line in lines:

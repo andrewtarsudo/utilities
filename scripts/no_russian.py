@@ -4,7 +4,8 @@ from typing import Iterable
 
 from click.core import Context
 from click.decorators import help_option, option, pass_context
-from click.termui import echo, pause
+from click.termui import pause
+from click.utils import echo
 from click.types import BOOL, Path as ClickPath
 
 from common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, PRESS_ENTER_KEY
@@ -16,9 +17,9 @@ NAME: str = Path(__file__).name
 
 
 @command_line_interface.command(
-    "check-no-russian",
+    "check-russian",
     cls=APIGroup,
-    help="Команда для проверки наличия не переведенных слов",
+    help="Команда для проверки наличия непереведенных слов",
     invoke_without_command=True)
 @option(
     "-f", "--file", "files",
@@ -62,7 +63,7 @@ NAME: str = Path(__file__).name
     help=HELP,
     is_eager=True)
 @pass_context
-def check_no_russian(
+def check_no_russian_command(
         ctx: Context,
         files: Iterable[str | Path] = None,
         directory: str | Path = None,

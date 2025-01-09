@@ -75,9 +75,9 @@ def repair_svg_command(
 
     FOREIGN_OBJECT: str = "<foreignObject.*?</foreignObject>"
     TEXT: str = (
-        "<a\s?transform=\"translate(0,-5)\"\s?xlink:href=\"https://www.drawio.com/doc/faq/svg-export-text-problems"
+        r"<a\s?transform=\"translate(0,-5)\"\s?xlink:href=\"https://www.drawio.com/doc/faq/svg-export-text-problems"
         "\".*?</a>")
-    FEATURES: str = "<g>\s?<g\s?requiredFeatures=\"http://www.w3.org/TR/SVG11/feature#Extensibility\"/>\s?</g>"
+    FEATURES: str = r"<g>\s?<g\s?requiredFeatures=\"http://www.w3.org/TR/SVG11/feature#Extensibility\"/>\s?</g>"
 
     for file in files:
         file: Path = Path(file).expanduser().resolve()
