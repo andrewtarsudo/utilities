@@ -1,22 +1,19 @@
 # -*- coding: utf-8 -*-
 from http.client import HTTPResponse
+from pathlib import Path
 from typing import NamedTuple
 
 from loguru import logger
 
-from terms.const import StrPath, CustomScheme, CustomPort, _temp_terms, _temp_version, write_file
-from terms.custom_exceptions import InvalidProjectIdError
-from terms.http_request import CustomPreparedRequest, CustomHTTPResponseChunked, CustomHTTPRequest
-
-
-def validate_positive_int(value: int) -> bool:
-    return value > 0
+from common.errors import InvalidProjectIdError
+from terms.const import CustomPort, CustomScheme, write_file
+from terms.http_request import CustomHTTPRequest, CustomHTTPResponseChunked, CustomPreparedRequest
 
 
 class ContentGitPage(NamedTuple):
-    project_id: int | str
-    file_name: str
-    path: StrPath
+    project_id: int | str = 57022544
+    file_name: str = None
+    path: str | Path = None
     content: list[str] = []
 
     def __iter__(self):
@@ -74,7 +71,7 @@ class ContentGitPage(NamedTuple):
             self.content.append(_content)
 
         else:
-            self.content.extend(_content.split("\n"))
+            self.content.extend(_content)
 
         logger.debug(f"Response: {self.content is not None}")
 
@@ -91,7 +88,3 @@ class ContentGitPage(NamedTuple):
         self.validate()
         self.set_content()
         write_file(self.path, str(self))
-
-
-content_git_terms: ContentGitPage = ContentGitPage(57022544, "terms.adoc", _temp_terms)
-content_git_version: ContentGitPage = ContentGitPage(57022544, "__version__.txt", _temp_version)

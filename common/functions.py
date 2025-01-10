@@ -2,7 +2,7 @@
 from enum import Enum
 from io import UnsupportedOperation
 from pathlib import Path
-from typing import Callable, Iterable, TextIO
+from typing import Callable, Iterable
 
 from loguru import logger
 
@@ -16,13 +16,6 @@ class ReaderMode(Enum):
     def __str__(self):
         return self._value_
 
-    def read(self, context_manager: TextIO):
-        functions: dict[type(ReaderMode), Callable] = {
-            self.__class__.STRING: context_manager.read,
-            self.__class__.LINES: context_manager.readlines}
-
-        return functions.get(self._name_)
-
 
 def file_reader(path: str | Path, reader_mode: str | ReaderMode):
     if isinstance(reader_mode, str):
@@ -30,7 +23,11 @@ def file_reader(path: str | Path, reader_mode: str | ReaderMode):
 
     try:
         with open(path, "r", encoding="utf-8", errors="ignore") as f:
-            _: str | list[str] = reader_mode.read(f)()
+            functions: dict[ReaderMode, Callable] = {
+                ReaderMode.STRING: f.read,
+                ReaderMode.LINES: f.readlines}
+
+            _ = functions.get(reader_mode)()
 
         return _
 

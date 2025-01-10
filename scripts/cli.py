@@ -24,6 +24,10 @@ TERMINAL_WIDTH: int = 100
 SEPARATOR: str = "-" * MAX_CONTENT_WIDTH
 
 
+def up(value: str):
+    return value.upper() if not value.startswith("--") else value
+
+
 def underscore_to_dash(value: str, *, prefix: bool = True):
     return f'{int(prefix) * "--"}{value.replace("_", "-")}'
 
@@ -234,6 +238,25 @@ class APIGroup(Group):
     def format_args(self, ctx: Context, formatter: HelpFormatter):
         format_args(self, ctx, formatter)
 
+    def parse_args(self, ctx, args):
+        if self.__class__.__name__ == "APIGroup" and args is not None and args[0] in self.commands:
+            if len(args) == 1 or args[-1] not in self.commands:
+                # args.append('')
+                pass
+
+        super().parse_args(ctx, args)
+
+
+class TermsAPIGroup(APIGroup):
+    def parse_args(self, ctx, args):
+        args: list[str] = list(map(up, args))
+
+        if args is not None and all(not x.startswith("--") for x in args):
+            args.insert(0, '--common')
+
+        echo(f"{args=}")
+        super().parse_args(ctx, args)
+
 
 class MutuallyExclusiveOption(Option):
     def __init__(self, *args, **kwargs):
@@ -289,7 +312,8 @@ def command_line_interface(**kwargs):
     ctx.ensure_object(dict)
     ctx.obj = dict(**kwargs)
 
-    echo(ctx.command_path)
+    echo(f"{ctx.command_path=}")
+    echo(f"{ctx.invoked_subcommand=}")
 
     if ctx.invoked_subcommand is None:
         echo("Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help")

@@ -5,8 +5,8 @@ from typing import NamedTuple
 
 from loguru import logger
 
-from terms.const import _temp_version, _temp_terms_version, read_file
-from terms.custom_exceptions import InvalidVersionError
+from common.errors import InvalidVersionError
+from common.functions import file_reader, ReaderMode
 
 
 class Version(NamedTuple):
@@ -48,6 +48,7 @@ class Version(NamedTuple):
 
     @classmethod
     def from_string(cls, line: str):
+        logger.error(f"{line=}")
         if not line:
             return cls(0, 0, 0)
 
@@ -61,9 +62,9 @@ class Version(NamedTuple):
 
 
 class VersionContainer:
-    def __init__(self):
-        self._version_file: Path = Path(_temp_version)
-        self._basic_version_file: Path = Path(_temp_terms_version)
+    def __init__(self, version_file: str | Path, basic_version_file: str | Path):
+        self._version_file: Path = Path(version_file)
+        self._basic_version_file: Path = Path(basic_version_file)
 
         self._version: Version | None = None
         self._version_basic: Version | None = None
@@ -138,5 +139,5 @@ class VersionContainer:
         return self._version == self._version_basic
 
     def set_version_basic(self):
-        line: str = read_file(self._basic_version_file)
+        line: str = file_reader(self._basic_version_file, ReaderMode.STRING)
         self._version_basic = Version.from_string(line)

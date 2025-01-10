@@ -11,7 +11,7 @@ from urllib.request import Request, urlopen
 from loguru import logger
 
 from terms.const import CustomPort, CustomScheme
-from terms.custom_exceptions import RequiredAttributeMissingError
+from common.errors import RequiredAttributeMissingError
 
 try:
     PROTOCOL: str = environ['PROTOCOL']
@@ -264,6 +264,7 @@ class CustomHTTPResponseChunked:
         return self._http_response.read()
 
     def get_response(self):
+        self._path.parent.mkdir(parents=True, exist_ok=True)
         self._path.touch(exist_ok=True)
 
         with open(self._path, mode="w+b") as fb:

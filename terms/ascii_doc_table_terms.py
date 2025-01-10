@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-from bisect import bisect_left, bisect
+from bisect import bisect_left
 from pathlib import Path
+from re import fullmatch
 from typing import Iterable
 
 from loguru import logger
-from more_itertools import pairwise, flatten
+from more_itertools import pairwise
 
-from terms.const import _header_pattern, read_lines_file
-from terms.custom_exceptions import AsciiDocFileTableRowIndexError, InvalidTermIndexError, EmptyFileError
-from terms.table import TableItem, _Term, TableCellCoordinate
+from common.functions import file_reader, ReaderMode
+from common.errors import AsciiDocFileTableRowIndexError, EmptyFileError, InvalidTermIndexError
+from terms.table import _Term, TableCellCoordinate, TableItem
 
 
 class AsciiDocTableTerms:
@@ -21,7 +22,7 @@ class AsciiDocTableTerms:
 
     @classmethod
     def from_file(cls, file_path: str | Path):
-        _content: list[str] = read_lines_file(file_path)
+        _content: list[str] = file_reader(file_path, ReaderMode.LINES)
 
         if not _content or len(_content) < 6:
             raise EmptyFileError
@@ -73,18 +74,18 @@ class AsciiDocTableTerms:
     def get(self, item):
         return self.__getitem__(item)
 
-    def __contains__(self, item):
-        if isinstance(item, str):
-            return item in self._dict_terms
-
-        else:
-            return False
+    # def __contains__(self, item):
+    #     if isinstance(item, str):
+    #         return item in self._dict_terms
+    #
+    #     else:
+    #         return False
 
     def __len__(self):
         return len(self._dict_terms)
 
     def __iter__(self):
-        return iter(self._dict_terms)
+        return iter(self._dict_terms.keys())
 
     @property
     def _keys(self):
@@ -94,7 +95,7 @@ class AsciiDocTableTerms:
         return self._keys[index] if index is not None else None
 
     def terms_short(self) -> tuple[str, ...]:
-        return tuple(map(lambda x: x.upper(), self._dict_terms.keys()))
+        return tuple(map(lambda x: x.upper(), iter(self)))
 
     def _binary_search(
             self,
@@ -138,8 +139,10 @@ class AsciiDocTableTerms:
         return max(_.row_index for _ in self._items.keys())
 
     def _find_header(self) -> int:
+        HEADER_PATTERN: str = r"\|(.*)\|(.*)\|(.*)\|(.*)\n"
+
         for index, line in enumerate(iter(self._content)):
-            if _header_pattern.fullmatch(line):
+            if fullmatch(HEADER_PATTERN, line):
                 return index
 
         else:
@@ -167,49 +170,3 @@ class AsciiDocTableTerms:
     @property
     def dict_terms(self):
         return self._dict_terms
-
-    def set_dict_positions(self):
-        term: _Term
-        for index, term in enumerate(flatten(self._dict_terms.values())):
-            if (_short := term.short) not in self._dict_positions.keys():
-                self._dict_positions[_short] = []
-            self._dict_positions[_short].append(index)
-
-        for k, v in self._dict_positions.items():
-            if len(v) == 1:
-                self._dict_positions[k] = v[0]
-
-        return
-
-    def dict_positions(self):
-        return self._dict_positions
-
-    def _get_first(self, item: str):
-        values: int | list[int] | None = self._dict_positions.get(item)
-
-        if isinstance(values, int):
-            return values
-
-        elif isinstance(values, list):
-            return values[0]
-
-        else:
-            return None
-
-    def get_positions(self, short: str) -> int | list[int] | None:
-        if short in self._keys:
-            return self._dict_positions.get(short)
-
-        else:
-            logger.error(f"Термин {short} не найден")
-            return None
-
-    def find_position(self, short: str):
-        if short in self._keys:
-            return self._get_first(short)
-
-        else:
-            return bisect(self._keys, short)
-
-    def find_item_before(self, short):
-        return self.get(self.find_position(short))

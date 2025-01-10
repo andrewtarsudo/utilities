@@ -1,115 +1,142 @@
 # -*- coding: utf-8 -*-
-import os.path as p
-from os import environ, rmdir, listdir, unlink
-from textwrap import dedent
+from pathlib import Path
+from typing import Any, Iterable
 
-from loguru import logger
+from click.core import Context, Parameter
+from click.decorators import argument, help_option, option, pass_context
+from click.termui import pause
+from click.utils import echo
 
+from common.constants import HELP, PRESS_ENTER_KEY
+from common.functions import file_reader, ReaderMode
+from scripts.cli import command_line_interface, MutuallyExclusiveOption, TermsAPIGroup
 from terms.ascii_doc_table_terms import AsciiDocTableTerms
-from terms.const import _log_folder, _temp_version, _temp_terms, State
-from terms.git_manager import GitManager
-from terms.init_logger import configure_custom_logging
-from terms.user_input import UserInputParser
+from terms.git_manager import git_manager
+from terms.table import _Term
 
-_spec: str = dedent(
-    """\
-    Для вывода информации о списке необходимо ввести любой из ниже предложенных вариантов:
-    -a/--all -- отобразить все термины и сокращения на английском;
-    -f/--full -- отобразить все термины и сокращения, а также их полные расшифровки и комментарии к ним;
-    """)
-
-_disclaimer: str = dedent(
-    f"""\
-    В случае ошибки необходимо сохранить лог-файл, который будет находиться здесь:
-    '{_log_folder}'
-
-    https://gitlab.com/tech_writers_protei/terms/-/tree/main
-
-    Утилита для получения полного наименования сокращения и его описания.
-    Используется таблица, хранящаяся в репозитории Gitlab:
-
-    https://gitlab.com/tech_writers_protei/glossary/-/blob/main/terms.adoc
-
-    Искомые термины и аббревиатуры можно вводить как по одному, так и несколько.
-    При вводе нескольких необходимо разделить любым не циферным и не буквенным символом, кроме '_' и '-'.
-    """)
-
-_help: str = dedent(
-    """\
-    Для вывода краткой справочной информации необходимо ввести любой из ниже предложенных вариантов:
-    -h/--help
-    Для вывода полной справочной информации необходимо ввести любой из ниже предложенных вариантов:
-    -r/--readme
-    Для вывода примеров использования необходимо ввести любой из ниже предложенных вариантов:
-    -s/--samples
-    """)
-
-_exit: str = dedent(
-    """\
-    Для выхода необходимо ввести любой из ниже предложенных вариантов:
-    __exit__, exit, __quit__, quit, !e, !exit, !q, !quit
-    """)
+_SOURCES: Path = Path(__file__).parent.parent.joinpath("sources")
+HELP_FILE: Path = _SOURCES.joinpath("help.txt")
+README_FILE: Path = _SOURCES.joinpath("readme.txt")
+SAMPLES_FILE: Path = _SOURCES.joinpath("samples.txt")
 
 
-def _delete_log_dir():
-    try:
-        return rmdir(_log_folder)
-
-    except (FileNotFoundError, NotADirectoryError):
-        print(f"Директория {_log_folder} уже удалена")
-
-    except PermissionError:
-        print(f"Недостаточно прав для удаления директории {_log_folder}")
-
-    except (OSError, RuntimeError) as e:
-        print(
-            f"Возникла внутренняя ошибка {e.__class__.__name__} "
-            f"при удалении директории {_log_folder}")
-
-
-def _delete_logs():
-    env_variable: str = "KEEP_TERMS_LOGS"
-
-    if env_variable in environ.keys() and bool(environ.get(env_variable)):
+# noinspection PyUnusedLocal
+def print_file(ctx: Context, param: Parameter, value: Any):
+    if not value or ctx.resilient_parsing:
         return
 
-    if not listdir(_log_folder):
-        return
+    command_files: dict[str, Path] = {
+        "help": HELP_FILE,
+        "readme_flag": README_FILE,
+        "samples_flag": SAMPLES_FILE}
 
-    try:
-        for file in listdir(_log_folder):
-            unlink(p.join(_log_folder, file))
+    path: Path = command_files.get(param.name)
 
-    except (FileNotFoundError, NotADirectoryError, IsADirectoryError) as e:
-        print(f"Директория {_log_folder} уже пуста. {e.__class__.__name__}")
-
-    except PermissionError:
-        print(f"Недостаточно прав для удаления файлов из директории {_log_folder}")
-
-    except (OSError, RuntimeError) as e:
-        print(
-            f"Возникла внутренняя ошибка {e.__class__.__name__} при удалении файлов из директории {_log_folder}")
+    result: str = file_reader(path, ReaderMode.STRING)
+    echo(result)
+    pause(PRESS_ENTER_KEY)
+    ctx.exit(0)
 
 
-def _delete_temp_files():
-    try:
-        unlink(_temp_terms)
-        unlink(_temp_version)
-
-    except (FileNotFoundError, IsADirectoryError) as e:
-        print(f"{_temp_terms} и {_temp_version} уже удалены. {e.__class__.__name__}")
-
-    except PermissionError:
-        print(f"Недостаточно прав для удаления файлов {_temp_terms} и {_temp_version}")
-
-    except (OSError, RuntimeError) as e:
-        print(f"Возникла внутренняя ошибка {e.__class__.__name__} при удалении файлов {_temp_terms} и {_temp_version}")
-
-
-@logger.catch
-@configure_custom_logging("terms", True)
-def run_script():
-    git_manager: GitManager = GitManager()
+@command_line_interface.command(
+    "terms",
+    cls=TermsAPIGroup,
+    help="Команда для проверки наличия непереведенных слов",
+    invoke_without_command=True)
+@option(
+    "-a", "--all", "all_flag",
+    is_flag=True,
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["full_flag", "readme_flag", "samples_flag"],
+    help="Флаг вывода всех сокращений",
+    show_default=True,
+    required=False,
+    is_eager=True,
+    default=False)
+@option(
+    "-f", "--full", "full_flag",
+    is_flag=True,
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["all_flag", "readme_flag", "samples_flag"],
+    help="Флаг вывода всех сокращений с их расшифровками",
+    show_default=True,
+    required=False,
+    is_eager=True,
+    default=False)
+@option(
+    "-r", "--readme", "readme_flag",
+    is_flag=True,
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["full_flag", "all_flag", "samples_flag"],
+    help="Флаг вывода полного руководства",
+    show_default=True,
+    required=False,
+    is_eager=True,
+    callback=print_file,
+    default=False)
+@option(
+    "-s", "--samples", "samples_flag",
+    is_flag=True,
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["full_flag", "readme_flag", "all_flag"],
+    help="Флаг вывода примеров использования",
+    show_default=True,
+    required=False,
+    is_eager=True,
+    callback=print_file,
+    default=False)
+@option(
+    "--abbr", "abbr_flag",
+    is_flag=True,
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["ascii_flag", "common_flag"],
+    help="Флаг вывода сокращения для добавления в файл Markdown.\nФормат: <abbr title=""></abbr>",
+    show_default=True,
+    required=False,
+    default=False)
+@option(
+    "--ascii", "ascii_flag",
+    is_flag=True,
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["abbr_flag", "common_flag"],
+    help="Флаг вывода сокращения для добавления в файл AsciiDoc.\nФормат: pass:q[<abbr title=""></abbr>]",
+    show_default=True,
+    required=False,
+    default=False)
+@option(
+    "--common", "common_flag",
+    is_flag=True,
+    cls=MutuallyExclusiveOption,
+    mutually_exclusive=["abbr_flag", "ascii_flag"],
+    help="Флаг вывода сокращения для добавления в файл AsciiDoc.\nФормат: pass:q[<abbr title=""></abbr>]",
+    show_default=True,
+    required=False,
+    default=True)
+@help_option(
+    "-h", "--help",
+    help=HELP,
+    is_eager=True,
+    callback=print_file)
+@argument(
+    "args",
+    required=False,
+    metavar="TERMS",
+    default=None
+)
+@pass_context
+def terms_command(
+        ctx: Context,
+        args: Iterable[str] = None, *,
+        all_flag: bool = False,
+        full_flag: bool = False,
+        readme_flag: bool = False,
+        samples_flag: bool = False,
+        abbr_flag: bool = False,
+        ascii_flag: bool = False,
+        common_flag: bool = True):
+    echo(f"terms {ctx.params=}")
+    echo(f"{ctx.invoked_subcommand=}")
+    git_manager.set_content_git_pages()
     git_manager.compare()
     git_manager.set_terms()
 
@@ -119,26 +146,47 @@ def run_script():
     ascii_doc_table.complete()
     ascii_doc_table.set_terms()
 
-    user_input_parser: UserInputParser = UserInputParser(ascii_doc_table)
-    prompt: str = (
-        "Введите сокращение или несколько сокращений, "
-        "чтобы получить полное наименование и описание:\n")
+    if all_flag:
+        result: str = file_reader(HELP_FILE, ReaderMode.STRING)
 
-    logger.success(_disclaimer)
-    logger.success(_spec)
-    logger.success(_help)
-    logger.success(_exit)
+    elif full_flag:
+        terms_full: list[_Term] = [v for values in iter(ascii_doc_table.dict_terms.values()) for v in values]
+        result: str = "\n".join(map(lambda x: x.formatted(), terms_full))
 
-    while user_input_parser.state != State.STOPPED:
-        print(prompt)
-        user_input: str = input()
-        user_input_parser.handle_input(user_input)
+    elif readme_flag:
+        result: str = file_reader(README_FILE, ReaderMode.STRING)
 
-    input("Нажмите любую клавишу, чтобы закрыть окно ...")
-    logger.stop()
-    _delete_logs()
-    _delete_log_dir()
-    _delete_temp_files()
+    elif samples_flag:
+        result: str = file_reader(SAMPLES_FILE, ReaderMode.STRING)
 
+    elif args is None or not args:
+        echo("Не задана ни одна аббревиатура")
+        result: str = ""
 
+    else:
+        terms_print: list[_Term] = []
 
+        for term in args:
+            term: str = term.upper()
+
+            if term not in ascii_doc_table.terms_short():
+                terms_print.append(_Term())
+
+            else:
+                terms_print.extend(ascii_doc_table.get(term))
+
+        if abbr_flag:
+            result: str = "\n".join(map(lambda x: x.abbr(), terms_print))
+
+        elif ascii_flag:
+            result: str = "\n".join(map(lambda x: x.adoc(), terms_print))
+
+        elif common_flag:
+            result: str = "\n".join(map(lambda x: x.formatted(), terms_print))
+
+        else:
+            result: str = ""
+
+    echo(result)
+    pause(PRESS_ENTER_KEY)
+    ctx.exit(0)
