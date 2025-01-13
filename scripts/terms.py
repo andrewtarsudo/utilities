@@ -12,7 +12,7 @@ from common.functions import file_reader, ReaderMode
 from scripts.cli import command_line_interface, MutuallyExclusiveOption, TermsAPIGroup
 from terms.ascii_doc_table_terms import AsciiDocTableTerms
 from terms.git_manager import git_manager
-from terms.table import _Term
+from terms.table import Term
 
 _SOURCES: Path = Path(__file__).parent.parent.joinpath("sources")
 HELP_FILE: Path = _SOURCES.joinpath("help.txt")
@@ -41,7 +41,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
 @command_line_interface.command(
     "terms",
     cls=TermsAPIGroup,
-    help="Команда для проверки наличия непереведенных слов",
+    help="Команда для вывода расшифровки аббревиатур",
     invoke_without_command=True)
 @option(
     "-a", "--all", "all_flag",
@@ -121,6 +121,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     "args",
     required=False,
     metavar="TERMS",
+    nargs=-1,
     default=None
 )
 @pass_context
@@ -134,8 +135,6 @@ def terms_command(
         abbr_flag: bool = False,
         ascii_flag: bool = False,
         common_flag: bool = True):
-    echo(f"terms {ctx.params=}")
-    echo(f"{ctx.invoked_subcommand=}")
     git_manager.set_content_git_pages()
     git_manager.compare()
     git_manager.set_terms()
@@ -150,7 +149,7 @@ def terms_command(
         result: str = file_reader(HELP_FILE, ReaderMode.STRING)
 
     elif full_flag:
-        terms_full: list[_Term] = [v for values in iter(ascii_doc_table.dict_terms.values()) for v in values]
+        terms_full: list[Term] = [v for values in iter(ascii_doc_table.dict_terms.values()) for v in values]
         result: str = "\n".join(map(lambda x: x.formatted(), terms_full))
 
     elif readme_flag:
@@ -164,13 +163,16 @@ def terms_command(
         result: str = ""
 
     else:
-        terms_print: list[_Term] = []
+        terms_print: list[Term] = []
+
+        if isinstance(args, str):
+            args: list[str] = [args]
 
         for term in args:
             term: str = term.upper()
 
             if term not in ascii_doc_table.terms_short():
-                terms_print.append(_Term())
+                terms_print.append(Term())
 
             else:
                 terms_print.extend(ascii_doc_table.get(term))
@@ -181,11 +183,8 @@ def terms_command(
         elif ascii_flag:
             result: str = "\n".join(map(lambda x: x.adoc(), terms_print))
 
-        elif common_flag:
-            result: str = "\n".join(map(lambda x: x.formatted(), terms_print))
-
         else:
-            result: str = ""
+            result: str = "\n".join(map(lambda x: x.formatted(), terms_print))
 
     echo(result)
     pause(PRESS_ENTER_KEY)

@@ -2,7 +2,7 @@
 from typing import NamedTuple
 
 
-class _Term(NamedTuple):
+class Term(NamedTuple):
     short: str = None
     full: str = None
     rus: str = None

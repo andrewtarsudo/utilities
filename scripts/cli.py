@@ -17,7 +17,7 @@ from common.constants import args_help_dict, HELP, PRESS_ENTER_KEY
 from common.custom_logger import custom_logging
 
 COL_SPACING: int = 3
-COL_MAX: int = 38
+COL_MAX: int = 39
 MAX_CONTENT_WIDTH: int = 100
 TERMINAL_WIDTH: int = 100
 
@@ -145,8 +145,7 @@ def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
             (arg.name, args_help_dict.get_multiple_keys(keys=keys).get(arg.name))
             for arg in args]
 
-        col_spacing: int = COL_MAX - max(map(len, map(attrgetter("name"), args)))
-        echo(f"{col_spacing=}")
+        col_spacing: int = COL_MAX - max(map(len, map(attrgetter("name"), args))) - 2
         col_max: int = COL_MAX
 
         with formatter.section("Аргументы"):

@@ -9,14 +9,14 @@ from more_itertools import pairwise
 
 from common.functions import file_reader, ReaderMode
 from common.errors import AsciiDocFileTableRowIndexError, EmptyFileError, InvalidTermIndexError
-from terms.table import _Term, TableCellCoordinate, TableItem
+from terms.table import Term, TableCellCoordinate, TableItem
 
 
 class AsciiDocTableTerms:
     def __init__(self, lines: Iterable[str] = None):
         self._content: list[str] = [*lines]
         self._items: dict[TableCellCoordinate, TableItem] = dict()
-        self._dict_terms: dict[str, tuple[_Term, ...]] = dict()
+        self._dict_terms: dict[str, tuple[Term, ...]] = dict()
         self._header: list[str] = []
         self._dict_positions: dict[str, int | list[int]] = dict()
 
@@ -37,8 +37,8 @@ class AsciiDocTableTerms:
         return f"<{self.__class__.__name__}>({self._items.items()})"
 
     def set_terms(self):
-        _: list[_Term] = [_Term(*self._get_row_item(row_index)) for row_index in range(self.max_row)]
-        _dict_proxy: dict[str, list[_Term]] = dict()
+        _: list[Term] = [Term(*self._get_row_item(row_index)) for row_index in range(self.max_row)]
+        _dict_proxy: dict[str, list[Term]] = dict()
 
         for term in _:
             term_short: str = term.short
@@ -48,9 +48,9 @@ class AsciiDocTableTerms:
 
             _dict_proxy[term_short].append(term)
 
-        _dict_terms: dict[str, tuple[_Term, ...]] = {k.upper(): (*v,) for k, v in _dict_proxy.items()}
+        _dict_terms: dict[str, tuple[Term, ...]] = {k.upper(): (*v,) for k, v in _dict_proxy.items()}
         self._dict_terms.update(**_dict_terms)
-        logger.debug("Terms are parsed")
+        logger.debug("Файл обработан успешно")
         return
 
     def __getitem__(self, item):
@@ -69,17 +69,17 @@ class AsciiDocTableTerms:
 
         else:
             logger.debug(f"Термин {item} не найден")
-            return _Term(),
+            return Term(),
 
     def get(self, item):
         return self.__getitem__(item)
 
-    # def __contains__(self, item):
-    #     if isinstance(item, str):
-    #         return item in self._dict_terms
-    #
-    #     else:
-    #         return False
+    def __contains__(self, item):
+        if isinstance(item, str):
+            return item in self._dict_terms
+
+        else:
+            return False
 
     def __len__(self):
         return len(self._dict_terms)
@@ -101,7 +101,7 @@ class AsciiDocTableTerms:
             self,
             search_value: str,
             min_index: int = 0,
-            max_index: int = None) -> tuple[_Term, ...]:
+            max_index: int = None) -> tuple[Term, ...]:
         """
         Specifies the binary search to accelerate the common one.
 
@@ -109,7 +109,7 @@ class AsciiDocTableTerms:
         :param int min_index: the lower bound, default = 0
         :param max_index: the higher bound, default = len(values)
         :return: the searched value position in the list if the value is in the list.
-        :rtype: tuple[_Term, ...]
+        :rtype: tuple[Term, ...]
         """
         if max_index is None:
             max_index: int = len(self)
@@ -121,7 +121,7 @@ class AsciiDocTableTerms:
             return self._dict_terms.get(_term_short)
 
         else:
-            return _Term()
+            return Term()
 
     def _get_row_item(self, row_index: int) -> list[str | None]:
         return [v.text for v in self._get_row(row_index)]
@@ -153,7 +153,7 @@ class AsciiDocTableTerms:
         _: list[str] = header_line.split("|")
         self._header = [line.strip() for line in _ if line]
 
-        _empty: list[int] = [index for index, line in enumerate(self._content) if not line]
+        _empty: list[int] = [index for index, line in enumerate(self._content) if line == "\n"]
 
         for row_index, (_from, _to) in enumerate(pairwise(_empty[1:-1])):
             lines: list[str] = [content.strip("\n") for content in self._content[_from + 1:_to]]
@@ -164,7 +164,7 @@ class AsciiDocTableTerms:
                 _value: TableItem = TableItem(row_index, column_index, text.strip("|"))
                 self._items[_key] = _value
 
-        logger.debug(f"Dictionary of the {self.__class__.__name__} class has been initialized")
+        logger.debug(f"Словарь {self.__class__.__name__} инициализирован")
         return
 
     @property
