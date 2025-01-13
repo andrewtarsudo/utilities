@@ -5,17 +5,18 @@
 На данный момент здесь находятся:
 
 [horizontal]
-link:scripts/inspect_yaml.py[add_hook.py]:: скрипт для добавления автоматической проверки корректности путей, указанных в YAML-файле для сборки PDF, не позволяющий внести изменения в проект при наличии ошибок;
-link:scripts/check_yml.py[check_yml.py]:: скрипт для проверки корректности путей, указанных в YAML-файле для сборки PDF;
-link:scripts/list_files.py[list_files.py]:: скрипт для вывода файлов в директории с использованием ряда фильтров;
-link:scripts/no_russian.py[no_russian.py]:: скрипт для проверки наличия не переведенных слов в англоязычных файлах;
-link:scripts/repair_svg.py[repair_svg.py]:: скрипт для исправления SVG-файлов.
+link:utilities/scripts/inspect_yaml.py[add_hook.py]:: скрипт для добавления автоматической проверки корректности путей, указанных в YAML-файле для сборки PDF, не позволяющий внести изменения в проект при наличии ошибок;
+link:utilities/scripts/check_yml.py[check_yml.py]:: скрипт для проверки корректности путей, указанных в YAML-файле для сборки PDF;
+link:utilities/scripts/list_files.py[list_files.py]:: скрипт для вывода файлов в директории с использованием ряда фильтров;
+link:utilities/scripts/no_russian.py[no_russian.py]:: скрипт для проверки наличия не переведенных слов в англоязычных файлах;
+link:utilities/scripts/repair_svg.py[repair_svg.py]:: скрипт для исправления SVG-файлов.
 
 Вся документация для скриптов выше лежит в директории link:docs/[docs/].
 
 [horizontal]
-add_hook.py:: link:docs/README_add_hook.adoc[README_add_hook.adoc]
-check_yml.py:: link:docs/README_check_yml.adoc[README_check_yml.adoc]
+format_code.py:: link:docs/README_add_hook.adoc[README_format_code.adoc]
 list_files.py:: link:docs/README_list_files.adoc[README_list_files.adoc]
 no_russian.py:: link:docs/README_no_russian.adoc[README_no_russian.adoc]
 repair_svg.py:: link:docs/README_repair_svg.adoc[README_repair_svg.adoc]
+terms.py:: link:docs/README_terms.adoc[README_terms.adoc]
+validate_yaml_file.py:: link:docs/README_check_yml.adoc[README_check_yml.adoc]

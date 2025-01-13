@@ -10,7 +10,7 @@ readme = "README.adoc"
 python = ">=3.9"
 loguru = ">=0.6"
 click = ">=8.1"
-more-itertools = "^10.5.0"
+more-itertools = ">=10.5.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.3"
