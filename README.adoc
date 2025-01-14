@@ -1,22 +1,72 @@
+= Руководство пользователя
+:experimental:
+:icons: font
+:source-highlighter: rouge
+:imagesdir: docs/images
+:figure-caption: Рисунок
+:stylesdir: ../css
+:stylesheet: default.css
+:nofooter:
+:toc: auto
+:toc-title: Содержание
+:sectnums:
+:name: tw_utilities.exe
+
+== Общая информация
+
 В репозитории собраны небольшие скрипты, которые явно не тянут на отдельные проекты.
 
 Руководства пользователя находятся в директории link:docs/[docs].
 
-На данный момент здесь находятся:
+На данный момент доступны команды:
 
 [horizontal]
-link:utilities/scripts/inspect_yaml.py[add_hook.py]:: скрипт для добавления автоматической проверки корректности путей, указанных в YAML-файле для сборки PDF, не позволяющий внести изменения в проект при наличии ошибок;
-link:utilities/scripts/check_yml.py[check_yml.py]:: скрипт для проверки корректности путей, указанных в YAML-файле для сборки PDF;
-link:utilities/scripts/list_files.py[list_files.py]:: скрипт для вывода файлов в директории с использованием ряда фильтров;
-link:utilities/scripts/no_russian.py[no_russian.py]:: скрипт для проверки наличия не переведенных слов в англоязычных файлах;
-link:utilities/scripts/repair_svg.py[repair_svg.py]:: скрипт для исправления SVG-файлов.
+link:docs/README_check_russian.adoc[check-russian]:: команда для проверки наличия не переведенных слов в англоязычных файлах
+link:docs/README_format_code.adoc[format-code]:: команда для форматирования блоков кода
+link:docs/README_link_repair.adoc[link-repair]:: команда для исправления ссылок в проекте
+link:docs/README_list_files.adoc[list-files]:: команда для вывода файлов в директории с использованием ряда фильтров
+link:docs/README_repair_svg.adoc[repair-svg]:: команда для корректирования SVG-файлов
+link:docs/README_terms.adoc[terms]:: команда для получения расшифровок аббревиатур
+link:docs/README_validate_yaml_file.adoc[validate-yaml]:: команда для валидации YAML-файлов, используемых для генерации PDF
 
 Вся документация для скриптов выше лежит в директории link:docs/[docs/].
 
-[horizontal]
-format_code.py:: link:docs/README_add_hook.adoc[README_format_code.adoc]
-list_files.py:: link:docs/README_list_files.adoc[README_list_files.adoc]
-no_russian.py:: link:docs/README_no_russian.adoc[README_no_russian.adoc]
-repair_svg.py:: link:docs/README_repair_svg.adoc[README_repair_svg.adoc]
-terms.py:: link:docs/README_terms.adoc[README_terms.adoc]
-validate_yaml_file.py:: link:docs/README_check_yml.adoc[README_check_yml.adoc]
+== Запуск команд
+
+Все вызовы активируются через командную строку.
+
+Для использования любой команды необходимо в терминале ввести:
+
+[source,bash,subs="attributes"]
+----
+$ py {name} COMMAND OPTIONS
+----
+
+или
+
+[source,bash,subs="attributes"]
+----
+$ python {name} COMMAND OPTIONS
+----
+
+или
+
+[source,bash,subs="attributes"]
+----
+$ python3 {name} COMMAND OPTIONS
+----
+
+== Некоторые рекомендации
+
+. В IDE есть встроенная консоль.
+Она способна выполнять все те же команды, что и Powershell/Terminal.
++
+.Иконка консоли
+image::find_console.png[align="center",width=960]
++
+.Консоль в IDE
+image::console_ide.png[align="center",width=960]
++
+. Чтобы удобно и быстро получить путь до файла, можно выполнить следующие шаги:
++
+include::docs/partials/get_path.adoc[]

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from bisect import bisect_left
-from pathlib import Path
 from re import fullmatch
 from typing import Iterable
 
@@ -8,9 +7,9 @@ from loguru import logger
 from more_itertools import pairwise
 
 from utilities.common.constants import StrPath
-from utilities.common.functions import file_reader, ReaderMode
 from utilities.common.errors import AsciiDocFileTableRowIndexError, EmptyFileError, InvalidTermIndexError
-from utilities.terms.table import Term, TableCellCoordinate, TableItem
+from utilities.common.functions import file_reader, ReaderMode
+from utilities.terms.table import TableCellCoordinate, TableItem, Term
 
 
 class AsciiDocTableTerms:

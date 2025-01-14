@@ -1,0 +1,10 @@
+== Как запустить?
+
+Запускается так же, как и любые другие скрипты:
+
+[source,shell,subs=attributes+]
+----
+$ py {name} {script-name} OPTIONS
+----
+
+OPTIONS -- опции скрипта

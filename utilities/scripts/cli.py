@@ -2,6 +2,7 @@
 from operator import attrgetter
 from typing import Any, Iterable, Mapping
 
+from click import pass_context
 # noinspection PyProtectedMember
 from click.core import Argument, Command, Context, Group, Option, Parameter
 from click.decorators import group, help_option, option
@@ -12,7 +13,7 @@ from click.termui import pause
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import args_help_dict, HELP, PRESS_ENTER_KEY
+from utilities.common.constants import args_help_dict, DEBUG, HELP, NORMAL, PRESS_ENTER_KEY
 from utilities.common.custom_logger import custom_logging
 
 COL_SPACING: int = 3
@@ -48,7 +49,7 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
                 _metavar: str = f" {param.make_metavar()}"
 
             elif param.name not in ("version", "help"):
-                _metavar: str = f"/--no-{underscore_to_dash(param.name, prefix=False)}"
+                _metavar: str = f""
 
             else:
                 _metavar: str = ""
@@ -100,8 +101,10 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
 
     if rows:
         with formatter.section("Опции"):
-            col_spacing: int = COL_SPACING
-            col_max: int = COL_MAX
+            opt_names: list[str] = [item[0] for item in rows]
+
+            col_spacing: int = COL_MAX - max(map(len, opt_names))
+            col_max: int = MAX_CONTENT_WIDTH
             formatter.write_dl(rows, col_max, col_spacing)
 
 
@@ -120,8 +123,10 @@ def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter
                 (sub.name, sub.help)
                 for sub in sorted(commands.values(), key=attrgetter("name"))
                 if not sub.hidden]
-            col_spacing: int = COL_SPACING
-            col_max: int = COL_MAX
+
+            sub_names: list[str] = [sub.name for sub in commands.values() if not sub.hidden]
+            col_spacing: int = COL_MAX - max(map(len, sub_names))
+            col_max: int = MAX_CONTENT_WIDTH
 
             formatter.write_dl(rows, col_max, col_spacing)
 
@@ -146,8 +151,10 @@ def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
             (arg.name, args_help_dict.get_multiple_keys(keys=keys).get(arg.name))
             for arg in args]
 
-        col_spacing: int = COL_MAX - max(map(len, map(attrgetter("name"), args))) - 2
-        col_max: int = COL_MAX
+        args_names: list[str] = [arg.name for arg in args]
+
+        col_spacing: int = COL_MAX - max(map(len, args_names))
+        col_max: int = MAX_CONTENT_WIDTH
 
         with formatter.section("Аргументы"):
             formatter.write_dl(rows, col_max, col_spacing)
@@ -245,6 +252,7 @@ class APIGroup(Group):
                 pass
 
         super().parse_args(ctx, args)
+        # ctx.obj["keep_logs"] = "--keep-logs" in args
 
 
 class TermsAPIGroup(APIGroup):
@@ -268,7 +276,10 @@ class MutuallyExclusiveOption(Option):
             exclusive_options: str = ", ".join(map(underscore_to_dash, self.mutually_exclusive))
 
             _: dict[str, str] = {
-                "help": f"{_help}\nПримечание. Аргумент не может использоваться одновременно с {exclusive_options}"}
+                "help": (
+                    f"{_help}.\n"
+                    f"Примечание. Аргумент не может использоваться одновременно с \n"
+                    f"{exclusive_options}")}
             kwargs.update(_)
 
         super().__init__(*args, **kwargs)
@@ -288,6 +299,8 @@ class MutuallyExclusiveOption(Option):
 
         else:
             args: list[str] = [*args]
+            ctx.terminal_width = TERMINAL_WIDTH
+            ctx.max_content_width = MAX_CONTENT_WIDTH
             return super().handle_parse_result(ctx, opts, args)
 
 
@@ -312,8 +325,8 @@ def command_line_interface(**kwargs):
     ctx.ensure_object(dict)
     ctx.obj = dict(**kwargs)
 
-    echo(f"{ctx.command_path=}")
-    echo(f"{ctx.invoked_subcommand=}")
+    logger.debug(f"{ctx.command_path=}")
+    logger.debug(f"{ctx.invoked_subcommand=}")
 
     if ctx.invoked_subcommand is None:
         echo("Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help")
@@ -322,3 +335,12 @@ def command_line_interface(**kwargs):
 
     else:
         logger.debug(f"Команда: {ctx.command_path}")
+
+
+@pass_context
+def clear_logs(ctx: Context):
+    if ctx.obj.get("keep_logs") is True:
+        logger.remove()
+
+        DEBUG.unlink(missing_ok=True)
+        NORMAL.unlink(missing_ok=True)

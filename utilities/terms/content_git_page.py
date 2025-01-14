@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from http.client import HTTPResponse
-from pathlib import Path
 from typing import NamedTuple
 
 from loguru import logger

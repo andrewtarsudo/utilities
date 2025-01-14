@@ -5,14 +5,17 @@ from pathlib import Path
 from sys import platform
 from typing import Any, get_args, get_origin, Iterable, Mapping
 
-from click import Context, pause
+from click import echo
+from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
+from click.termui import pause
 from loguru import logger
 from yaml import safe_load
 
 from utilities.common.constants import FAIL_COLOR, NORMAL_COLOR, PASS_COLOR, HELP, PRESS_ENTER_KEY, StrPath
 from utilities.common.functions import file_reader, ReaderMode
+from utilities.scripts import clear_logs
 from utilities.scripts.cli import APIGroup, command_line_interface
 
 _SETTINGS_NAMES: tuple[str, ...] = (
@@ -350,7 +353,7 @@ def validate(
         resolve_path=True,
         allow_dash=True,
         dir_okay=False),
-    help="Файл для записи вывода.\nПо умолчанию: вывод в консоль",
+    help="\b\nФайл для записи вывода.\nПо умолчанию: вывод в консоль",
     multiple=False,
     required=False,
     metavar="<FILE>",
@@ -359,7 +362,16 @@ def validate(
     "--verbose/--no-verbose",
     type=BOOL,
     is_flag=True,
-    help="Флаг подробного вывода.\nПо умолчанию: False",
+    help="\b\nФлаг подробного вывода.\nПо умолчанию: False, выводятся только ошибки",
+    show_default=True,
+    required=False,
+    default=False)
+@option(
+    "--keep-logs",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг сохранения директории с лог-файлом по завершении \nработы в штатном режиме.\n"
+         "По умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
     default=False)
@@ -368,7 +380,12 @@ def validate(
     help=HELP,
     is_eager=True)
 @pass_context
-def validate_yaml_command(ctx: Context, yaml_file: StrPath, output: StrPath = None, verbose: bool = False):
+def validate_yaml_command(
+        ctx: Context,
+        yaml_file: StrPath,
+        output: StrPath = None,
+        verbose: bool = False,
+        keep_logs: bool = False):
     if platform.startswith("win"):
         system("color")
 
@@ -399,16 +416,18 @@ def validate_yaml_command(ctx: Context, yaml_file: StrPath, output: StrPath = No
     warnings, messages = inspect_sections(content, verbose, warnings, messages)
 
     if warnings or messages:
-        print("Предупреждения:")
-        print("\n".join(warnings))
-        print("\n".join(messages))
+        echo("Предупреждения:")
+        echo("\n".join(warnings))
+        echo("\n".join(messages))
 
     elif not verbose:
-        print("В файле проблемы не обнаружены")
+        echo("В файле проблемы не обнаружены")
 
     lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
 
     validate(Path(yaml_file).resolve().parent, lines, output, verbose)
 
+    ctx.obj["keep_logs"] = keep_logs
+
     pause(PRESS_ENTER_KEY)
-    ctx.exit(0)
+    ctx.invoke(clear_logs)

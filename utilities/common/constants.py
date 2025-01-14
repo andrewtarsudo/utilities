@@ -13,6 +13,13 @@ separator: str = "-" * 80
 
 StrPath: TypeAlias = str | Path
 
+DEBUG: Path = Path.cwd().joinpath("_logs/utilities_debug.log")
+NORMAL: Path = Path("~/Desktop/_logs/utilities_debug.log").expanduser().resolve()
+
+PRESS_ENTER_KEY: str = "\nНажмите ENTER, чтобы завершить работу скрипта ..."
+
+HELP: str = """Вывести справочную информацию на экран и завершить работу"""
+
 
 class SystemInfo(NamedTuple):
     prog: str
@@ -35,16 +42,11 @@ class SystemInfo(NamedTuple):
         return cls(prog, folder)
 
 
-SOURCES: Path = Path(__file__).parent
-
-PRESS_ENTER_KEY: str = "\nНажмите ENTER, чтобы завершить работу скрипта ..."
-
-HELP: str = """Вывести справочную информацию на экран и завершить работу"""
-
-
 class ArgsHelpDict(dict):
+    SOURCES: Path = Path(__file__).parent.joinpath("../../sources/dict.yaml")
+
     def __init__(self):
-        with open(SOURCES.joinpath("../../sources/dict.yaml"), "r", encoding="utf-8", errors="ignore") as f:
+        with open(self.__class__.SOURCES, "r", encoding="utf-8", errors="ignore") as f:
             _content: dict[str, dict[str, dict[str, str]]] = safe_load(f)
 
         super().__init__(**_content)

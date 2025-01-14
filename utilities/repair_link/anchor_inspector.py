@@ -80,14 +80,10 @@ class AnchorInspector:
 
     @property
     def dict_ru_files(self) -> dict[TextFile, list[str]]:
-        """
-        The files in Russian.
+        """Gets the files in Russian.
 
-        Returns
-        -------
-        dict[TextFile, list[str]]
-            The dictionary of Russian files and their anchors.
-
+        :return: The dictionary of Russian files and their anchors.
+        :rtype: dict[TextFile, list[str]]
         """
         return {k: v for k, v in self._dict_anchors.items() if k.language == FileLanguage.RU}
 

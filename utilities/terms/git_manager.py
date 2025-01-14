@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
 
-from click import get_app_dir
+from click.utils import get_app_dir
 from loguru import logger
 
 from utilities.common.functions import file_reader, ReaderMode

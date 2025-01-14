@@ -11,6 +11,8 @@ from warnings import simplefilter
 
 from loguru import logger
 
+from utilities.common.constants import DEBUG, NORMAL
+
 HandlerType: Type[str] = Literal["stream", "file_rotating", "result_file"]
 LoggingLevel: Type[str] = Literal["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"]
 ColorLevel: Type[str] = Literal["red", "fg #FF7518", "green", "magenta", "light-green", "cyan"]
@@ -138,8 +140,6 @@ class LoggerConfiguration:
         The logger handlers.
 
     """
-    DEBUG: Path = Path.cwd().joinpath("_logs/translation_api_debug.log")
-    NORMAL: Path = Path("~/Desktop/_logs/translation_api_debug.log").expanduser().resolve()
     _COLORED_FORMAT: str = " | ".join(
         ("<green>{time:DD-MMM-YYYY HH:mm:ss}</green>::<level>{level.name}</level>",
          "<cyan>{module}</cyan>::<cyan>{function}</cyan>",
@@ -162,10 +162,10 @@ class LoggerConfiguration:
     @property
     def log_folder(self) -> Path:
         if self._is_debug:
-            return self.__class__.DEBUG.parent
+            return DEBUG.parent
 
         else:
-            return self.__class__.NORMAL.parent
+            return NORMAL.parent
 
     def stream_handler(self) -> dict[str, Any] | None:
         """

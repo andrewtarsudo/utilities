@@ -10,7 +10,7 @@ from loguru import logger
 
 from utilities.common.constants import HELP, PRESS_ENTER_KEY, StrPath
 from utilities.common.functions import get_files
-from utilities.scripts.cli import APIGroup, command_line_interface
+from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 
 MAX_LENGTH: int = 84
 
@@ -105,19 +105,27 @@ def split(
 @option(
     "--recursive/--no-recursive",
     type=BOOL,
-    is_flag=True,
-    help="Флаг рекурсивного поиска файлов. \n\n\bПо умолчанию: True",
+    help="\b\nФлаг рекурсивного поиска файлов.\nПо умолчанию: True, поиск файлов по вложенным папкам",
     show_default=True,
     required=False,
     default=True)
 @option(
     "-l", "--length",
     type=INT,
-    help=f"Максимальная длина строки. \n\bПо умолчанию: {MAX_LENGTH}",
+    help=f"Максимальная длина строки.\nПо умолчанию: {MAX_LENGTH}",
     multiple=False,
     required=False,
     metavar="<LEN>",
     default=MAX_LENGTH)
+@option(
+    "--keep-logs",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг сохранения директории с лог-файлом по завершении \nработы в штатном режиме.\n"
+         "По умолчанию: False, лог-файл и директория удаляются",
+    show_default=True,
+    required=False,
+    default=False)
 @help_option(
     "-h", "--help",
     help=HELP,
@@ -128,7 +136,7 @@ def format_code_command(
         files: Iterable[StrPath] = None,
         directory: StrPath = None,
         recursive: bool = True,
-        length: int = MAX_LENGTH):
+        length: int = MAX_LENGTH, keep_logs: bool = False):
     files: list[StrPath] | None = get_files(files, directory, recursive)
 
     if files is None:
@@ -142,7 +150,7 @@ def format_code_command(
 
             _result: list[str] = []
 
-            for code in finditer(r"`{3}\S*\n(.*?)\n`{3}", _content):
+            for code in finditer(r"```\S*\n(.*?)\n```", _content):
                 lines: list[str] = code.group(1).splitlines()
 
                 for line in lines:
@@ -166,5 +174,7 @@ def format_code_command(
             logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
             continue
 
+    ctx.obj["keep_logs"] = keep_logs
+
     pause(PRESS_ENTER_KEY)
-    ctx.exit(0)
+    ctx.invoke(clear_logs)

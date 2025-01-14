@@ -10,7 +10,7 @@ from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 
 from utilities.common.constants import HELP, PRESS_ENTER_KEY
-from utilities.scripts.cli import APIGroup, command_line_interface, MutuallyExclusiveOption
+from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, MutuallyExclusiveOption
 
 NAME: str = Path(__file__).name
 
@@ -48,7 +48,7 @@ def generate_prefix(path: Path):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_dirs"],
     type=list[str],
-    help="Перечень игнорируемых директорий. Может использоваться несколько раз.\nПо умолчанию: _temp_folder, "
+    help="\b\nПеречень игнорируемых директорий. Может использоваться несколько раз.\nПо умолчанию: _temp_folder, "
          "_temp_storage, private",
     multiple=True,
     required=False,
@@ -60,7 +60,7 @@ def generate_prefix(path: Path):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["ignored_dirs"],
     type=BOOL,
-    help="Флаг обработки всех директорий.\nПо умолчанию: False",
+    help="\b\nФлаг обработки всех директорий.\nПо умолчанию: False",
     multiple=False,
     required=False,
     show_default=True,
@@ -70,8 +70,8 @@ def generate_prefix(path: Path):
     "-f", "--ignored-files", "ignored_files",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_files"],
-    type=list[str],
-    help="Перечень игнорируемых файлов. Может использоваться несколько раз.\nПо умолчанию: README, _check_list",
+    type=list[STRING],
+    help="\b\nПеречень игнорируемых файлов. Может использоваться несколько раз.\nПо умолчанию: README, _check_list",
     multiple=True,
     required=False,
     metavar="<FILE> ... <FILE>",
@@ -82,7 +82,7 @@ def generate_prefix(path: Path):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["ignored_files"],
     type=BOOL,
-    help="Флаг обработки всех файлов.\nПо умолчанию: False",
+    help="\b\nФлаг обработки всех файлов.\nПо умолчанию: False, выводятся файлы с определенными именами",
     multiple=False,
     required=False,
     show_default=True,
@@ -93,7 +93,7 @@ def generate_prefix(path: Path):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_extensions"],
     type=STRING,
-    help="Обрабатываемые типы файлов. Задаются перечислением, разделяемые пробелом.\nПо умолчанию: md adoc",
+    help="\b\nОбрабатываемые типы файлов. Задаются перечислением, разделяемые пробелом.\nПо умолчанию: md adoc",
     multiple=False,
     required=False,
     metavar="\"<EXT> ... <EXT>\"",
@@ -104,7 +104,7 @@ def generate_prefix(path: Path):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["extensions"],
     type=BOOL,
-    help="Флаг обработки файлов всех расширений.\nПо умолчанию: False",
+    help="\b\nФлаг обработки файлов всех расширений.\nПо умолчанию: False, выводятся файлы определенных расширений",
     multiple=False,
     required=False,
     show_default=True,
@@ -115,7 +115,7 @@ def generate_prefix(path: Path):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_languages"],
     type=STRING,
-    help="Язык файлов.\nПо умолчанию: \"\", все файлы независимо от языка",
+    help="\b\nЯзык файлов.\nПо умолчанию: \"\", выводятся все файлы независимо от языка",
     multiple=False,
     required=False,
     metavar="<LANG>",
@@ -126,7 +126,7 @@ def generate_prefix(path: Path):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["language"],
     type=BOOL,
-    help="Флаг обработки файлов всех языков.\nПо умолчанию: True",
+    help="\b\nФлаг обработки файлов всех языков.\nПо умолчанию: True, выводятся файлы на любом языке",
     multiple=False,
     required=False,
     show_default=True,
@@ -136,7 +136,7 @@ def generate_prefix(path: Path):
     "-p", "--prefix", "prefix",
     cls=MutuallyExclusiveOption,
     type=STRING,
-    help="Префикс, добавляемый к названиям файлов.\nПо умолчанию: '- content/common/'",
+    help="\b\nПрефикс, добавляемый к названиям файлов.\nПо умолчанию: '- content/common/'",
     multiple=False,
     required=False,
     metavar="<PFX>",
@@ -146,7 +146,7 @@ def generate_prefix(path: Path):
     "--hidden/--no-hidden",
     type=BOOL,
     is_flag=True,
-    help="Флаг поиска скрытых файлов.\nПо умолчанию: False",
+    help="\b\nФлаг поиска скрытых файлов.\nПо умолчанию: False, скрытые файлы не выводятся",
     show_default=True,
     required=False,
     metavar="",
@@ -155,11 +155,20 @@ def generate_prefix(path: Path):
     "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
-    help="Флаг рекурсивного поиска файлов.\nПо умолчанию: True",
+    help="\b\nФлаг рекурсивного поиска файлов.\nПо умолчанию: True, поиск файлов по вложенным папкам",
     show_default=True,
     required=False,
     metavar="",
     default=True)
+@option(
+    "--keep-logs",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг сохранения директории с лог-файлом по завершении \nработы в штатном режиме.\n"
+         "По умолчанию: False, лог-файл и директория удаляются",
+    show_default=True,
+    required=False,
+    default=False)
 @help_option(
     "-h", "--help",
     help=HELP,
@@ -179,7 +188,8 @@ def list_files_command(
         prefix: str = "- content/common/",
         hidden: bool = False,
         recursive: bool = True,
-        auxiliary: bool = False):
+        auxiliary: bool = False,
+        keep_logs: bool = False):
     if extensions is None and all_extensions is None:
         extensions: list[str] = [".md", ".adoc"]
 
@@ -260,8 +270,9 @@ def list_files_command(
 
     if not auxiliary:
         echo("\n".join(results))
+        ctx.obj["keep_logs"] = keep_logs
         pause(PRESS_ENTER_KEY)
-        ctx.exit(0)
+        ctx.invoke(clear_logs)
 
     else:
         return results

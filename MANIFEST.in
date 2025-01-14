@@ -1,0 +1,7 @@
+include __main__.py
+graft utilities/*.py
+include pyproject.toml
+include README.adoc
+graft docs/*.adoc
+include LICENSE
+include MANIFEST.in

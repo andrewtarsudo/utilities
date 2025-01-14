@@ -19,7 +19,7 @@ from utilities.repair_link.internal_link_inspector import internal_inspector
 from utilities.repair_link.link import Link
 from utilities.repair_link.link_fixer import link_fixer
 from utilities.repair_link.link_inspector import link_inspector
-from utilities.scripts.cli import APIGroup, command_line_interface
+from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 
 
 def validate_dir_path(path: StrPath | None) -> bool:
@@ -67,18 +67,8 @@ def has_no_required_files(path: StrPath) -> bool:
     type=BOOL,
     is_flag=True,
     help=(
-            "Флаг. Индикатор вывода некорректных ссылок на экран без изменения файлов.\n"
-            "По умолчанию: False, файлы перезаписываются. При отсутствии используется значение по умолчанию"),
-    show_default=True,
-    required=False,
-    default=False)
-@option(
-    "-l", "--keep-log",
-    type=BOOL,
-    is_flag=True,
-    help=(
-            "Флаг. Индикатор сохранения директории с лог-файлом по завершении работы в штатном режиме.\n"
-            "По умолчанию: False, лог-файл и директория удаляются. При отсутствии используется значение по умолчанию"),
+            "\b\nФлаг вывода некорректных ссылок на экран без изменения файлов.\n"
+            "По умолчанию: False, файлы перезаписываются"),
     show_default=True,
     required=False,
     default=False)
@@ -87,8 +77,9 @@ def has_no_required_files(path: StrPath) -> bool:
     type=BOOL,
     is_flag=True,
     help=(
-            "Флаг. Индикатор удаления файла с результатами работы скрипта по завершении работы в штатном режиме.\n"
-            "По умолчанию: False, файл сохраняется. При отсутствии используется значение по умолчанию"),
+            "\b\nФлаг удаления файла с результатами работы скрипта по завершении \n"
+            "работы в штатном режиме.\n"
+            "По умолчанию: False, файл сохраняется"),
     show_default=True,
     required=False,
     default=True)
@@ -97,9 +88,8 @@ def has_no_required_files(path: StrPath) -> bool:
     type=BOOL,
     is_flag=True,
     help=(
-            "Флаг. Индикатор поиска повторяющихся якорей.\n"
-            "По умолчанию: True, поиск дублирующихся якорей осуществляется. "
-            "При отсутствии используется значение по умолчанию"),
+            "\b\nФлаг поиска повторяющихся якорей.\n"
+            "По умолчанию: True, поиск дублирующихся якорей осуществляется"),
     show_default=True,
     required=False,
     default=True)
@@ -108,9 +98,9 @@ def has_no_required_files(path: StrPath) -> bool:
     type=BOOL,
     is_flag=True,
     help=(
-            "Флаг. Индикатор раздельной обработки файлов на различных языках.\n"
-            "По умолчанию: True, файлы на русском и английском обрабатываются отдельно. "
-            "При отсутствии используется значение по умолчанию"),
+            "\b\nФлаг раздельной обработки файлов на различных языках.\n"
+            "По умолчанию: True, файлы на русском и английском обрабатываются \n"
+            "отдельно"),
     show_default=True,
     required=False,
     default=True)
@@ -118,10 +108,17 @@ def has_no_required_files(path: StrPath) -> bool:
     "--skip-en",
     type=BOOL,
     is_flag=True,
-    help=(
-            "Флаг. Индикатор обработки файлов только на русском языке.\n"
-            "По умолчанию: False, обрабатываются файлы и на русском, и на английском. "
-            "При отсутствии используется значение по умолчанию"),
+    help="\b\nФлаг обработки файлов только на русском языке.\n"
+         "По умолчанию: False, обрабатываются файлы на обоих языках",
+    show_default=True,
+    required=False,
+    default=False)
+@option(
+    "--keep-logs",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг сохранения директории с лог-файлом по завершении работы \nв штатном режиме.\n"
+         "По умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
     default=False)
@@ -134,11 +131,11 @@ def link_repair_command(
         ctx: Context,
         pathdir: Path,
         dry_run: bool = False,
-        keep_log: bool = False,
         no_result: bool = True,
         anchor_validation: bool = True,
         separate_languages: bool = True,
-        skip_en: bool = False):
+        skip_en: bool = False,
+        keep_logs: bool = False):
     result_file_path: Path = Path.cwd().joinpath(f"results.txt")
 
     if not validate_dir_path(pathdir):
@@ -278,10 +275,7 @@ def link_repair_command(
 
     else:
         logger.info(f"Файл results.txt находится здесь:\n{result_file_path}")
-    # stop logging
-    logger.remove()
-    # delete logs
-    # if not keep_log:
-    #     rmtree(log_folder, True)
+
+    ctx.obj["keep_logs"] = keep_logs
     pause(PRESS_ENTER_KEY)
-    ctx.exit(0)
+    ctx.invoke(clear_logs)
