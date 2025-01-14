@@ -4,7 +4,7 @@
 
 [source,shell,subs=attributes+]
 ----
-$ py {name} {script-name} OPTIONS
+$ {name} {script-name} OPTIONS
 ----
 
 OPTIONS -- опции скрипта

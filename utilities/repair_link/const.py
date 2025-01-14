@@ -4,9 +4,6 @@ from typing import Any, Iterable
 
 from utilities.common.constants import separator
 
-MD_EXTENSION: str = ".md"
-ADOC_EXTENSION: str = ".adoc"
-
 
 class FileLanguage(Enum):
     RU = "russian"

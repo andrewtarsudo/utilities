@@ -3,8 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import NamedTuple
 
-from utilities.common.constants import StrPath
-from utilities.repair_link.const import MD_EXTENSION, ADOC_EXTENSION
+from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
 
 __all__ = ["Link"]
 

@@ -2,10 +2,8 @@
 from operator import attrgetter
 from typing import Any, Iterable, Mapping
 
-from click import pass_context
-# noinspection PyProtectedMember
 from click.core import Argument, Command, Context, Group, Option, Parameter
-from click.decorators import group, help_option, option
+from click.decorators import group, help_option, option, pass_context
 from click.exceptions import UsageError
 from click.formatting import HelpFormatter
 from click.globals import get_current_context

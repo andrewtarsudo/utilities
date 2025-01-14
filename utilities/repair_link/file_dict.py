@@ -6,10 +6,9 @@ from typing import Iterable, Iterator, NamedTuple
 
 from loguru import logger
 
-from utilities.common.constants import StrPath
+from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
 from utilities.common.errors import InternalLinkAnchorError, LineInvalidTypeError
-from utilities.repair_link.const import ADOC_EXTENSION, FileLanguage, \
-    MD_EXTENSION, prepare_logging
+from utilities.repair_link.const import FileLanguage, prepare_logging
 from utilities.repair_link.link import Link
 
 _MD_ANCHOR_HEADING: str = r"(?<=\{#)[\w_-]+(?=})"

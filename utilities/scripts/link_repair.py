@@ -9,11 +9,10 @@ from click.termui import echo, pause
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
-from utilities.common.constants import HELP, PRESS_ENTER_KEY, StrPath
+from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.common.errors import InvalidFileDictAttributeError, InvalidStorageAttributeError
 from utilities.repair_link.file_dict import FileDict, FileLinkItem, TextFile
-from utilities.repair_link.const import ADOC_EXTENSION, FileLanguage, MD_EXTENSION, \
-    prepare_logging
+from utilities.repair_link.const import FileLanguage, prepare_logging
 from utilities.repair_link.general_storage import Storage
 from utilities.repair_link.internal_link_inspector import internal_inspector
 from utilities.repair_link.link import Link

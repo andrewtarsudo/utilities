@@ -20,6 +20,9 @@ PRESS_ENTER_KEY: str = "\nНажмите ENTER, чтобы завершить р
 
 HELP: str = """Вывести справочную информацию на экран и завершить работу"""
 
+MD_EXTENSION: str = ".md"
+ADOC_EXTENSION: str = ".adoc"
+
 
 class SystemInfo(NamedTuple):
     prog: str

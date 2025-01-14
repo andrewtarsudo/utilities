@@ -6,8 +6,7 @@ from typing import Iterator, Iterable, Any
 
 from loguru import logger
 
-from utilities.common.constants import StrPath
-from utilities.repair_link.const import ADOC_EXTENSION, MD_EXTENSION
+from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
 
 
 def unique(values: Iterable[Any] = None) -> list[Any]:

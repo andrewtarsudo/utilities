@@ -8,64 +8,11 @@ from click.termui import pause
 from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
-from utilities.common.constants import HELP, PRESS_ENTER_KEY, StrPath
+from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.common.functions import get_files
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 
 MAX_LENGTH: int = 84
-
-
-def split(
-        line: str,
-        start: int = 0,
-        length: int = MAX_LENGTH,
-        split_lines: Iterable[str] = None) -> list[str] | None:
-    if split_lines is None:
-        split_lines: list[str] = []
-    else:
-        split_lines: list[str] = [*split_lines]
-
-    if len(line) <= length:
-        split_lines.append(line)
-        return split_lines
-
-    while start < len(line) - 1:
-        end: int = min(start + length, len(line))
-
-        _slice: str = line[start:end]
-
-        if end < len(line):
-            _matches: list[Match] = list(finditer(";", _slice))
-
-            if not _matches:
-                stop_br: int = _slice.rfind("[")
-                stop_comma: int = _slice.rfind(",")
-
-                stop: int = max(stop_br, stop_comma)
-
-                if stop == -1:
-                    stop: int = len(_slice) - 1
-
-            else:
-                _last: Match = _matches[-1]
-                stop: int = _last.end()
-
-            if stop <= 0:
-                logger.error("Ошибка разбиения файла на части")
-                raise OSError
-
-        else:
-            stop: int = len(line) - start
-
-        split_line: str = line[start:start + stop]
-        split_lines.append(split_line)
-
-        start += stop
-
-        split(line, start, length, split_lines)
-
-    else:
-        return split_lines
 
 
 @command_line_interface.command(
@@ -136,21 +83,29 @@ def format_code_command(
         files: Iterable[StrPath] = None,
         directory: StrPath = None,
         recursive: bool = True,
-        length: int = MAX_LENGTH, keep_logs: bool = False):
+        length: int = MAX_LENGTH,
+        keep_logs: bool = False):
     files: list[StrPath] | None = get_files(files, directory, recursive)
 
     if files is None:
+        ctx.obj["keep_logs"] = keep_logs
         pause(PRESS_ENTER_KEY)
-        ctx.exit(0)
+        ctx.invoke(clear_logs)
+
+    patterns: dict[str, str] = {
+        MD_EXTENSION: r"```\S*\n(.*?)\n```",
+        ADOC_EXTENSION: r"(?:----|\.\.\.\.|====)\n(.*?)\n(?:----|\.\.\.\.|====)"
+    }
 
     for file in files:
+
         try:
             with open(file, "r", encoding="utf-8", errors="ignore") as fr:
                 _content: str = fr.read()
 
             _result: list[str] = []
 
-            for code in finditer(r"```\S*\n(.*?)\n```", _content):
+            for code in finditer(patterns.get(file.suffix), _content):
                 lines: list[str] = code.group(1).splitlines()
 
                 for line in lines:
@@ -178,3 +133,58 @@ def format_code_command(
 
     pause(PRESS_ENTER_KEY)
     ctx.invoke(clear_logs)
+
+
+def split(
+        line: str,
+        start: int = 0,
+        length: int = MAX_LENGTH,
+        split_lines: Iterable[str] = None) -> list[str] | None:
+    if split_lines is None:
+        split_lines: list[str] = []
+
+    else:
+        split_lines: list[str] = [*split_lines]
+
+    if len(line) <= length:
+        split_lines.append(line)
+        return split_lines
+
+    while start < len(line) - 1:
+        end: int = min(start + length, len(line))
+
+        _slice: str = line[start:end]
+
+        if end < len(line):
+            _matches: list[Match] = list(finditer(";", _slice))
+
+            if not _matches:
+                stop_square_bracket: int = _slice.rfind("[")
+                stop_curly_bracket: int = _slice.rfind("(")
+                stop_comma: int = _slice.rfind(",")
+
+                stop: int = max(stop_square_bracket, stop_curly_bracket, stop_comma)
+
+                if stop == -1:
+                    stop: int = len(_slice) - 1
+
+            else:
+                _last: Match = _matches[-1]
+                stop: int = _last.end()
+
+            if stop <= 0:
+                logger.error("Ошибка разбиения файла на части")
+                raise OSError
+
+        else:
+            stop: int = len(line) - start
+
+        split_line: str = line[start:start + stop]
+        split_lines.append(split_line)
+
+        start += stop
+
+        split(line, start, length, split_lines)
+
+    else:
+        return split_lines

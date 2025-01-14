@@ -41,7 +41,7 @@ include::partials/run.adoc[]
 [source,console,subs=+attributes]
 ----
 Использование:
-py {name} {script-name} YAML_FILE
+{name} {script-name} YAML_FILE
 -o/--output <FILE>
 --verbose
 --keep-logs

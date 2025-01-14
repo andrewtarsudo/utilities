@@ -54,7 +54,7 @@ include::partials/run.adoc[]
 [source,console,subs="attributes"]
 ----
 Использование:
-py {name} {script-name}
+{name} {script-name}
 -d/--ignored-dirs <DIR> ... <DIR>
 --all-dirs
 -f/--ignored-files <FILE> ... <FILE>

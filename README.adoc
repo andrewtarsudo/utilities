@@ -39,21 +39,7 @@ link:docs/README_validate_yaml_file.adoc[validate-yaml]:: команда для 
 
 [source,bash,subs="attributes"]
 ----
-$ py {name} COMMAND OPTIONS
-----
-
-или
-
-[source,bash,subs="attributes"]
-----
-$ python {name} COMMAND OPTIONS
-----
-
-или
-
-[source,bash,subs="attributes"]
-----
-$ python3 {name} COMMAND OPTIONS
+$ {name} COMMAND OPTIONS
 ----
 
 == Некоторые рекомендации

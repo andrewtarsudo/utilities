@@ -31,7 +31,7 @@ include::partials/run.adoc[]
 [source,console,subs="attributes"]
 ----
 Использование:
-py {name} {script-name}
+{name} {script-name}
 -f/--file <FILE> ... <FILE>
 -d/--dir <DIR>
 --recursive

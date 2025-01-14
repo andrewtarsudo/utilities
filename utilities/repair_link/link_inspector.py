@@ -5,9 +5,8 @@ from pathlib import Path
 
 from loguru import logger
 
-from utilities.common.constants import StrPath
+from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
 from utilities.repair_link.file_dict import FileDict, TextFile, DirFile
-from utilities.repair_link.const import ADOC_EXTENSION, MD_EXTENSION
 from utilities.repair_link.link import Link
 from utilities.repair_link.internal_link_inspector import internal_inspector, InternalLinkInspector
 from utilities.repair_link.general_storage import GeneralStorage, ComponentStorage, Storage
