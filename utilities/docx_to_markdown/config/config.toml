@@ -1,0 +1,9 @@
+[basic]
+folder_tables = "./tables"
+folder_temp = "./_temp"
+
+[formatting]
+remove_multispaces = true
+remove_spaces_before_dots = true
+escape_chars = false
+escape_lt_gt = true
