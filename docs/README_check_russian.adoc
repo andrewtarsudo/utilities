@@ -1,3 +1,4 @@
+[[check-russian]]
 = Руководство для check-russian
 :experimental:
 :icons: font

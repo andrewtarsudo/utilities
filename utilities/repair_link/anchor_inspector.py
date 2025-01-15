@@ -23,16 +23,13 @@ class AnchorInspector:
         The dictionary of the anchors and the files containing these links.
     _dict_changes : dict[TextFile, list[str]]
         The dictionary of the files and anchors to fix.
-    _separate_languages : bool
-        The flag to handle the file according to the file languages.
 
     """
 
-    def __init__(self, separate_languages: bool = True):
+    def __init__(self):
         self._dict_anchors: dict[TextFile, list[str]] = dict()
         self._dict_files: dict[str, list[TextFile]] = dict()
         self._dict_changes: dict[TextFile, list[str]] = dict()
-        self._separate_languages: bool = separate_languages
 
     def __str__(self):
         return f"<{self.__class__.__name__}>"

@@ -1,3 +1,4 @@
+[[list-files]]
 = Руководство для list-files
 :experimental:
 :icons: font
@@ -9,7 +10,9 @@
 :nofooter:
 :toc: auto
 :toc-title: Содержание
+:sectnums:
 :script-name: list-files
+:name: tw_utilities.exe
 
 == Описание
 

@@ -1,3 +1,4 @@
+[[link-repair]]
 = Руководство для link-repair
 :experimental:
 :icons: font

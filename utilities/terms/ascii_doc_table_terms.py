@@ -18,7 +18,6 @@ class AsciiDocTableTerms:
         self._items: dict[TableCellCoordinate, TableItem] = dict()
         self._dict_terms: dict[str, tuple[Term, ...]] = dict()
         self._header: list[str] = []
-        self._dict_positions: dict[str, int | list[int]] = dict()
 
     @classmethod
     def from_file(cls, file_path: StrPath):

@@ -1,3 +1,4 @@
+[[terms]]
 = Руководство для terms
 :experimental:
 :icons: font

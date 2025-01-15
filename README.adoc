@@ -21,13 +21,13 @@
 На данный момент доступны команды:
 
 [horizontal]
-link:docs/README_check_russian.adoc[check-russian]:: команда для проверки наличия не переведенных слов в англоязычных файлах
-link:docs/README_format_code.adoc[format-code]:: команда для форматирования блоков кода
-link:docs/README_link_repair.adoc[link-repair]:: команда для исправления ссылок в проекте
-link:docs/README_list_files.adoc[list-files]:: команда для вывода файлов в директории с использованием ряда фильтров
-link:docs/README_repair_svg.adoc[repair-svg]:: команда для корректирования SVG-файлов
-link:docs/README_terms.adoc[terms]:: команда для получения расшифровок аббревиатур
-link:docs/README_validate_yaml_file.adoc[validate-yaml]:: команда для валидации YAML-файлов, используемых для генерации PDF
+link:docs/README_check_russian.adoc#check-russian[check-russian]:: команда для проверки наличия не переведенных слов в англоязычных файлах
+link:docs/README_format_code.adoc#format-code[format-code]:: команда для форматирования блоков кода
+link:docs/README_link_repair.adoc#link-repair[link-repair]:: команда для исправления ссылок в проекте
+link:docs/README_list_files.adoc#list-files[list-files]:: команда для вывода файлов в директории с использованием ряда фильтров
+link:docs/README_repair_svg.adoc#repair-svg[repair-svg]:: команда для корректирования SVG-файлов
+link:docs/README_terms.adoc#terms[terms]:: команда для получения расшифровок аббревиатур
+link:docs/README_validate_yaml.adoc#validate-yaml[validate-yaml]:: команда для валидации YAML-файлов, используемых для генерации PDF
 
 Вся документация для скриптов выше лежит в директории link:docs/[docs/].
 
@@ -56,3 +56,21 @@ image::console_ide.png[align="center",width=960]
 . Чтобы удобно и быстро получить путь до файла, можно выполнить следующие шаги:
 +
 include::docs/partials/get_path.adoc[]
+
+:leveloffset: +1
+
+include::docs/README_check_russian.adoc[]
+
+include::docs/README_format_code.adoc[]
+
+include::docs/README_link_repair.adoc[]
+
+include::docs/README_list_files.adoc[]
+
+include::docs/README_repair_svg.adoc[]
+
+include::docs/README_terms.adoc[]
+
+include::docs/README_validate_yaml.adoc[]
+
+:leveloffset: -1

@@ -68,12 +68,6 @@ class Term(NamedTuple):
         else:
             return f"{self.short}\n{self._formatting_description()}"
 
-    def list_terms(self):
-        if bool(self):
-            return str()
-        else:
-            return f"| {self.short} | {self._formatting_description()} |"
-
 
 class TableCellCoordinate(NamedTuple):
     row_index: int
@@ -170,10 +164,6 @@ class TableItem(NamedTuple):
     def __repr__(self):
         return f"<{self.__class__.__name__}({self.row_index}, {self.column_index}, {self.text})>"
 
-    @property
-    def is_null(self) -> bool:
-        return bool(self.coord)
-
     def __bool__(self):
         return bool(self.text)
 
@@ -218,6 +208,3 @@ class TableItem(NamedTuple):
 
         else:
             return NotImplemented
-
-    def str_table_item(self):
-        return f"|{self.text}"

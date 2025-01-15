@@ -29,7 +29,7 @@ MAX_LENGTH: int = 84
         resolve_path=True,
         allow_dash=False,
         dir_okay=False),
-    help="Файл для обработки.\nМожет использоваться несколько раз",
+    help="\b\nПеречень файлов для обработки.\nМожет использоваться несколько раз",
     multiple=True,
     required=False,
     metavar="<FILE> ... <FILE>",
@@ -59,7 +59,7 @@ MAX_LENGTH: int = 84
 @option(
     "-l", "--length",
     type=INT,
-    help=f"Максимальная длина строки.\nПо умолчанию: {MAX_LENGTH}",
+    help=f"\b\nМаксимальная длина строки. По умолчанию: {MAX_LENGTH}",
     multiple=False,
     required=False,
     metavar="<LEN>",

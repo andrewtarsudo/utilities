@@ -147,10 +147,6 @@ class TextFile(DirFile):
         self._is_changed: bool = False
         self._patterns: FilePattern | None = patterns
 
-    @classmethod
-    def from_parent(cls, parent: DirFile):
-        return cls(parent._root_dir, parent._full_path)
-
     def __getitem__(self, item):
         if isinstance(item, int):
             return self._content[item]

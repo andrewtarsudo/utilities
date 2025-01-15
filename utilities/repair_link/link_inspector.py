@@ -200,12 +200,12 @@ class LinkInspector:
     def source_file(self) -> TextFile:
         return self._file_dict.get(self.source_link())
 
-    def destination_link(self) -> Path:
-        """
-        The path to the file according to the original link.
-
-        """
-        return self.source_link().joinpath(self._link.link_to_file).resolve()
+    # def destination_link(self) -> Path:
+    #     """
+    #     The path to the file according to the original link.
+    #
+    #     """
+    #     return self.source_link().joinpath(self._link.link_to_file).resolve()
 
     def destination_file(self) -> DirFile | TextFile:
         """

@@ -150,11 +150,13 @@ def terms_command(
         args: Iterable[str] = None, *,
         all_flag: bool = False,
         full_flag: bool = False,
+        info_flag: bool = False,
         readme_flag: bool = False,
         samples_flag: bool = False,
         abbr_flag: bool = False,
         ascii_flag: bool = False,
-        keep_logs: bool = False):
+        keep_logs: bool = False,
+        common_flag: bool = False):
     git_manager.set_content_git_pages()
     git_manager.compare()
     git_manager.set_terms()
@@ -171,6 +173,9 @@ def terms_command(
     elif full_flag:
         terms_full: list[Term] = [v for values in iter(ascii_doc_table.dict_terms.values()) for v in values]
         result: str = "\n".join(map(lambda x: x.formatted(), terms_full))
+
+    elif info_flag:
+        result: str = file_reader(INFO_FILE, ReaderMode.STRING)
 
     elif readme_flag:
         result: str = file_reader(README_FILE, ReaderMode.STRING)

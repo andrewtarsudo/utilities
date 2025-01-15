@@ -1,3 +1,4 @@
+[[repair-svg]]
 = Руководство для repair-svg
 :experimental:
 :icons: font

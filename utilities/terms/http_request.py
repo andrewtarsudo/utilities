@@ -84,24 +84,11 @@ class CustomHTTPRequest:
             _params = "&".join([f"{name}={value}" for name, value in self._params])
             return f"?{_params}"
 
-    def _get_web_hook(self) -> str:
-        if self._web_hook is None:
-            logger.error("Не указан web hook")
-            raise RequiredAttributeMissingError
-        else:
-            return self._web_hook.rstrip("/")
-
     def _get_scheme(self) -> str:
         if self._scheme is None:
             return "https"
         else:
             return self._scheme.lower().strip("/")
-
-    def _get_port(self) -> int:
-        if self._port is None:
-            return CustomPort[PROTOCOL].value
-        else:
-            return self._port
 
     def _get_host(self) -> str:
         if self._host is None:
@@ -189,13 +176,6 @@ class CustomPreparedRequest(NamedTuple):
             self.host,
             self.unverifiable,
             self.method)
-
-    def response(self) -> bytes:
-        req: HTTPResponse
-        with urlopen(self.request()) as req:
-            _: bytes = req.read()
-
-        return _
 
     def http_response(self) -> HTTPResponse:
         return urlopen(self.request())

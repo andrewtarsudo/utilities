@@ -49,11 +49,11 @@ class Version(NamedTuple):
 
     @classmethod
     def from_string(cls, line: str):
-        logger.error(f"{line=}")
+
         if not line:
             return cls(0, 0, 0)
 
-        elif Counter(line).get("") != 2:
+        elif Counter(line).get(".") != 2:
             logger.error(f"Версия должна иметь вид: day.month.year, но получено {line}")
             raise InvalidVersionError
 

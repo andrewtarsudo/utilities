@@ -3,6 +3,10 @@ class BaseError(Exception):
     """Base class to inherit."""
 
 
+class InvalidPythonVersion(BaseError):
+    """Installed Python version is outdated."""
+
+
 class TimerError(BaseError):
     """Base class for errors associated with the timer."""
 
@@ -27,10 +31,6 @@ class AsciiDocFileTableRowIndexError(TermsError):
     """Invalid AsciiDocTable row index."""
 
 
-class ImportLibraryDependencyFailedError(TermsError):
-    """Dependency lib failed to import."""
-
-
 class InvalidProjectIdError(TermsError):
     """Gitlab project identifier is not a positive integer."""
 
@@ -47,7 +47,6 @@ class EmptyFileError(TermsError):
     """Read file is empty."""
 
 
-# -*- coding: utf-8 -*-
 class LinkRepairError(BaseError):
     """Base class to inherit."""
 
@@ -62,10 +61,6 @@ class InvalidStorageAttributeError(LinkRepairError):
 
 class InvalidFileDictAttributeError(LinkRepairError):
     """FileDict attribute is not proper."""
-
-
-class InvalidPythonVersion(LinkRepairError):
-    """Installed Python version is outdated."""
 
 
 class FileInvalidTypeError(LinkRepairError):

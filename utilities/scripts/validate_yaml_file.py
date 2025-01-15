@@ -25,8 +25,6 @@ _RIGHTS_NAMES: tuple[str, ...] = (
     "rights", "Rights"
 )
 
-NAME: str = Path(__file__).name
-
 _DICT_RESULTS: dict[bool, dict[str, str]] = {
     True: {
         "status": "OK",
@@ -353,7 +351,7 @@ def validate(
         resolve_path=True,
         allow_dash=True,
         dir_okay=False),
-    help="\b\nФайл для записи вывода.\nПо умолчанию: вывод в консоль",
+    help="\b\nФайл для записи вывода. По умолчанию: вывод в консоль",
     multiple=False,
     required=False,
     metavar="<FILE>",

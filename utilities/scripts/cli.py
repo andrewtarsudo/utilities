@@ -98,6 +98,8 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
             rows.append(("-h, --help", HELP))
 
     if rows:
+        formatter.width = MAX_CONTENT_WIDTH
+
         with formatter.section("Опции"):
             opt_names: list[str] = [item[0] for item in rows]
 
@@ -112,6 +114,8 @@ def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter
 
     if formatter is None:
         formatter: HelpFormatter = parent.make_formatter()
+
+    formatter.width = MAX_CONTENT_WIDTH
 
     commands: dict[str, Command] = getattr(cmd, "commands", dict())
 

@@ -12,8 +12,6 @@ from click.utils import echo
 from utilities.common.constants import HELP, PRESS_ENTER_KEY
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, MutuallyExclusiveOption
 
-NAME: str = Path(__file__).name
-
 
 def generate_prefix(path: Path):
     try:
@@ -60,7 +58,7 @@ def generate_prefix(path: Path):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["ignored_dirs"],
     type=BOOL,
-    help="\b\nФлаг обработки всех директорий.\nПо умолчанию: False",
+    help="\b\nФлаг обработки всех директорий. По умолчанию: False",
     multiple=False,
     required=False,
     show_default=True,

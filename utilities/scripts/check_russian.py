@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
-from pathlib import Path
 from typing import Iterable
 
 from click.core import Context
 from click.decorators import help_option, option, pass_context
 from click.termui import pause
-from click.utils import echo
 from click.types import BOOL, Path as ClickPath
+from click.utils import echo
 
 from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, PRESS_ENTER_KEY, StrPath
 from utilities.common.functions import get_files
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 
 RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-NAME: str = Path(__file__).name
 
 
 @command_line_interface.command(
@@ -72,7 +70,7 @@ NAME: str = Path(__file__).name
     help=HELP,
     is_eager=True)
 @pass_context
-def check_no_russian_command(
+def check_russian_command(
         ctx: Context,
         files: Iterable[StrPath] = None,
         directory: StrPath = None,

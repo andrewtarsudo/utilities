@@ -29,7 +29,7 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
         resolve_path=True,
         allow_dash=False,
         dir_okay=False),
-    help="\b\nФайл для обработки.\nМожет использоваться несколько раз",
+    help="\b\nФайл для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
     metavar="<FILE> ... <FILE>",
