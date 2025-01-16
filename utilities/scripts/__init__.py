@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from .cli import APIGroup, clear_logs, command_line_interface
+from .cli import APIGroup, clear_logs, command_line_interface, MutuallyExclusiveOption
 from .check_russian import check_russian_command
+from .convert_tables import convert_tables_command
 from .format_code import format_code_command
 from .link_repair import link_repair_command
 from .list_files import list_files_command

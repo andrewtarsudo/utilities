@@ -10,6 +10,8 @@
 :toc: auto
 :toc-title: Содержание
 :sectnums:
+:pdf-themesdir: themes
+:pdf-theme: base-theme.yml
 :name: tw_utilities.exe
 
 == Общая информация
@@ -22,6 +24,7 @@
 
 [horizontal]
 link:docs/README_check_russian.adoc#check-russian[check-russian]:: команда для проверки наличия не переведенных слов в англоязычных файлах
+link:docs/README_convert_tables.adoc#convert-tables[convert-tables]:: команда для извлечения таблиц из файлов docx в формат Markdown
 link:docs/README_format_code.adoc#format-code[format-code]:: команда для форматирования блоков кода
 link:docs/README_link_repair.adoc#link-repair[link-repair]:: команда для исправления ссылок в проекте
 link:docs/README_list_files.adoc#list-files[list-files]:: команда для вывода файлов в директории с использованием ряда фильтров
@@ -60,6 +63,8 @@ include::docs/partials/get_path.adoc[]
 :leveloffset: +1
 
 include::docs/README_check_russian.adoc[]
+
+include::docs/README_convert_tables.adoc[]
 
 include::docs/README_format_code.adoc[]
 

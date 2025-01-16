@@ -44,7 +44,7 @@ def has_no_required_files(path: StrPath) -> bool:
     return bool_md and bool_adoc
 
 
-@command_line_interface.group(
+@command_line_interface.command(
     "link-repair",
     cls=APIGroup,
     help="Команда для проверки и исправления ссылок в файлах документации",
@@ -59,8 +59,7 @@ def has_no_required_files(path: StrPath) -> bool:
         dir_okay=True),
     required=True,
     nargs=1,
-    is_eager=True
-)
+    is_eager=True)
 @option(
     "-d", "--dry-run",
     type=BOOL,

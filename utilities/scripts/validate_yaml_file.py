@@ -331,7 +331,8 @@ def validate(
 @command_line_interface.command(
     "validate-yaml",
     cls=APIGroup,
-    help="Команда для валидации YAML-файла, используемого при генерации PDF")
+    help="Команда для валидации YAML-файла, используемого при генерации PDF",
+    invoke_without_command=True)
 @argument(
     "yaml_file",
     type=ClickPath(

@@ -148,6 +148,8 @@ def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
         if param.param_type_name == "argument"]
 
     if args:
+        formatter.width = MAX_CONTENT_WIDTH
+
         keys: list[str] = [item.removesuffix(".exe") for item in ctx.command_path.split(" ")]
         rows: list[tuple[str, str]] = [
             (arg.name, args_help_dict.get_multiple_keys(keys=keys).get(arg.name))
@@ -249,12 +251,10 @@ class APIGroup(Group):
 
     def parse_args(self, ctx, args):
         if self.__class__.__name__ == "APIGroup" and args is not None and args[0] in self.commands:
-            if len(args) == 1 or args[-1] not in self.commands:
-                # args.append('')
-                pass
+            if "--debug" in args:
+                ctx.obj["debug"] = True
 
         super().parse_args(ctx, args)
-        # ctx.obj["keep_logs"] = "--keep-logs" in args
 
 
 class TermsAPIGroup(APIGroup):
@@ -264,7 +264,6 @@ class TermsAPIGroup(APIGroup):
         if args is not None and all(not x.startswith("--") for x in args):
             args.insert(0, '--common')
 
-        echo(f"{args=}")
         super().parse_args(ctx, args)
 
 
@@ -308,13 +307,13 @@ class MutuallyExclusiveOption(Option):
 
 @group(
     cls=APIGroup,
-    help="""Набор скриптов для технических писателей""")
+    help="Набор скриптов для технических писателей")
 @option(
     "-v", "--version",
     is_flag=True,
     expose_value=False,
     is_eager=True,
-    help="""Вывести версию скрипта на экран и завершить работу""",
+    help="Вывести версию скрипта на экран и завершить работу",
     callback=print_version)
 @help_option(
     "-h", "--help",
@@ -341,8 +340,19 @@ def command_line_interface(**kwargs):
 
 @pass_context
 def clear_logs(ctx: Context):
-    if ctx.obj.get("keep_logs") is True:
+    if ctx.obj.get("debug") is True:
+        echo(DEBUG)
+        echo(NORMAL)
+        pause(PRESS_ENTER_KEY)
+        ctx.exit()
+
+    elif ctx.obj.get("keep_logs") is False:
         logger.remove()
 
         DEBUG.unlink(missing_ok=True)
         NORMAL.unlink(missing_ok=True)
+
+        echo("Временные журналы скрипта удалены")
+
+        pause(PRESS_ENTER_KEY)
+        ctx.exit()

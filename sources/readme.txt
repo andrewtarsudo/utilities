@@ -47,14 +47,14 @@ Binary Floor Control Protocol, протокол управления на дво
 
 Чтобы отобразить термин в виде, пригодном для вставки в качестве всплывающей подсказки в файл Markdown, используется опция '--abbr':
 
-py __main__.py terms --abbr IMSI IMEI
+tw_utilities.exe terms --abbr IMSI IMEI
 
 <abbr title="International Mobile Subscriber Identifier">IMSI</abbr>
 <abbr title="International Mobile Equipment Identifier">IMEI</abbr>
 
 Чтобы отобразить термин в виде, пригодном для вставки в качестве всплывающей подсказки в файл AsciiDoc, используется опция '--ascii':
 
-py __main__.py terms --ascii GERAN ISUP
+tw_utilities.exe terms --ascii GERAN ISUP
 
 :geran: GERAN
 :geran: pass:[<abbr title="GSM/EDGE Radio Access Network">GERAN</abbr>]
@@ -69,7 +69,7 @@ py __main__.py terms --ascii GERAN ISUP
 
 ==== Сокращение с одним значением ===
 
-py __main__.py terms PC
+tw_utilities.exe terms PC
 
 PC
 Protocol Class, класс протокола
@@ -77,7 +77,7 @@ Protocol Class, класс протокола
 
 ==== Сокращение с несколькими значениями ====
 
-py __main__.py terms LAC
+tw_utilities.exe terms LAC
 
 LAC
 L2TP Access Concentrator, концентратор доступа L2TP
@@ -87,14 +87,14 @@ Local Area Code, код локальной зоны
 
 ==== Неизвестное сокращение ====
 
-py __main__.py terms QWE
+tw_utilities.exe terms QWE
 
 Не найдено
 -------------------------------------------------------------------------------------------------
 
 ==== Ввод нескольких известных сокращений ====
 
-py __main__.py terms SCP SRF DPC ASP
+tw_utilities.exe terms SCP SRF DPC ASP
 
 SCP
 Service Control Point, модуль логик услуг, реализованных посредством протокола CAMEL
@@ -110,7 +110,7 @@ Application Service Provider, поставщик услуг доступа к п
 
 ==== Ввод нескольких корректных сокращений, среди которых есть неизвестные ====
 
-py __main__.py terms LCS LI LOS
+tw_utilities.exe terms LCS LI LOS
 
 LCS
 Location Service, служба определения местоположения
@@ -125,7 +125,7 @@ Log Intelligence, обработка лог-файлов
 
 ==== Некорректный ввод ====
 
-py __main__.py terms ~A
+tw_utilities.exe terms ~A
 
 Не найдено
 -------------------------------------------------------------------------------------------------

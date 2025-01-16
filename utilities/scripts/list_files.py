@@ -26,7 +26,6 @@ def generate_prefix(path: Path):
     "list-files",
     cls=APIGroup,
     help="Команда для вывода файлов в директории",
-    context_settings={"ignore_unknown_options": True},
     invoke_without_command=True)
 @argument(
     "root_dir",
@@ -39,8 +38,7 @@ def generate_prefix(path: Path):
     default=Path.cwd(),
     nargs=1,
     required=True,
-    is_eager=True
-)
+    is_eager=True)
 @option(
     "-d", "--ignored-dirs", "ignored_dirs",
     cls=MutuallyExclusiveOption,
@@ -91,7 +89,7 @@ def generate_prefix(path: Path):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_extensions"],
     type=STRING,
-    help="\b\nОбрабатываемые типы файлов. Задаются перечислением, разделяемые пробелом.\nПо умолчанию: md adoc",
+    help="\b\nОбрабатываемые типы файлов, разделяемые пробелом.\nПо умолчанию: md adoc",
     multiple=False,
     required=False,
     metavar="\"<EXT> ... <EXT>\"",
@@ -102,7 +100,7 @@ def generate_prefix(path: Path):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["extensions"],
     type=BOOL,
-    help="\b\nФлаг обработки файлов всех расширений.\nПо умолчанию: False, выводятся файлы определенных расширений",
+    help="\b\nФлаг обработки файлов всех расширений.\nПо умолчанию: False, вывод файлов определенных расширений",
     multiple=False,
     required=False,
     show_default=True,
@@ -113,7 +111,7 @@ def generate_prefix(path: Path):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_languages"],
     type=STRING,
-    help="\b\nЯзык файлов.\nПо умолчанию: \"\", выводятся все файлы независимо от языка",
+    help="\b\nЯзык файлов.\nПо умолчанию: \"\", вывод всех файлов независимо от языка",
     multiple=False,
     required=False,
     metavar="<LANG>",
@@ -124,7 +122,7 @@ def generate_prefix(path: Path):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["language"],
     type=BOOL,
-    help="\b\nФлаг обработки файлов всех языков.\nПо умолчанию: True, выводятся файлы на любом языке",
+    help="\b\nФлаг обработки файлов всех языков.\nПо умолчанию: True, вывод файлов на всех языках",
     multiple=False,
     required=False,
     show_default=True,
@@ -144,7 +142,7 @@ def generate_prefix(path: Path):
     "--hidden/--no-hidden",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг поиска скрытых файлов.\nПо умолчанию: False, скрытые файлы не выводятся",
+    help="\b\nФлаг поиска скрытых файлов.\nПо умолчанию: False, исключение скрытых файлов из вывода",
     show_default=True,
     required=False,
     metavar="",

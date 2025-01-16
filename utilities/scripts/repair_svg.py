@@ -33,8 +33,7 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
     multiple=True,
     required=False,
     metavar="<FILE> ... <FILE>",
-    default=None
-)
+    default=None)
 @option(
     "-d", "--dir", "directory",
     type=ClickPath(
@@ -47,8 +46,7 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
     multiple=False,
     required=False,
     metavar="<DIR>",
-    default=None
-)
+    default=None)
 @option(
     "--recursive/--no-recursive",
     type=BOOL,

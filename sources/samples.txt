@@ -6,14 +6,14 @@
 
 ==== Сокращение с одним значением ===
 
-py __main__.py terms PC
+tw_utilities.exe terms PC
 
 Protocol Class, класс протокола
 ---------------------------------------------------------------------------------------------------
 
 ==== Сокращение с несколькими значениями ====
 
-py __main__.py terms LAC
+tw_utilities.exe terms LAC
 
 LAC
 L2TP Access Concentrator, концентратор доступа L2TP
@@ -23,14 +23,14 @@ Local Area Code, код локальной зоны
 
 ==== Неизвестное сокращение ====
 
-py __main__.py terms QWE
+tw_utilities.exe terms QWE
 
 Не найдено
 ---------------------------------------------------------------------------------------------------
 
 ==== Ввод нескольких известных сокращений ====
 
-py __main__.py terms SCP SRF DPC ASP
+tw_utilities.exe terms SCP SRF DPC ASP
 
 SCP
 Service Control Point, модуль логик услуг, реализованных посредством протокола CAMEL
@@ -46,7 +46,7 @@ Application Service Provider, поставщик услуг доступа к п
 
 ==== Ввод нескольких корректных сокращений, среди которых есть неизвестные ====
 
-py __main__.py terms LCS LI LOS
+tw_utilities.exe terms LCS LI LOS
 
 LCS
 Location Service, служба определения местоположения
@@ -61,7 +61,7 @@ Log Intelligence, обработка лог-файлов
 
 ==== Некорректный ввод ====
 
-py __main__.py terms ~A
+tw_utilities.exe terms ~A
 
 Не найдено
 ---------------------------------------------------------------------------------------------------

@@ -11,6 +11,8 @@
 :toc: auto
 :toc-title: Содержание
 :sectnums:
+:pdf-themesdir: themes
+:pdf-theme: base-theme.yml
 :script-name: format-code
 :name: tw_utilities.exe
 

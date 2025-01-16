@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-
 validate-yaml:
   yaml_file: "Путь до файла PDF_*.yml"
 
 list-files:
-  root_dir: "Путь до директории. По умолчанию: текущая директория"
+  root_dir: "Путь до директории"
 
 terms:
   args: "Перечень запрашиваемых аббревиатур"
 
 link-repair:
-  pathdir: "Директория, в которой обрабатываются все *.md- и *.adoc-файлы"
+  pathdir: "Путь до директории для обработки *.md- и *.adoc-файлов"
+
+convert-tables:
+  docx_file: "Путь до файла Word в формате *.docx или *.docm"

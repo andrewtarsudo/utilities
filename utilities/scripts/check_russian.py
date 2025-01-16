@@ -32,8 +32,7 @@ RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъы
     multiple=True,
     required=False,
     metavar="<FILE> ... <FILE>",
-    default=None
-)
+    default=None)
 @option(
     "-d", "--dir", "directory",
     type=ClickPath(
@@ -46,8 +45,7 @@ RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъы
     multiple=False,
     required=False,
     metavar="<DIR>",
-    default=None
-)
+    default=None)
 @option(
     "--recursive/--no-recursive",
     type=BOOL,

@@ -1,0 +1,255 @@
+extends: default
+
+base:
+  font:
+    family: PT Sans Web
+    size: 10
+    color: #000
+    style: normal
+  text:
+    align: left
+
+header:
+  height: 1.5cm
+  image:
+    vertical:
+      align: 11
+  padding:
+    top: 0.7
+  font:
+    size: 0.6cm
+    color: #6f6f6f
+  recto:
+    left:
+      content: '{document-title}'
+  verso:
+    right:
+      content: $header-recto-left-content
+
+footer:
+  recto:
+    left:
+      content: '{docdate}'
+    center:
+      content: '{section-or-chapter-title}'
+    right:
+      content: '{page-number} из {page-count}'
+  verso:
+    left:
+      content: '{page-number} из {page-count}'
+    center:
+      content: '{section-or-chapter-title}'
+    right:
+      content: '{docdate}'
+
+admonition:
+  font:
+    family: $base-font-family
+    size: $base-font-size
+  label:
+    font:
+      color: #CCCCCC
+      size: $base-font-size
+
+image:
+  align: center
+  caption:
+    align: center
+    end: bottom
+    text:
+      align: center
+  border:
+    color: #999
+    fit: content
+    style: solid
+    width: 2
+
+page:
+  layout: portrait
+  margin: [ 20mm, 10mm, 10mm, 20mm ]
+  size: A4
+  numbering:
+    start:
+      at: after-toc
+
+caption:
+  font:
+    color: $base-font-color
+    family: $base-font-family
+    size: $base-font-size
+    style: $base-font-style
+  text:
+    align: left
+
+code:
+  background:
+    color: #fff
+  border:
+    color: #fff
+  font:
+    color: $base-font-color
+    family: PT Mono
+    size: 0.8 * $base-font-size
+    style: normal
+  padding: [ 0.5, 5 ]
+  caption:
+    font:
+      size: $base-font-size
+
+codespan:
+  background:
+    color: #fff
+  font:
+    family: $code-font-family
+    size: $code-font-size
+    style: $code-font-style
+    color: $code-font-color
+
+description-list:
+  description:
+    indent: 15
+  term:
+    font:
+      family: $base-font-family
+      size: $base-font-size
+      color: #333
+
+heading:
+  font:
+    color: $base-font-color
+    family: $base-font-family
+    style: bold
+  text:
+    align: left
+    transform: None
+  min:
+    height:
+      after: auto
+  part:
+    break:
+      before: always
+      after: auto
+  chapter:
+    break:
+      before: always
+  h1:
+    font:
+      size: 18
+    margin:
+      bottom: 12
+      top: 12
+  h2:
+    font:
+      size: 16
+    margin:
+      bottom: 11
+      top: 11
+  h3:
+    font:
+      size: 14
+    margin:
+      bottom: 9
+      top: 9
+  h4:
+    font:
+      size: 12
+    margin:
+      bottom: 8
+      top: 8
+  h5:
+    font:
+      size: 10
+    margin:
+      bottom: 6
+      top: 6
+  h6:
+    font:
+      size: 10
+      style: bold_italic
+    margin:
+      bottom: 6
+      top: 6
+
+kbd:
+  font:
+    color: $base-font-color
+    family: $code-font-family
+    size: $base-font-size
+    style: $base-font-style
+
+link:
+  font:
+    color: #000066
+    family: $base-font-family
+    style: $base-font-style
+  text:
+    decoration: underline
+
+list:
+  indent: 15
+  item:
+    spacing: 5
+  marker:
+    font:
+      color: $base-font-color
+  text:
+    align: left
+
+running-content:
+  start:
+    at: after-toc
+
+table:
+  align: left
+  stripes: none
+  background:
+    color: #fff
+  caption:
+    align: left
+    text:
+      align: left
+      size: $caption-font-size
+    end: top
+  border:
+    color: #000
+    style: solid
+    width: 0.5
+  cell:
+    padding: 2
+  font:
+    family: $base-font-family
+    color: #000
+    size: 0.8rem
+    style: $base-font-style
+  width: auto
+  head:
+    border:
+      bottom:
+        width: 1
+    font:
+      style: bold
+
+toc:
+  break-after: auto
+  dot-leader:
+    levels: none
+
+font:
+  catalog:
+    merge: true
+    Roboto:
+      normal: roboto-normal.ttf
+      italic: roboto-italic.ttf
+      bold: roboto-bold.ttf
+      bold_italic: roboto-bold_italic.ttf
+    PT Serif Web:
+      normal: pt-serif-web-normal.ttf
+      italic: pt-serif-web-italic.ttf
+      bold: pt-serif-web-bold.ttf
+      bold_italic: pt-serif-web-bold_italic.ttf
+    PT Sans Web:
+      normal: pt-sans-web-updated-normal.ttf
+      italic: pt-sans-web-updated-italic.ttf
+      bold: pt-sans-web-updated-bold.ttf
+      bold_italic: pt-sans-web-updated-bold_italic.ttf
+    PT Mono: pt-mono.ttf

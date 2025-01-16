@@ -48,7 +48,7 @@ class EmptyFileError(TermsError):
 
 
 class LinkRepairError(BaseError):
-    """Base class to inherit."""
+    """Base class for errors associated with the link-repair."""
 
 
 class LineInvalidTypeError(LinkRepairError):
@@ -85,3 +85,11 @@ class InvalidHashCharIndexError(LinkRepairError):
 
 class MissingFileError(LinkRepairError):
     """File is not found."""
+
+
+class ConvertTablesError(BaseError):
+    """Base class for errors associated with the convert-tables."""
+
+
+class EmptyLinesError(ConvertTablesError):
+    """Lines to format is not specified."""

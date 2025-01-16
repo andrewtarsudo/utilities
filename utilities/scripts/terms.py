@@ -142,8 +142,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     required=False,
     metavar="TERMS",
     nargs=-1,
-    default=None
-)
+    default=None)
 @pass_context
 def terms_command(
         ctx: Context,
