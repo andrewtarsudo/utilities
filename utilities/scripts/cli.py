@@ -80,7 +80,7 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     suffix: str = "" if not platform.startswith("win") else ".exe"
     name: str = ctx.command_path.replace("__main__.py", f"tw_utilities{suffix}")
 
-    if commands is not None:
+    if commands is not None and commands != dict():
         commands_str: str = " | ".join(commands)
         formatter.write(
             f"Использование:\n{name}\n"

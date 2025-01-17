@@ -11,13 +11,14 @@ from loguru import logger
 from utilities.common import NonIntegerLineLengthError, NonPositiveLineLengthError
 from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.common.functions import file_reader, get_files, ReaderMode
-from utilities.scripts.cli import clear_logs, command_line_interface
+from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 
 MAX_LENGTH: int = 84
 
 
 @command_line_interface.command(
     "format-code",
+    cls=APIGroup,
     help="Команда для форматирования блоков кода")
 @option(
     "-d", "--dir", "directory",

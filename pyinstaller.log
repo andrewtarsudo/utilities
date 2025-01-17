@@ -1,12 +1,12 @@
-58 INFO: PyInstaller: 6.11.1, contrib hooks: 2024.11
-58 INFO: Python: 3.12.8
+59 INFO: PyInstaller: 6.11.1, contrib hooks: 2024.11
+59 INFO: Python: 3.12.8
 72 INFO: Platform: macOS-15.2-arm64-arm-64bit
 72 INFO: Python environment: /Users/andrewtarasov/PycharmProjects/utilities/venv
-106 WARNING: collect_dynamic_libs - skipping library collection for module '.' as it is not a package.
-106 DEPRECATION: Foreign Python environment's site-packages paths added to --paths/pathex:
+105 WARNING: collect_dynamic_libs - skipping library collection for module '.' as it is not a package.
+105 DEPRECATION: Foreign Python environment's site-packages paths added to --paths/pathex:
 ['venv/lib/python3.12/site-packages']
 This is ALWAYS the wrong thing to do. If your environment's site-packages is not in PyInstaller's module search path then you are running PyInstaller from a different environment to the one your packages are in. Run print(sys.prefix) without PyInstaller to get the environment you should be using then install and run PyInstaller from that environment instead of this one. This warning will become an error in PyInstaller 7.0.
-107 INFO: Module search paths (PYTHONPATH):
+106 INFO: Module search paths (PYTHONPATH):
 ['/opt/homebrew/Cellar/python@3.12/3.12.8/Frameworks/Python.framework/Versions/3.12/lib/python312.zip',
  '/opt/homebrew/Cellar/python@3.12/3.12.8/Frameworks/Python.framework/Versions/3.12/lib/python3.12',
  '/opt/homebrew/Cellar/python@3.12/3.12.8/Frameworks/Python.framework/Versions/3.12/lib/python3.12/lib-dynload',
@@ -16,87 +16,87 @@ This is ALWAYS the wrong thing to do. If your environment's site-packages is not
  '/Users/andrewtarasov/PycharmProjects/utilities',
  '/Users/andrewtarasov/PycharmProjects/utilities/utilities',
  '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages']
-238 INFO: Appending 'datas' from .spec
-241 INFO: checking Analysis
-241 INFO: Building Analysis because Analysis-00.toc is non existent
-241 INFO: Running Analysis Analysis-00.toc
-241 INFO: Target bytecode optimization level: 0
-241 INFO: Initializing module dependency graph...
-242 INFO: Initializing module graph hook caches...
-248 INFO: Analyzing base_library.zip ...
-698 INFO: Processing standard module hook 'hook-heapq.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-747 INFO: Processing standard module hook 'hook-encodings.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-1601 INFO: Processing standard module hook 'hook-pickle.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-2254 INFO: Caching module dependency graph...
-2299 INFO: Looking for Python shared library...
-2302 INFO: Using Python shared library: /opt/homebrew/Cellar/python@3.12/3.12.8/Frameworks/Python.framework/Versions/3.12/Python
-2302 INFO: Analyzing /Users/andrewtarasov/PycharmProjects/utilities/__main__.py
-2344 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-2426 INFO: Processing standard module hook 'hook-xml.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-2845 INFO: Processing standard module hook 'hook-sysconfig.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-3092 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-3093 INFO: SetuptoolsInfo: initializing cached setuptools info...
-5106 INFO: Processing standard module hook 'hook-difflib.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-5132 INFO: Processing standard module hook 'hook-platform.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-5209 INFO: Processing pre-safe-import-module hook 'hook-importlib_metadata.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-5210 INFO: Setuptools: 'importlib_metadata' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.importlib_metadata'!
-5214 INFO: Processing standard module hook 'hook-setuptools.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-5222 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-5235 INFO: Processing pre-safe-import-module hook 'hook-jaraco.functools.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-5235 INFO: Setuptools: 'jaraco.functools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.functools'!
-5239 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-5314 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-5319 INFO: Processing standard module hook 'hook-packaging.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-5367 INFO: Processing pre-safe-import-module hook 'hook-jaraco.text.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-5367 INFO: Setuptools: 'jaraco.text' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.text'!
-5372 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-5373 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-5373 INFO: Processing pre-safe-import-module hook 'hook-jaraco.context.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-5373 INFO: Setuptools: 'jaraco.context' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.context'!
-5476 INFO: Processing pre-safe-import-module hook 'hook-backports.tarfile.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-5476 INFO: Setuptools: 'backports.tarfile' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.backports.tarfile'!
-5520 INFO: Processing standard module hook 'hook-backports.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
-5690 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-5690 INFO: Setuptools: 'tomli' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.tomli'!
-5919 INFO: Processing standard module hook 'hook-pkg_resources.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-6024 INFO: Processing pre-safe-import-module hook 'hook-platformdirs.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-6031 INFO: Processing standard module hook 'hook-platformdirs.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
-6126 INFO: Processing pre-safe-import-module hook 'hook-wheel.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-6126 INFO: Setuptools: 'wheel' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.wheel'!
-6245 INFO: Processing standard module hook 'hook-setuptools._vendor.importlib_metadata.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-6246 INFO: Processing pre-safe-import-module hook 'hook-zipp.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
-6246 INFO: Setuptools: 'zipp' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.zipp'!
-6317 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
-6398 INFO: Processing module hooks (post-graph stage)...
-6757 INFO: Performing binary vs. data reclassification (93 entries)
-6768 INFO: Looking for ctypes DLLs
-6786 INFO: Analyzing run-time hooks ...
-6788 INFO: Including run-time hook 'pyi_rth_inspect.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
-6789 INFO: Including run-time hook 'pyi_rth_setuptools.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
-6789 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
-6790 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
-6791 INFO: Including run-time hook 'pyi_rth_pkgres.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
-6798 INFO: Looking for dynamic libraries
-6847 INFO: Warnings written to /Users/andrewtarasov/PycharmProjects/utilities/build/utilities/warn-utilities.txt
-6862 INFO: Graph cross-reference written to /Users/andrewtarasov/PycharmProjects/utilities/build/utilities/xref-utilities.html
-6899 INFO: checking PYZ
-6899 INFO: Building PYZ because PYZ-00.toc is non existent
-6899 INFO: Building PYZ (ZlibArchive) /Users/andrewtarasov/PycharmProjects/utilities/build/utilities/PYZ-00.pyz
-7313 INFO: Building PYZ (ZlibArchive) /Users/andrewtarasov/PycharmProjects/utilities/build/utilities/PYZ-00.pyz completed successfully.
-7318 INFO: EXE target arch: arm64
-7318 INFO: Code signing identity: None
-7319 INFO: checking PKG
-7319 INFO: Building PKG because PKG-00.toc is non existent
-7319 INFO: Building PKG (CArchive) tw_utilities.pkg
-9551 INFO: Building PKG (CArchive) tw_utilities.pkg completed successfully.
-9553 INFO: Bootloader /Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/bootloader/Darwin-64bit/run
-9553 INFO: checking EXE
-9553 INFO: Building EXE because EXE-00.toc is non existent
-9553 INFO: Building EXE from EXE-00.toc
-9553 INFO: Copying bootloader EXE to /Users/andrewtarasov/PycharmProjects/utilities/bin/tw_utilities
-9559 INFO: Converting EXE to target arch (arm64)
-9607 INFO: Removing signature(s) from EXE
-9647 INFO: Appending PKG archive to EXE
-9666 INFO: Fixing EXE headers for code signing
-9671 INFO: Re-signing the EXE
-9725 INFO: Building EXE from EXE-00.toc completed successfully.
+222 INFO: Appending 'datas' from .spec
+224 INFO: checking Analysis
+228 INFO: Building because /Users/andrewtarasov/PycharmProjects/utilities/sources/dict.yaml changed
+228 INFO: Running Analysis Analysis-00.toc
+228 INFO: Target bytecode optimization level: 0
+228 INFO: Initializing module dependency graph...
+229 INFO: Initializing module graph hook caches...
+236 INFO: Analyzing base_library.zip ...
+697 INFO: Processing standard module hook 'hook-encodings.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+1529 INFO: Processing standard module hook 'hook-pickle.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+1966 INFO: Processing standard module hook 'hook-heapq.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+2200 INFO: Caching module dependency graph...
+2244 INFO: Looking for Python shared library...
+2248 INFO: Using Python shared library: /opt/homebrew/Cellar/python@3.12/3.12.8/Frameworks/Python.framework/Versions/3.12/Python
+2248 INFO: Analyzing /Users/andrewtarasov/PycharmProjects/utilities/__main__.py
+2291 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+2373 INFO: Processing standard module hook 'hook-xml.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+2807 INFO: Processing standard module hook 'hook-sysconfig.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3051 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+3051 INFO: SetuptoolsInfo: initializing cached setuptools info...
+5025 INFO: Processing standard module hook 'hook-difflib.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+5051 INFO: Processing standard module hook 'hook-platform.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+5129 INFO: Processing pre-safe-import-module hook 'hook-importlib_metadata.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+5129 INFO: Setuptools: 'importlib_metadata' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.importlib_metadata'!
+5133 INFO: Processing standard module hook 'hook-setuptools.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+5141 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+5154 INFO: Processing pre-safe-import-module hook 'hook-jaraco.functools.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+5154 INFO: Setuptools: 'jaraco.functools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.functools'!
+5159 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+5233 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+5238 INFO: Processing standard module hook 'hook-packaging.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+5285 INFO: Processing pre-safe-import-module hook 'hook-jaraco.text.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+5286 INFO: Setuptools: 'jaraco.text' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.text'!
+5291 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+5291 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+5292 INFO: Processing pre-safe-import-module hook 'hook-jaraco.context.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+5292 INFO: Setuptools: 'jaraco.context' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.context'!
+5392 INFO: Processing pre-safe-import-module hook 'hook-backports.tarfile.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+5392 INFO: Setuptools: 'backports.tarfile' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.backports.tarfile'!
+5436 INFO: Processing standard module hook 'hook-backports.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+5604 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+5604 INFO: Setuptools: 'tomli' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.tomli'!
+5832 INFO: Processing standard module hook 'hook-pkg_resources.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+5936 INFO: Processing pre-safe-import-module hook 'hook-platformdirs.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+5943 INFO: Processing standard module hook 'hook-platformdirs.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+6039 INFO: Processing pre-safe-import-module hook 'hook-wheel.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+6039 INFO: Setuptools: 'wheel' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.wheel'!
+6159 INFO: Processing standard module hook 'hook-setuptools._vendor.importlib_metadata.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+6159 INFO: Processing pre-safe-import-module hook 'hook-zipp.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+6160 INFO: Setuptools: 'zipp' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.zipp'!
+6236 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks'
+6320 INFO: Processing module hooks (post-graph stage)...
+6678 INFO: Performing binary vs. data reclassification (93 entries)
+6689 INFO: Looking for ctypes DLLs
+6706 INFO: Analyzing run-time hooks ...
+6708 INFO: Including run-time hook 'pyi_rth_inspect.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+6709 INFO: Including run-time hook 'pyi_rth_setuptools.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+6710 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+6711 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+6712 INFO: Including run-time hook 'pyi_rth_pkgres.py' from '/Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+6718 INFO: Looking for dynamic libraries
+6766 INFO: Warnings written to /Users/andrewtarasov/PycharmProjects/utilities/build/utilities/warn-utilities.txt
+6781 INFO: Graph cross-reference written to /Users/andrewtarasov/PycharmProjects/utilities/build/utilities/xref-utilities.html
+6816 INFO: checking PYZ
+6820 INFO: Building because /Users/andrewtarasov/PycharmProjects/utilities/utilities/scripts/check_russian.py changed
+6820 INFO: Building PYZ (ZlibArchive) /Users/andrewtarasov/PycharmProjects/utilities/build/utilities/PYZ-00.pyz
+7244 INFO: Building PYZ (ZlibArchive) /Users/andrewtarasov/PycharmProjects/utilities/build/utilities/PYZ-00.pyz completed successfully.
+7248 INFO: EXE target arch: arm64
+7248 INFO: Code signing identity: None
+7250 INFO: checking PKG
+7252 INFO: Building because toc changed
+7252 INFO: Building PKG (CArchive) tw_utilities.pkg
+9411 INFO: Building PKG (CArchive) tw_utilities.pkg completed successfully.
+9414 INFO: Bootloader /Users/andrewtarasov/PycharmProjects/utilities/venv/lib/python3.12/site-packages/PyInstaller/bootloader/Darwin-64bit/run
+9414 INFO: checking EXE
+9419 INFO: Building because toc changed
+9419 INFO: Building EXE from EXE-00.toc
+9423 INFO: Copying bootloader EXE to /Users/andrewtarasov/PycharmProjects/utilities/bin/tw_utilities
+9424 INFO: Converting EXE to target arch (arm64)
+9436 INFO: Removing signature(s) from EXE
+9449 INFO: Appending PKG archive to EXE
+9460 INFO: Fixing EXE headers for code signing
+9463 INFO: Re-signing the EXE
+9491 INFO: Building EXE from EXE-00.toc completed successfully.

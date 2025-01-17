@@ -9,7 +9,7 @@ from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 
 from utilities.common.constants import HELP, StrPath
-from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption
+from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, MutuallyExclusiveOption
 
 
 def generate_prefix(path: Path):
@@ -23,6 +23,7 @@ def generate_prefix(path: Path):
 
 @command_line_interface.command(
     "list-files",
+    cls=APIGroup,
     help="Команда для вывода файлов в директории")
 @argument(
     "root_dir",
@@ -181,6 +182,8 @@ def list_files_command(
         recursive: bool = True,
         auxiliary: bool = False,
         keep_logs: bool = False):
+    root_dir: Path = Path(root_dir).expanduser()
+
     if extensions is None and all_extensions is None:
         extensions: list[str] = [".md", ".adoc"]
 
@@ -232,7 +235,7 @@ def list_files_command(
     results: list[str] = []
 
     for item in iglob(
-            "*",
+            "**",
             root_dir=root_dir,
             recursive=recursive,
             include_hidden=hidden):

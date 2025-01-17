@@ -8,6 +8,7 @@ from click.utils import echo
 
 from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, StrPath
 from utilities.common.functions import get_files
+from utilities.scripts import APIGroup
 from utilities.scripts.cli import clear_logs, command_line_interface
 
 RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
@@ -15,6 +16,7 @@ RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъы
 
 @command_line_interface.command(
     "check-russian",
+    cls=APIGroup,
     help="Команда для проверки наличия непереведенных слов")
 @option(
     "-d", "--dir", "directory",

@@ -29,17 +29,12 @@ include::partials/run.adoc[]
 
 === Опции скрипта
 
-[source,console,subs="attributes"]
+[source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name}
--d/--dry-run
--n/--no-result
--a/--anchor-disable
--s/--separate
---skip-en
---keep-logs
-PATHDIR
+{name} {script-name} <PATHDIR>
+-d/--dry-run | -n/--no-result | -a/--anchor-disable | -s/--separate | --skip-en | --keep-logs |
+--h/--help
 
   Команда для проверки и исправления ссылок в файлах документации
 
@@ -58,7 +53,7 @@ PATHDIR
                                          По умолчанию: True, файлы на русском и английском обрабатываются
                                          отдельно
   --skip-en                              Флаг обработки файлов только на русском языке.
-                                         По умолчанию: False, обрабатываются файлы на обоих языках.
+                                         По умолчанию: False, обрабатываются файлы на обоих языках
   --keep-logs                            Флаг сохранения директории с лог-файлом по завершении работы
                                          в штатном режиме.
                                          По умолчанию: False, лог-файл и директория удаляются

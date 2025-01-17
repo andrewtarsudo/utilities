@@ -29,50 +29,42 @@ include::partials/run.adoc[]
 
 === Опции скрипта
 
-[source,console,subs="attributes"]
+[source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name}
--a/--all
--f/--full
--i/--info
--r/--readme
--s/--samples
---abbr
---ascii
---common
---keep-logs
-TERMS
+{name} {script-name} <TERMS>
+-a/--all | -f/--full | -i/--info | -r/--readme | -s/--samples | --abbr | --ascii | --common |
+--keep-logs | --h/--help
 
   Команда для вывода расшифровки аббревиатур
 
 Аргументы:
-  args                                   Перечень запрашиваемых аббревиатур
+  terms                                  Перечень запрашиваемых аббревиатур
 
 Опции:
   -a, --all                              Флаг вывода всех сокращений.
                                          Примечание. Аргумент не может использоваться одновременно с
-                                         --samples-flag, --full-flag, --readme-flag
+                                         --full-flag, --samples-flag, --readme-flag
   -f, --full                             Флаг вывода всех сокращений с их расшифровками.
                                          Примечание. Аргумент не может использоваться одновременно с
                                          --all-flag, --samples-flag, --readme-flag
   -i, --info                             Флаг вывода полного руководства.
                                          Примечание. Аргумент не может использоваться одновременно с
-                                         --all-flag, --samples-flag, --full-flag, --readme-flag
+                                         --full-flag, --all-flag, --samples-flag, --readme-flag
   -r, --readme                           Флаг вывода полного руководства.
                                          Примечание. Аргумент не может использоваться одновременно с
-                                         --all-flag, --samples-flag, --full-flag, --info-flag
+                                         --full-flag, --all-flag, --samples-flag, --info-flag
   -s, --samples                          Флаг вывода примеров использования.
                                          Примечание. Аргумент не может использоваться одновременно с
-                                         --all-flag, --full-flag, --readme-flag, --info-flag
+                                         --full-flag, --all-flag, --readme-flag, --info-flag
   --abbr                                 Флаг вывода сокращения для добавления в файл Markdown.
                                          Формат: <abbr title=""></abbr>.
                                          Примечание. Аргумент не может использоваться одновременно с
-                                         --common-flag, --ascii-flag
+                                         --ascii-flag, --common-flag
   --ascii                                Флаг вывода сокращения для добавления в файл AsciiDoc.
                                          Формат: pass:q[<abbr title=""></abbr>].
                                          Примечание. Аргумент не может использоваться одновременно с
-                                         --common-flag, --abbr-flag
+                                         --abbr-flag, --common-flag
   --common                               Флаг вывода сокращения в свободном виде.
                                          Примечание. Аргумент не может использоваться одновременно с
                                          --ascii-flag, --abbr-flag

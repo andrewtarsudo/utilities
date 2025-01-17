@@ -56,29 +56,18 @@ include::partials/run.adoc[]
 
 === Опции скрипта
 
-[source,console,subs="attributes"]
+[source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name}
--d/--ignored-dirs <DIR> ... <DIR>
---all-dirs
--f/--ignored-files <FILE> ... <FILE>
---all-files
--e/--extensions "<EXT> ... <EXT>"
---all-ext
--l/--language <LANG>
---all-langs
--p/--prefix <PFX>
---hidden
---recursive
---keep-logs
-ROOT_DIR
+{name} {script-name} <ROOT_DIR>
+-d/--ignored-dirs <DIR> ... <DIR> | --all-dirs | -f/--ignored-files <FILE> ... <FILE> | --all-files |
+-e/--extensions "<EXT> ... <EXT>" | --all-ext | -l/--language <LANG> | --all-langs |
+-p/--prefix <PFX> | --hidden | --recursive | --keep-logs | --h/--help
 
   Команда для вывода файлов в директории
 
 Аргументы:
-  root_dir                               Путь до директории. По умолчанию:
-                                         текущая директория
+  root_dir                               Путь до директории
 
 Опции:
   -d, --ignored-dirs <DIR> ... <DIR>     Перечень игнорируемых директорий. Может использоваться несколько раз.

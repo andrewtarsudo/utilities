@@ -36,26 +36,23 @@ include::partials/run.adoc[]
 
 === Опции скрипта
 
-[source,console,subs="attributes"]
+[source,console,subs="attributes+"]
 ----
 Использование:
 {name} {script-name}
-Использование:
-utilities.exe format-code
--f/--file <FILE> ... <FILE>
--d/--dir <DIR>
--l/--length <LEN>
---recursive
---keep-logs
+-d/--dir <DIR> | -f/--file <FILE> ... <FILE> | -l/--length <LEN> | --recursive | --keep-logs |
+--h/--help
 
   Команда для форматирования блоков кода
 
 Опции:
-  -f, --file <FILE> ... <FILE>           Файл для обработки. Может использоваться несколько раз
   -d, --dir <DIR>                        Директория для обработки
+  -f, --file <FILE> ... <FILE>           Перечень файлов для обработки.
+                                         Может использоваться несколько раз
+  -l, --length <LEN>                     Максимальная длина строки. По умолчанию: 84
+                                         Примечание. Должно быть целым положительным числом
   --recursive / --no-recursive           Флаг рекурсивного поиска файлов.
                                          По умолчанию: True, поиск файлов по вложенным папкам
-  -l, --length <LEN>                     Максимальная длина строки. По умолчанию: 84
   --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
                                          работы в штатном режиме.
                                          По умолчанию: False, лог-файл и директория удаляются
