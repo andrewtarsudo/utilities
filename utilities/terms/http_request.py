@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from base64 import b64decode
-from http.client import HTTPResponse
+from http.client import HTTPException, HTTPResponse
 from json import loads
 from os import environ
 from pathlib import Path
@@ -11,8 +11,8 @@ from urllib.request import Request, urlopen
 from loguru import logger
 
 from utilities.common.constants import StrPath
-from utilities.terms.const import CustomPort, CustomScheme
 from utilities.common.errors import RequiredAttributeMissingError
+from utilities.terms.const import CustomPort, CustomScheme
 
 try:
     PROTOCOL: str = environ['PROTOCOL']
@@ -68,18 +68,21 @@ class CustomHTTPRequest:
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.url() == other.url()
+
         else:
             return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
             return self.url() != other.url()
+
         else:
             return NotImplemented
 
     def _get_params(self) -> str:
         if self._params is None:
             return ""
+
         else:
             _params = "&".join([f"{name}={value}" for name, value in self._params])
             return f"?{_params}"
@@ -87,6 +90,7 @@ class CustomHTTPRequest:
     def _get_scheme(self) -> str:
         if self._scheme is None:
             return "https"
+
         else:
             return self._scheme.lower().strip("/")
 
@@ -94,6 +98,7 @@ class CustomHTTPRequest:
         if self._host is None:
             logger.error("Не указан адрес host")
             raise RequiredAttributeMissingError
+
         else:
             return self._host.strip("/")
 
@@ -169,6 +174,8 @@ class CustomPreparedRequest(NamedTuple):
         if self.headers is None:
             self.headers = dict()
 
+        self.headers["User-Agent"] = "My User Agent 1.0"
+
         return Request(
             self.url,
             self.data,
@@ -178,7 +185,12 @@ class CustomPreparedRequest(NamedTuple):
             self.method)
 
     def http_response(self) -> HTTPResponse:
-        return urlopen(self.request())
+        try:
+            return urlopen(self.request(), timeout=60.0)
+
+        except HTTPException as e:
+            logger.error(f"{e.__class__.__name__}, {str(e)}")
+            raise
 
 
 class CustomHTTPResponse:
@@ -197,12 +209,14 @@ class CustomHTTPResponse:
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self._http_response == other._http_response
+
         else:
             return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
             return self._http_response != other._http_response
+
         else:
             return NotImplemented
 
@@ -251,6 +265,7 @@ class CustomHTTPResponseChunked:
         with open(self._path, mode="w+b") as fb:
             while chunk := self._http_response.read(self._chunk):
                 fb.write(chunk)
+
             fb.seek(0)
             full_response: dict[str, Any] = loads(fb.read())
             self._response_dict = full_response
@@ -266,12 +281,14 @@ class CustomHTTPResponseChunked:
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self._http_response == other._http_response
+
         else:
             return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
             return self._http_response != other._http_response
+
         else:
             return NotImplemented
 

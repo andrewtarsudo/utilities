@@ -11,14 +11,14 @@ from loguru import logger
 
 from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.common.errors import InvalidFileDictAttributeError, InvalidStorageAttributeError
-from utilities.repair_link.file_dict import FileDict, FileLinkItem, TextFile
 from utilities.repair_link.const import FileLanguage, prepare_logging
+from utilities.repair_link.file_dict import FileDict, FileLinkItem, TextFile
 from utilities.repair_link.general_storage import Storage
 from utilities.repair_link.internal_link_inspector import internal_inspector
 from utilities.repair_link.link import Link
 from utilities.repair_link.link_fixer import link_fixer
 from utilities.repair_link.link_inspector import link_inspector
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.scripts.cli import clear_logs, command_line_interface
 
 
 def validate_dir_path(path: StrPath | None) -> bool:
@@ -46,13 +46,10 @@ def has_no_required_files(path: StrPath) -> bool:
 
 @command_line_interface.command(
     "link-repair",
-    cls=APIGroup,
-    help="Команда для проверки и исправления ссылок в файлах документации",
-    invoke_without_command=True)
+    help="Команда для проверки и исправления ссылок в файлах документации")
 @argument(
     "pathdir",
     type=ClickPath(
-        exists=True,
         file_okay=False,
         resolve_path=True,
         allow_dash=False,
@@ -64,9 +61,8 @@ def has_no_required_files(path: StrPath) -> bool:
     "-d", "--dry-run",
     type=BOOL,
     is_flag=True,
-    help=(
-            "\b\nФлаг вывода некорректных ссылок на экран без изменения файлов.\n"
-            "По умолчанию: False, файлы перезаписываются"),
+    help="\b\nФлаг вывода некорректных ссылок на экран без изменения файлов.\n"
+         "По умолчанию: False, файлы перезаписываются",
     show_default=True,
     required=False,
     default=False)
@@ -74,10 +70,9 @@ def has_no_required_files(path: StrPath) -> bool:
     "-n", "--no-result",
     type=BOOL,
     is_flag=True,
-    help=(
-            "\b\nФлаг удаления файла с результатами работы скрипта по завершении \n"
-            "работы в штатном режиме.\n"
-            "По умолчанию: False, файл сохраняется"),
+    help="\b\nФлаг удаления файла с результатами работы скрипта по завершении \n"
+         "работы в штатном режиме.\n"
+         "По умолчанию: False, файл сохраняется",
     show_default=True,
     required=False,
     default=True)
@@ -85,9 +80,8 @@ def has_no_required_files(path: StrPath) -> bool:
     "-a", "--anchor-disable", "anchor_validation",
     type=BOOL,
     is_flag=True,
-    help=(
-            "\b\nФлаг поиска повторяющихся якорей.\n"
-            "По умолчанию: True, поиск дублирующихся якорей осуществляется"),
+    help="\b\nФлаг поиска повторяющихся якорей.\n"
+         "По умолчанию: True, поиск дублирующихся якорей осуществляется",
     show_default=True,
     required=False,
     default=True)
@@ -95,10 +89,9 @@ def has_no_required_files(path: StrPath) -> bool:
     "-s", "--separate", "separate_languages",
     type=BOOL,
     is_flag=True,
-    help=(
-            "\b\nФлаг раздельной обработки файлов на различных языках.\n"
-            "По умолчанию: True, файлы на русском и английском обрабатываются \n"
-            "отдельно"),
+    help="\b\nФлаг раздельной обработки файлов на различных языках.\n"
+         "По умолчанию: True, файлы на русском и английском обрабатываются \n"
+         "отдельно",
     show_default=True,
     required=False,
     default=True)
@@ -134,7 +127,7 @@ def link_repair_command(
         separate_languages: bool = True,
         skip_en: bool = False,
         keep_logs: bool = False):
-    result_file_path: Path = Path.cwd().joinpath(f"results.txt")
+    result_file_path: Path = Path.cwd().joinpath("results.txt")
 
     if not validate_dir_path(pathdir):
         logger.critical(f"Путь {pathdir} не существует или указывает не на директорию")
@@ -148,6 +141,7 @@ def link_repair_command(
         ctx.exit(0)
 
     _base_dir: Path = Path(pathdir).parent.parent.resolve()
+
     # operate with Storage
     storage: Storage = Storage(pathdir)
     storage.prepare()
@@ -173,6 +167,7 @@ def link_repair_command(
 
     if anchor_validation:
         from utilities.repair_link.anchor_inspector import anchor_inspector
+
         # operate with AnchorInspector
         anchor_inspector + iter(file_dict.dict_files.values())
 
@@ -192,11 +187,13 @@ def link_repair_command(
         for file, anchors in anchor_inspector.dict_changes.items():
             for anchor in anchors:
                 line_number: list[int] = file.find_anchor(anchor)
-                file.update_line(
-                    line_number,
-                    anchor,
-                    f"{anchor}-{file.full_path.stem.lower().removeprefix('_').replace('_', '-').replace('.', '-')}",
-                    is_boundary=True)
+                addition: str = (
+                    file.full_path.stem
+                    .lower()
+                    .removeprefix('_')
+                    .replace('_', '-')
+                    .replace('.', '-'))
+                file.update_line(line_number, anchor, f"{anchor}-{addition}", is_boundary=True)
 
     else:
         logger.info("Проверка дублирования якорей отключена пользователем", result=True)
@@ -225,15 +222,19 @@ def link_repair_command(
             index: int
             link: Link
             index, link = link_item.index, link_item.link
+
             # nullify values
             link_inspector.clear()
+
             # specify values
             link_inspector.link = link
             link_inspector.preprocess_link()
+
             # validate link or search for file
             link_inspector.inspect_original_link()
             link_inspector.inspect_trivial_options()
             link_inspector.find_file()
+
             # if not found
             if not bool(link_inspector):
                 _file_path: str = relpath(link_inspector.link.from_file, _base_dir).replace('\\', '/')
@@ -242,14 +243,17 @@ def link_repair_command(
                     f"Ссылка: {link_inspector.link.link_to}\n"
                     f"Файл: {_file_path}", result=True)
                 continue
+
             # if file is out of root directory
             if link_inspector.destination_file() is None:
                 continue
+
             # specify link
             logger.debug(f"link = {link_inspector.link}")
             link_inspector.inspect_anchor()
             link_inspector.find_proper_anchor()
             link_inspector.set_proper_link()
+
             # inspect if proper link and origin one are equal
             if not link_inspector.compare_links():
                 dir_file.update_line(index, link.link_to, link_inspector.proper_link)
@@ -275,5 +279,4 @@ def link_repair_command(
         logger.info(f"Файл results.txt находится здесь:\n{result_file_path}")
 
     ctx.obj["keep_logs"] = keep_logs
-    pause(PRESS_ENTER_KEY)
     ctx.invoke(clear_logs)

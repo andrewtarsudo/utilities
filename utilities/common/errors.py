@@ -93,3 +93,15 @@ class ConvertTablesError(BaseError):
 
 class EmptyLinesError(ConvertTablesError):
     """Lines to format is not specified."""
+
+
+class FormatCodeError(BaseError):
+    """Base class for errors associated with the format-code."""
+
+
+class NonPositiveLineLengthError(FormatCodeError):
+    """Maximum line length cannot be less than zero."""
+
+
+class NonIntegerLineLengthError(FormatCodeError):
+    """Maximum line length cannot be non-integer."""

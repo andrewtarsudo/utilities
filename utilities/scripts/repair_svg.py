@@ -3,27 +3,23 @@ from pathlib import Path
 from re import DOTALL, MULTILINE, sub
 from typing import Iterable
 
-from click import echo, option
 from click.core import Context
-from click.decorators import help_option, pass_context
-from click.termui import pause
+from click.decorators import help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
+from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import HELP, PRESS_ENTER_KEY, StrPath
+from utilities.common.constants import HELP, StrPath
 from utilities.common.functions import get_files
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.scripts.cli import clear_logs, command_line_interface
 
 
 @command_line_interface.command(
     "repair-svg",
-    cls=APIGroup,
-    help="Команда для исправления файлов SVG",
-    invoke_without_command=True)
+    help="Команда для исправления файлов SVG")
 @option(
     "-f", "--file", "files",
     type=ClickPath(
-        exists=True,
         file_okay=True,
         readable=True,
         resolve_path=True,
@@ -37,7 +33,6 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 @option(
     "-d", "--dir", "directory",
     type=ClickPath(
-        exists=True,
         file_okay=False,
         resolve_path=True,
         allow_dash=False,
@@ -75,60 +70,57 @@ def repair_svg_command(
         directory: StrPath = None,
         recursive: bool = True,
         keep_logs: bool = False):
-    files: list[StrPath] | None = get_files(files, directory, recursive)
+    print(recursive)
+    files: list[StrPath] | None = get_files(ctx, files, directory, recursive)
 
-    if files is None:
-        pause(PRESS_ENTER_KEY)
-        ctx.exit(0)
+    if files is not None:
+        FOREIGN_OBJECT: str = "<foreignObject.*?</foreignObject>"
+        TEXT: str = (
+            r"<a\s?transform=\"translate(0,-5)\"\s?xlink:href=\"https://www.drawio.com/doc/faq/svg-export-text-problems"
+            "\".*?</a>")
+        FEATURES: str = r"<g>\s?<g\s?requiredFeatures=\"http://www.w3.org/TR/SVG11/feature#Extensibility\"/>\s?</g>"
 
-    FOREIGN_OBJECT: str = "<foreignObject.*?</foreignObject>"
-    TEXT: str = (
-        r"<a\s?transform=\"translate(0,-5)\"\s?xlink:href=\"https://www.drawio.com/doc/faq/svg-export-text-problems"
-        "\".*?</a>")
-    FEATURES: str = r"<g>\s?<g\s?requiredFeatures=\"http://www.w3.org/TR/SVG11/feature#Extensibility\"/>\s?</g>"
+        for file in files:
+            file: Path = Path(file).expanduser().resolve()
 
-    for file in files:
-        file: Path = Path(file).expanduser().resolve()
-
-        if not file.exists(follow_symlinks=True):
-            echo(f"Указан не существующий файл {file}")
-            continue
-
-        elif not file.is_file():
-            echo(f"Путь {file} указывает не на файл")
-            continue
-
-        elif file.suffix != ".svg":
-            echo(f"Указанный файл {file.name} имеет расширение не SVG")
-            continue
-
-        else:
-            try:
-                with open(file, "rb") as fr:
-                    svg: str = fr.read().decode()
-
-                svg: str = sub(TEXT, "", svg, flags=DOTALL | MULTILINE)
-                svg: str = sub(FOREIGN_OBJECT, "", svg, flags=DOTALL | MULTILINE)
-                svg: str = sub(FEATURES, "", svg, flags=DOTALL | MULTILINE)
-                svg: str = svg.replace("switch>", "g>")
-
-                with open(file, "wb") as fw:
-                    fw.write(svg.encode())
-
-                logger.info(f"Файл {file.name} успешно обработан")
-
-            except PermissionError:
-                logger.error(f"Недостаточно прав для чтения/записи в файл {file.name}")
+            if not file.exists(follow_symlinks=True):
+                echo(f"Указан не существующий файл {file}")
                 continue
 
-            except RuntimeError:
-                logger.error(f"Истекло время чтения/записи файл {file.name}")
+            elif not file.is_file():
+                echo(f"Путь {file} указывает не на файл")
                 continue
 
-            except OSError as e:
-                logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+            elif file.suffix != ".svg":
+                echo(f"Указанный файл {file.name} имеет расширение не SVG")
                 continue
+
+            else:
+                try:
+                    with open(file, "rb") as fr:
+                        svg: str = fr.read().decode()
+
+                    svg: str = sub(TEXT, "", svg, flags=DOTALL | MULTILINE)
+                    svg: str = sub(FOREIGN_OBJECT, "", svg, flags=DOTALL | MULTILINE)
+                    svg: str = sub(FEATURES, "", svg, flags=DOTALL | MULTILINE)
+                    svg: str = svg.replace("switch>", "g>")
+
+                    with open(file, "wb") as fw:
+                        fw.write(svg.encode())
+
+                    logger.info(f"Файл {file.name} успешно обработан")
+
+                except PermissionError:
+                    logger.error(f"Недостаточно прав для чтения/записи в файл {file.name}")
+                    continue
+
+                except RuntimeError:
+                    logger.error(f"Истекло время чтения/записи файл {file.name}")
+                    continue
+
+                except OSError as e:
+                    logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+                    continue
 
     ctx.obj["keep_logs"] = keep_logs
-    pause(PRESS_ENTER_KEY)
     ctx.invoke(clear_logs)

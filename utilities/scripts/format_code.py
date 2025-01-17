@@ -8,22 +8,32 @@ from click.termui import pause
 from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
+from utilities.common import NonIntegerLineLengthError, NonPositiveLineLengthError
 from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
-from utilities.common.functions import get_files
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.common.functions import file_reader, get_files, ReaderMode
+from utilities.scripts.cli import clear_logs, command_line_interface
 
 MAX_LENGTH: int = 84
 
 
 @command_line_interface.command(
     "format-code",
-    cls=APIGroup,
-    help="Команда для форматирования блоков кода",
-    invoke_without_command=True)
+    help="Команда для форматирования блоков кода")
+@option(
+    "-d", "--dir", "directory",
+    type=ClickPath(
+        file_okay=False,
+        resolve_path=True,
+        allow_dash=False,
+        dir_okay=True),
+    help="Директория для обработки",
+    multiple=False,
+    required=False,
+    metavar="<DIR>",
+    default=None)
 @option(
     "-f", "--file", "files",
     type=ClickPath(
-        exists=True,
         file_okay=True,
         readable=True,
         resolve_path=True,
@@ -33,22 +43,16 @@ MAX_LENGTH: int = 84
     multiple=True,
     required=False,
     metavar="<FILE> ... <FILE>",
-    default=None
-)
+    default=None)
 @option(
-    "-d", "--dir", "directory",
-    type=ClickPath(
-        exists=True,
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
-    help="Директория для обработки",
+    "-l", "--length",
+    type=INT,
+    help=f"\b\nМаксимальная длина строки. По умолчанию: {MAX_LENGTH}\n"
+         "Примечание. Должно быть целым положительным числом",
     multiple=False,
     required=False,
-    metavar="<DIR>",
-    default=None
-)
+    metavar="<LEN>",
+    default=MAX_LENGTH)
 @option(
     "--recursive/--no-recursive",
     type=BOOL,
@@ -56,14 +60,6 @@ MAX_LENGTH: int = 84
     show_default=True,
     required=False,
     default=True)
-@option(
-    "-l", "--length",
-    type=INT,
-    help=f"\b\nМаксимальная длина строки. По умолчанию: {MAX_LENGTH}",
-    multiple=False,
-    required=False,
-    metavar="<LEN>",
-    default=MAX_LENGTH)
 @option(
     "--keep-logs",
     type=BOOL,
@@ -85,7 +81,15 @@ def format_code_command(
         recursive: bool = True,
         length: int = MAX_LENGTH,
         keep_logs: bool = False):
-    files: list[StrPath] | None = get_files(files, directory, recursive)
+    if length < 0:
+        logger.error(f"Максимальная длина не может быть неположительным числом, однако получено {length}")
+        raise NonPositiveLineLengthError
+
+    elif not isinstance(length, int):
+        logger.error(f"Максимальная длина должна быть целым числом, однако получено {type(length)}")
+        raise NonIntegerLineLengthError
+
+    files: list[StrPath] | None = get_files(ctx, files, directory, recursive)
 
     if files is None:
         ctx.obj["keep_logs"] = keep_logs
@@ -94,14 +98,12 @@ def format_code_command(
 
     patterns: dict[str, str] = {
         MD_EXTENSION: r"```\S*\n(.*?)\n```",
-        ADOC_EXTENSION: r"(?:----|\.\.\.\.|====)\n(.*?)\n(?:----|\.\.\.\.|====)"
+        ADOC_EXTENSION: r"(?:-{4}|={4}|\.{4})([\s\S]+)(?:-{4}|={4}|\.{4})"
     }
 
     for file in files:
-
         try:
-            with open(file, "r", encoding="utf-8", errors="ignore") as fr:
-                _content: str = fr.read()
+            _content: str = file_reader(file, ReaderMode.STRING)
 
             _result: list[str] = []
 
@@ -130,8 +132,6 @@ def format_code_command(
             continue
 
     ctx.obj["keep_logs"] = keep_logs
-
-    pause(PRESS_ENTER_KEY)
     ctx.invoke(clear_logs)
 
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from operator import attrgetter
+from sys import platform
 from typing import Any, Iterable, Mapping
 
 from click.core import Argument, Command, Context, Group, Option, Parameter
@@ -32,6 +33,15 @@ def underscore_to_dash(value: str, *, prefix: bool = True):
     return f'{int(prefix) * "--"}{value.replace("_", "-")}'
 
 
+def wrap_line(line: str):
+    if len(line) >= MAX_CONTENT_WIDTH:
+        pipe_indexes: list[int] = [index for index, char in enumerate(line) if char == "|"]
+        index: int = max(filter(lambda x: x <= MAX_CONTENT_WIDTH, pipe_indexes))
+        line: str = f"{line[:index + 1]}\n{wrap_line(line[index + 2:])}"
+
+    return line
+
+
 def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     args: list[str] = []
     opts: list[str] = []
@@ -40,13 +50,16 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
         if param.name == "help":
             continue
 
-        elif param.param_type_name == "option":
+        elif isinstance(param, Option):
             _opts: str = "/".join(param.opts)
+
+            if param.hidden:
+                continue
 
             if param.type.name != "boolean":
                 _metavar: str = f" {param.make_metavar()}"
 
-            elif param.name not in ("version", "help"):
+            elif param.name in ("version", "help"):
                 _metavar: str = f""
 
             else:
@@ -60,14 +73,31 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
             args.append(_param)
 
     args_str: str = " ".join(args) if args else ""
-    opts_str: str = "\n".join(opts) if opts else ""
+    opts_str: str = " | ".join(opts) if opts else ""
+    opts_str: str = f"{opts_str} | --h/--help"
 
-    formatter.write(f"Использование:\n{ctx.command_path} {args_str}\n{opts_str}\n")
+    commands: dict[str, Command] = getattr(cmd, "commands", None)
+    suffix: str = "" if not platform.startswith("win") else ".exe"
+    name: str = ctx.command_path.replace("__main__.py", f"tw_utilities{suffix}")
+
+    if commands is not None:
+        commands_str: str = " | ".join(commands)
+        formatter.write(
+            f"Использование:\n{name}\n"
+            f"{commands_str}\n{wrap_line(opts_str)}\n{wrap_line(args_str)}\n")
+
+    else:
+
+        formatter.write(
+            f"Использование:\n{name} {args_str}\n{wrap_line(opts_str)}\n")
 
 
 def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     def modify_help_record(parameter: Parameter):
         if isinstance(parameter, Argument):
+            return None
+
+        elif isinstance(parameter, Option) and parameter.hidden:
             return None
 
         option_help: str
@@ -249,13 +279,6 @@ class APIGroup(Group):
     def format_args(self, ctx: Context, formatter: HelpFormatter):
         format_args(self, ctx, formatter)
 
-    def parse_args(self, ctx, args):
-        if self.__class__.__name__ == "APIGroup" and args is not None and args[0] in self.commands:
-            if "--debug" in args:
-                ctx.obj["debug"] = True
-
-        super().parse_args(ctx, args)
-
 
 class TermsAPIGroup(APIGroup):
     def parse_args(self, ctx, args):
@@ -309,6 +332,14 @@ class MutuallyExclusiveOption(Option):
     cls=APIGroup,
     help="Набор скриптов для технических писателей")
 @option(
+    "--debug", "debug",
+    is_flag=True,
+    expose_value=False,
+    required=False,
+    is_eager=False,
+    hidden=True,
+    help="Флаг активации режима отладки.\nПо умолчанию: False, отключение режима")
+@option(
     "-v", "--version",
     is_flag=True,
     expose_value=False,
@@ -319,15 +350,13 @@ class MutuallyExclusiveOption(Option):
     "-h", "--help",
     help=HELP,
     is_eager=True)
-@logger.catch
-@custom_logging("cli", is_debug=True)
-def command_line_interface(**kwargs):
+def command_line_interface(debug: bool = False, **kwargs):
     ctx: Context = get_current_context()
     ctx.ensure_object(dict)
     ctx.obj = dict(**kwargs)
+    ctx.obj["debug"] = debug
 
-    logger.debug(f"{ctx.command_path=}")
-    logger.debug(f"{ctx.invoked_subcommand=}")
+    custom_logging("cli", is_debug=debug)
 
     if ctx.invoked_subcommand is None:
         echo("Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help")
@@ -340,19 +369,15 @@ def command_line_interface(**kwargs):
 
 @pass_context
 def clear_logs(ctx: Context):
-    if ctx.obj.get("debug") is True:
-        echo(DEBUG)
-        echo(NORMAL)
-        pause(PRESS_ENTER_KEY)
-        ctx.exit()
-
-    elif ctx.obj.get("keep_logs") is False:
+    if ctx.obj.get("keep_logs") is False:
         logger.remove()
-
-        DEBUG.unlink(missing_ok=True)
         NORMAL.unlink(missing_ok=True)
 
-        echo("Временные журналы скрипта удалены")
+    elif ctx.obj.get("debug"):
+        echo(DEBUG)
 
-        pause(PRESS_ENTER_KEY)
-        ctx.exit()
+    else:
+        echo(NORMAL)
+
+    pause(PRESS_ENTER_KEY)
+    ctx.exit()

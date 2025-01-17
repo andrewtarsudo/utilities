@@ -302,7 +302,8 @@ class TextFile(DirFile):
             return
 
         elif anchor not in self.iter_internal_link_anchors():
-            raise InternalLinkAnchorError(f"В файле {self.rel_path} не обнаружен ни якорь, ни ссылка {anchor}")
+            logger.error(f"В файле {self.rel_path} не обнаружен ни якорь, ни ссылка {anchor}")
+            raise InternalLinkAnchorError
 
         else:
             return tuple(filter(lambda x: x.anchor == anchor, self._iter_internal_links()))
@@ -418,11 +419,11 @@ class MdFile(TextFile):
         """
         for line in iter(self):
             _m: list[str] = findall(self._patterns.pattern_anchor, line.removesuffix("\n"))
+
             if _m:
                 self._anchors.update(_m)
 
         logger.debug(f"File {self.rel_path}, anchors:\n{prepare_logging(self._anchors)}")
-        return
 
     def set_links(self):
         """
@@ -444,7 +445,6 @@ class MdFile(TextFile):
         logger.debug(
             f"File {self.rel_path}, "
             f"links:\n{prepare_logging(_.link.link_to for _ in self.iter_links())}")
-        return
 
     def set_internal_links(self):
         """
@@ -460,7 +460,6 @@ class MdFile(TextFile):
         logger.debug(
             f"File {self.rel_path}, "
             f"internal links:\n{prepare_logging(_.anchor for _ in self._iter_internal_links())}")
-        return
 
 
 class AsciiDocFile(TextFile):
@@ -511,12 +510,12 @@ class AsciiDocFile(TextFile):
         """
         for line in iter(self):
             _m: list[str] = findall(self._patterns.pattern_anchor, line.removesuffix("\n"))
+
             if _m:
                 self._anchors.update(_m)
 
         logger.debug(
             f"File {self.rel_path}, anchors:\n{prepare_logging(self._anchors)}")
-        return
 
     def set_links(self):
         """
@@ -543,7 +542,6 @@ class AsciiDocFile(TextFile):
         logger.debug(
             f"File {self.rel_path}, "
             f"links:\n{prepare_logging(_.link.link_to for _ in self.iter_links())}")
-        return
 
     def set_internal_links(self):
         """
@@ -559,7 +557,6 @@ class AsciiDocFile(TextFile):
         logger.debug(
             f"File {self.rel_path}, "
             f"internal links:\n{prepare_logging(_.anchor for _ in self._iter_internal_links())}")
-        return
 
 
 def get_file(root_dir: StrPath, full_path: StrPath) -> MdFile | AsciiDocFile:
@@ -666,7 +663,6 @@ class FileDict:
 
         else:
             logger.debug(f"Элемент {other} должен быть типа str или Path, но получено {type(other)}")
-        return
 
     __radd__ = __add__
     __iadd__ = __add__
@@ -681,15 +677,16 @@ class FileDict:
 
         if item not in self:
             _relpath: str = relpath(item, self._root_dir.parent.parent).replace("\\", "/")
-            return
 
         return self._dict_files.get(Path(item))
 
-    get = __getitem__
+    def get(self, item):
+        return self.__getitem__(item)
 
     def __setitem__(self, key, value):
         if isinstance(key, (str, Path)) and isinstance(value, DirFile):
             self._dict_files[key] = value
+
         else:
             logger.debug(
                 f"Ключ {key} должен быть типа str или Path, а значение {value} типа TextFile, "

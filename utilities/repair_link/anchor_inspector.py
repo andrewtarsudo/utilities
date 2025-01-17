@@ -50,7 +50,8 @@ class AnchorInspector:
             logger.error(f"Ключ {item} должен быть типа str, но получен {type(item)}")
             raise FileInvalidTypeError
 
-    get = __getitem__
+    def get(self, item):
+        return self.__getitem__(item)
 
     def __add__(self, other):
         if isinstance(other, TextFile):

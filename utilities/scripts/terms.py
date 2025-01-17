@@ -7,10 +7,11 @@ from click.decorators import argument, help_option, option, pass_context
 from click.termui import pause
 from click.types import BOOL
 from click.utils import echo
+from loguru import logger
 
 from utilities.common.constants import HELP, PRESS_ENTER_KEY
 from utilities.common.functions import file_reader, ReaderMode
-from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption, TermsAPIGroup
+from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption
 from utilities.terms.ascii_doc_table_terms import AsciiDocTableTerms
 from utilities.terms.git_manager import git_manager
 from utilities.terms.table import Term
@@ -39,11 +40,16 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     ctx.exit(0)
 
 
+# noinspection PyUnusedLocal
 @command_line_interface.command(
     "terms",
-    cls=TermsAPIGroup,
-    help="\b\nКоманда для вывода расшифровки аббревиатур",
-    invoke_without_command=True)
+    help="\b\nКоманда для вывода расшифровки аббревиатур")
+@argument(
+    "terms",
+    required=False,
+    metavar="TERMS",
+    nargs=-1,
+    default=None)
 @option(
     "-a", "--all", "all_flag",
     is_flag=True,
@@ -137,16 +143,10 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     "-h", "--help",
     help=HELP,
     is_eager=True)
-@argument(
-    "args",
-    required=False,
-    metavar="TERMS",
-    nargs=-1,
-    default=None)
 @pass_context
 def terms_command(
         ctx: Context,
-        args: Iterable[str] = None, *,
+        terms: Iterable[str] = None, *,
         all_flag: bool = False,
         full_flag: bool = False,
         info_flag: bool = False,
@@ -182,17 +182,17 @@ def terms_command(
     elif samples_flag:
         result: str = file_reader(SAMPLES_FILE, ReaderMode.STRING)
 
-    elif args is None or not args:
+    elif terms is None or not terms:
         echo("Не задана ни одна аббревиатура")
         result: str = ""
 
     else:
         terms_print: list[Term] = []
 
-        if isinstance(args, str):
-            args: list[str] = [args]
+        if isinstance(terms, str):
+            terms: list[str] = [terms]
 
-        for term in args:
+        for term in terms:
             term: str = term.upper()
 
             if term not in ascii_doc_table.terms_short():
@@ -210,7 +210,7 @@ def terms_command(
         else:
             result: str = "\n".join(map(lambda x: x.formatted(), terms_print))
 
-    echo(result)
+    logger.success(result)
+
     ctx.obj["keep_logs"] = keep_logs
-    pause(PRESS_ENTER_KEY)
     ctx.invoke(clear_logs)

@@ -8,11 +8,7 @@ from utilities.repair_link.file_dict import TextFile
 
 
 class LinkFixer:
-    """Class to represent the instance to fix links.
-
-    :param text_file: The file in the directory.
-    :type text_file: TextFile or None
-    """
+    """Class to represent the instance to fix links."""
     PATTERN: str = r"(\.\.)(\w)"
 
     def __init__(self):

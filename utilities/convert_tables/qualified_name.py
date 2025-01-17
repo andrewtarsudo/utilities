@@ -51,8 +51,7 @@ _ns: dict[str, str] = {
     "xsi": "http://www.w3.org/2001/XMLSchema-instance",
     "xmlns": "http://schemas.openxmlformats.org/package/2006/content-types",
     "ve": "http://schemas.openxmlformats.org/markup-compatibility/2006",
-    "vt": "http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
-}
+    "vt": "http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"}
 
 
 def prefix_tagroot(tag: str) -> list[str]:

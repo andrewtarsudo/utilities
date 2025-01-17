@@ -5,12 +5,11 @@ from pathlib import Path
 
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
-from click.termui import pause
 from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 
-from utilities.common.constants import HELP, PRESS_ENTER_KEY
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, MutuallyExclusiveOption
+from utilities.common.constants import HELP, StrPath
+from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption
 
 
 def generate_prefix(path: Path):
@@ -24,26 +23,22 @@ def generate_prefix(path: Path):
 
 @command_line_interface.command(
     "list-files",
-    cls=APIGroup,
-    help="Команда для вывода файлов в директории",
-    invoke_without_command=True)
+    help="Команда для вывода файлов в директории")
 @argument(
     "root_dir",
     type=ClickPath(
-        exists=True,
         file_okay=False,
         resolve_path=True,
         path_type=Path,
         dir_okay=True),
     default=Path.cwd(),
-    nargs=1,
     required=True,
     is_eager=True)
 @option(
     "-d", "--ignored-dirs", "ignored_dirs",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_dirs"],
-    type=list[str],
+    type=STRING,
     help="\b\nПеречень игнорируемых директорий. Может использоваться несколько раз.\nПо умолчанию: _temp_folder, "
          "_temp_storage, private",
     multiple=True,
@@ -66,7 +61,7 @@ def generate_prefix(path: Path):
     "-f", "--ignored-files", "ignored_files",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_files"],
-    type=list[STRING],
+    type=STRING,
     help="\b\nПеречень игнорируемых файлов. Может использоваться несколько раз.\nПо умолчанию: README, _check_list",
     multiple=True,
     required=False,
@@ -172,7 +167,7 @@ def generate_prefix(path: Path):
 @pass_context
 def list_files_command(
         ctx: Context,
-        root_dir: Path,
+        root_dir: StrPath,
         ignored_dirs: Iterable[str] = None,
         all_dirs: bool = False,
         ignored_files: Iterable[str] = None,
@@ -267,7 +262,6 @@ def list_files_command(
     if not auxiliary:
         echo("\n".join(results))
         ctx.obj["keep_logs"] = keep_logs
-        pause(PRESS_ENTER_KEY)
         ctx.invoke(clear_logs)
 
     else:

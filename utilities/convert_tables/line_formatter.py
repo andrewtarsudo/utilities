@@ -11,27 +11,22 @@ class LineFormatter:
     def __init__(self, remove_spaces: bool, escape_chars: bool):
         self._remove_spaces: bool = remove_spaces
         self._escape_chars: bool = escape_chars
-
         self._patterns: dict[str, dict[str, str]] = {
             "remove_spaces": {
                 r"\s+": " ",
-                r"\s\.": "."
-            },
+                r"\s\.": "."},
             "escape_chars": {
                 r"([*-_])": r"\\\1",
-                r"<(?!/?br>|/?sub>|/?sup>)([^<>]*)(?<!<br)>": r"\\<\1\\>"
-            }
-        }
+                r"<(?!/?br>|/?sub>|/?sup>)([^<>]*)(?<!<br)>": r"\\<\1\\>"}}
 
     def __str__(self):
         _convert_bool: dict[bool, str] = {
             True: "да",
-            False: "нет"
-        }
+            False: "нет"}
 
         return (
             f"Параметры форматирования текста\n"
-            f"удаление лишних пробелов: {_convert_bool.get(self._remove_spaces)}"
+            f"удаление лишних пробелов: {_convert_bool.get(self._remove_spaces)}\n"
             f"экранирование символов '<', '>': {_convert_bool.get(self._escape_chars)}")
 
     def __repr__(self):

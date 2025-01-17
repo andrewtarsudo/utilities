@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-from sys import platform
-from typing import Any, Mapping, NamedTuple, Sequence, TypeAlias
+from typing import Any, Mapping, Sequence, TypeAlias
 
 from yaml import safe_load
 
@@ -22,9 +21,6 @@ HELP: str = """Вывести справочную информацию на э�
 
 MD_EXTENSION: str = ".md"
 ADOC_EXTENSION: str = ".adoc"
-
-
-
 
 
 class ArgsHelpDict(dict):

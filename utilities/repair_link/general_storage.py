@@ -165,10 +165,7 @@ class GeneralStorage:
         return self.join_path(path).parent.parent.name
 
     def prepare(self):
-        """
-        Generating the dictionaries.
-
-        """
+        """Generates the dictionaries."""
         _dir_indexes: list[Path] = []
         _dirindexes: list[Path] = []
         _text_files: list[Path] = []
@@ -483,7 +480,6 @@ class Storage(GeneralStorage):
             component_storage: ComponentStorage = ComponentStorage(self._root_dir, _name)
             component_storage.prepare()
             self._component_storages[_name] = component_storage
-        return
 
     def get_component_storage(self, name: str):
         if name not in self._component_storage_names:

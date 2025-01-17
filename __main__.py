@@ -11,6 +11,14 @@ if __name__ == '__main__':
             f"Необходимо обновить или использовать более новую версию")
         raise InvalidPythonVersion
 
+    import faulthandler
+
+    if not faulthandler.is_enabled():
+        faulthandler.enable()
+
     from utilities.scripts.cli import command_line_interface
 
     command_line_interface()
+
+    if faulthandler.is_enabled():
+        faulthandler.disable()

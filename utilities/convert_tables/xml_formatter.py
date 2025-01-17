@@ -51,7 +51,7 @@ def find_children(element: Element, tags: Iterable[str] = None) -> set[str] | No
         return
 
     child: Element
-    _children_names: set[str] = set(child.tag for child in element.getchildren())
+    _children_names: set[str] = set(child.tag for child in iter(element))
     return _children_names.intersection(tags)
 
 

@@ -4,6 +4,7 @@ from io import UnsupportedOperation
 from pathlib import Path
 from typing import Callable, Iterable
 
+from click.core import Context
 from loguru import logger
 
 from utilities.common.constants import StrPath
@@ -23,12 +24,12 @@ def file_reader(path: StrPath, reader_mode: str | ReaderMode):
         reader_mode: ReaderMode = ReaderMode[reader_mode]
 
     try:
-        with open(path, "r", encoding="utf-8", errors="ignore") as f:
+        with open(Path(path).expanduser().resolve(), "r", encoding="utf-8", errors="ignore") as f:
             functions: dict[ReaderMode, Callable] = {
                 ReaderMode.STRING: f.read,
                 ReaderMode.LINES: f.readlines}
 
-            _ = functions.get(reader_mode)()
+            _: str | list[str] = functions.get(reader_mode)()
 
         return _
 
@@ -53,7 +54,11 @@ def file_reader(path: StrPath, reader_mode: str | ReaderMode):
         raise
 
 
-def get_files(files: Iterable[StrPath] = None, directory: StrPath = None, recursive: bool = True):
+def get_files(
+        ctx: Context,
+        files: Iterable[StrPath] = None,
+        directory: StrPath = None,
+        recursive: bool = True):
     if files is None and directory is None:
         logger.error("Хотя бы один из параметров --file, --dir должен быть задан")
         return None
@@ -65,10 +70,11 @@ def get_files(files: Iterable[StrPath] = None, directory: StrPath = None, recurs
         files: list[StrPath] = [*files]
 
     if directory is not None:
-        directory: Path = Path(directory)
+        directory: Path = Path(directory).expanduser()
 
-        listed_files: list[str] = list_files_command(
-            directory,
+        listed_files: list[str] = ctx.invoke(
+            list_files_command,
+            root_dir=directory,
             all_dirs=True,
             extensions="svg",
             prefix="",

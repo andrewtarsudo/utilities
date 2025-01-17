@@ -1,20 +1,17 @@
 # -*- coding: utf-8 -*-
-from click import pause
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 
-from utilities.common.constants import HELP, PRESS_ENTER_KEY, StrPath
+from utilities.common.constants import HELP, StrPath
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, MutuallyExclusiveOption
+from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption
 
 
 @command_line_interface.command(
     "convert-tables",
-    cls=APIGroup,
-    help="Команда для корректного извлечения таблиц из файлов docx в формат Markdown",
-    invoke_without_command=True)
+    help="Команда для корректного извлечения таблиц из файлов docx в формат Markdown")
 @argument(
     "docx_file",
     type=ClickPath(
@@ -53,15 +50,7 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, 
     metavar="<TEMP DIR>",
     default="./_temp/")
 @option(
-    "-r", "--remove/--no-remove",
-    type=BOOL,
-    help="\b\nФлаг удаления всех множественных пробелов и пробелов \nперед знаками препинания.\n"
-         "По умолчанию: True, удаление всех дополнительных пробелов",
-    show_default=True,
-    required=False,
-    default=False)
-@option(
-    "-e", "--escape/--no-escape",
+    "-e", "--escape/--no-escape", "escape",
     type=BOOL,
     help="\b\nФлаг экранирования символов '<', '>'.\n"
          "По умолчанию: True, добавление '\\' перед символами",
@@ -69,12 +58,21 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, 
     required=False,
     default=True)
 @option(
+    "-r", "--remove/--no-remove", "remove",
+    type=BOOL,
+    help="\b\nФлаг удаления всех множественных пробелов и пробелов \nперед знаками препинания.\n"
+         "По умолчанию: True, удаление всех дополнительных пробелов",
+    show_default=True,
+    required=False,
+    default=False)
+@option(
     "-f", "--fix/--no-fix", "fix",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["keep"],
     type=BOOL,
     help="\b\nФлаг удаления лишних пробелов и экранирования символов.\n"
-         "По умолчанию: не задано, обработка определяется параметрами \n--preserve и --escape.\n"
+         "По умолчанию: не задано, обработка определяется параметрами \n"
+         "--preserve и --escape.\n"
          "Имеет приоритет выше, чем у опций --preserve и --escape",
     show_default=True,
     required=False,
@@ -138,6 +136,4 @@ def convert_tables_command(
     core_document.delete_temp_archive()
 
     ctx.obj["keep_logs"] = keep_logs
-
-    pause(PRESS_ENTER_KEY)
     ctx.invoke(clear_logs)

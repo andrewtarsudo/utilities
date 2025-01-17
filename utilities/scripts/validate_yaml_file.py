@@ -5,18 +5,16 @@ from pathlib import Path
 from sys import platform
 from typing import Any, get_args, get_origin, Iterable, Mapping
 
-from click import echo
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
-from click.termui import pause
+from click.utils import echo
 from loguru import logger
 from yaml import safe_load
 
-from utilities.common.constants import FAIL_COLOR, NORMAL_COLOR, PASS_COLOR, HELP, PRESS_ENTER_KEY, StrPath
+from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, StrPath
 from utilities.common.functions import file_reader, ReaderMode
-from utilities.scripts import clear_logs
-from utilities.scripts.cli import APIGroup, command_line_interface
+from utilities.scripts.cli import clear_logs, command_line_interface
 
 _SETTINGS_NAMES: tuple[str, ...] = (
     "settings", "Settings"
@@ -291,13 +289,14 @@ def validate(
         lines: Iterable[str],
         out: str | None = None,
         verbose: bool = False):
+    max_length: int = max(map(len, lines)) + 5
+
     paths: dict[Path, int] = {
         Path(root).joinpath(line.strip().removeprefix("- ")): index
         for index, line in enumerate(lines)
         if line.strip().startswith("- ")
     }
 
-    max_length: int = max(map(len, map(str, paths.keys()))) + 10
     _lines: list[str] = []
 
     for path, line_no in paths.items():
@@ -315,7 +314,7 @@ def validate(
             print(_line)
 
     if out is not None and out:
-        out: Path = Path(out)
+        out: Path = Path(out).expanduser()
         mode: str = "w" if out.exists() else "x"
 
         with open(out, mode) as f:
@@ -325,28 +324,21 @@ def validate(
                 replace(FAIL_COLOR, "").
                 replace(NORMAL_COLOR, ""))
 
-    return
-
 
 @command_line_interface.command(
     "validate-yaml",
-    cls=APIGroup,
-    help="Команда для валидации YAML-файла, используемого при генерации PDF",
-    invoke_without_command=True)
+    help="Команда для валидации YAML-файла, используемого при генерации PDF")
 @argument(
     "yaml_file",
     type=ClickPath(
-        exists=True,
         file_okay=True,
         readable=True,
-        resolve_path=True,
         allow_dash=False,
         dir_okay=False),
     required=True)
 @option(
     "-o", "--output", "output",
     type=ClickPath(
-        exists=False,
         file_okay=True,
         readable=True,
         resolve_path=True,
@@ -388,6 +380,8 @@ def validate_yaml_command(
     if platform.startswith("win"):
         system("color")
 
+    yaml_file: Path = Path(yaml_file).expanduser().resolve()
+
     try:
         with open(yaml_file, "r", encoding="utf-8", errors="ignore") as f:
             content: dict[str, Any] = safe_load(f)
@@ -414,7 +408,7 @@ def validate_yaml_command(
     warnings, messages = inspect_legal(content, verbose, warnings, messages)
     warnings, messages = inspect_sections(content, verbose, warnings, messages)
 
-    if warnings or messages:
+    if warnings != [] or messages != []:
         echo("Предупреждения:")
         echo("\n".join(warnings))
         echo("\n".join(messages))
@@ -423,10 +417,9 @@ def validate_yaml_command(
         echo("В файле проблемы не обнаружены")
 
     lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
+    validate(yaml_file.parent, lines, output, verbose)
 
-    validate(Path(yaml_file).resolve().parent, lines, output, verbose)
+    echo(output)
 
     ctx.obj["keep_logs"] = keep_logs
-
-    pause(PRESS_ENTER_KEY)
     ctx.invoke(clear_logs)

@@ -200,13 +200,6 @@ class LinkInspector:
     def source_file(self) -> TextFile:
         return self._file_dict.get(self.source_link())
 
-    # def destination_link(self) -> Path:
-    #     """
-    #     The path to the file according to the original link.
-    #
-    #     """
-    #     return self.source_link().joinpath(self._link.link_to_file).resolve()
-
     def destination_file(self) -> DirFile | TextFile:
         """
         The file given in the link if found.
@@ -239,7 +232,7 @@ class LinkInspector:
 
         """
         if bool(self):
-            logger.debug(f"File path has already been found")
+            logger.debug("File path has already been found")
             return
 
         for index, _option in enumerate(get_options(self._link.link_to_file)):
@@ -256,7 +249,7 @@ class LinkInspector:
 
     def find_in_storage(self, storage: GeneralStorage):
         if bool(self):
-            logger.debug(f"File path has already been found")
+            logger.debug("File path has already been found")
             return
 
         _storage_dict_items: tuple[dict[str, Path], ...] = (
@@ -327,11 +320,11 @@ class LinkInspector:
             return
 
         if not isinstance(self.destination_file(), TextFile):
-            logger.debug(f"Anchor cannot be in image")
+            logger.debug("Anchor cannot be in image")
             self._proper_anchor = ""
 
         elif self._link.anchor is None:
-            logger.debug(f"Anchor is not set")
+            logger.debug("Anchor is not set")
             self._proper_anchor = "/"
 
         elif self._link.anchor in self.destination_file().iter_anchors():

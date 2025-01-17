@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-import faulthandler
 import logging
 from logging import basicConfig, Handler, LogRecord
 from pathlib import Path
 # noinspection PyProtectedMember
 from sys import _getframe, stdout as sysout
 from types import FrameType
-from typing import Any, Callable, Literal, NamedTuple, Type
+from typing import Any, Literal, NamedTuple, Type
 from warnings import simplefilter
 
 from loguru import logger
@@ -78,10 +77,7 @@ LEVEL_COLOR_STYLE: tuple[LevelColorStyle, ...] = (
 
 
 class InterceptHandler(Handler):
-    """
-    The handler to add loggers based on the 'logging' module.
-
-    """
+    """Class to specify the handler to add loggers based on the 'logging' module."""
 
     def emit(self, record: LogRecord):
         """
@@ -168,17 +164,17 @@ class LoggerConfiguration:
             return NORMAL.parent
 
     def stream_handler(self) -> dict[str, Any] | None:
-        """
-        Specifying the stream handler.
+        """Specifies the stream handler.
 
-        Handles KeyError."""
+        Handles KeyError.
+        """
         try:
             _logging_level: str | None = self._handlers.get("stream")
 
             return {
                 "sink": sysout,
                 "level": _logging_level,
-                "format": self.__class__._USER_FORMAT,
+                "format": self.__class__._COLORED_FORMAT,
                 "colorize": True,
                 "filter": _to_stream,
                 "backtrace": False,
@@ -189,10 +185,10 @@ class LoggerConfiguration:
             return
 
     def rotating_file_handler(self) -> dict[str, Any] | None:
-        """
-        Specifying the rotating file handler.
+        """Specifies the rotating file handler.
 
-        Handles KeyError."""
+        Handles KeyError.
+        """
         try:
             _logging_level: str = self._handlers.get("file_rotating")
             _log_path: str = str(self.log_folder.joinpath(f"{self._file_name}_{_logging_level.lower()}.log"))
@@ -215,20 +211,13 @@ class LoggerConfiguration:
 
 
 def custom_logging(name: str, *, is_debug: bool = False):
+    """Specifies the loguru Logger.
+
+    :param name: The log file name.
+    :type name: str
+    :param is_debug: The flag to use the debug mode.
+    :type is_debug: bool, default=False
     """
-    Specifying the logging decorator.
-
-    Parameters
-    ----------
-    name : str
-        The log file name.
-    is_debug : bool, default=False
-        The flag to use the debug mode.
-
-    """
-    if not faulthandler.is_enabled():
-        faulthandler.enable()
-
     if not is_debug:
         simplefilter("ignore")
         stream_level: LoggingLevel = "INFO"
@@ -256,13 +245,4 @@ def custom_logging(name: str, *, is_debug: bool = False):
     # add the basic log messages to the logger
     basicConfig(handlers=[InterceptHandler()], level=0)
 
-    def inner(func: Callable):
-        def wrapper(*args, **kwargs):
-            return func(*args, **kwargs)
-
-        return wrapper
-
-    if faulthandler.is_enabled():
-        faulthandler.disable()
-
-    return inner
+    logger.catch(level="ERROR")
