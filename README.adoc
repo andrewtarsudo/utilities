@@ -34,7 +34,7 @@ link:docs/README_validate_yaml.adoc#validate-yaml[validate-yaml]:: команд�
 
 Вся документация для скриптов выше лежит в директории link:docs/[docs/].
 
-Сгенерированные исполняемые файлы доступны в директории link:bin/[bin]:
+Сгенерированные исполняемые файлы доступны в директории link:bin/[bin/]:
 
 [horizontal]
 Windows:: link:https://gitlab.com/tech_writers_protei/utilities/-/raw/main/bin/tw_utilities.exe?ref_type=heads[bin/tw_utilities.exe]
@@ -78,8 +78,69 @@ list-files | check-russian | convert-tables | format-code | link-repair | repair
   validate-yaml                          Команда для валидации YAML-файла, используемого при
                                          генерации PDF
 ----------------------------------------------------------------------------------------------------
-
 ----
+
+=== Примеры
+
+* Вызов справочной информации
++
+[source,bash,subs="attributes+"]
+----
+$ {name} <command> --help
+$ {name} check-russian --help
+----
++
+* Вызов команды с единственным аргументом
++
+[source,bash,subs="attributes+"]
+----
+$ {name} <command> <ARGUMENT>
+$ {name} convert-tables "..\Word File.docx"
+----
++
+* Вызов команды со множественными аргументами
++
+[source,bash,subs="attributes+"]
+----
+$ {name} <command> <ARGUMENT> <ARGUMENT> <ARGUMENT>
+$ {name} terms CAP MAP ISUP
+----
++
+* Вызов команды с опциями с единственными значениями
++
+[source,bash,subs="attributes+"]
+----
+$ {name} <command> <option_1> <value_1> <option_N> <value_N>
+$ {name} format-code --dir "..\Project" --length 80
+----
++
+* Вызов команды с опциями со множественными значениями
++
+[source,bash,subs="attributes+"]
+----
+$ {name} <command> <option> <value_1> <value_2>
+$ {name} repair-svg --file "..\Project\SOME_IMAGE.svg" "..\Project\ANOTHER_IMAGE.svg"
+$ {name} <command> <option> <value_1> <option> <value_2>
+$ {name} repair-svg --file "..\Project\SOME_IMAGE.svg" --file "..\Project\ANOTHER_IMAGE.svg"
+$ {name} <command> <option> <value_1> <value_2> <option> <value_3>
+$ {name} repair-svg --file "..\Project\SOME_IMAGE.svg" "..\Project\ANOTHER_IMAGE.svg" --file "..\Project\AND_ANOTHER_ONE.svg"
+----
++
+* Вызов команды с опциями, задаваемыми как флаг
++
+[source,bash,subs="attributes+"]
+----
+$ {name} <command> <flag>
+$ {name} list-files "..\folder" --recursive
+$ {name} <command> <no-flag>
+$ {name} list-files "..\folder" --no-recursive
+----
+
+[CAUTION]
+====
+Некоторые параметры взаимоисключающие, т.е. их нельзя задать одновременно.
+В таком случае будет активирована ошибка `UsageError: Ошибка в задании команды: '<param>' не может использоваться одновременно с '<mutually exclusive params>'`.
+====
 
 == Некоторые рекомендации
 

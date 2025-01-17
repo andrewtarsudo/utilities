@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
-from .errors import *
-from .custom_logger import custom_logging
+from utilities.common.errors import *
+from utilities.common.custom_logger import custom_logging
