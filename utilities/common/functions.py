@@ -19,12 +19,12 @@ class ReaderMode(Enum):
         return self._value_
 
 
-def file_reader(path: StrPath, reader_mode: str | ReaderMode):
+def file_reader(path: StrPath, reader_mode: str | ReaderMode, encoding: str = "utf-8"):
     if isinstance(reader_mode, str):
         reader_mode: ReaderMode = ReaderMode[reader_mode]
 
     try:
-        with open(Path(path).expanduser().resolve(), "r", encoding="utf-8", errors="ignore") as f:
+        with open(Path(path).expanduser().resolve(), "r", encoding=encoding, errors="ignore") as f:
             functions: dict[ReaderMode, Callable] = {
                 ReaderMode.STRING: f.read,
                 ReaderMode.LINES: f.readlines}

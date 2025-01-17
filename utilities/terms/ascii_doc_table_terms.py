@@ -21,7 +21,7 @@ class AsciiDocTableTerms:
 
     @classmethod
     def from_file(cls, file_path: StrPath):
-        _content: list[str] = file_reader(file_path, ReaderMode.LINES)
+        _content: list[str] = file_reader(file_path, ReaderMode.LINES, "cp1251")
 
         if not _content or len(_content) < 6:
             raise EmptyFileError

@@ -49,7 +49,6 @@ class Version(NamedTuple):
 
     @classmethod
     def from_string(cls, line: str):
-
         if not line:
             return cls(0, 0, 0)
 
@@ -101,13 +100,13 @@ class VersionContainer:
 
         elif isinstance(value, str):
             try:
-                _version: Version = Version.from_string(value)
+                version: Version = Version.from_string(value)
 
             except InvalidVersionError:
                 raise
 
             else:
-                self._version = _version
+                self._version = version
 
         else:
             logger.error(f"Значение {value} должно быть типа Version или str, но получено {type(value)}")
@@ -124,13 +123,13 @@ class VersionContainer:
 
         elif isinstance(value, str):
             try:
-                _version: Version = Version.from_string(value)
+                version: Version = Version.from_string(value)
 
             except InvalidVersionError:
                 raise
 
             else:
-                self._version_basic = _version
+                self._version_basic = version
 
         else:
             logger.error(f"Значение {value} должно быть типа Version или str, но получено {type(value)}")
@@ -140,5 +139,9 @@ class VersionContainer:
         return self._version == self._version_basic
 
     def set_version_basic(self):
-        line: str = file_reader(self._basic_version_file, ReaderMode.STRING)
-        self._version_basic = Version.from_string(line)
+        if not self._basic_version_file.exists():
+            self._version_basic = Version(0, 0, 0)
+
+        else:
+            line: str = file_reader(self._basic_version_file, ReaderMode.STRING)
+            self._version_basic = Version.from_string(line)

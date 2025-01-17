@@ -43,3 +43,6 @@ venv.bak/
 
 .idea/
 _logs/
+fonts/
+themes/
+css/
