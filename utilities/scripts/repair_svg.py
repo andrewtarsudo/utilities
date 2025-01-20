@@ -29,7 +29,7 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
     help="\b\nФайл для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
-    metavar="<FILE> ... <FILE>",
+    metavar="FILE ... FILE",
     default=None)
 @option(
     "-d", "--dir", "directory",
@@ -41,7 +41,7 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
     help="Директория для обработки",
     multiple=False,
     required=False,
-    metavar="<DIR>",
+    metavar="DIR",
     default=None)
 @option(
     "--recursive/--no-recursive",

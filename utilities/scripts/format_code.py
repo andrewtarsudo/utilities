@@ -30,7 +30,7 @@ MAX_LENGTH: int = 84
     help="Директория для обработки",
     multiple=False,
     required=False,
-    metavar="<DIR>",
+    metavar="DIR",
     default=None)
 @option(
     "-f", "--file", "files",
@@ -43,7 +43,7 @@ MAX_LENGTH: int = 84
     help="\b\nПеречень файлов для обработки.\nМожет использоваться несколько раз",
     multiple=True,
     required=False,
-    metavar="<FILE> ... <FILE>",
+    metavar="FILE ... FILE",
     default=None)
 @option(
     "-l", "--length",
@@ -52,7 +52,7 @@ MAX_LENGTH: int = 84
          "Примечание. Должно быть целым положительным числом",
     multiple=False,
     required=False,
-    metavar="<LEN>",
+    metavar="LEN",
     default=MAX_LENGTH)
 @option(
     "--recursive/--no-recursive",
@@ -77,8 +77,8 @@ MAX_LENGTH: int = 84
 @pass_context
 def format_code_command(
         ctx: Context,
-        files: Iterable[StrPath] = None,
         directory: StrPath = None,
+        files: Iterable[StrPath] = None,
         recursive: bool = True,
         length: int = MAX_LENGTH,
         keep_logs: bool = False):

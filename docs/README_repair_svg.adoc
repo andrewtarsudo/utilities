@@ -35,13 +35,13 @@ include::partials/run.adoc[]
 ----
 Использование:
 {name} {script-name}
--f/--file <FILE> ... <FILE> | -d/--dir <DIR> | --recursive | --keep-logs | --h/--help
+-f/--file FILE ... FILE | -d/--dir DIR | --recursive | --keep-logs | --h/--help
 
   Команда для исправления файлов SVG
 
 Опции:
-  -f, --file <FILE> ... <FILE>           Файл для обработки. Может использоваться несколько раз
-  -d, --dir <DIR>                        Директория для обработки
+  -f, --file FILE ... FILE               Файл для обработки. Может использоваться несколько раз
+  -d, --dir DIR                          Директория для обработки
   --recursive / --no-recursive           Флаг рекурсивного поиска файлов.
                                          По умолчанию: True, поиск файлов по вложенным папкам
   --keep-logs                            Флаг сохранения директории с лог-файлом по завершении

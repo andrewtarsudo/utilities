@@ -22,8 +22,7 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, 
         allow_dash=False,
         dir_okay=False),
     required=True,
-    nargs=1,
-    is_eager=True)
+    metavar="DOCX_FILE")
 @option(
     "-p", "--parse", "tables_dir",
     type=ClickPath(
@@ -35,7 +34,7 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, 
     help="\b\nДиректория для хранения таблиц. По умолчанию: ./tables/.\nЕсли не существует, то будет создана",
     multiple=False,
     required=False,
-    metavar="<DIR TABLES>",
+    metavar="DIR_TABLES",
     default="./tables/")
 @option(
     "-t", "--temp", "temp_dir",
@@ -48,7 +47,7 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, 
     help="\b\nВременная директория для скрипта. По умолчанию: ./_temp/.\nЕсли не существует, то будет создана",
     multiple=False,
     required=False,
-    metavar="<TEMP DIR>",
+    metavar="TEMP_DIR",
     default="./_temp/")
 @option(
     "-e", "--escape/--no-escape", "escape",
@@ -105,7 +104,7 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, 
 @pass_context
 def convert_tables_command(
         ctx: Context,
-        file: StrPath,
+        docx_file: StrPath,
         tables_dir: StrPath = "./tables/",
         temp_dir: StrPath = "./_temp/",
         remove: bool = False,
@@ -127,7 +126,7 @@ def convert_tables_command(
 
     line_formatter: LineFormatter = LineFormatter(remove_spaces, escape_chars)
 
-    core_document: CoreDocument = CoreDocument(file, temp_dir)
+    core_document: CoreDocument = CoreDocument(docx_file, temp_dir)
     core_document.unarchive()
 
     xml_document: XmlDocument = XmlDocument(core_document, tables_dir)

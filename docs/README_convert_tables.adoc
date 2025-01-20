@@ -33,8 +33,8 @@ include::partials/run.adoc[]
 [source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name} <DOCX_FILE>
--p/--parse <DIR TABLES> | -t/--temp <TEMP DIR> | -e/--escape | -r/--remove | -f/--fix | -k/--keep |
+{name} {script-name} DOCX_FILE
+-p/--parse DIR_TABLES | -t/--temp TEMP_DIR | -e/--escape | -r/--remove | -f/--fix | -k/--keep |
 --keep-logs | --h/--help
 
   Команда для корректного извлечения таблиц из файлов docx в формат Markdown
@@ -43,9 +43,9 @@ include::partials/run.adoc[]
   docx_file                              Путь до файла Word в формате *.docx или *.docm
 
 Опции:
-  -p, --parse <DIR TABLES>               Директория для хранения таблиц. По умолчанию: ./tables/.
+  -p, --parse DIR_TABLES                 Директория для хранения таблиц. По умолчанию: ./tables/.
                                          Если не существует, то будет создана
-  -t, --temp <TEMP DIR>                  Временная директория для скрипта. По умолчанию: ./_temp/.
+  -t, --temp TEMP_DIR                    Временная директория для скрипта. По умолчанию: ./_temp/.
                                          Если не существует, то будет создана
   -e, --escape / --no-escape             Флаг экранирования символов '<', '>'.
                                          По умолчанию: True, добавление '\' перед символами

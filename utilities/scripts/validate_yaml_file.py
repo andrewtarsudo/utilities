@@ -348,7 +348,7 @@ def validate(
     help="\b\nФайл для записи вывода. По умолчанию: вывод в консоль",
     multiple=False,
     required=False,
-    metavar="<FILE>",
+    metavar="FILE",
     default=None)
 @option(
     "--verbose/--no-verbose",

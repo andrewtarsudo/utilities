@@ -59,10 +59,10 @@ include::partials/run.adoc[]
 [source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name} <ROOT_DIR>
--d/--ignored-dirs <DIR> ... <DIR> | --all-dirs | -f/--ignored-files <FILE> ... <FILE> | --all-files |
--e/--extensions "<EXT> ... <EXT>" | --all-ext | -l/--language <LANG> | --all-langs |
--p/--prefix <PFX> | --hidden | --recursive | --keep-logs | --h/--help
+{name} {script-name} ROOT_DIR
+--d/--ignored-dirs DIR ... DIR | --all-dirs | -f/--ignored-files FILE ... FILE | --all-files |
+-e/--extensions "EXT ... EXT" | --all-ext | -l/--language LANG | --all-langs | -p/--prefix PFX |
+--hidden | --recursive | --keep-logs | --h/--help
 
   Команда для вывода файлов в директории
 
@@ -70,40 +70,42 @@ include::partials/run.adoc[]
   root_dir                               Путь до директории
 
 Опции:
-  -d, --ignored-dirs <DIR> ... <DIR>     Перечень игнорируемых директорий. Может использоваться несколько раз.
+  -d, --ignored-dirs DIR ... DIR         Перечень игнорируемых директорий. Может использоваться
+                                         несколько раз.
                                          По умолчанию: _temp_folder, _temp_storage, private.
                                          Примечание. Аргумент не может использоваться одновременно с
                                          --all-dirs
-  --all-dirs                             Флаг обработки всех директорий. По умолчанию: False.
+  --all-dirs BOOLEAN                     Флаг обработки всех директорий. По умолчанию: False.
                                          Примечание. Аргумент не может использоваться одновременно с
                                          --ignored-dirs
-  -f, --ignored-files <FILE> ... <FILE>  Перечень игнорируемых файлов. Может использоваться несколько раз.
+  -f, --ignored-files FILE ... FILE      Перечень игнорируемых файлов. Может использоваться несколько
+                                         раз.
                                          По умолчанию: README, _check_list.
                                          Примечание. Аргумент не может использоваться одновременно с
                                          --all-files
-  --all-files                            Флаг обработки всех файлов.
+  --all-files BOOLEAN                    Флаг обработки всех файлов.
                                          По умолчанию: False, выводятся файлы с определенными именами.
                                          Примечание. Аргумент не может использоваться одновременно с
                                          --ignored-files
-  -e, --extensions "<EXT> ... <EXT>"     Обрабатываемые типы файлов, разделяемые пробелом.
+  -e, --extensions "EXT ... EXT"         Обрабатываемые типы файлов, разделяемые пробелом.
                                          По умолчанию: md adoc.
                                          Примечание. Аргумент не может использоваться одновременно с
                                          --all-extensions
-  --all-ext                              Флаг обработки файлов всех расширений.
+  --all-ext BOOLEAN                      Флаг обработки файлов всех расширений.
                                          По умолчанию: False, вывод файлов определенных расширений.
                                          Примечание. Аргумент не может использоваться одновременно с
                                          --extensions
-  -l, --language <LANG>                  Язык файлов.
+  -l, --language LANG                    Язык файлов.
                                          По умолчанию: "", вывод всех файлов независимо от языка.
                                          Примечание. Аргумент не может использоваться одновременно с
                                          --all-languages
-  --all-langs                            Флаг обработки файлов всех языков.
+  --all-langs BOOLEAN                    Флаг обработки файлов всех языков.
                                          По умолчанию: True, вывод файлов на всех языках.
                                          Примечание. Аргумент не может использоваться одновременно с
                                          --language
-  -p, --prefix <PFX>                     Префикс, добавляемый к названиям файлов.
+  -p, --prefix PFX                       Префикс, добавляемый к названиям файлов.
                                          По умолчанию: '- content/common/'
-  --hidden / --no-hidden                 Флаг поиска скрытых файлов.
+  --hidden                               Флаг поиска скрытых файлов.
                                          По умолчанию: False, исключение скрытых файлов из вывода
   --recursive / --no-recursive           Флаг рекурсивного поиска файлов.
                                          По умолчанию: True, поиск файлов по вложенным папкам

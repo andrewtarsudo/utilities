@@ -56,8 +56,16 @@ def has_no_required_files(path: StrPath) -> bool:
         allow_dash=False,
         dir_okay=True),
     required=True,
-    nargs=1,
-    is_eager=True)
+    metavar="PATHDIR")
+@option(
+    "-a", "--anchor-disable", "anchor_validation",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг поиска повторяющихся якорей.\n"
+         "По умолчанию: True, поиск дублирующихся якорей осуществляется",
+    show_default=True,
+    required=False,
+    default=True)
 @option(
     "-d", "--dry-run",
     type=BOOL,
@@ -78,21 +86,11 @@ def has_no_required_files(path: StrPath) -> bool:
     required=False,
     default=True)
 @option(
-    "-a", "--anchor-disable", "anchor_validation",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг поиска повторяющихся якорей.\n"
-         "По умолчанию: True, поиск дублирующихся якорей осуществляется",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
     "-s", "--separate", "separate_languages",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг раздельной обработки файлов на различных языках.\n"
-         "По умолчанию: True, файлы на русском и английском обрабатываются \n"
-         "отдельно",
+         "По умолчанию: True, файлы на русском и английском \nобрабатываются отдельно",
     show_default=True,
     required=False,
     default=True)

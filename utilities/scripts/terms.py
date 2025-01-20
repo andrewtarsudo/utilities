@@ -41,7 +41,6 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     ctx.exit(0)
 
 
-# noinspection PyUnusedLocal
 @command_line_interface.command(
     "terms",
     cls=APIGroup,
@@ -208,6 +207,9 @@ def terms_command(
 
         elif ascii_flag:
             result: str = "\n".join(map(lambda x: x.adoc(), terms_print))
+
+        elif common_flag:
+            result: str = "\n".join(map(lambda x: x.formatted(), terms_print))
 
         else:
             result: str = "\n".join(map(lambda x: x.formatted(), terms_print))

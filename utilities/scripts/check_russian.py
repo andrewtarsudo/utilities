@@ -29,7 +29,7 @@ RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъы
     help="Директория для обработки",
     multiple=False,
     required=False,
-    metavar="<DIR>",
+    metavar="DIR",
     default=None)
 @option(
     "-f", "--file", "files",
@@ -43,7 +43,7 @@ RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъы
     help="\b\nПеречень файлов для обработки.\nМожет использоваться несколько раз",
     multiple=True,
     required=False,
-    metavar="<FILE> ... <FILE>",
+    metavar="FILE ... FILE",
     default=None)
 @option(
     "--recursive/--no-recursive",
@@ -53,6 +53,14 @@ RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъы
     show_default=True,
     required=False,
     default=True)
+@option(
+    "--verbose/--no-verbose",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг подробного вывода.\nПо умолчанию: False, выводятся только ошибки",
+    show_default=True,
+    required=False,
+    default=False)
 @option(
     "--keep-logs",
     type=BOOL,
@@ -72,6 +80,7 @@ def check_russian_command(
         files: Iterable[StrPath] = None,
         directory: StrPath = None,
         recursive: bool = True,
+        verbose: bool = False,
         keep_logs: bool = False):
     files: list[StrPath] | None = get_files(ctx, files, directory, recursive)
 
@@ -86,7 +95,7 @@ def check_russian_command(
                     f"{index + 1}" for index, line in enumerate(f.readlines())
                     if any(char in line for char in RUSSIAN_CHARS))
 
-            if not _indexes:
+            if not _indexes and verbose:
                 result.append(
                     f"{PASS_COLOR}В файле {file} не найдены кириллические буквы{NORMAL_COLOR}")
 
