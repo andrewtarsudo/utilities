@@ -193,50 +193,6 @@ class CustomPreparedRequest(NamedTuple):
             raise
 
 
-class CustomHTTPResponse:
-    def __init__(self, http_response: HTTPResponse):
-        self._http_response: HTTPResponse = http_response
-
-    def __repr__(self):
-        return f"<{self.__class__.__name__}({str(self)})>"
-
-    def __str__(self):
-        return bytes(self).decode("utf-8")
-
-    def __hash__(self):
-        return hash(self._http_response)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self._http_response == other._http_response
-
-        else:
-            return NotImplemented
-
-    def __ne__(self, other):
-        if isinstance(other, self.__class__):
-            return self._http_response != other._http_response
-
-        else:
-            return NotImplemented
-
-    def __len__(self):
-        return len(self.dict_response)
-
-    def __getitem__(self, item):
-        return self.dict_response.get(item)
-
-    def __bool__(self):
-        return len(self) > 0
-
-    def __bytes__(self):
-        return self._http_response.read()
-
-    @property
-    def dict_response(self) -> dict[str, Any]:
-        return loads(bytes(self))
-
-
 class CustomHTTPResponseChunked:
     def __init__(
             self,

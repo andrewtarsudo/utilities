@@ -17,7 +17,6 @@ class AsciiDocTableTerms:
         self._content: list[str] = [*lines]
         self._items: dict[TableCellCoordinate, TableItem] = dict()
         self._dict_terms: dict[str, tuple[Term, ...]] = dict()
-        self._header: list[str] = []
 
     @classmethod
     def from_file(cls, file_path: StrPath):
@@ -150,7 +149,6 @@ class AsciiDocTableTerms:
     def complete(self):
         header_line: str = self._content[self._find_header()]
         _: list[str] = header_line.split("|")
-        self._header = [line.strip() for line in _ if line]
 
         _empty: list[int] = [index for index, line in enumerate(self._content) if line == "\n"]
 

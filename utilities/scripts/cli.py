@@ -15,14 +15,13 @@ from loguru import logger
 from utilities.common.constants import args_help_dict, DEBUG, HELP, NORMAL, PRESS_ENTER_KEY
 from utilities.common.custom_logger import custom_logging
 
-COL_SPACING: int = 3
 COL_MAX: int = 39
 MAX_CONTENT_WIDTH: int = 100
 TERMINAL_WIDTH: int = 100
 
 SEPARATOR: str = "-" * MAX_CONTENT_WIDTH
 
-__version__: str = "0.1.0"
+__version__: str = "1.0.0"
 
 
 def up(value: str):
