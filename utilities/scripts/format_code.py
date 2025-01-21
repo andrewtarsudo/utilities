@@ -90,7 +90,7 @@ def format_code_command(
         logger.error(f"Максимальная длина должна быть целым числом, однако получено {type(length)}")
         raise NonIntegerLineLengthError
 
-    files: list[StrPath] | None = get_files(ctx, files, directory, recursive)
+    files: list[StrPath] | None = get_files(ctx, files=files, directory=directory, recursive=recursive)
 
     if files is None:
         ctx.obj["keep_logs"] = keep_logs

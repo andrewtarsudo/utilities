@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from os import system
+from sys import platform
 from typing import Iterable
 
 from click.core import Context
@@ -82,7 +84,15 @@ def check_russian_command(
         recursive: bool = True,
         verbose: bool = False,
         keep_logs: bool = False):
-    files: list[StrPath] | None = get_files(ctx, files, directory, recursive)
+    if platform.startswith("win"):
+        system("color")
+
+    files: list[StrPath] | None = get_files(
+        ctx,
+        files=files,
+        directory=directory,
+        recursive=recursive,
+        language="en")
 
     if files is not None:
         result: list[str] = []
@@ -99,10 +109,16 @@ def check_russian_command(
                 result.append(
                     f"{PASS_COLOR}В файле {file} не найдены кириллические буквы{NORMAL_COLOR}")
 
+            elif not _indexes:
+                continue
+
             else:
                 result.append(
                     f"{FAIL_COLOR}В файле {file} найдены кириллические буквы в строках: "
                     f"{', '.join(_indexes)}{NORMAL_COLOR}")
+
+        if not result:
+            result.append(f"{PASS_COLOR}Ни в одном файле не обнаружены кириллические символы{NORMAL_COLOR}")
 
         echo("\n".join(result))
 

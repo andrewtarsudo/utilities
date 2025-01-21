@@ -353,7 +353,7 @@ def command_line_interface(debug: bool = False, **kwargs):
     ctx: Context = get_current_context()
     ctx.ensure_object(dict)
     ctx.obj = dict(**kwargs)
-    ctx.obj["debug"] = debug
+    ctx.obj["debug"] = str(debug)
 
     custom_logging("cli", is_debug=debug)
 
@@ -368,15 +368,16 @@ def command_line_interface(debug: bool = False, **kwargs):
 
 @pass_context
 def clear_logs(ctx: Context):
+    logger.remove()
+
     if ctx.obj.get("keep_logs") is False:
-        logger.remove()
         NORMAL.unlink(missing_ok=True)
 
-    elif ctx.obj.get("debug"):
-        echo(DEBUG)
+    elif ctx.obj.get("debug") == "True":
+        echo(f"Папка с логами: {DEBUG}")
 
     else:
-        echo(NORMAL)
+        echo(f"Папка с логами: {NORMAL}")
 
     pause(PRESS_ENTER_KEY)
     ctx.exit()

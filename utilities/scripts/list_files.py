@@ -247,10 +247,10 @@ def list_files_command(
         elif extensions != [] and _.suffix not in extensions:
             continue
 
-        elif language and not _.stem.endswith(language):
+        elif language == "" and len(_.suffixes) > 1:
             continue
 
-        elif not language and len(_.suffixes) > 1:
+        elif language != "" and f".{language}" not in _.suffixes:
             continue
 
         else:

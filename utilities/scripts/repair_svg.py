@@ -71,8 +71,12 @@ def repair_svg_command(
         directory: StrPath = None,
         recursive: bool = True,
         keep_logs: bool = False):
-    print(recursive)
-    files: list[StrPath] | None = get_files(ctx, files, directory, recursive)
+    files: list[StrPath] | None = get_files(
+        ctx,
+        files=files,
+        directory=directory,
+        recursive=recursive,
+        extensions="svg")
 
     if files is not None:
         FOREIGN_OBJECT: str = "<foreignObject.*?</foreignObject>"

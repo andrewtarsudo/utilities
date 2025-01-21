@@ -55,10 +55,12 @@ def file_reader(path: StrPath, reader_mode: str | ReaderMode, encoding: str = "u
 
 
 def get_files(
-        ctx: Context,
+        ctx: Context, *,
         files: Iterable[StrPath] = None,
         directory: StrPath = None,
-        recursive: bool = True):
+        recursive: bool = True,
+        language: str = "",
+        extensions: str = "md adoc"):
     if files is None and directory is None:
         logger.error("Хотя бы один из параметров --file, --dir должен быть задан")
         return None
@@ -72,11 +74,15 @@ def get_files(
     if directory is not None:
         directory: Path = Path(directory).expanduser()
 
+        all_languages: bool = not bool(language)
+
         listed_files: list[str] = ctx.invoke(
             list_files_command,
             root_dir=directory,
             all_dirs=True,
-            extensions="svg",
+            all_languages=all_languages,
+            language=language,
+            extensions=extensions,
             prefix="",
             hidden=False,
             recursive=recursive,
