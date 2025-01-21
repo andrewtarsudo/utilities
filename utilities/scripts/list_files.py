@@ -176,7 +176,7 @@ def list_files_command(
         recursive: bool = True,
         auxiliary: bool = False,
         keep_logs: bool = False):
-    root_dir: Path = Path(root_dir).expanduser()
+    root_dir: Path = root_dir.expanduser()
 
     if extensions is None and all_extensions is None:
         extensions: list[str] = [".md", ".adoc"]
