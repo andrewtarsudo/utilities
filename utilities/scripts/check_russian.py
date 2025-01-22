@@ -92,9 +92,10 @@ def check_russian_command(
         files=files,
         directory=directory,
         recursive=recursive,
-        language="en")
+        language="en",
+        extensions="md adoc")
 
-    if files is not None:
+    if files is not None and files:
         result: list[str] = []
 
         for file in files:
@@ -118,9 +119,12 @@ def check_russian_command(
                     f"{', '.join(_indexes)}{NORMAL_COLOR}")
 
         if not result:
-            result.append(f"{PASS_COLOR}Ни в одном файле не обнаружены кириллические символы{NORMAL_COLOR}")
+            result.append(f"{PASS_COLOR}Ни в одном файле не обнаружены кириллические буквы{NORMAL_COLOR}")
 
         echo("\n".join(result))
+
+    else:
+        echo("Не найдено ни одного подходящего файла")
 
     ctx.obj["keep_logs"] = keep_logs
     ctx.invoke(clear_logs)

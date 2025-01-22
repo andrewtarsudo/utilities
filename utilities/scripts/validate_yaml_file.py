@@ -311,7 +311,7 @@ def validate(
         _lines.append(_line)
 
         if verbose or _status == "NOT OK":
-            print(_line)
+            echo(_line)
 
     if out is not None and out:
         out: Path = Path(out).expanduser()

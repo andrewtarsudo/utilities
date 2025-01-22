@@ -167,7 +167,7 @@ def list_files_command(
         all_dirs: bool = False,
         ignored_files: Iterable[str] = None,
         all_files: bool = False,
-        extensions: str = "md adoc",
+        extensions: str = None,
         all_extensions: bool = False,
         language: str = "",
         all_languages: bool = True,
@@ -178,13 +178,13 @@ def list_files_command(
         keep_logs: bool = False):
     root_dir: Path = root_dir.expanduser()
 
-    if extensions is None and all_extensions is None:
+    if extensions is None and not all_extensions:
         extensions: list[str] = [".md", ".adoc"]
 
     elif extensions is None:
         extensions: list[str] = []
 
-    elif all_extensions is None:
+    elif not all_extensions:
         extensions: list[str] = [
             f".{extension.removeprefix('.')}"
             for extension in extensions.strip().split(" ")]
