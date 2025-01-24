@@ -12,8 +12,9 @@ from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
 def unique(values: Iterable[Any] = None) -> list[Any]:
     """Gets unique values from the iterable instance.
 
-    :type values: Iterable, default=None
-    :return: The unique values.
+    :param values: The initial iterable. (default = None)
+    :type values: Iterable
+    :returns: The unique values.
     :rtype: list
     """
     if values is None:
@@ -25,63 +26,31 @@ def unique(values: Iterable[Any] = None) -> list[Any]:
 
 
 def with_parent(path: StrPath) -> str:
-    """
-    Getting the file name with the parent.
+    """Getting the file name with the parent.
 
-    Parameters
-    ----------
-    path : str or Path
-        The file path.
-
-    Returns
-    -------
-    str
-        The name of the file.
-
+    :param path: The file path.
+    :type path: str or Path
+    :return: The file name.
+    :rtype: str
     """
     _: Path = Path(path).parent
     return f"{_.parent.name}/{_.name}"
 
 
-def with_grandparent(path: StrPath):
-    """
-    Getting the file name with the parent and the grandparent.
+def with_grandparent(path: StrPath) -> str:
+    """Getting the file name with the parent and the grandparent.
 
-    Parameters
-    ----------
-    path : str or Path
-        The file path.
-
-    Returns
-    -------
-    str
-        The name of the file.
-
+    :param path: The file path.
+    :type path: str or Path
+    :return: The file name.
+    :rtype: str
     """
     _: Path = Path(path).parent
     return f"{_.parent.parent.name}/{_.parent.name}/{_.name}"
 
 
 class GeneralStorage:
-    """
-    The storage of the file names.
-
-    Attributes
-    ----------
-    _root_dir : Path
-        The directory path.
-    _dirindexes : dict[str, Path]
-        The names of the directories with the index.md or the index.adoc file inside.
-    _dir_indexes : dict[str, Path]
-        The names of the directories with the _index.md or the _index.adoc file inside.
-    _non_text_files : dict[str, Path]
-        The names of the files having neither the *.md nor the *.adoc extension.
-    _text_files : dict[str, Path]
-        The names of the markdown and asciidoc files.
-    _component_storages : dict[str, ComponentStorage]
-        The storages of the 'components' children directories.
-
-    """
+    """The storage of the file names."""
 
     def __init__(self, root_dir: StrPath):
         self._root_dir: Path = Path(root_dir).resolve()
@@ -124,43 +93,26 @@ class GeneralStorage:
         )
 
     def join_path(self, path: StrPath) -> Path:
-        """
-        Generating the path basing on the root_dir.
+        """Generates the path basing on the root_dir.
 
-        Attributes
-        ----------
-        path : str or Path
-            The path to add to the root_dir.
-
-        Returns
-        -------
-        Path
-            The result path.
-
+        :param path: The path to add to the root_dir.
+        :type path: str or Path
         """
         return self._root_dir.joinpath(path).resolve()
 
     def parent_name(self, path: StrPath) -> str:
-        """
-        Generating the file parent name.
+        """Generates the file parent name.
 
-        Attributes
-        ----------
-        path : str or Path
-            The path to the file.
-
+        :param path: The path to the file.
+        :type path: str or Path
         """
         return self.join_path(path).parent.name
 
     def grandparent_name(self, path: StrPath):
-        """
-        Generating the file grandparent name.
+        """Generates the file grandparent name.
 
-        Attributes
-        ----------
-        path : str or Path
-            The path to the file.
-
+        :param path: The path to the file.
+        :type path: str or Path
         """
         return self.join_path(path).parent.parent.name
 
@@ -190,14 +142,10 @@ class GeneralStorage:
         return
 
     def _set_dir_indexes(self, paths: Iterable[Path]):
-        """
-        Generating the '_dir_indexes' dictionary.
+        """Generates the '_dir_indexes' dictionary.
 
-        Parameters
-        ----------
-        paths : Iterable[Path]
-            The paths to the directories with the '_index.md' or '_index.adoc' file.
-
+        :param paths: The paths to the directories with the '_index.md' or '_index.adoc' file.
+        :type paths: Iterable[Path]
         """
         _unique_md: list[str] = unique(
             iter(
@@ -241,14 +189,10 @@ class GeneralStorage:
         return
 
     def _set_dirindexes(self, paths: Iterable[Path]):
-        """
-        Generating the '_dirindexes' dictionary.
+        """Generates the '_dirindexes' dictionary.
 
-        Parameters
-        ----------
-        paths : Iterable[Path]
-            The paths to the directories with the 'index.md' file.
-
+        :param paths: The paths to the directories with the 'index.md' file.
+        :type paths: Iterable[Path]
         """
         _unique_md: list[str] = unique(
             iter(
@@ -292,14 +236,10 @@ class GeneralStorage:
         return
 
     def _set_text_files(self, paths: Iterable[Path]):
-        """
-        Generating the '_text_files' dictionary.
+        """Generates the '_text_files' dictionary.
 
-        Parameters
-        ----------
-        paths : Iterable[Path]
-            The paths to the Markdown files.
-
+        :param paths: The paths to the Markdown files.
+        :type paths: Iterable[Path]
         """
         _unique_md: list[str] = unique(
             iter(
@@ -344,14 +284,10 @@ class GeneralStorage:
         return
 
     def _set_non_text_files(self, paths: Iterable[Path]):
-        """
-        Generating the '_non_text_files' dictionary.
+        """Generates the '_non_text_files' dictionary.
 
-        Parameters
-        ----------
-        paths : Iterable[Path]
-            The paths to the non-Markdown and non-AsciiDoc files.
-
+        :param paths: The paths to the non-Markdown and non-AsciiDoc files.
+        :type paths: Iterable[Path]
         """
         for _path in paths:
             self._non_text_files[_path.name] = self.join_path(_path)
@@ -374,19 +310,12 @@ class GeneralStorage:
 
     @property
     def root_dir(self):
+        """ """
         return self._root_dir
 
     @property
     def _components_path(self) -> Path:
-        """
-        The path to the 'components' part.
-
-        Returns
-        -------
-        Path
-            The full path to the part.
-
-        """
+        """The path to the 'components' part."""
         return self._root_dir.joinpath("components").resolve()
 
 
@@ -417,25 +346,7 @@ class ComponentStorage(GeneralStorage):
 
 
 class Storage(GeneralStorage):
-    """
-    The main storage of all file names.
-
-    Attributes
-    ----------
-    _root_dir : Path
-        The directory path.
-    _dirindexes : dict[str, Path]
-        The names of the directories with the index.md or index.adoc file inside.
-    _dir_indexes : dict[str, Path]
-        The names of the directories with the _index.md or _index.adoc file inside.
-    _non_text_files : dict[str, Path]
-        The names of the files having neither the *.md nor the *.adoc extension.
-    _text_files : dict[str, Path]
-        The names of the markdown or adoc files.
-    _component_storages : dict[str, ComponentStorage]
-        The storages for the components.
-
-    """
+    """The main storage of all file names."""
 
     def __init__(self, root_dir: StrPath):
         super().__init__(root_dir)
@@ -447,15 +358,7 @@ class Storage(GeneralStorage):
 
     @property
     def is_empty(self) -> bool:
-        """
-        The flag of having the 'components' directory and any files in it.
-
-        Returns
-        -------
-        bool
-            True if the directory does not exist or have _index file, otherwise, False.
-
-        """
+        """Checks if the directory does not exist or have _index file in it."""
         if not self._components_path.exists():
             return True
 
@@ -481,7 +384,14 @@ class Storage(GeneralStorage):
             component_storage.prepare()
             self._component_storages[_name] = component_storage
 
-    def get_component_storage(self, name: str):
+    def get_component_storage(self, name: str) -> ComponentStorage:
+        """Gets the ComponentStorage instance by its name.
+
+        :param name: The component storage name.
+        :type name: str
+        :return: The ComponentStorage instance
+        :rtype: ComponentStorage
+        """
         if name not in self._component_storage_names:
             logger.debug(f"Component {name} is not found")
 

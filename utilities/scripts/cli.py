@@ -363,7 +363,7 @@ def command_line_interface(debug: bool = False, **kwargs):
         ctx.exit(0)
 
     else:
-        logger.debug(f"Команда: {ctx.command_path}")
+        logger.debug(f"Команда: {ctx.invoked_subcommand}\nПараметры: {ctx.params}\nНеобработанные: {ctx.args}")
 
 
 @pass_context

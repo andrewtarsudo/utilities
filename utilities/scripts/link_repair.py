@@ -11,6 +11,7 @@ from loguru import logger
 
 from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.common.errors import InvalidFileDictAttributeError, InvalidStorageAttributeError
+from utilities.common.functions import file_reader, ReaderMode
 from utilities.repair_link.const import FileLanguage, prepare_logging
 from utilities.repair_link.file_dict import FileDict, FileLinkItem, TextFile
 from utilities.repair_link.general_storage import Storage
@@ -210,7 +211,7 @@ def link_repair_command(
         if not dry_run:
             dir_file.write()
 
-        dir_file.read()
+        dir_file._content = file_reader(dir_file.full_path, ReaderMode.LINES, "utf-8")
 
         # validate internal links
         internal_inspector.text_file = dir_file

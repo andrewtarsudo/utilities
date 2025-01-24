@@ -92,7 +92,7 @@ class InternalLinkInspector:
             self._text_file = value
 
         else:
-            logger.error(f"Файл должен быть типа Text, но получено {type(value)}")
+            logger.error(f"Файл должен быть типа TextFile, но получено {type(value)}")
             raise FileInvalidTypeError
 
     def modified_anchor(self, anchor: str) -> str | None:

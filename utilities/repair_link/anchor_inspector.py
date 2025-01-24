@@ -7,6 +7,7 @@ from loguru import logger
 
 from utilities.common.constants import separator
 from utilities.common.errors import FileInvalidTypeError, MissingFileError
+from utilities.common.functions import file_reader, ReaderMode
 from utilities.repair_link.file_dict import TextFile
 from utilities.repair_link.const import FileLanguage, prepare_logging
 
@@ -55,14 +56,14 @@ class AnchorInspector:
 
     def __add__(self, other):
         if isinstance(other, TextFile):
-            other.read()
+            other._content = file_reader(other.full_path, ReaderMode.LINES, "utf-8")
             self._dict_anchors[other] = list(other.iter_anchors())
 
         elif isinstance(other, Iterable):
             text_files: list[TextFile] = [_ for _ in other if isinstance(_, TextFile)]
 
             for text_file in text_files:
-                text_file.read()
+                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, "utf-8")
                 self._dict_anchors[text_file] = list(text_file.iter_anchors())
 
         else:

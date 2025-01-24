@@ -8,6 +8,7 @@ from loguru import logger
 
 from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
 from utilities.common.errors import InternalLinkAnchorError, LineInvalidTypeError
+from utilities.common.functions import file_reader, ReaderMode
 from utilities.repair_link.const import FileLanguage, prepare_logging
 from utilities.repair_link.link import Link
 
@@ -172,50 +173,6 @@ class TextFile(DirFile):
     def __iter__(self):
         return iter(self._content)
 
-    def read(self) -> bool:
-        """
-        Reading the file content.
-
-        The method tries to open the text file and read each line.
-
-        Handling UnicodeDecodeError, PermissionError, RuntimeError, FileNotFoundError, OSError.
-
-        Returns
-        -------
-        bool
-            The flag if the file contains text lines.
-
-        """
-        __flag: bool = False
-
-        try:
-            with open(self._full_path, "r+", encoding="utf-8") as f:
-                self._content = f.readlines()
-
-            __flag = True
-
-        except UnicodeDecodeError as exc:
-            logger.error(
-                f"Ошибка декодирования символа, {exc.reason}\n"
-                f"От {exc.start} до {exc.end}, в кодировке {exc.encoding}")
-
-        except PermissionError:
-            logger.error(f"Недостаточно прав для чтения файла {self.rel_path}")
-
-        except RuntimeError:
-            logger.error(f"Истекло время ожидания ответа во время чтения файла {self.rel_path}")
-
-        except FileNotFoundError:
-            logger.error(f"Файл {self.rel_path} был найден, но в течение работы скрипта был изменен")
-
-        except OSError as exc:
-            logger.error(
-                f"Ошибка при работе с системой для файла {self.rel_path}, {exc.__class__.__name__}.\n"
-                f"{exc.strerror}")
-
-        finally:
-            return __flag
-
     def write(self):
         """
         Writing the file content.
@@ -337,6 +294,7 @@ class TextFile(DirFile):
 
         if not is_boundary:
             boundaries: list[Boundary] | None = None
+
         else:
             boundaries: list[Boundary] | None = self._pattern_anchor
 
@@ -643,11 +601,11 @@ class FileDict:
             if file_path.suffix in (MD_EXTENSION, ADOC_EXTENSION):
                 text_file: TextFile = get_file(self._root_dir, file_path)
 
-                if text_file.read():
-                    text_file.set_imagesdir()
-                    text_file.set_links()
-                    text_file.set_anchors()
-                    text_file.set_internal_links()
+                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, "utf-8")
+                text_file.set_imagesdir()
+                text_file.set_links()
+                text_file.set_anchors()
+                text_file.set_internal_links()
 
                 self[file_path] = text_file
 
@@ -675,8 +633,9 @@ class FileDict:
             logger.exception(f"Элемент {item} должен быть типа str или Path, но получено {type(item)}", result=True)
             return
 
-        if item not in self:
-            _relpath: str = relpath(item, self._root_dir.parent.parent).replace("\\", "/")
+        # if item not in self:
+        #     _relpath: str = self._root_dir.parent.parent.relative_to(item).as_posix()
+        #     # _relpath: str = relpath(item, self._root_dir.parent.parent).replace("\\", "/")
 
         return self._dict_files.get(Path(item))
 
