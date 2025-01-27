@@ -362,7 +362,13 @@ def command_line_interface(debug: bool = False, **kwargs):
         pause(PRESS_ENTER_KEY)
         ctx.exit(0)
 
+    elif ctx.invoked_subcommand == "link-repair":
+        result_file: bool = True
+        custom_logging("cli", is_debug=debug, result_file=result_file)
+
     else:
+        result_file: bool = False
+        custom_logging("cli", is_debug=debug, result_file=result_file)
         logger.debug(f"Команда: {ctx.invoked_subcommand}\nПараметры: {ctx.params}\nНеобработанные: {ctx.args}")
 
 
