@@ -9,7 +9,7 @@ from click.termui import echo
 from click.types import BOOL, Path as ClickPath
 from PIL import Image
 
-from utilities.common.constants import HELP, StrPath
+from utilities.common.constants import HELP, separator, StrPath
 from utilities.common.functions import get_files
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 
@@ -111,16 +111,22 @@ def reduce_image_command(
         extensions=extensions)
 
     if files is not None:
+        before: int = 0
+        after: int = 0
+
         for file in files:
             file: Path = Path(file).expanduser().resolve()
             temp_file: Path = file.with_stem("temp_file")
 
             current_size: int = getsize(file)
+            before += current_size
 
             with Image.open(file, "r") as image:
                 image.save(temp_file, optimize=True)
 
                 new_size: int = getsize(temp_file)
+
+            after += new_size
 
             echo(f"Файл {file.name}: {file_size(current_size)} -> {file_size(new_size)}")
 
@@ -129,6 +135,12 @@ def reduce_image_command(
 
             else:
                 temp_file.unlink(missing_ok=True)
+
+        echo(separator)
+        echo(f"Итоговое изменение: {file_size(before)} -> {file_size(after)}")
+
+    if dry_run:
+        echo("Файлы не были изменены, поскольку использована опция --dry-run")
 
     ctx.obj["keep_logs"] = keep_logs
     ctx.invoke(clear_logs)
