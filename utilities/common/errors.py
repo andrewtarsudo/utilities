@@ -105,3 +105,15 @@ class NonPositiveLineLengthError(FormatCodeError):
 
 class NonIntegerLineLengthError(FormatCodeError):
     """Maximum line length cannot be non-integer."""
+
+
+class TableColsError(BaseError):
+    """Base class for errors associated with the table_cols-cols."""
+
+
+class TableBorderNotClosedError(TableColsError):
+    """Specified file has closing table_cols border mark '|===' missing."""
+
+
+class TableCoordinateInitError(TableColsError):
+    """Specified value cannot represent the cell coordinates in the table."""
