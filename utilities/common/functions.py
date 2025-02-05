@@ -19,7 +19,7 @@ class ReaderMode(Enum):
         return self._value_
 
 
-def file_reader(path: StrPath, reader_mode: str | ReaderMode, encoding: str = "utf-8"):
+def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str = "utf-8"):
     if isinstance(reader_mode, str):
         reader_mode: ReaderMode = ReaderMode[reader_mode]
 
@@ -38,11 +38,36 @@ def file_reader(path: StrPath, reader_mode: str | ReaderMode, encoding: str = "u
         raise
 
     except PermissionError:
-        input(f"Недостаточно прав для записи в файл {path}")
+        input(f"Недостаточно прав для чтения файла {path}")
         raise
 
     except RuntimeError:
-        input(f"Истекло время записи в файл {path}")
+        input(f"Истекло время чтения файла {path}")
+        raise
+
+    except UnsupportedOperation:
+        input(f"Не поддерживаемая операция с файлом {path}")
+        raise
+
+    except OSError as e:
+        input(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+        raise
+
+
+def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = "utf-8"):
+    if not isinstance(content, str):
+        content: str = "".join(content)
+
+    try:
+        with open(path, "w", encoding=encoding, errors="ignore") as f:
+            f.write(content)
+
+    except PermissionError:
+        logger.error(f"Недостаточно прав для чтения/записи в файл {path}")
+        raise
+
+    except RuntimeError:
+        input(f"Истекло время чтения файла {path}")
         raise
 
     except UnsupportedOperation:

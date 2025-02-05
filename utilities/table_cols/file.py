@@ -7,6 +7,7 @@ from typing import Iterable, Iterator
 from loguru import logger
 
 from utilities.common import TableBorderNotClosedError
+from utilities.common.functions import file_writer
 from utilities.table_cols import TableAnalyser
 from utilities.table_cols.column import TableColumn
 from utilities.table_cols.table import Table
@@ -163,7 +164,7 @@ class AsciiDocFile:
                 logger.warning(
                     "В таблице есть объединенные горизонтальные ячейки.\n"
                     "На данный момент такие таблицы оставляются как есть.\n"
-                    f"Таблица {table.index}, {table.name}", tech_writers=True)
+                    f"Таблица {table.index}, {table.name}")
                 continue
 
             # skip table_cols if it already has cols option
@@ -175,15 +176,19 @@ class AsciiDocFile:
                 _: str = "\n".join(iter(table))
 
                 logger.warning(
-                    f"Не удалось корректно обработать текст:\n{_}", tech_writers=True)
+                    f"Не удалось корректно обработать текст:\n{_}")
                 continue
 
             else:
                 table_column: TableColumn
                 table_analyser._column_parameters = [
                     table_column.column_parameters() for table_column in table.iter_column_items()]
-                table_analyser._table_id = f"{self._path.relative_to(Path.cwd())}, {table.name}"
+                table_analyser._table_id = f"{self._path.name}, {table.name}"
                 table_analyser.inspect_valid()
                 table_analyser.set_base_column_widths()
                 table_analyser.distribute_rest()
+                logger.info(f"{table_analyser._column_parameters=}")
                 table.options["cols"] = str(table_analyser)
+
+    def save(self):
+        file_writer(self._path, self._content)

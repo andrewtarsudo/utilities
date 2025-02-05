@@ -34,6 +34,19 @@ def file_size(value: int) -> str:
             return f"{mb:.2f} Мб"
 
 
+def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
+    if dry_run:
+        destination: StrPath = file.with_stem("temp_file")
+
+    else:
+        destination: StrPath = file
+
+    with Image.open(file, "r") as image:
+        image.save(destination, optimize=True)
+
+    return destination
+
+
 @command_line_interface.command(
     "reduce-image",
     cls=APIGroup,
@@ -116,25 +129,18 @@ def reduce_image_command(
 
         for file in files:
             file: Path = Path(file).expanduser().resolve()
-            temp_file: Path = file.with_stem("temp_file")
 
             current_size: int = getsize(file)
             before += current_size
 
-            with Image.open(file, "r") as image:
-                image.save(temp_file, optimize=True)
-
-                new_size: int = getsize(temp_file)
+            result: Path = duplicate_image(file, dry_run)
+            new_size: int = getsize(result)
 
             after += new_size
-
             echo(f"Файл {file.name}: {file_size(current_size)} -> {file_size(new_size)}")
 
-            if not dry_run:
-                temp_file.rename(file)
-
-            else:
-                temp_file.unlink(missing_ok=True)
+            if result.stem.startswith("temp_file"):
+                result.unlink(missing_ok=True)
 
         echo(separator)
         echo(f"Итоговое изменение: {file_size(before)} -> {file_size(after)}")

@@ -210,7 +210,7 @@ def link_repair_command(
         if not dry_run:
             dir_file.write()
 
-        dir_file._content = file_reader(dir_file.full_path, ReaderMode.LINES, "utf-8")
+        dir_file._content = file_reader(dir_file.full_path, ReaderMode.LINES, encoding="utf-8")
 
         # validate internal links
         internal_inspector.text_file = dir_file

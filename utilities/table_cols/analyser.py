@@ -20,22 +20,22 @@ The general steps:
 
 from loguru import logger
 
-from utilities.common.constants import MAX_SYMBOLS, MIN_COLUMN_WIDTH
+from utilities.common.constants import MAX_SYMBOLS, MIN_COLUMN
 from utilities.table_cols.column import TableColumnParameters
 
 
 class TableAnalyser:
     """Class to represent the scheme to specify the cols options of the table_cols."""
 
-    def __init__(self, *, max_symbols: int = None, min_column_width: int = None):
+    def __init__(self, *, max_symbols: int = None, min_column: int = None):
         if max_symbols is None:
             max_symbols: int = MAX_SYMBOLS
 
-        if min_column_width is None:
-            min_column_width: int = MIN_COLUMN_WIDTH
+        if min_column is None:
+            min_column: int = MIN_COLUMN
 
         self._max_symbols: int = max_symbols
-        self._min_column_width: int = min_column_width
+        self._min_column: int = min_column
         self._columns: dict[int, int] = dict()
         self._column_parameters: list[TableColumnParameters] = []
         self._is_valid: bool | None = None
@@ -77,17 +77,22 @@ class TableAnalyser:
         :return: The column width to add to the TableAnalyser::_columns.
         :rtype: int
         """
+        print(f"{self._is_valid}, {column_parameters.is_spaced}")
+        print(f"{column_parameters.preferred_length=}")
+        print(f"{column_parameters.minimum_length=}")
         if self._is_valid and not column_parameters.is_spaced:
-            return max((column_parameters.preferred_length, self._min_column_width))
+            return max((column_parameters.preferred_length, self._min_column))
 
         else:
-            return max((column_parameters.minimum_length, self._min_column_width))
+            return max((column_parameters.minimum_length, self._min_column))
 
     def set_base_column_widths(self):
         """Specifies the min base column widths to fit the table_cols."""
         for column_parameters in iter(self):
             value: int = self.find_base_column_width(column_parameters)
             self._columns[column_parameters.index] = value
+
+            print(f"{column_parameters.index} {value=}")
 
     def distribute_rest(self):
         """Splits the width points to the columns with the longest texts.

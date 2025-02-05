@@ -6,7 +6,7 @@ from click.decorators import help_option, option, pass_context
 from click.termui import echo
 from click.types import BOOL, INT, Path as ClickPath
 
-from utilities.common.constants import HELP, MAX_SYMBOLS, MIN_COLUMN_WIDTH, StrPath
+from utilities.common.constants import HELP, MAX_SYMBOLS, MIN_COLUMN, StrPath
 from utilities.common.functions import file_reader, get_files, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 from utilities.table_cols import TableAnalyser
@@ -62,12 +62,12 @@ from utilities.table_cols.file import AsciiDocFile
 @option(
     "-c", "--min-column",
     type=INT,
-    help=f"\b\nМинимальная ширина столбца в символах. По умолчанию: {MIN_COLUMN_WIDTH}.\n"
+    help=f"\b\nМинимальная ширина столбца в символах. По умолчанию: {MIN_COLUMN}.\n"
          "Примечание. Должно быть целым положительным числом",
     multiple=False,
     required=False,
     metavar="LEN",
-    default=MIN_COLUMN_WIDTH)
+    default=MIN_COLUMN)
 @option(
     "--keep-logs",
     type=BOOL,
@@ -88,7 +88,7 @@ def table_cols_command(
         directory: StrPath = None,
         recursive: bool = True,
         max_symbols: int = MAX_SYMBOLS,
-        min_column_width: int = MIN_COLUMN_WIDTH,
+        min_column: int = MIN_COLUMN,
         keep_logs: bool = False):
     files: list[StrPath] | None = get_files(
         ctx,
@@ -98,18 +98,17 @@ def table_cols_command(
         extensions="adoc")
 
     if files is not None:
-        table_analyser: TableAnalyser = TableAnalyser(
-            max_symbols=max_symbols,
-            min_column_width=min_column_width)
+        table_analyser: TableAnalyser = TableAnalyser(max_symbols=max_symbols, min_column=min_column)
 
         for file in files:
-            content: list[str] = file_reader(file, ReaderMode.LINES, "utf-8")
+            content: list[str] = file_reader(file, ReaderMode.LINES, encoding="utf-8")
             ascii_doc_file: AsciiDocFile = AsciiDocFile(file, content=content)
             ascii_doc_file.set_tables()
             ascii_doc_file.fix_tables(table_analyser)
             ascii_doc_file.replace_tables()
+            ascii_doc_file.save()
 
-            echo(f"Файл {file} обработан")
+            echo(f"Файл {file} обработан и сохранен")
 
     ctx.obj["keep_logs"] = keep_logs
     ctx.invoke(clear_logs)

@@ -56,14 +56,14 @@ class AnchorInspector:
 
     def __add__(self, other):
         if isinstance(other, TextFile):
-            other._content = file_reader(other.full_path, ReaderMode.LINES, "utf-8")
+            other._content = file_reader(other.full_path, ReaderMode.LINES, encoding="utf-8")
             self._dict_anchors[other] = list(other.iter_anchors())
 
         elif isinstance(other, Iterable):
             text_files: list[TextFile] = [_ for _ in other if isinstance(_, TextFile)]
 
             for text_file in text_files:
-                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, "utf-8")
+                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, encoding="utf-8")
                 self._dict_anchors[text_file] = list(text_file.iter_anchors())
 
         else:

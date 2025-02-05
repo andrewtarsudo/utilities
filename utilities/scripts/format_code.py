@@ -10,7 +10,7 @@ from loguru import logger
 
 from utilities.common import NonIntegerLineLengthError, NonPositiveLineLengthError
 from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
-from utilities.common.functions import file_reader, get_files, ReaderMode
+from utilities.common.functions import file_reader, file_writer, get_files, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 
 MAX_LENGTH: int = 84
@@ -115,8 +115,7 @@ def format_code_command(
                     _: list[str] = split(line, length=length)
                     _result.append("\n".join(_))
 
-            with open(file, "w", encoding="utf-8", errors="ignore") as fw:
-                fw.write("\n\n".join(_result))
+            file_writer(file, "\n\n".join(_result))
 
             logger.info(f"Файл {file.name} успешно обработан")
 

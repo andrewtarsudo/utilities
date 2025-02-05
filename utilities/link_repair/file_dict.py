@@ -601,7 +601,7 @@ class FileDict:
             if file_path.suffix in (MD_EXTENSION, ADOC_EXTENSION):
                 text_file: TextFile = get_file(self._root_dir, file_path)
 
-                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, "utf-8")
+                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, encoding="utf-8")
                 text_file.set_imagesdir()
                 text_file.set_links()
                 text_file.set_anchors()

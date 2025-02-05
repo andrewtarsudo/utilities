@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import Counter
-from re import sub
+from re import DOTALL, sub
 from string import ascii_letters, digits
 
 from slugify import slugify
@@ -8,16 +8,16 @@ from slugify import slugify
 from utilities.table_cols.coordinate import TableCoordinate
 
 
-def length_offset(line: str) -> int:
-    """Adds the correction for narrow symbols that require little space.
+def fix_length(text: str):
+    NARROW: str = ":;.\",!'`/"
+    MEDIUM: str = "{}[]$#()"
 
-    The symbols are punctuation marks.
-    The function is taken out of the class for easier testing.
-    """
-    NARROW_SYMBOLS: str = ".[]()\\/:;,{}'\"|"
-    narrow_offset: int = (sum(Counter(line).get(char, 0) for char in NARROW_SYMBOLS) + 1) // 2
+    counter: Counter = Counter(text)
 
-    return len(line) - narrow_offset
+    narrow: int = sum((counter.get(_, 0) for _ in NARROW), 0)
+    medium: int = sum((counter.get(_, 0) for _ in MEDIUM), 0)
+
+    return len(text) - 2 * narrow - medium
 
 
 class TableCell:
@@ -48,14 +48,26 @@ class TableCell:
 
         SUBS: dict[str, str] = {
             r"pass:q\[(.*?)\]": r"\1",
+            r"\[\[.*?\]\]": r"",
             r"<[^>]*?>(.+?)</[^>]*?>": r"\1",
-            r"[&\{]nbsp[;}]": "_",
-            r"https?[^)\[]*?": "",
+            r"[&\{]nbsp[;}]": r"_",
+            r"\[.*?\]#(.*?)#": r"\1",
+            r"https?[^)\[]*?": r"",
             r"<<[^,]*?,([^>]*?)>>": r"\1",
-            r"\[\.?[\[#].*?]": "",
-            r"link:[^\[]*": r""
+            r"\[\.?[\[#].*?]": r"",
+            r"link:[^\[]*": r"",
+            r"[&\{][lg]t[;}]": r"_",
+            r"[\<\>\[\]\{\}]": r"",
         }
 
+        _: str = self.text
+
+        for k, v in SUBS.items():
+            _: str = sub(k, v, _, DOTALL)
+
+        return _
+
+    def processed_text(self):
         # implemented to process names of standards and specifications as a single word
         replacements: tuple[tuple[str, str], ...] = (
             ("3GPP ", "3GPP_"),
@@ -65,10 +77,6 @@ class TableCell:
             ("Recommendation ", "Recommendation_"),
             ("GSM ", "GSM_")
         )
-        _: str = self.text
-
-        for k, v in SUBS.items():
-            _: str = sub(k, v, _)
 
         if self.is_spaced():
             separator: str = " "
@@ -76,19 +84,19 @@ class TableCell:
         else:
             separator: str = "-"
 
-        raw_text: str = slugify(
-            _,
+        _: str = slugify(
+            self.raw_text(),
             replacements=replacements,
             separator=separator,
             lowercase=False,
             allow_unicode=True,
             stopwords=["br"])
 
-        if raw_text == "":
+        if _ == "":
             return ""
 
         else:
-            return raw_text.strip()
+            return _.strip()
 
     @property
     def occupied_elements(self) -> int:
@@ -150,14 +158,14 @@ class TableCell:
             return 0
 
         elif self.is_spaced():
-            return max(map(length_offset, self.raw_text().split()))
+            return max(map(fix_length, self.processed_text().split()))
 
         else:
-            return length_offset(self.raw_text())
+            return fix_length(self.processed_text())
 
     def preferred_length(self) -> int:
         """Gets the complete length of the text counting all symbols."""
-        return len(self.raw_text())
+        return fix_length(self.raw_text())
 
     def __len__(self):
         return self.preferred_length()
