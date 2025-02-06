@@ -125,3 +125,11 @@ class TableColumnTypeError(TableColsError):
 
 class TableColumnIndexError(TableColsError):
     """Specified column index has not been found."""
+
+
+class TableColumnInvalidNameError(TableColsError):
+    """Specified column name has not been found."""
+
+
+class TableColumnInvalidIdentifierError(TableColsError):
+    """Specified column identifier has an invalid type."""

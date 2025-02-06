@@ -108,22 +108,14 @@ class TableColumn(NamedTuple):
 
     def minimum_length(self) -> int:
         """Gets the maximum 'minimum_length' of cells."""
-        for table_cell in iter(self):
-            print(f"{table_cell.coord}, {table_cell.minimum_length()}")
-
-        print(f"column {self.column} min: {max(table_cell.minimum_length() for table_cell in iter(self))}")
-        return max(table_cell.minimum_length() for table_cell in iter(self))
+        return max(table_cell.minimum_length for table_cell in iter(self))
 
     def __str__(self):
         return "\n".join(map(str, iter(self)))
 
     def preferred_length(self) -> int:
         """Gets the maximum 'preferred_length' of cells."""
-        for table_cell in iter(self):
-            print(f"{table_cell.coord}, {table_cell.preferred_length()}\n{table_cell.raw_text()}")
-
-        print(f"column {self.column} prf: {max(table_cell.preferred_length() for table_cell in iter(self))}")
-        return max(table_cell.preferred_length() for table_cell in iter(self))
+        return max(table_cell.preferred_length for table_cell in iter(self))
 
     def __hash__(self):
         return hash(self.column)

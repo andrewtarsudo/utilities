@@ -7,7 +7,7 @@ from typing import Iterable, Iterator, Mapping, Pattern
 
 from loguru import logger
 
-from utilities.common import TableColumnIndexError
+from utilities.common import TableColumnIndexError, TableColumnInvalidIdentifierError, TableColumnInvalidNameError
 from utilities.table_cols.cell import TableCell
 from utilities.table_cols.column import TableColumn
 from utilities.table_cols.coordinate import TableCoordinate
@@ -187,7 +187,8 @@ class Table:
         if isinstance(column, int):
             if 0 <= column < self.num_columns:
                 table_cells: list[TableCell] = [
-                    v for k, v in self._table_cells.items() if k.column == column]
+                    v for k, v in self._table_cells.items()
+                    if k.column == column]
                 return TableColumn(table_cells, column)
 
             else:
@@ -199,6 +200,16 @@ class Table:
                 for column_item in self.iter_column_items():
                     if column_item.name == column:
                         return column_item
+
+            else:
+                column_names: str = ", ".join(self.column_names)
+                logger.error(f"Столбец с именем {column} не найден. Доступные названия:\n{column_names}")
+                raise TableColumnInvalidNameError
+
+        else:
+            logger.error(
+                f"Столбец задается индексом типа int или именем типа str, но получено {column} типа {type(column)}")
+            raise TableColumnInvalidIdentifierError
 
     def iter_column_items(self) -> Iterator['TableColumn']:
         """Iterates over the table_cols columns.
@@ -226,15 +237,6 @@ class Table:
     @property
     def name(self):
         return self._name
-
-    @property
-    def lines(self):
-        return self._lines
-
-    def widest_column_index(self) -> int:
-        """Gets the index of the widest column in the table_cols."""
-        column_item: TableColumn = max(self.iter_column_items(), key=len)
-        return list(self.iter_column_items()).index(column_item)
 
     @property
     def column_names(self) -> list[str]:

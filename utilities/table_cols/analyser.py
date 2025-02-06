@@ -77,9 +77,6 @@ class TableAnalyser:
         :return: The column width to add to the TableAnalyser::_columns.
         :rtype: int
         """
-        print(f"{self._is_valid}, {column_parameters.is_spaced}")
-        print(f"{column_parameters.preferred_length=}")
-        print(f"{column_parameters.minimum_length=}")
         if self._is_valid and not column_parameters.is_spaced:
             return max((column_parameters.preferred_length, self._min_column))
 

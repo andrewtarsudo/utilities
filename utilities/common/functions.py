@@ -5,9 +5,10 @@ from pathlib import Path
 from typing import Callable, Iterable
 
 from click.core import Context
+from click.termui import pause
 from loguru import logger
 
-from utilities.common.constants import StrPath
+from utilities.common.constants import PRESS_ENTER_KEY, StrPath
 from utilities.scripts.list_files import list_files_command
 
 
@@ -88,7 +89,7 @@ def get_files(
         extensions: str = "md adoc"):
     if files is None and directory is None:
         logger.error("Хотя бы один из параметров --file, --dir должен быть задан")
-        return None
+        pause(PRESS_ENTER_KEY)
 
     if files is None:
         files: list[StrPath] = []
