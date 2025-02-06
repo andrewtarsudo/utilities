@@ -57,13 +57,13 @@ class TableAnalyser:
         If the sum of minimum lengths < max table_cols width = Basic_config::analyser::max_symbols,
         then there is no way to fit the table_cols properly.
         """
-        minimum_lengths: int = sum([column_parameters.minimum_length for column_parameters in iter(self)])
+        minimum_lengths: int = sum(column_parameters.minimum_length for column_parameters in iter(self))
 
         if minimum_lengths > self._max_symbols:
             logger.error(
                 f"Минимальная допустимая ширина для таблицы, {minimum_lengths}, "
                 f"превышает максимально допустимую, {self._max_symbols}\n"
-                f"Таблица {self._table_id}", tech_writers=True)
+                f"Таблица {self._table_id}")
             self._is_valid = False
 
         else:
@@ -91,8 +91,6 @@ class TableAnalyser:
         for column_parameters in iter(self):
             value: int = self.find_base_column_width(column_parameters)
             self._columns[column_parameters.index] = value
-
-            print(f"{column_parameters.index} {value=}")
 
     def distribute_rest(self):
         """Splits the width points to the columns with the longest texts.

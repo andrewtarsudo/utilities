@@ -7,6 +7,7 @@ from typing import Iterable, Iterator, Mapping, Pattern
 
 from loguru import logger
 
+from utilities.common import TableColumnIndexError
 from utilities.table_cols.cell import TableCell
 from utilities.table_cols.column import TableColumn
 from utilities.table_cols.coordinate import TableCoordinate
@@ -181,16 +182,23 @@ class Table:
         """Gets the number of columns."""
         return Counter(self[0]).get("|")
 
-    def get_column_item(self, column: int) -> TableColumn:
+    def get_column_item(self, column: int | str) -> TableColumn:
         """Gets the table_cols column as TableColumn instance."""
-        if 0 <= column < self.num_columns:
-            table_cells: list[TableCell] = [
-                v for k, v in self._table_cells.items() if k.column == column]
-            return TableColumn(table_cells, column)
+        if isinstance(column, int):
+            if 0 <= column < self.num_columns:
+                table_cells: list[TableCell] = [
+                    v for k, v in self._table_cells.items() if k.column == column]
+                return TableColumn(table_cells, column)
 
-        else:
-            logger.error(f"Индекс строки должен быть в диапазоне 0-{self.num_columns}, но получен {column}")
-            raise IndexError
+            else:
+                logger.error(f"Индекс строки должен быть в диапазоне 0-{self.num_columns}, но получен {column}")
+                raise TableColumnIndexError
+
+        elif isinstance(column, str):
+            if column in self.column_names:
+                for column_item in self.iter_column_items():
+                    if column_item.name == column:
+                        return column_item
 
     def iter_column_items(self) -> Iterator['TableColumn']:
         """Iterates over the table_cols columns.
@@ -227,3 +235,8 @@ class Table:
         """Gets the index of the widest column in the table_cols."""
         column_item: TableColumn = max(self.iter_column_items(), key=len)
         return list(self.iter_column_items()).index(column_item)
+
+    @property
+    def column_names(self) -> list[str]:
+        """Gets the names of the columns."""
+        return [_.name for _ in self.iter_column_items()]

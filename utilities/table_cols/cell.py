@@ -41,9 +41,9 @@ class TableCell:
         """Gets the text without decorations and modifications like styling, links, anchors, html tags, etc."""
         # check if the text has any characters or digits
         # if not, keep as is since it means the text is a set of punctuation marks
-        sense_letters: str = f"{ascii_letters}{digits}АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя"
+        LETTERS: str = f"{ascii_letters}{digits}АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя"
 
-        if not any(char in sense_letters for char in self.text):
+        if not any(char in LETTERS for char in self.text):
             return self.text
 
         SUBS: dict[str, str] = {
@@ -68,6 +68,7 @@ class TableCell:
         return _
 
     def processed_text(self):
+        """Gets the raw text modified for the standards and recommendations."""
         # implemented to process names of standards and specifications as a single word
         replacements: tuple[tuple[str, str], ...] = (
             ("3GPP ", "3GPP_"),
@@ -165,7 +166,7 @@ class TableCell:
 
     def preferred_length(self) -> int:
         """Gets the complete length of the text counting all symbols."""
-        return fix_length(self.raw_text())
+        return len(self.raw_text())
 
     def __len__(self):
         return self.preferred_length()

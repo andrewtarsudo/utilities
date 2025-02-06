@@ -22,7 +22,7 @@ HELP: str = """Вывести справочную информацию на э�
 MD_EXTENSION: str = ".md"
 ADOC_EXTENSION: str = ".adoc"
 
-MAX_SYMBOLS: int = 66
+MAX_SYMBOLS: int = 72
 MIN_COLUMN = 4
 
 

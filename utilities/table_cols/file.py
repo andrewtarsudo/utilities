@@ -187,7 +187,6 @@ class AsciiDocFile:
                 table_analyser.inspect_valid()
                 table_analyser.set_base_column_widths()
                 table_analyser.distribute_rest()
-                logger.info(f"{table_analyser._column_parameters=}")
                 table.options["cols"] = str(table_analyser)
 
     def save(self):

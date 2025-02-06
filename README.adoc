@@ -28,7 +28,9 @@ link:docs/README_convert_tables.adoc#convert-tables[convert-tables]:: коман
 link:docs/README_format_code.adoc#format-code[format-code]:: команда для форматирования блоков кода
 link:docs/README_link_repair.adoc#link-repair[link-repair]:: команда для исправления ссылок в проекте
 link:docs/README_list_files.adoc#list-files[list-files]:: команда для вывода файлов в директории с использованием ряда фильтров
+link:docs/README_reduce_image.adoc#reduce-image[reduce-image]:: команда для сжатия файлов изображений
 link:docs/README_repair_svg.adoc#repair-svg[repair-svg]:: команда для корректирования SVG-файлов
+link:docs/README_table_cols.adoc#table-cols[table-cols]:: команда для задания ширин столбцов таблиц в файлах AsciiDoc
 link:docs/README_terms.adoc#terms[terms]:: команда для получения расшифровок аббревиатур
 link:docs/README_validate_yaml.adoc#validate-yaml[validate-yaml]:: команда для валидации YAML-файлов, используемых для генерации PDF
 
@@ -54,8 +56,8 @@ $ <path/to/{name}> COMMAND OPTIONS
 [source,console]
 ----
 Использование:
-tw_utilities.exe
-list-files | check-russian | convert-tables | format-code | link-repair | repair-svg | terms | validate-yaml
+tw_utilities
+list-files | check-russian | convert-tables | format-code | link-repair | reduce-image | repair-svg | table-cols | terms | validate-yaml
 -v/--version | --h/--help
 
 
@@ -73,7 +75,9 @@ list-files | check-russian | convert-tables | format-code | link-repair | repair
   link-repair                            Команда для проверки и исправления ссылок в файлах
                                          документации
   list-files                             Команда для вывода файлов в директории
+  reduce-image                           Команда для уменьшения размера изображений JPG, PNG
   repair-svg                             Команда для исправления файлов SVG
+  table-cols                             Команда для задания ширины столбцам таблиц
   terms                                  Команда для вывода расшифровки аббревиатур
   validate-yaml                          Команда для валидации YAML-файла, используемого при
                                          генерации PDF
@@ -169,7 +173,11 @@ include::docs/README_link_repair.adoc[]
 
 include::docs/README_list_files.adoc[]
 
+include::docs/README_reduce_image.adoc
+
 include::docs/README_repair_svg.adoc[]
+
+include::docs/README_table_cols.adoc[]
 
 include::docs/README_terms.adoc[]
 

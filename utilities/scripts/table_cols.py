@@ -57,7 +57,7 @@ from utilities.table_cols.file import AsciiDocFile
          "Примечание. Должно быть целым положительным числом",
     multiple=False,
     required=False,
-    metavar="LEN",
+    metavar="WIDTH",
     default=MAX_SYMBOLS)
 @option(
     "-c", "--min-column",
@@ -66,7 +66,7 @@ from utilities.table_cols.file import AsciiDocFile
          "Примечание. Должно быть целым положительным числом",
     multiple=False,
     required=False,
-    metavar="LEN",
+    metavar="WIDTH",
     default=MIN_COLUMN)
 @option(
     "--keep-logs",

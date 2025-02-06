@@ -12,8 +12,8 @@ loguru = ">=0.6"
 click = ">=8.1"
 more-itertools = ">=10.5"
 pyyaml = ">6.0"
-pillow = "^11.1.0"
-python-slugify = "^8.0.4"
+pillow = ">=11.1"
+python-slugify = ">8.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.3"

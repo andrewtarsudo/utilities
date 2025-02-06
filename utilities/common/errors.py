@@ -117,3 +117,11 @@ class TableBorderNotClosedError(TableColsError):
 
 class TableCoordinateInitError(TableColsError):
     """Specified value cannot represent the cell coordinates in the table."""
+
+
+class TableColumnTypeError(TableColsError):
+    """Specified value has an invalid type."""
+
+
+class TableColumnIndexError(TableColsError):
+    """Specified column index has not been found."""

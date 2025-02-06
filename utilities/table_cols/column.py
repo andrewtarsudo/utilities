@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from typing import Iterator, NamedTuple
 
+from loguru import logger
+
+from utilities.common import TableColumnTypeError
 from utilities.table_cols.cell import TableCell
 
 
@@ -68,11 +71,32 @@ class TableColumn(NamedTuple):
     table_cells: list[TableCell]
     column: int
 
+    @property
+    def name(self) -> str:
+        """Gets the column name as the text of the cell in the table header."""
+        return self[0].text
+
     def __iter__(self) -> Iterator[TableCell]:
         return iter(self.table_cells)
 
     def __len__(self):
         return max(map(len, self.table_cells))
+
+    @property
+    def num_cells(self) -> int:
+        """Gets the number of cells."""
+        return len(self.table_cells)
+
+    def __getitem__(self, item) -> TableCell | list[TableCell]:
+        if isinstance(item, int):
+            return self.table_cells[item]
+
+        elif isinstance(item, slice):
+            return self.table_cells[item.start:item.stop:item.step]
+
+        else:
+            logger.error(f"Ключ должен быть типа int или slice, но получено {type(item)}")
+            raise TableColumnTypeError
 
     def is_spaced(self):
         """Indicates if the column has any cell with a space.
