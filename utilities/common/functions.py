@@ -35,48 +35,57 @@ def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str =
         return _
 
     except FileNotFoundError:
-        input(f"Файл {path} не найден")
+        logger.error(f"Файл {path} не найден")
         raise
 
     except PermissionError:
-        input(f"Недостаточно прав для чтения файла {path}")
+        from os import stat
+
+        logger.error(f"Недостаточно прав для чтения файла {path}")
+        logger.error(f"Доступ: {stat(path).st_mode}")
         raise
 
     except RuntimeError:
-        input(f"Истекло время чтения файла {path}")
+        logger.error(f"Произошла ошибка обработки во время записи файла {path}")
         raise
 
-    except UnsupportedOperation:
-        input(f"Не поддерживаемая операция с файлом {path}")
+    except UnsupportedOperation as e:
+        logger.error(f"Не поддерживаемая операция с файлом {path}: {e.strerror}")
         raise
 
     except OSError as e:
-        input(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+        logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
         raise
 
 
 def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = "utf-8"):
+    path: Path = Path(path).expanduser().resolve()
+    mode: str = "w" if path.exists() else "x"
+
     if not isinstance(content, str):
         content: str = "".join(content)
 
     try:
-        with open(path, "w", encoding=encoding, errors="ignore") as f:
+        with open(path, mode=mode, encoding=encoding, errors="ignore") as f:
             f.write(content)
 
     except PermissionError:
-        logger.error(f"Недостаточно прав для чтения/записи в файл {path}")
+        from os import stat
+
+        logger.error(f"Недостаточно прав для записи в файл {path}")
+        logger.error(f"Доступ: {stat(path).st_mode}")
         raise
 
     except RuntimeError:
-        input(f"Истекло время чтения файла {path}")
+        logger.error(f"Произошла ошибка обработки во время записи файла {path}")
         raise
 
-    except UnsupportedOperation:
-        input(f"Не поддерживаемая операция с файлом {path}")
+    except UnsupportedOperation as e:
+        logger.error(f"Не поддерживаемая операция с файлом {path}: {e.strerror}")
         raise
 
     except OSError as e:
-        input(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+        logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
         raise
 
 

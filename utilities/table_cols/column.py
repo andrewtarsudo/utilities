@@ -3,7 +3,7 @@ from typing import Iterator, NamedTuple
 
 from loguru import logger
 
-from utilities.common import TableColumnTypeError
+from utilities.common import TableColsTableColumnTypeError
 from utilities.table_cols.cell import TableCell
 
 
@@ -96,7 +96,7 @@ class TableColumn(NamedTuple):
 
         else:
             logger.error(f"Ключ должен быть типа int или slice, но получено {type(item)}")
-            raise TableColumnTypeError
+            raise TableColsTableColumnTypeError
 
     def is_spaced(self):
         """Indicates if the column has any cell with a space.

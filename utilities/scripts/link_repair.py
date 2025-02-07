@@ -10,7 +10,7 @@ from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
 from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
-from utilities.common.errors import InvalidFileDictAttributeError, InvalidStorageAttributeError
+from utilities.common.errors import LinkRepairInvalidFileDictAttributeError, LinkRepairInvalidStorageAttributeError
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.link_repair.const import FileLanguage, prepare_logging
 from utilities.link_repair.file_dict import FileDict, FileLinkItem, TextFile
@@ -147,7 +147,7 @@ def link_repair_command(
 
     if storage is None:
         logger.error("Объект типа Storage не определен")
-        raise InvalidStorageAttributeError
+        raise LinkRepairInvalidStorageAttributeError
 
     logger.debug(prepare_logging(storage.dir_indexes.items()))
     logger.debug(prepare_logging(storage.dirindexes.items()))
@@ -160,7 +160,7 @@ def link_repair_command(
 
     if file_dict is None:
         logger.error("Объект типа FileDict не определен")
-        raise InvalidFileDictAttributeError
+        raise LinkRepairInvalidFileDictAttributeError
 
     logger.debug(prepare_logging(file_dict.dict_files.items()))
 

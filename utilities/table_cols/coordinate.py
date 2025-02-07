@@ -3,7 +3,7 @@ from typing import NamedTuple
 
 from loguru import logger
 
-from utilities.common.errors import TableCoordinateInitError
+from utilities.common.errors import TableColsTableCoordinateInitError
 
 
 class TableCoordinate(NamedTuple):
@@ -54,7 +54,7 @@ class TableCoordinate(NamedTuple):
         else:
             logger.error(
                 f"Индекс {number} и количество столбцов {num_columns} должны быть положительными")
-            raise TableCoordinateInitError
+            raise TableColsTableCoordinateInitError
 
     def shift(self, row_offset: int = 0, column_offset: int = 0):
         """Generates the table_cols coordinates displaced from the given one.

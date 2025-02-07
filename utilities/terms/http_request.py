@@ -11,7 +11,7 @@ from urllib.request import Request, urlopen
 from loguru import logger
 
 from utilities.common.constants import StrPath
-from utilities.common.errors import RequiredAttributeMissingError
+from utilities.common.errors import TermsRequiredAttributeMissingError
 from utilities.terms.const import CustomPort, CustomScheme
 
 try:
@@ -97,7 +97,7 @@ class CustomHTTPRequest:
     def _get_host(self) -> str:
         if self._host is None:
             logger.error("Не указан адрес host")
-            raise RequiredAttributeMissingError
+            raise TermsRequiredAttributeMissingError
 
         else:
             return self._host.strip("/")
@@ -136,12 +136,14 @@ class CustomPreparedRequest(NamedTuple):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.request() == other.request()
+
         else:
             return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
             return self.request() != other.request()
+
         else:
             return NotImplemented
 

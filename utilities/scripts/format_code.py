@@ -8,7 +8,7 @@ from click.termui import pause
 from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
-from utilities.common import NonIntegerLineLengthError, NonPositiveLineLengthError
+from utilities.common import ConvertTablesNonIntegerLineLengthError, ConvertTablesNonPositiveLineLengthError
 from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.common.functions import file_reader, file_writer, get_files, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
@@ -84,11 +84,11 @@ def format_code_command(
         keep_logs: bool = False):
     if length < 0:
         logger.error(f"Максимальная длина не может быть неположительным числом, однако получено {length}")
-        raise NonPositiveLineLengthError
+        raise ConvertTablesNonPositiveLineLengthError
 
     elif not isinstance(length, int):
         logger.error(f"Максимальная длина должна быть целым числом, однако получено {type(length)}")
-        raise NonIntegerLineLengthError
+        raise ConvertTablesNonIntegerLineLengthError
 
     files: list[StrPath] | None = get_files(ctx, files=files, directory=directory, recursive=recursive)
 

@@ -4,7 +4,7 @@
 :source-highlighter: rouge
 :imagesdir: docs/images
 :figure-caption: Рисунок
-:stylesdir: css
+:stylesdir: ./css/
 :stylesheet: general.css
 :nofooter:
 :toc: auto

@@ -9,6 +9,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 from loguru import logger
 
 from utilities.common.constants import StrPath
+from utilities.common.functions import file_writer
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.qualified_name import _ns, fqdn
 from utilities.convert_tables.xml_formatter import get_all_text
@@ -164,7 +165,12 @@ class XmlTable(XmlFilePart):
         self._lines = line_formatter.format_lines(content)
         self._lines.insert(1, f"|{header}|")
 
+    @property
+    def md_table_path(self):
+        return self._xml_document.tables_dir.joinpath(f"table_{self._table_index + 1}.md")
+
     def write_to_file(self):
+        file_writer(self.md_table_path, str(self))
         file_path: Path = self._xml_document.tables_dir.joinpath(f"table_{self._table_index + 1}.md")
 
         if not file_path.exists():

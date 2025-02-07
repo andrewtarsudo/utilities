@@ -1,5 +1,14 @@
-@import "default.css";
-@import "doc.css";
-@import "theme.css";
-@import "footer.css"
-@import "font-awesome.css"
+@import "css/font-awesome.css"
+@import "css/footer.css"
+@import "css/doc.css";
+@import "css/default.css";
+@import "css/theme.css";
+
+hdlist {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.listingblock > .content > * > code {
+  font-size: 0.8rem;
+}

@@ -6,7 +6,7 @@ from typing import Iterable, Iterator
 
 from loguru import logger
 
-from utilities.common import TableBorderNotClosedError
+from utilities.common import TableColsTableBorderNotClosedError
 from utilities.common.functions import file_writer
 from utilities.table_cols import TableAnalyser
 from utilities.table_cols.column import TableColumn
@@ -87,7 +87,7 @@ class AsciiDocFile:
             logger.error(
                 f"В файле {self._path} пропущен символ завершения таблицы '|==='\n"
                 f"Найдено {len(table_marks)}: в строках {line_indexes}", tech_writers=True)
-            raise TableBorderNotClosedError
+            raise TableColsTableBorderNotClosedError
 
         for i in range(len(table_marks) // 2):
             yield table_marks[2 * i], table_marks[2 * i + 1]

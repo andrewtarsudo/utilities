@@ -5,8 +5,9 @@ from typing import NamedTuple
 from loguru import logger
 
 from utilities.common.constants import StrPath
-from utilities.common.errors import InvalidProjectIdError
-from utilities.terms.const import CustomPort, CustomScheme, write_file
+from utilities.common.errors import TermsInvalidProjectIdError
+from utilities.common.functions import file_writer
+from utilities.terms.const import CustomPort, CustomScheme
 from utilities.terms.http_request import CustomHTTPRequest, CustomHTTPResponseChunked, CustomPreparedRequest
 
 
@@ -26,19 +27,16 @@ class ContentGitPage(NamedTuple):
 
     def validate(self):
         if isinstance(self.project_id, str) and self.project_id.isnumeric():
-            value: int = int(self.project_id)
+            return int(self.project_id)
 
         elif isinstance(self.project_id, int):
-            value: int = self.project_id
+            return self.project_id
 
         else:
-            raise InvalidProjectIdError
-
-        if value > 0:
-            return
-
-        else:
-            raise InvalidProjectIdError
+            logger.error(
+                f"Идентификатор проекта {self.project_id} должен быть int или str, "
+                f"но получено {type(self.project_id)}")
+            raise TermsInvalidProjectIdError
 
     @property
     def _custom_http_request(self):
@@ -87,4 +85,4 @@ class ContentGitPage(NamedTuple):
     def download(self):
         self.validate()
         self.set_content()
-        write_file(self.path, str(self))
+        file_writer(self.path, str(self))

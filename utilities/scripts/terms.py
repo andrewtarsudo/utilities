@@ -161,7 +161,7 @@ def terms_command(
     git_manager.compare()
     git_manager.set_terms()
 
-    lines: list[str] = git_manager.lines
+    lines: list[str] = list(iter(git_manager))
 
     ascii_doc_table: AsciiDocTableTerms = AsciiDocTableTerms(lines)
     ascii_doc_table.complete()

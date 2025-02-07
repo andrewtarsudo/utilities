@@ -3,7 +3,7 @@ from re import finditer, Match, sub
 
 from loguru import logger
 
-from utilities.common.errors import FixerNoLinkError, InvalidHashCharIndexError
+from utilities.common.errors import LinkRepairFixerNoLinkError, LinkRepairInvalidHashCharIndexError
 from utilities.link_repair.file_dict import TextFile
 
 
@@ -41,7 +41,7 @@ class LinkFixer:
         """Inspects if the file is specified."""
         if not bool(self):
             logger.error("Не задан файл")
-            raise FixerNoLinkError
+            raise LinkRepairFixerNoLinkError
 
     def _fix_whitespaces(self):
         """Fixes errors when the link has whitespaces."""
@@ -91,7 +91,7 @@ class LinkFixer:
                     logger.error(
                         f"Позиция # в файле {self.text_file.rel_path} в ссылке {_} определена как {index}, "
                         f"что некорректно")
-                    raise InvalidHashCharIndexError
+                    raise LinkRepairInvalidHashCharIndexError
 
                 elif index == -1:
                     logger.debug(f"Link {link} is internal")

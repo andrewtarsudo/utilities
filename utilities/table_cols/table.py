@@ -7,7 +7,7 @@ from typing import Iterable, Iterator, Mapping, Pattern
 
 from loguru import logger
 
-from utilities.common import TableColumnIndexError, TableColumnInvalidIdentifierError, TableColumnInvalidNameError
+from utilities.common import TableColsTableColumnIndexError, TableColsTableColumnInvalidIdentifierError, TableColsTableColumnInvalidNameError
 from utilities.table_cols.cell import TableCell
 from utilities.table_cols.column import TableColumn
 from utilities.table_cols.coordinate import TableCoordinate
@@ -193,7 +193,7 @@ class Table:
 
             else:
                 logger.error(f"Индекс строки должен быть в диапазоне 0-{self.num_columns}, но получен {column}")
-                raise TableColumnIndexError
+                raise TableColsTableColumnIndexError
 
         elif isinstance(column, str):
             if column in self.column_names:
@@ -204,12 +204,12 @@ class Table:
             else:
                 column_names: str = ", ".join(self.column_names)
                 logger.error(f"Столбец с именем {column} не найден. Доступные названия:\n{column_names}")
-                raise TableColumnInvalidNameError
+                raise TableColsTableColumnInvalidNameError
 
         else:
             logger.error(
                 f"Столбец задается индексом типа int или именем типа str, но получено {column} типа {type(column)}")
-            raise TableColumnInvalidIdentifierError
+            raise TableColsTableColumnInvalidIdentifierError
 
     def iter_column_items(self) -> Iterator['TableColumn']:
         """Iterates over the table_cols columns.

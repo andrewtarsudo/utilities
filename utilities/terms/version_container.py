@@ -6,7 +6,7 @@ from typing import NamedTuple
 from loguru import logger
 
 from utilities.common.constants import StrPath
-from utilities.common.errors import InvalidVersionError
+from utilities.common.errors import TermsInvalidTypeVersionError, TermsInvalidVersionError
 from utilities.common.functions import file_reader, ReaderMode
 
 
@@ -54,7 +54,7 @@ class Version(NamedTuple):
 
         elif Counter(line).get(".") != 2:
             logger.error(f"Версия должна иметь вид: day.month.year, но получено {line}")
-            raise InvalidVersionError
+            raise TermsInvalidVersionError
 
         else:
             day, month, year = line.split(".")
@@ -102,7 +102,7 @@ class VersionContainer:
             try:
                 version: Version = Version.from_string(value)
 
-            except InvalidVersionError:
+            except TermsInvalidVersionError:
                 raise
 
             else:
@@ -125,7 +125,7 @@ class VersionContainer:
             try:
                 version: Version = Version.from_string(value)
 
-            except InvalidVersionError:
+            except TermsInvalidVersionError:
                 raise
 
             else:
@@ -133,7 +133,7 @@ class VersionContainer:
 
         else:
             logger.error(f"Значение {value} должно быть типа Version или str, но получено {type(value)}")
-            raise TypeError
+            raise TermsInvalidTypeVersionError
 
     def __bool__(self):
         return self._version == self._version_basic
