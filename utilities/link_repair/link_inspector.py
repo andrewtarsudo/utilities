@@ -56,7 +56,13 @@ def _update_prefix(*lines: str) -> tuple[str, ...]:
     """
     return tuple(
         chain.from_iterable(
-            (f"../../{_}", f"../{_}", _, _.removeprefix("../"), _.removeprefix("../../")) for _ in lines))
+            (
+                f"../../{_}",
+                f"../{_}",
+                _,
+                _.removeprefix("../"),
+                _.removeprefix("../../")
+            ) for _ in lines))
 
 
 def _update_suffix(*lines: str) -> tuple[str, ...]:
@@ -73,7 +79,7 @@ def _update_suffix(*lines: str) -> tuple[str, ...]:
     tuple[str, ...]
 
     """
-    return iter(
+    return tuple(
         chain.from_iterable(
             (
                 _,

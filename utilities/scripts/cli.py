@@ -21,7 +21,7 @@ TERMINAL_WIDTH: int = 100
 
 SEPARATOR: str = "-" * MAX_CONTENT_WIDTH
 
-__version__: str = "1.0.0"
+__version__: str = "1.1.0"
 
 
 def up(value: str):
