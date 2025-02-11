@@ -9,6 +9,7 @@ __all__ = ["Link"]
 
 
 class _LinkType(Enum):
+    """Class to represent the type of the link."""
     IMAGE_TYPE = "image"
     TEXT_TYPE = "text"
     DIR_INDEX_TYPE = "dir_index"
@@ -76,8 +77,8 @@ class Link(NamedTuple):
     def from_type(self) -> _LinkType:
         """Gets the category of the link.
 
-        :rtype: _LinkType
         :return: The type of the link based on the extension and index/_index files.
+        :rtype: _LinkType
         """
         if self.from_file.suffix not in (MD_EXTENSION, ADOC_EXTENSION):
             return _LinkType.IMAGE_TYPE

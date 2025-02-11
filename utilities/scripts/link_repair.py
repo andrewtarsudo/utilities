@@ -12,13 +12,13 @@ from loguru import logger
 from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.common.errors import InvalidFileDictAttributeError, InvalidStorageAttributeError
 from utilities.common.functions import file_reader, ReaderMode
-from utilities.repair_link.const import FileLanguage, prepare_logging
-from utilities.repair_link.file_dict import FileDict, FileLinkItem, TextFile
-from utilities.repair_link.general_storage import Storage
-from utilities.repair_link.internal_link_inspector import internal_inspector
-from utilities.repair_link.link import Link
-from utilities.repair_link.link_fixer import link_fixer
-from utilities.repair_link.link_inspector import link_inspector
+from utilities.link_repair.const import FileLanguage, prepare_logging
+from utilities.link_repair.file_dict import FileDict, FileLinkItem, TextFile
+from utilities.link_repair.general_storage import Storage
+from utilities.link_repair.internal_link_inspector import internal_inspector
+from utilities.link_repair.link import Link
+from utilities.link_repair.link_fixer import link_fixer
+from utilities.link_repair.link_inspector import link_inspector
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 
 
@@ -166,7 +166,7 @@ def link_repair_command(
     logger.debug(prepare_logging(file_dict.dict_files.items()))
 
     if anchor_validation:
-        from utilities.repair_link.anchor_inspector import anchor_inspector
+        from utilities.link_repair.anchor_inspector import anchor_inspector
 
         # operate with AnchorInspector
         anchor_inspector + iter(file_dict.dict_files.values())

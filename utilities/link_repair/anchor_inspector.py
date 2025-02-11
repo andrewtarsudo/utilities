@@ -8,8 +8,8 @@ from loguru import logger
 from utilities.common.constants import separator
 from utilities.common.errors import FileInvalidTypeError, MissingFileError
 from utilities.common.functions import file_reader, ReaderMode
-from utilities.repair_link.file_dict import TextFile
-from utilities.repair_link.const import FileLanguage, prepare_logging
+from utilities.link_repair.file_dict import TextFile
+from utilities.link_repair.const import FileLanguage, prepare_logging
 
 
 class AnchorInspector:

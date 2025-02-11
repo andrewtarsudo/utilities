@@ -6,10 +6,10 @@ from pathlib import Path
 from loguru import logger
 
 from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
-from utilities.repair_link.file_dict import FileDict, TextFile, DirFile
-from utilities.repair_link.link import Link
-from utilities.repair_link.internal_link_inspector import internal_inspector, InternalLinkInspector
-from utilities.repair_link.general_storage import GeneralStorage, ComponentStorage, Storage
+from utilities.link_repair.file_dict import FileDict, TextFile, DirFile
+from utilities.link_repair.link import Link
+from utilities.link_repair.internal_link_inspector import internal_inspector, InternalLinkInspector
+from utilities.link_repair.general_storage import GeneralStorage, ComponentStorage, Storage
 
 
 def _prepare_link(link: str) -> str:
@@ -35,14 +35,14 @@ def _prepare_link(link: str) -> str:
         item: str = f"{name}{suffix}"
 
         if _.endswith(item):
-            _ = _.removesuffix(item)
+            _: str = _.removesuffix(item)
 
     return _
 
 
 def _update_prefix(*lines: str) -> tuple[str, ...]:
     """
-    The generation of the links having one more or less level ups.
+    The generation of the links having two more or less level ups.
 
     Parameters
     ----------
@@ -54,7 +54,9 @@ def _update_prefix(*lines: str) -> tuple[str, ...]:
     tuple[str, ...]
 
     """
-    return tuple(chain.from_iterable((f"../{_}", _, _.removeprefix("../")) for _ in lines))
+    return tuple(
+        chain.from_iterable(
+            (f"../../{_}", f"../{_}", _, _.removeprefix("../"), _.removeprefix("../../")) for _ in lines))
 
 
 def _update_suffix(*lines: str) -> tuple[str, ...]:
@@ -71,7 +73,7 @@ def _update_suffix(*lines: str) -> tuple[str, ...]:
     tuple[str, ...]
 
     """
-    return tuple(
+    return iter(
         chain.from_iterable(
             (
                 _,
@@ -309,7 +311,7 @@ class LinkInspector:
             The path to the file.
 
         """
-        return relpath(path, self.base_dir()).replace("\\", "/")
+        return Path(relpath(path, self.base_dir())).as_posix()
 
     def inspect_anchor(self):
         """
@@ -368,20 +370,19 @@ class LinkInspector:
         if self._proper_link is not None:
             return
 
-        _path: str = relpath(self._destination, self.source_link()).replace("\\", "/")
-
-        _proper_link = f"{_prepare_link(_path)}"
+        _path: str = Path(relpath(self._destination, self.source_link())).as_posix()
+        proper_link: str = _prepare_link(_path).removesuffix("/")
 
         if self._proper_anchor:
-            _proper_link = f"{_prepare_link(_path)}{self._proper_anchor}"
+            proper_link: str = f"{_prepare_link(_path)}{self._proper_anchor}"
 
         if self._link.from_file.stem in ("index", "_index"):
-            _proper_link = _proper_link.removeprefix("../")
+            proper_link: str = proper_link.removeprefix("../")
 
-        if not _proper_link.startswith("."):
-            _proper_link = f"./{_proper_link}"
+        if not proper_link.startswith("."):
+            proper_link: str = f"./{proper_link}"
 
-        self._proper_link: str = _proper_link
+        self._proper_link: str = proper_link
 
     def compare_links(self) -> bool:
         """

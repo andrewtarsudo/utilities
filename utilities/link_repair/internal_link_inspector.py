@@ -5,30 +5,19 @@ from typing import Iterator
 from loguru import logger
 
 from utilities.common.errors import FileInvalidTypeError, InvalidMatchError
-from utilities.repair_link.file_dict import TextFile
+from utilities.link_repair.file_dict import TextFile
 
 __all__ = ["InternalLinkInspector", "internal_inspector"]
 
 
 def _replace_dash_underline(match: Match) -> str:
-    """
-    The replacement of snake_case and kebab-case to camelCase.
+    """Replaces snake_case and kebab-case with camelCase.
 
-    Parameters
-    ----------
-    match : Match
-        The substring matching the pattern.
-
-    Returns
-    -------
-    str
-        The updated string converted to camelCase.
-
-    Raises
-    ------
-    InvalidMatchError
-        If the line does not have dashes or underlines in proper places.
-
+    :param match: The substring matching the pattern.
+    :type match: Match
+    :return: The updated string converted to camelCase.
+    :rtype: str
+    :raises: InvalidMatchError if the line does not have dashes or underlines in proper places.
     """
     if not match:
         logger.error(f"В строке не найден паттерн {match.re.pattern}")
@@ -39,21 +28,14 @@ def _replace_dash_underline(match: Match) -> str:
 
 
 def _iter_internal_options(line: str) -> Iterator[str]:
-    """
-    The iterator for updated forms of line.
+    """Iterates over updated forms of line.
 
     The updated forms are snake_case, kebab-case, and camelCase.
 
-    Parameters
-    ----------
-    line : str
-        The line to switch the case.
-
-    Returns
-    ------
-    Iterator[str]
-        The new form of line converted to one of the cases.
-
+    :param line: The line to switch the case.
+    :type line: str
+    :return: The new form of line converted to one of the cases.
+    :rtype: Iterator[str]
     """
     to_underline: str = line.replace("-", "_")
     to_dash: str = line.replace("_", "-")
@@ -64,13 +46,10 @@ def _iter_internal_options(line: str) -> Iterator[str]:
 
 class InternalLinkInspector:
     """
-    The inspector for internal links having only anchors.
+    Class to represent the inspector for internal links having only anchors.
 
-    Attributes
-    ----------
-    _text_file : TextFile or None
-        The markdown file to inspect internal links.
-
+    :param _text_file: The markdown file to inspect internal links.
+    :type _text_file : TextFile or None
     """
 
     def __init__(self):

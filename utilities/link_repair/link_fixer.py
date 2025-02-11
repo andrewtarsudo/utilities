@@ -4,7 +4,7 @@ from re import finditer, Match, sub
 from loguru import logger
 
 from utilities.common.errors import FixerNoLinkError, InvalidHashCharIndexError
-from utilities.repair_link.file_dict import TextFile
+from utilities.link_repair.file_dict import TextFile
 
 
 class LinkFixer:

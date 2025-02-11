@@ -9,8 +9,8 @@ from loguru import logger
 from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
 from utilities.common.errors import InternalLinkAnchorError, LineInvalidTypeError
 from utilities.common.functions import file_reader, ReaderMode
-from utilities.repair_link.const import FileLanguage, prepare_logging
-from utilities.repair_link.link import Link
+from utilities.link_repair.const import FileLanguage, prepare_logging
+from utilities.link_repair.link import Link
 
 _MD_ANCHOR_HEADING: str = r"(?<=\{#)[\w_-]+(?=})"
 _MD_ANCHOR_A_NAME: str = r"(?<=<a\sname=\")[^\"]+(?=\">)"
