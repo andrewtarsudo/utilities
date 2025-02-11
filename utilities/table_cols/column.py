@@ -3,7 +3,7 @@ from typing import Iterator, NamedTuple
 
 from loguru import logger
 
-from utilities.common import TableColsTableColumnTypeError
+from utilities.common.errors import TableColsTableColumnTypeError
 from utilities.table_cols.cell import TableCell
 
 

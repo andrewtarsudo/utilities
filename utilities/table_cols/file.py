@@ -6,7 +6,7 @@ from typing import Iterable, Iterator
 
 from loguru import logger
 
-from utilities.common import TableColsTableBorderNotClosedError
+from utilities.common.errors import TableColsTableBorderNotClosedError
 from utilities.common.functions import file_writer
 from utilities.table_cols import TableAnalyser
 from utilities.table_cols.column import TableColumn

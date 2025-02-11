@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from enum import Enum
 from pathlib import Path
 from typing import Any, Mapping, Sequence, TypeAlias
 
@@ -24,6 +25,11 @@ ADOC_EXTENSION: str = ".adoc"
 
 MAX_SYMBOLS: int = 68
 MIN_COLUMN = 4
+
+
+class TableType(Enum):
+    MD = ".md"
+    ADOC = ".adoc"
 
 
 class ArgsHelpDict(dict):

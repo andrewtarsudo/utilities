@@ -1,50 +1,35 @@
 # -*- coding: utf-8 -*-
 from collections import Counter
 from itertools import product
-from re import compile, DOTALL, finditer, MULTILINE
-from string import digits
-from typing import Iterable, Iterator, Mapping, Pattern
+from re import DOTALL, finditer, MULTILINE
+from typing import Iterable, Iterator
 
 from loguru import logger
 
+from utilities.common.asciidoc_table_cell import TableCell
+from utilities.common.asciidoc_table_column import TableColumn
+from utilities.common.table_coordinate import TableCoordinate
 from utilities.common.errors import TableColsTableColumnIndexError, TableColsTableColumnInvalidIdentifierError, \
     TableColsTableColumnInvalidNameError
-from utilities.table_cols.cell import TableCell
-from utilities.table_cols.column import TableColumn
-from utilities.table_cols.coordinate import TableCoordinate
 
 
 class Table:
-    """Class to represent the AsciiDoc table_cols."""
+    """Class to represent the table."""
 
     def __init__(
             self,
             name: str | None = None,
             index: int | None = None,
-            lines: Iterable[str] = None,
-            options: Mapping[str, str | None] = None):
+            lines: Iterable[str] = None):
         if lines is None:
             self._lines: list[str] = []
 
         else:
             self._lines = [_.removesuffix("\n").strip() for _ in lines if _.removesuffix("\n").strip()]
 
-        if options is None:
-            options: dict[str, str | None] = dict()
-
         self._name: str | None = name
         self._index: int | None = index
-        self._options: dict[str, str | None] = {**options}
         self._table_cells: dict[TableCoordinate, TableCell] = dict()
-
-    def has_horizontal_span(self):
-        """Detects if the table_cols has span cells.
-
-        At the time such tables are skipped since they require separate algorithm to determine the rows.
-        """
-        return any(
-            line.strip().startswith(digits)
-            for line in iter(self))
 
     def __iter__(self) -> Iterator[str]:
         return iter(self._lines)
@@ -53,6 +38,7 @@ class Table:
         if isinstance(other, self.__class__):
             if self._name is None or other._name is None:
                 return False
+
             else:
                 return self._name == other._name
 
@@ -63,6 +49,7 @@ class Table:
         if isinstance(other, self.__class__):
             if self._name is None or other._name is None:
                 return True
+
             else:
                 return self._name != other._name
 
@@ -93,11 +80,11 @@ class Table:
         self._table_cells.clear()
 
     def content(self) -> str:
-        """Gets the table_cols content as a string."""
+        """Gets the table content as a string."""
         return "\n".join(self._lines)
 
     def define_cells(self):
-        """Divides the table_cols into cells.
+        """Divides the table into cells.
 
         Returns if the table_cols is valid and proper to continue processing.
         """
@@ -107,11 +94,11 @@ class Table:
             logger.error(f"{str(self)}")
             return
 
-        CELL_PATTERN: Pattern = compile(r"(\d*)\.?(\d*)[<^>]?\.?[<^>]?\+?\|([^|]*)", MULTILINE | DOTALL)
+        CELL_PATTERN: str = r"(\d*)\.?(\d*)[<^>]?\.?[<^>]?\+?\|([^|]*)"
 
         _occupied: set[TableCoordinate] = set()
 
-        for number, match in enumerate(finditer(CELL_PATTERN, self.content())):
+        for number, match in enumerate(finditer(CELL_PATTERN, self.content(), MULTILINE | DOTALL)):
             if not match:
                 continue
 
@@ -144,33 +131,13 @@ class Table:
             table_cell: TableCell = TableCell(table_coordinate, text)
             self._table_cells[table_coordinate] = table_cell
 
-    def options_str(self) -> str:
-        """Gets the string of table_cols options."""
-        if self._options == dict():
-            return ""
-
-        else:
-            options: list[str] = []
-
-            for k, v in self._options.items():
-                # if option has a format 'key="value"'
-                if v is not None:
-                    options.append(f'{k}="{v}"')
-
-                # if option has a format '%key'
-                else:
-                    options.append(f"{k}")
-
-            options_str: str = ",".join(options)
-            return f"[{options_str}]\n"
-
     def __str__(self):
         separator: str = "|==="
         name: str = f"{self._name}\n" if self._name.startswith(".") else ""
         header_str: str = f"{self[0]}"
         rows_str: str = "\n".join(self[1:])
 
-        return f"{name}{self.options_str()}{separator}\n{header_str}\n\n{rows_str}\n{separator}\n"
+        return f"{name}{separator}\n{header_str}\n\n{rows_str}\n{separator}\n"
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self._name})"
@@ -184,7 +151,7 @@ class Table:
         return Counter(self[0]).get("|")
 
     def get_column_item(self, column: int | str) -> TableColumn:
-        """Gets the table_cols column as TableColumn instance."""
+        """Gets the column as TableColumn instance."""
         if isinstance(column, int):
             if 0 <= column < self.num_columns:
                 table_cells: list[TableCell] = [
@@ -226,10 +193,6 @@ class Table:
     @property
     def table_cells(self):
         return self._table_cells
-
-    @property
-    def options(self):
-        return self._options
 
     @property
     def index(self):
