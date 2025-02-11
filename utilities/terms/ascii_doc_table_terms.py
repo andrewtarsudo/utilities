@@ -7,7 +7,7 @@ from loguru import logger
 from more_itertools import pairwise
 
 from utilities.common.constants import StrPath
-from utilities.common.errors import AsciiDocFileTableRowIndexError, EmptyFileError, InvalidTermIndexError
+from utilities.common.errors import TermsAsciiDocFileTableRowIndexError, TermsEmptyFileError, TermsInvalidTermIndexError
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.terms.table import TableCellCoordinate, TableItem, Term
 
@@ -20,13 +20,15 @@ class AsciiDocTableTerms:
 
     @classmethod
     def from_file(cls, file_path: StrPath):
-        _content: list[str] = file_reader(file_path, ReaderMode.LINES, "cp1251")
+        _content: list[str] = file_reader(file_path, ReaderMode.LINES, encoding="cp1251")
 
         if not _content or len(_content) < 6:
-            raise EmptyFileError
+            logger.error(f"Файл {file_path} пуст")
+            raise TermsEmptyFileError
 
-        lines: list[str] = _content[6:-1]
-        return cls(lines)
+        else:
+            lines: list[str] = _content[6:-1]
+            return cls(lines)
 
     def __str__(self):
         return f"{self._content}"
@@ -48,8 +50,8 @@ class AsciiDocTableTerms:
 
         _dict_terms: dict[str, tuple[Term, ...]] = {k.upper(): (*v,) for k, v in _dict_proxy.items()}
         self._dict_terms.update(**_dict_terms)
+
         logger.debug("Файл обработан успешно")
-        return
 
     def __getitem__(self, item):
         if isinstance(item, str):
@@ -63,7 +65,7 @@ class AsciiDocTableTerms:
 
             else:
                 logger.error(f"Термин с индексом {item} не найден")
-                raise InvalidTermIndexError
+                raise TermsInvalidTermIndexError
 
         else:
             logger.debug(f"Термин {item} не найден")
@@ -127,7 +129,7 @@ class AsciiDocTableTerms:
     def _get_row(self, row_index: int) -> list[TableItem]:
         if row_index > self.max_row:
             logger.error(f"Индекс строки {row_index} превышает максимально возможное значение")
-            raise AsciiDocFileTableRowIndexError
+            raise TermsAsciiDocFileTableRowIndexError
 
         else:
             return [v for k, v in self._items.items() if k.row_index == row_index]
@@ -162,7 +164,6 @@ class AsciiDocTableTerms:
                 self._items[_key] = _value
 
         logger.debug(f"Словарь {self.__class__.__name__} инициализирован")
-        return
 
     @property
     def dict_terms(self):

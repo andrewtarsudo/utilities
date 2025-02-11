@@ -124,6 +124,10 @@ def _to_stream(record: dict) -> bool:
     return record["level"].no >= 10
 
 
+def _to_result(record: dict) -> bool:
+    return record["extra"].get("result") is True
+
+
 class LoggerConfiguration:
     """
     The loguru logger configuration instance.
@@ -209,14 +213,37 @@ class LoggerConfiguration:
             print(f"{e.__class__.__name__}, {str(e)}")
             return
 
+    def result_file_handler(self):
+        try:
+            _logging_level: str = "SUCCESS"
+            _log_path: str = Path.cwd().joinpath("results.txt").as_posix()
 
-def custom_logging(name: str, *, is_debug: bool = False):
+            return {
+                "sink": _log_path,
+                "level": _logging_level,
+                "format": self.__class__._USER_FORMAT,
+                "filter": _to_result,
+                "colorize": False,
+                "diagnose": True,
+                "backtrace": True,
+                "mode": "a",
+                "encoding": "utf-8",
+                "catch": True}
+
+        except KeyError as e:
+            print(f"{e.__class__.__name__}, {str(e)}")
+            return
+
+
+def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = False):
     """Specifies the loguru Logger.
 
     :param name: The log file name.
     :type name: str
     :param is_debug: The flag to use the debug mode.
     :type is_debug: bool, default=False
+    :param result_file: Flag to use results.txt file.
+    :type result_file: bool, default=False
     """
     if not is_debug:
         simplefilter("ignore")
@@ -236,7 +263,14 @@ def custom_logging(name: str, *, is_debug: bool = False):
     stream_handler: dict[str, Any] = logger_configuration.stream_handler()
     rotating_file_handler: dict[str, Any] = logger_configuration.rotating_file_handler()
 
-    logger.configure(handlers=[stream_handler, rotating_file_handler])
+    if result_file:
+        result_file_handler: dict[str, Any] = logger_configuration.result_file_handler()
+        handlers: list[dict[str, Any]] = [stream_handler, rotating_file_handler, result_file_handler]
+
+    else:
+        handlers: list[dict[str, Any]] = [stream_handler, rotating_file_handler]
+
+    logger.configure(handlers=handlers)
 
     # specify the styles for the levels
     for item in LEVEL_COLOR_STYLE:

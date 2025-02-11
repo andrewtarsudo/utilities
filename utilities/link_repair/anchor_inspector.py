@@ -6,7 +6,7 @@ from typing import Iterable
 from loguru import logger
 
 from utilities.common.constants import separator
-from utilities.common.errors import FileInvalidTypeError, MissingFileError
+from utilities.common.errors import LinkRepairFileInvalidTypeError, LinkRepairMissingFileError
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.link_repair.file_dict import TextFile
 from utilities.link_repair.const import FileLanguage, prepare_logging
@@ -45,25 +45,25 @@ class AnchorInspector:
 
             else:
                 logger.error(f"Не найден файл {item}", result=True)
-                raise MissingFileError
+                raise LinkRepairMissingFileError
 
         else:
             logger.error(f"Ключ {item} должен быть типа str, но получен {type(item)}")
-            raise FileInvalidTypeError
+            raise LinkRepairFileInvalidTypeError
 
     def get(self, item):
         return self.__getitem__(item)
 
     def __add__(self, other):
         if isinstance(other, TextFile):
-            other._content = file_reader(other.full_path, ReaderMode.LINES, "utf-8")
+            other._content = file_reader(other.full_path, ReaderMode.LINES, encoding="utf-8")
             self._dict_anchors[other] = list(other.iter_anchors())
 
         elif isinstance(other, Iterable):
             text_files: list[TextFile] = [_ for _ in other if isinstance(_, TextFile)]
 
             for text_file in text_files:
-                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, "utf-8")
+                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, encoding="utf-8")
                 self._dict_anchors[text_file] = list(text_file.iter_anchors())
 
         else:

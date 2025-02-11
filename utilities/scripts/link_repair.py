@@ -10,7 +10,7 @@ from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
 from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
-from utilities.common.errors import InvalidFileDictAttributeError, InvalidStorageAttributeError
+from utilities.common.errors import LinkRepairInvalidFileDictAttributeError, LinkRepairInvalidStorageAttributeError
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.link_repair.const import FileLanguage, prepare_logging
 from utilities.link_repair.file_dict import FileDict, FileLinkItem, TextFile
@@ -19,7 +19,7 @@ from utilities.link_repair.internal_link_inspector import internal_inspector
 from utilities.link_repair.link import Link
 from utilities.link_repair.link_fixer import link_fixer
 from utilities.link_repair.link_inspector import link_inspector
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.scripts.cli import clear_logs, command_line_interface
 
 
 def validate_dir_path(path: StrPath | None) -> bool:
@@ -47,7 +47,6 @@ def has_no_required_files(path: StrPath) -> bool:
 
 @command_line_interface.command(
     "link-repair",
-    cls=APIGroup,
     help="Команда для проверки и исправления ссылок в файлах документации")
 @argument(
     "pathdir",
@@ -85,7 +84,7 @@ def has_no_required_files(path: StrPath) -> bool:
          "По умолчанию: False, файл сохраняется",
     show_default=True,
     required=False,
-    default=True)
+    default=False)
 @option(
     "-s", "--separate", "separate_languages",
     type=BOOL,
@@ -122,7 +121,7 @@ def link_repair_command(
         ctx: Context,
         pathdir: Path,
         dry_run: bool = False,
-        no_result: bool = True,
+        no_result: bool = False,
         anchor_validation: bool = True,
         separate_languages: bool = True,
         skip_en: bool = False,
@@ -148,7 +147,7 @@ def link_repair_command(
 
     if storage is None:
         logger.error("Объект типа Storage не определен")
-        raise InvalidStorageAttributeError
+        raise LinkRepairInvalidStorageAttributeError
 
     logger.debug(prepare_logging(storage.dir_indexes.items()))
     logger.debug(prepare_logging(storage.dirindexes.items()))
@@ -161,7 +160,7 @@ def link_repair_command(
 
     if file_dict is None:
         logger.error("Объект типа FileDict не определен")
-        raise InvalidFileDictAttributeError
+        raise LinkRepairInvalidFileDictAttributeError
 
     logger.debug(prepare_logging(file_dict.dict_files.items()))
 
@@ -211,7 +210,7 @@ def link_repair_command(
         if not dry_run:
             dir_file.write()
 
-        dir_file._content = file_reader(dir_file.full_path, ReaderMode.LINES, "utf-8")
+        dir_file._content = file_reader(dir_file.full_path, ReaderMode.LINES, encoding="utf-8")
 
         # validate internal links
         internal_inspector.text_file = dir_file

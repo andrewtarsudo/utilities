@@ -7,7 +7,7 @@ from typing import Iterable, Iterator, NamedTuple
 from loguru import logger
 
 from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
-from utilities.common.errors import InternalLinkAnchorError, LineInvalidTypeError
+from utilities.common.errors import LinkRepairInternalLinkAnchorError, LinkRepairLineInvalidTypeError
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.link_repair.const import FileLanguage, prepare_logging
 from utilities.link_repair.link import Link
@@ -153,14 +153,14 @@ class TextFile(DirFile):
             return self._content[item]
 
         else:
-            raise LineInvalidTypeError(f"Тип должен быть int, но получен {type(item)}")
+            raise LinkRepairLineInvalidTypeError(f"Тип должен быть int, но получен {type(item)}")
 
     def __setitem__(self, key, value):
         if isinstance(key, int) and isinstance(value, str):
             self._content[key] = value
 
         else:
-            raise LineInvalidTypeError(
+            raise LinkRepairLineInvalidTypeError(
                 f"Тип ключа должен быть int, а value - str, но получены {type(key)} и {type(value)}")
 
     def __contains__(self, item):
@@ -253,14 +253,14 @@ class TextFile(DirFile):
         :type anchor: str or None
         :return: The internal links.
         :rtype: tuple[_InternalLink] or None
-        :raises: InternalLinkAnchorError if the anchor is found in neither internal link anchors.
+        :raises: LinkRepairInternalLinkAnchorError if the anchor is found in neither internal link anchors.
         """
         if anchor is None:
             return
 
         elif anchor not in self.iter_internal_link_anchors():
             logger.error(f"В файле {self.rel_path} не обнаружен ни якорь, ни ссылка {anchor}")
-            raise InternalLinkAnchorError
+            raise LinkRepairInternalLinkAnchorError
 
         else:
             return tuple(filter(lambda x: x.anchor == anchor, self._iter_internal_links()))
@@ -601,7 +601,7 @@ class FileDict:
             if file_path.suffix in (MD_EXTENSION, ADOC_EXTENSION):
                 text_file: TextFile = get_file(self._root_dir, file_path)
 
-                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, "utf-8")
+                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, encoding="utf-8")
                 text_file.set_imagesdir()
                 text_file.set_links()
                 text_file.set_anchors()

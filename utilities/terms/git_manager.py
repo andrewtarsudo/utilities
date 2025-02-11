@@ -4,8 +4,7 @@ from pathlib import Path
 from click.utils import get_app_dir
 from loguru import logger
 
-from utilities.common.functions import file_reader, ReaderMode
-from utilities.terms.const import write_file
+from utilities.common.functions import file_reader, file_writer, ReaderMode
 from utilities.terms.content_git_page import ContentGitPage
 from utilities.terms.version_container import Version, VersionContainer
 
@@ -53,10 +52,6 @@ class GitManager:
     def version_validator(self):
         return self._version_validator
 
-    @version_validator.setter
-    def version_validator(self, value):
-        self._version_validator = value
-
     def set_content_git_pages(self):
         content_git_terms: ContentGitPage = ContentGitPage(
             file_name="terms.adoc",
@@ -76,37 +71,29 @@ class GitManager:
         self._version_validator.set_version_basic()
         self._version_validator.version = Version.from_string("".join(self._content_git_version.content))
 
+    def output_if_different(self, message: str):
+        logger.info(message)
+        file_writer(self.TEMP_TERMS_VERSION, self._content_git_version.content)
+        logger.debug("Файл с версией записан")
+
     def compare(self):
         self.set_versions()
 
         if self._version_validator.version_basic == Version("0", "0", "0"):
-            logger.info("Версия не определена")
-            write_file(self.TEMP_TERMS_VERSION, self._content_git_version.content)
-            logger.debug("Файл с версией записан")
+            self.output_if_different("Версия не определена")
 
         elif not bool(self):
-            logger.info(f"Версия не последняя")
-            write_file(self.TEMP_TERMS_VERSION, self._content_git_version.content)
-            logger.debug(f"Файл с версией записан")
+            self.output_if_different("Версия не последняя")
 
         elif not Path(self.TEMP_TERMS_BASIC).exists():
-            logger.info(f"Файл с терминами не найден")
-            write_file(self.TEMP_TERMS_VERSION, self._content_git_version.content)
+            self.output_if_different(f"Файл с терминами не найден")
 
         else:
             logger.info(f"Версия актуальна")
 
-    @property
-    def lines(self):
-        return self._lines
-
-    @lines.setter
-    def lines(self, value):
-        self._lines = value
-
     def set_terms(self):
-        write_file(self.TEMP_TERMS_BASIC, self._content_git_terms.content)
-        lines: list[str] = file_reader(self.TEMP_TERMS_BASIC, ReaderMode.LINES, "cp1251")
+        file_writer(self.TEMP_TERMS_BASIC, self._content_git_terms.content)
+        lines: list[str] = file_reader(self.TEMP_TERMS_BASIC, ReaderMode.LINES, encoding="cp1251")
         self._lines = lines[6:-1]
 
     def __iter__(self):

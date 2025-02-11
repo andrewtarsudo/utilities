@@ -23,67 +23,71 @@ class TermsError(BaseError):
     """Base class for errors associated with the terms."""
 
 
-class RequiredAttributeMissingError(TermsError):
+class TermsRequiredAttributeMissingError(TermsError):
     """Required attribute has no specified value."""
 
 
-class AsciiDocFileTableRowIndexError(TermsError):
+class TermsAsciiDocFileTableRowIndexError(TermsError):
     """Invalid AsciiDocTable row index."""
 
 
-class InvalidProjectIdError(TermsError):
+class TermsInvalidProjectIdError(TermsError):
     """Gitlab project identifier is not a positive integer."""
 
 
-class InvalidVersionError(TermsError):
+class TermsInvalidVersionError(TermsError):
     """File version has an invalid structure."""
 
 
-class InvalidTermIndexError(TermsError):
+class TermsInvalidTermIndexError(TermsError):
     """Specified index is not found in the dictionary."""
 
 
-class EmptyFileError(TermsError):
+class TermsEmptyFileError(TermsError):
     """Read file is empty."""
+
+
+class TermsInvalidTypeVersionError(TermsError):
+    """File version has an invalid type."""
 
 
 class LinkRepairError(BaseError):
     """Base class for errors associated with the link-repair."""
 
 
-class LineInvalidTypeError(LinkRepairError):
+class LinkRepairLineInvalidTypeError(LinkRepairError):
     """Line index type must be int and its value must be str."""
 
 
-class InvalidStorageAttributeError(LinkRepairError):
+class LinkRepairInvalidStorageAttributeError(LinkRepairError):
     """Storage attribute is not proper."""
 
 
-class InvalidFileDictAttributeError(LinkRepairError):
+class LinkRepairInvalidFileDictAttributeError(LinkRepairError):
     """FileDict attribute is not proper."""
 
 
-class FileInvalidTypeError(LinkRepairError):
+class LinkRepairFileInvalidTypeError(LinkRepairError):
     """File has an invalid type."""
 
 
-class InternalLinkAnchorError(LinkRepairError):
+class LinkRepairInternalLinkAnchorError(LinkRepairError):
     """Neither anchor nor internal link is found in file."""
 
 
-class InvalidMatchError(LinkRepairError):
+class LinkRepairInvalidMatchError(LinkRepairError):
     """Match item does not have enough match groups."""
 
 
-class FixerNoLinkError(LinkRepairError):
+class LinkRepairFixerNoLinkError(LinkRepairError):
     """LinkFixer instance has no specified link."""
 
 
-class InvalidHashCharIndexError(LinkRepairError):
+class LinkRepairInvalidHashCharIndexError(LinkRepairError):
     """Impossible hash symbol position in the string."""
 
 
-class MissingFileError(LinkRepairError):
+class LinkRepairMissingFileError(LinkRepairError):
     """File is not found."""
 
 
@@ -91,17 +95,45 @@ class ConvertTablesError(BaseError):
     """Base class for errors associated with the convert-tables."""
 
 
-class EmptyLinesError(ConvertTablesError):
+class ConvertTablesEmptyLinesError(ConvertTablesError):
     """Lines to format is not specified."""
 
 
-class FormatCodeError(BaseError):
+class ConvertTablesFormatCodeError(BaseError):
     """Base class for errors associated with the format-code."""
 
 
-class NonPositiveLineLengthError(FormatCodeError):
+class ConvertTablesNonPositiveLineLengthError(ConvertTablesFormatCodeError):
     """Maximum line length cannot be less than zero."""
 
 
-class NonIntegerLineLengthError(FormatCodeError):
+class ConvertTablesNonIntegerLineLengthError(ConvertTablesFormatCodeError):
     """Maximum line length cannot be non-integer."""
+
+
+class TableColsError(BaseError):
+    """Base class for errors associated with the table_cols-cols."""
+
+
+class TableColsTableBorderNotClosedError(TableColsError):
+    """Specified file has closing table_cols border mark '|===' missing."""
+
+
+class TableColsTableCoordinateInitError(TableColsError):
+    """Specified value cannot represent the cell coordinates in the table."""
+
+
+class TableColsTableColumnTypeError(TableColsError):
+    """Specified value has an invalid type."""
+
+
+class TableColsTableColumnIndexError(TableColsError):
+    """Specified column index has not been found."""
+
+
+class TableColsTableColumnInvalidNameError(TableColsError):
+    """Specified column name has not been found."""
+
+
+class TableColsTableColumnInvalidIdentifierError(TableColsError):
+    """Specified column identifier has an invalid type."""

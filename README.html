@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.23">
+<title>Руководство пользователя</title>
+<style>
+@import "css/font-awesome.css"
+@import "css/footer.css"
+@import "css/doc.css";
+@import "css/default.css";
+@import "css/theme.css";
+
+hdlist {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.listingblock > .content > * > code {
+  font-size: 0.8rem;
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge .cm {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .cp {
+  color: #999999;
+  font-weight: bold;
+}
+pre.rouge .c1 {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .cs {
+  color: #999999;
+  font-weight: bold;
+  font-style: italic;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cpf {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+}
+pre.rouge .gd {
+  color: #000000;
+  background-color: #ffdddd;
+}
+pre.rouge .ge {
+  color: #000000;
+  font-style: italic;
+}
+pre.rouge .gr {
+  color: #aa0000;
+}
+pre.rouge .gh {
+  color: #999999;
+}
+pre.rouge .gi {
+  color: #000000;
+  background-color: #ddffdd;
+}
+pre.rouge .go {
+  color: #888888;
+}
+pre.rouge .gp {
+  color: #555555;
+}
+pre.rouge .gs {
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #aaaaaa;
+}
+pre.rouge .gt {
+  color: #aa0000;
+}
+pre.rouge .kc {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kd {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kn {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kp {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kr {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kt {
+  color: #445588;
+  font-weight: bold;
+}
+pre.rouge .k, pre.rouge .kv {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .mf {
+  color: #009999;
+}
+pre.rouge .mh {
+  color: #009999;
+}
+pre.rouge .il {
+  color: #009999;
+}
+pre.rouge .mi {
+  color: #009999;
+}
+pre.rouge .mo {
+  color: #009999;
+}
+pre.rouge .m, pre.rouge .mb, pre.rouge .mx {
+  color: #009999;
+}
+pre.rouge .sa {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .sb {
+  color: #d14;
+}
+pre.rouge .sc {
+  color: #d14;
+}
+pre.rouge .sd {
+  color: #d14;
+}
+pre.rouge .s2 {
+  color: #d14;
+}
+pre.rouge .se {
+  color: #d14;
+}
+pre.rouge .sh {
+  color: #d14;
+}
+pre.rouge .si {
+  color: #d14;
+}
+pre.rouge .sx {
+  color: #d14;
+}
+pre.rouge .sr {
+  color: #009926;
+}
+pre.rouge .s1 {
+  color: #d14;
+}
+pre.rouge .ss {
+  color: #990073;
+}
+pre.rouge .s, pre.rouge .dl {
+  color: #d14;
+}
+pre.rouge .na {
+  color: #008080;
+}
+pre.rouge .bp {
+  color: #999999;
+}
+pre.rouge .nb {
+  color: #0086B3;
+}
+pre.rouge .nc {
+  color: #445588;
+  font-weight: bold;
+}
+pre.rouge .no {
+  color: #008080;
+}
+pre.rouge .nd {
+  color: #3c5d5d;
+  font-weight: bold;
+}
+pre.rouge .ni {
+  color: #800080;
+}
+pre.rouge .ne {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nl {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nn {
+  color: #555555;
+}
+pre.rouge .nt {
+  color: #000080;
+}
+pre.rouge .vc {
+  color: #008080;
+}
+pre.rouge .vg {
+  color: #008080;
+}
+pre.rouge .vi {
+  color: #008080;
+}
+pre.rouge .nv, pre.rouge .vm {
+  color: #008080;
+}
+pre.rouge .ow {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .o {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .w {
+  color: #bbbbbb;
+}
+pre.rouge {
+  background-color: #f8f8f8;
+}
+</style>
+<style>
+/*! Asciidoctor Tabs | Copyright (c) 2018-present Dan Allen | MIT License */
+.tabs {
+    margin-bottom: 1.25em;
+}
+
+.tablist > ul {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tablist > ul li {
+    align-items: center;
+    background-color: #fff;
+    cursor: pointer;
+    display: flex;
+    font-weight: bold;
+    line-height: 1.5;
+    padding: 0.25em 1em;
+    position: relative;
+}
+
+.tablist > ul li:focus-visible {
+    outline: none;
+}
+
+.tablist.ulist,
+.tablist.ulist > ul li {
+    margin: 0;
+}
+
+.tablist.ulist > ul li + li {
+    margin-left: 0.25em;
+}
+
+.tabs .tablist li::after {
+    content: "";
+    display: block;
+    height: 1px;
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+}
+
+.tabs.is-loading .tablist li:not(:first-child),
+.tabs:not(.is-loading) .tablist li:not(.is-selected) {
+    background-color: #f5f5f5;
+}
+
+.tabs.is-loading .tablist li:first-child::after,
+.tabs:not(.is-loading) .tablist li.is-selected::after {
+    background-color: #fff;
+}
+
+/*
+.tabs:not(.is-loading) .tablist li,
+.tabs:not(.is-loading) .tablist li::after {
+  transition: background-color 200ms ease-in-out;
+}
+*/
+
+.tablist > ul p {
+    line-height: inherit;
+    margin: 0;
+}
+
+.tabpanel {
+    background-color: #fff;
+    padding: 1.25em;
+}
+
+.tablist > ul li,
+.tabpanel {
+    border: 1px solid #dcdcdc;
+}
+
+.tablist > ul li {
+    border-bottom: 0;
+}
+
+.tabs.is-loading .tabpanel + .tabpanel,
+.tabs:not(.is-loading) .tabpanel.is-hidden {
+    display: none;
+}
+
+.tabpanel > :first-child {
+    margin-top: 0;
+}
+
+/* #content is a signature of the Asciidoctor standalone HTML output */
+#content .tabpanel > :last-child,
+#content .tabpanel > :last-child > :last-child,
+#content .tabpanel > :last-child > :last-child > li:last-child > :last-child {
+    margin-bottom: 0;
+}
+
+.tablecontainer {
+    overflow-x: auto;
+}
+
+#content .tablecontainer {
+    margin-bottom: 1.25em;
+}
+
+#content .tablecontainer > table.tableblock {
+    margin-bottom: 0;
+}
+</style>
+</head>
+<body class="article">
+<div id="header">
+<h1>Руководство пользователя</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Содержание</div>
+<ul class="sectlevel1">
+<li><a href="#_общая_информация">1. Общая информация</a></li>
+<li><a href="#_запуск_команд">2. Запуск команд</a>
+<ul class="sectlevel2">
+<li><a href="#_примеры">2.1. Примеры</a></li>
+</ul>
+</li>
+<li><a href="#_некоторые_рекомендации">3. Некоторые рекомендации</a></li>
+<li><a href="#check-russian">4. Руководство для check-russian</a>
+<ul class="sectlevel2">
+<li><a href="#_описание">4.1. Описание</a></li>
+<li><a href="#_для_чего_нужно">4.2. Для чего нужно?</a></li>
+<li><a href="#_как_запустить">4.3. Как запустить?</a></li>
+</ul>
+</li>
+<li><a href="#convert-tables">5. Руководство для convert-tables</a>
+<ul class="sectlevel2">
+<li><a href="#_описание_2">5.1. Описание</a></li>
+<li><a href="#_для_чего_нужно_2">5.2. Для чего нужно?</a></li>
+<li><a href="#_как_запустить_2">5.3. Как запустить?</a></li>
+</ul>
+</li>
+<li><a href="#format-code">6. Руководство для format-code</a>
+<ul class="sectlevel2">
+<li><a href="#_описание_3">6.1. Описание</a></li>
+<li><a href="#_для_чего_нужно_3">6.2. Для чего нужно?</a></li>
+<li><a href="#_как_запустить_3">6.3. Как запустить?</a></li>
+</ul>
+</li>
+<li><a href="#link-repair">7. Руководство для link-repair</a>
+<ul class="sectlevel2">
+<li><a href="#_описание_4">7.1. Описание</a></li>
+<li><a href="#_для_чего_нужно_4">7.2. Для чего нужно?</a></li>
+<li><a href="#_как_запустить_4">7.3. Как запустить?</a></li>
+<li><a href="#_вывод_программы">7.4. Вывод программы</a></li>
+<li><a href="#_некоторые_особенности_работы">7.5. Некоторые особенности работы</a></li>
+</ul>
+</li>
+<li><a href="#list-files">8. Руководство для list-files</a>
+<ul class="sectlevel2">
+<li><a href="#_описание_5">8.1. Описание</a></li>
+<li><a href="#_для_чего_нужно_5">8.2. Для чего нужно?</a></li>
+<li><a href="#_как_запустить_5">8.3. Как запустить?</a></li>
+</ul>
+</li>
+<li><a href="#repair-svg">9. Руководство для repair-svg</a>
+<ul class="sectlevel2">
+<li><a href="#_описание_6">9.1. Описание</a></li>
+<li><a href="#_для_чего_нужно_6">9.2. Для чего нужно?</a></li>
+<li><a href="#_как_запустить_6">9.3. Как запустить?</a></li>
+</ul>
+</li>
+<li><a href="#table-cols">10. Руководство для table-cols</a>
+<ul class="sectlevel2">
+<li><a href="#_описание_7">10.1. Описание</a></li>
+<li><a href="#_для_чего_нужно_7">10.2. Для чего нужно?</a></li>
+<li><a href="#_как_запустить_7">10.3. Как запустить?</a></li>
+<li><a href="#_принцип_работы_analyzer">10.4. Принцип работы Analyzer</a></li>
+</ul>
+</li>
+<li><a href="#terms">11. Руководство для terms</a>
+<ul class="sectlevel2">
+<li><a href="#_описание_8">11.1. Описание</a></li>
+<li><a href="#_для_чего_нужно_8">11.2. Для чего нужно?</a></li>
+<li><a href="#_как_запустить_8">11.3. Как запустить?</a></li>
+</ul>
+</li>
+<li><a href="#validate-yaml">12. Руководство для validate-yaml</a>
+<ul class="sectlevel2">
+<li><a href="#_описание_9">12.1. Описание</a></li>
+<li><a href="#_для_чего_нужно_9">12.2. Для чего нужно?</a></li>
+<li><a href="#_как_запустить_9">12.3. Как запустить?</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_общая_информация">1. Общая информация</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>В репозитории собраны небольшие скрипты, которые явно не тянут на отдельные проекты.</p>
+</div>
+<div class="paragraph">
+<p>Руководства пользователя находятся в директории <a href="docs/">docs</a>.</p>
+</div>
+<div class="paragraph">
+<p>На данный момент доступны команды:</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<a href="docs/README_check_russian.adoc#check-russian">check-russian</a>
+</td>
+<td class="hdlist2">
+<p>команда для проверки наличия не переведенных слов в англоязычных файлах</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<a href="docs/README_convert_tables.adoc#convert-tables">convert-tables</a>
+</td>
+<td class="hdlist2">
+<p>команда для извлечения таблиц из файлов docx в формат Markdown</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<a href="docs/README_format_code.adoc#format-code">format-code</a>
+</td>
+<td class="hdlist2">
+<p>команда для форматирования блоков кода</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<a href="docs/README_link_repair.adoc#link-repair">link-repair</a>
+</td>
+<td class="hdlist2">
+<p>команда для исправления ссылок в проекте</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<a href="docs/README_list_files.adoc#list-files">list-files</a>
+</td>
+<td class="hdlist2">
+<p>команда для вывода файлов в директории с использованием ряда фильтров</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<a href="docs/README_reduce_image.adoc#reduce-image">reduce-image</a>
+</td>
+<td class="hdlist2">
+<p>команда для сжатия файлов изображений</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<a href="docs/README_repair_svg.adoc#repair-svg">repair-svg</a>
+</td>
+<td class="hdlist2">
+<p>команда для корректирования SVG-файлов</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<a href="docs/README_table_cols.adoc#table-cols">table-cols</a>
+</td>
+<td class="hdlist2">
+<p>команда для задания ширин столбцов таблиц в файлах AsciiDoc</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<a href="docs/README_terms.adoc#terms">terms</a>
+</td>
+<td class="hdlist2">
+<p>команда для получения расшифровок аббревиатур</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<a href="docs/README_validate_yaml.adoc#validate-yaml">validate-yaml</a>
+</td>
+<td class="hdlist2">
+<p>команда для валидации YAML-файлов, используемых для генерации PDF</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Вся документация для скриптов выше лежит в директории <a href="docs/">docs/</a>.</p>
+</div>
+<div class="paragraph">
+<p>Сгенерированные исполняемые файлы доступны в директории <a href="bin/">bin/</a>:</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+Windows
+</td>
+<td class="hdlist2">
+<p><a href="https://gitlab.com/tech_writers_protei/utilities/-/raw/main/bin/tw_utilities.exe?ref_type=heads">bin/tw_utilities.exe</a></p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+*nix/MacOS
+</td>
+<td class="hdlist2">
+<p><a href="https://gitlab.com/tech_writers_protei/utilities/-/raw/main/bin/tw_utilities?ref_type=heads">bin/tw_utilities</a></p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_запуск_команд">2. Запуск команд</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Все вызовы активируются через командную строку.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>&lt;path/to/tw_utilities.exe&gt; COMMAND OPTIONS</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Для использования любой команды необходимо в терминале ввести путь до исполняемого файла, команду, обязательные аргументы и требуемые опции.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Использование:
+tw_utilities
+list-files | check-russian | convert-tables | format-code | link-repair | reduce-image | repair-svg | table-cols | terms | validate-yaml
+-v/--version | --h/--help
+
+
+  Набор скриптов для технических писателей
+
+Опции:
+  -v, --version                          Вывести версию скрипта на экран и завершить работу
+  -h, --help                             Вывести справочную информацию на экран и завершить работу
+
+Подкоманды:
+  check-russian                          Команда для проверки наличия непереведенных слов
+  convert-tables                         Команда для корректного извлечения таблиц из файлов docx в
+                                         формат Markdown
+  format-code                            Команда для форматирования блоков кода
+  link-repair                            Команда для проверки и исправления ссылок в файлах
+                                         документации
+  list-files                             Команда для вывода файлов в директории
+  reduce-image                           Команда для уменьшения размера изображений JPG, PNG
+  repair-svg                             Команда для исправления файлов SVG
+  table-cols                             Команда для задания ширины столбцам таблиц
+  terms                                  Команда для вывода расшифровки аббревиатур
+  validate-yaml                          Команда для валидации YAML-файла, используемого при
+                                         генерации PDF
+----------------------------------------------------------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_примеры">2.1. Примеры</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Вызов справочной информации</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>tw_utilities.exe &lt;<span class="nb">command</span><span class="o">&gt;</span> <span class="nt">--help</span>
+<span class="nv">$ </span>tw_utilities.exe check-russian <span class="nt">--help</span></code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Вызов команды с единственным аргументом</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>tw_utilities.exe &lt;<span class="nb">command</span><span class="o">&gt;</span> &lt;ARGUMENT&gt;
+<span class="nv">$ </span>tw_utilities.exe convert-tables <span class="s2">"..</span><span class="se">\W</span><span class="s2">ord File.docx"</span></code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Вызов команды со множественными аргументами</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>tw_utilities.exe &lt;<span class="nb">command</span><span class="o">&gt;</span> &lt;ARGUMENT&gt; &lt;ARGUMENT&gt; &lt;ARGUMENT&gt;
+<span class="nv">$ </span>tw_utilities.exe terms CAP MAP ISUP</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Вызов команды с опциями с единственными значениями</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>tw_utilities.exe &lt;<span class="nb">command</span><span class="o">&gt;</span> &lt;option_1&gt; &lt;value_1&gt; &lt;option_N&gt; &lt;value_N&gt;
+<span class="nv">$ </span>tw_utilities.exe format-code <span class="nt">--dir</span> <span class="s2">"..</span><span class="se">\P</span><span class="s2">roject"</span> <span class="nt">--length</span> 80</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Вызов команды с опциями со множественными значениями</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>tw_utilities.exe &lt;<span class="nb">command</span><span class="o">&gt;</span> &lt;option&gt; &lt;value_1&gt; &lt;value_2&gt;
+<span class="nv">$ </span>tw_utilities.exe repair-svg <span class="nt">--file</span> <span class="s2">"..</span><span class="se">\P</span><span class="s2">roject</span><span class="se">\S</span><span class="s2">OME_IMAGE.svg"</span> <span class="s2">"..</span><span class="se">\P</span><span class="s2">roject</span><span class="se">\A</span><span class="s2">NOTHER_IMAGE.svg"</span>
+<span class="nv">$ </span>tw_utilities.exe &lt;<span class="nb">command</span><span class="o">&gt;</span> &lt;option&gt; &lt;value_1&gt; &lt;option&gt; &lt;value_2&gt;
+<span class="nv">$ </span>tw_utilities.exe repair-svg <span class="nt">--file</span> <span class="s2">"..</span><span class="se">\P</span><span class="s2">roject</span><span class="se">\S</span><span class="s2">OME_IMAGE.svg"</span> <span class="nt">--file</span> <span class="s2">"..</span><span class="se">\P</span><span class="s2">roject</span><span class="se">\A</span><span class="s2">NOTHER_IMAGE.svg"</span>
+<span class="nv">$ </span>tw_utilities.exe &lt;<span class="nb">command</span><span class="o">&gt;</span> &lt;option&gt; &lt;value_1&gt; &lt;value_2&gt; &lt;option&gt; &lt;value_3&gt;
+<span class="nv">$ </span>tw_utilities.exe repair-svg <span class="nt">--file</span> <span class="s2">"..</span><span class="se">\P</span><span class="s2">roject</span><span class="se">\S</span><span class="s2">OME_IMAGE.svg"</span> <span class="s2">"..</span><span class="se">\P</span><span class="s2">roject</span><span class="se">\A</span><span class="s2">NOTHER_IMAGE.svg"</span> <span class="nt">--file</span> <span class="s2">"..</span><span class="se">\P</span><span class="s2">roject</span><span class="se">\A</span><span class="s2">ND_ANOTHER_ONE.svg"</span></code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Вызов команды с опциями, задаваемыми как флаг</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>tw_utilities.exe &lt;<span class="nb">command</span><span class="o">&gt;</span> &lt;flag&gt;
+<span class="nv">$ </span>tw_utilities.exe list-files <span class="s2">"..</span><span class="se">\f</span><span class="s2">older"</span> <span class="nt">--recursive</span>
+<span class="nv">$ </span>tw_utilities.exe &lt;<span class="nb">command</span><span class="o">&gt;</span> &lt;no-flag&gt;
+<span class="nv">$ </span>tw_utilities.exe list-files <span class="s2">"..</span><span class="se">\f</span><span class="s2">older"</span> <span class="nt">--no-recursive</span></code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Некоторые параметры взаимоисключающие, т.е. их нельзя задать одновременно.
+В таком случае будет активирована ошибка <code>UsageError: Ошибка в задании команды: '&lt;param&gt;' не может использоваться одновременно с '&lt;mutually exclusive params&gt;'</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_некоторые_рекомендации">3. Некоторые рекомендации</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>В IDE есть встроенная консоль.
+Она способна выполнять все те же команды, что и Powershell/Terminal.</p>
+<div class="imageblock text-center">
+<div class="content">
+<img src="docs/images/find_console.png" alt="find console" width="960">
+</div>
+<div class="title">Рисунок 1. Иконка консоли</div>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="docs/images/console_ide.png" alt="console ide" width="960">
+</div>
+<div class="title">Рисунок 2. Консоль в IDE</div>
+</div>
+</li>
+<li>
+<p>Чтобы удобно и быстро получить путь до файла, можно выполнить следующие шаги:</p>
+<div class="olist alphanumeric">
+<ol class="alphanumeric">
+<li>
+<p>Выбрать файл и ПКМ вызвать меню.</p>
+</li>
+<li>
+<p>В меню выбрать <strong><b class="menuref">Copy Path/Reference</b></strong>.</p>
+<div class="imageblock text-center">
+<div class="content">
+<img src="docs/images/copy_path_reference.png" alt="copy path reference">
+</div>
+<div class="title">Рисунок 3. Меню Copy Path/Reference</div>
+</div>
+</li>
+<li>
+<p>В дополнительном окне выбрать <strong><b class="menuref">Path From Content Root</b></strong>.</p>
+<div class="imageblock text-center">
+<div class="content">
+<img src="docs/images/path_from_content_root.png" alt="path from content root">
+</div>
+<div class="title">Рисунок 4. Меню Path From Content Root</div>
+</div>
+</li>
+<li>
+<p>Нужный путь будет добавлен в буфер обмена.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="check-russian">4. Руководство для check-russian</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_описание">4.1. Описание</h3>
+<div class="paragraph">
+<p>Скрипт проверяет наличие кириллических символов в файлах.</p>
+</div>
+<div class="paragraph">
+<p>В результате отображается информация, найдены ли не латинские символы:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="log">В файле &lt;path to file&gt; &lt;найдены/не найдены&gt; кириллические буквы [в строках: &lt;line no&gt;, ..., &lt;line no&gt;]</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>path to file</code>&#8201;&#8212;&#8201;путь до файла;</p>
+</li>
+<li>
+<p><code>line no</code>&#8201;&#8212;&#8201;номер строки в файле, где найдены кириллические символы.</p>
+</li>
+</ul>
+</div>
+<div id="green-bg" class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">В файле config\ap.en.md не найдены кириллические буквы <i class="conum" data-value="1"></i><b>(1)</b>
+</span></code></pre>
+</div>
+</div>
+<div id="red-bg" class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">В файле config\component\diameter.en.md найдены кириллические буквы:
+В строке 20, начиная с 17 символа 'а' <i class="conum" data-value="2"></i><b>(2)</b>
+</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Файл переведен полностью</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Файл переведен не полностью или присутствуют замены похожих символов:<br>
+буквы А, В, Е, К, М, Н, О, Р, С, Т, Х.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Поскольку в выводе возможно много строк, то для удобства ориентирования в нем используется интуитивная цветовая индикация.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+Скрипт не показывает непереведенные слова или подмены схожих букв, это остается делом пользователя, а указывает лишь на файлы и строки, где это обнаружено.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_для_чего_нужно">4.2. Для чего нужно?</h3>
+<div class="paragraph">
+<p>При переводе вручную можно вполне себе забыть или не заметить какие-то фразы/слова/предложения, оставшиеся на русском языке.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_как_запустить">4.3. Как запустить?</h3>
+<div class="paragraph">
+<p>Запускается так же, как и любые другие скрипты:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>tw_utilities.exe check-russian OPTIONS</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OPTIONS&#8201;&#8212;&#8201;опции скрипта</p>
+</div>
+<div class="sect3">
+<h4 id="_опции_скрипта">4.3.1. Опции скрипта</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Использование:
+tw_utilities.exe check-russian
+-d/--dir DIR | -f/--file FILE ... FILE | --recursive | --verbose | --keep-logs | --h/--help
+
+  Команда для проверки наличия непереведенных слов
+
+Опции:
+  -d, --dir DIR                          Директория для обработки
+  -f, --file FILE ... FILE               Перечень файлов для обработки.
+                                         Может использоваться несколько раз
+  --recursive / --no-recursive           Флаг рекурсивного поиска файлов.
+                                         По умолчанию: True, поиск файлов по вложенным папкам
+  --verbose / --no-verbose               Флаг подробного вывода.
+                                         По умолчанию: False, выводятся только ошибки
+  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
+                                         работы в штатном режиме.
+                                         По умолчанию: False, лог-файл и директория удаляются
+  -h, --help                             Вывести справочную информацию на экран и завершить работу
+----------------------------------------------------------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+При указании директории в ней выбираются файлы, в которых присутствует постфикс <code>.en</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Путь может быть как абсолютным, так и относительным.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="convert-tables">5. Руководство для convert-tables</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_описание_2">5.1. Описание</h3>
+<div class="paragraph">
+<p>Скрипт извлекает из файла Word формата *.docx или *.docm все таблицы и преобразует их в формат Markdown.
+Каждая таблица записывается в отдельный файл под тем же номером, что и в исходном файле.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_для_чего_нужно_2">5.2. Для чего нужно?</h3>
+<div class="paragraph">
+<p>При использовании <code>pandoc</code>, самого распространенного программного обеспечения для конвертации файлов, таблицы в некоторых случаях обрабатываются некорректно.
+Например, если заголовок многоуровневый; содержит текст, расположенный на нескольких строках и др. возможные случаи.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_как_запустить_2">5.3. Как запустить?</h3>
+<div class="paragraph">
+<p>Запускается так же, как и любые другие скрипты:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>tw_utilities.exe convert-tables OPTIONS</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OPTIONS&#8201;&#8212;&#8201;опции скрипта</p>
+</div>
+<div class="sect3">
+<h4 id="_опции_скрипта_2">5.3.1. Опции скрипта</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Использование:
+tw_utilities.exe convert-tables DOCX_FILE
+-p/--parse DIR_TABLES | -t/--temp TEMP_DIR | -e/--escape | -r/--remove | -f/--fix | -k/--keep |
+--keep-logs | --h/--help
+
+  Команда для корректного извлечения таблиц из файлов docx в формат Markdown
+
+Аргументы:
+  docx_file                              Путь до файла Word в формате *.docx или *.docm
+
+Опции:
+  -p, --parse DIR_TABLES                 Директория для хранения таблиц. По умолчанию: ./tables/.
+                                         Если не существует, то будет создана
+  -t, --temp TEMP_DIR                    Временная директория для скрипта. По умолчанию: ./_temp/.
+                                         Если не существует, то будет создана
+</span><span class="gp">  -e, --escape / --no-escape             Флаг экранирования символов '&lt;', '&gt;</span><span class="s1">'.
+</span><span class="go">                                         По умолчанию: True, добавление '\' перед символами
+  -r, --remove / --no-remove             Флаг удаления всех множественных пробелов и пробелов
+                                         перед знаками препинания.
+                                         По умолчанию: True, удаление всех дополнительных пробелов
+  -f, --fix / --no-fix                   Флаг удаления лишних пробелов и экранирования символов.
+                                         По умолчанию: не задано, обработка определяется параметрами
+                                         --preserve и --escape.
+                                         Имеет приоритет выше, чем у опций --preserve и --escape.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --keep
+  -k, --keep / --no-keep                 Флаг извлечения текста без дополнительной обработки.
+                                         По умолчанию: не задано, обработка определяется параметрами
+                                         --preserve и --escape.
+                                         Имеет приоритет выше, чем у опций --preserve и --escape.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --fix
+  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
+                                         работы в штатном режиме.
+                                         По умолчанию: False, лог-файл и директория удаляются
+  -h, --help                             Вывести справочную информацию на экран и завершить работу
+----------------------------------------------------------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Путь может быть как абсолютным, так и относительным.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="format-code">6. Руководство для format-code</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_описание_3">6.1. Описание</h3>
+<div class="paragraph">
+<p>Скрипт форматирует блоки кода, разбивая их на строки, которые может в себя вместить PDF-файл без непреднамеренного переноса.</p>
+</div>
+<div class="paragraph">
+<p>Разбиение осуществляется по отдельным словам, добавляя разрыв строки:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>после 'точки с запятой';</p>
+</li>
+<li>
+<p>перед 'открывающей скобкой';</p>
+</li>
+<li>
+<p>после 'запятой'.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_для_чего_нужно_3">6.2. Для чего нужно?</h3>
+<div class="paragraph">
+<p>Записи журналов или примеры сущностей API могут иметь крайне длинные строки, которые превышают допустимую в PDF.
+В таком случае разрыв добавляется в "случайное" место в слове, чтобы все буквы уместились.
+Место, разумеется, выбирается не случайным образом, однако в любом случае повлиять на него со стороны невозможно.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_как_запустить_3">6.3. Как запустить?</h3>
+<div class="paragraph">
+<p>Запускается так же, как и любые другие скрипты:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>tw_utilities.exe format-code OPTIONS</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OPTIONS&#8201;&#8212;&#8201;опции скрипта</p>
+</div>
+<div class="sect3">
+<h4 id="_опции_скрипта_3">6.3.1. Опции скрипта</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Использование:
+tw_utilities.exe format-code
+-d/--dir DIR | -f/--file FILE ... FILE | -l/--length LEN | --recursive | --keep-logs | --h/--help
+
+  Команда для форматирования блоков кода
+
+Опции:
+  -d, --dir DIR                          Директория для обработки
+  -f, --file FILE ... FILE               Перечень файлов для обработки.
+                                         Может использоваться несколько раз
+  -l, --length LEN                       Максимальная длина строки. По умолчанию: 84
+                                         Примечание. Должно быть целым положительным числом
+  --recursive / --no-recursive           Флаг рекурсивного поиска файлов.
+                                         По умолчанию: True, поиск файлов по вложенным папкам
+  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
+                                         работы в штатном режиме.
+                                         По умолчанию: False, лог-файл и директория удаляются
+  -h, --help                             Вывести справочную информацию на экран и завершить работу
+----------------------------------------------------------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Путь может быть как абсолютным, так и относительным.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="link-repair">7. Руководство для link-repair</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_описание_4">7.1. Описание</h3>
+<div class="paragraph">
+<p>Скрипт проверяет и исправляет некорректные ссылки в файлах проекта, а также проверяет уникальность якорей.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_для_чего_нужно_4">7.2. Для чего нужно?</h3>
+<div class="paragraph">
+<p>Зачастую файлы перемещаются внутри проекта, удаляются, переименовываются, а ссылки на них внутри других файлов не исправляются.
+Также при задании якорей необходимо, чтобы они были уникальными в рамках всего проекта, не только отдельного файла.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_как_запустить_4">7.3. Как запустить?</h3>
+<div class="paragraph">
+<p>Запускается так же, как и любые другие скрипты:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>tw_utilities.exe link-repair OPTIONS</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OPTIONS&#8201;&#8212;&#8201;опции скрипта</p>
+</div>
+<div class="sect3">
+<h4 id="_опции_скрипта_4">7.3.1. Опции скрипта</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Использование:
+tw_utilities.exe link-repair PATHDIR
+-a/--anchor-disable | -d/--dry-run | -n/--no-result | -s/--separate | --skip-en | --keep-logs |
+--h/--help
+
+  Команда для проверки и исправления ссылок в файлах документации
+
+Аргументы:
+  pathdir                                Путь до директории для обработки *.md- и *.adoc-файлов
+
+Опции:
+  -a, --anchor-disable                   Флаг поиска повторяющихся якорей.
+                                         По умолчанию: True, поиск дублирующихся якорей осуществляется
+  -d, --dry-run                          Флаг вывода некорректных ссылок на экран без изменения файлов.
+                                         По умолчанию: False, файлы перезаписываются
+  -n, --no-result                        Флаг удаления файла с результатами работы скрипта по завершении
+                                         работы в штатном режиме.
+                                         По умолчанию: False, файл сохраняется
+  -s, --separate                         Флаг раздельной обработки файлов на различных языках.
+                                         По умолчанию: True, файлы на русском и английском
+                                         обрабатываются отдельно
+  --skip-en                              Флаг обработки файлов только на русском языке.
+                                         По умолчанию: False, обрабатываются файлы на обоих языках
+  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении работы
+                                         в штатном режиме.
+                                         По умолчанию: False, лог-файл и директория удаляются
+  -h, --help                             Вывести справочную информацию на экран и завершить работу
+----------------------------------------------------------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Путь может быть как абсолютным, так и относительным.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_вывод_программы">7.4. Вывод программы</h3>
+<div class="sect3">
+<h4 id="_критические_ошибки">7.4.1. Критические ошибки</h4>
+<div class="listingblock">
+<div class="title">link_repair: error: unrecognized arguments: &#8230;&#8203;</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell">link_repair: error: unrecognized arguments: <span class="nt">--arg</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что указана не существующий ключ.</p>
+</div>
+<div class="listingblock">
+<div class="title">Директория &#8230;&#8203; не найдена</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell">InvalidDirectoryPathError, Директория path/to/dir не найдена</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что указана не существующая директория.</p>
+</div>
+<div class="listingblock">
+<div class="title">Путь &#8230;&#8203; указывает не на директорию</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">InvalidDirectoryPathError, Путь path/to/file указывает не на директорию</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что путь ведет не к директории или же является символической ссылкой.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ошибки_требующие_ручного_исправления">7.4.2. Ошибки, требующие ручного исправления</h4>
+<div class="listingblock">
+<div class="title">В директории &#8230;&#8203; не найдены файлы с расширением .md, .adoc</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">!  В директории path/to/directory не найдены файлы с расширением .md, .adoc  ! <i class="conum" data-value="1"></i><b>(1)</b>
+</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что в директории <strong>&lt;1&gt;</strong> нет ни одного Markdown-/AsciiDoc-файла.</p>
+</div>
+<div class="listingblock">
+<div class="title">Внутри файла &#8230;&#8203; найдены дублирующиеся якори: &#8230;&#8203;</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">---------- Не исправлено автоматически ----------
+Внутри файла content/common/path/to/file.md найдены дублирующиеся якори: <i class="conum" data-value="1"></i><b>(1)</b>
+invalid-anchor, another-invalid-anchor  <i class="conum" data-value="2"></i><b>(2)</b> <i class="conum" data-value="3"></i><b>(3)</b>
+-------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что в файле <strong>&lt;1&gt;</strong> обнаружены якори <strong>&lt;2&gt;</strong> и <strong>&lt;3&gt;</strong>, которые привязаны к нескольким местам в тексте.</p>
+</div>
+<div class="listingblock">
+<div class="title">Найдены повторяющиеся якори</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">---------- Не исправлено автоматически ----------
+Найдены повторяющиеся якори:
+invalid-anchor <i class="conum" data-value="1"></i><b>(1)</b>
+
+Якорь invalid-anchor повторяется в файлах: <i class="conum" data-value="2"></i><b>(2)</b>
+/path/to/file.md <i class="conum" data-value="3"></i><b>(3)</b>
+/path/to/another_file.md <i class="conum" data-value="4"></i><b>(4)</b>
+-------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что найдены якори <strong>&lt;1&gt;</strong>, которые встречаются в различных файлах в проекте.
+Один и тот же якорь <strong>&lt;2&gt;</strong> обнаружен в файлах <strong>&lt;3&gt;</strong> и <strong>&lt;4&gt;</strong>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>Почему это проблема?</p>
+</div>
+<div class="paragraph">
+<p>Дублирование якорей никак не влияет на отображение HTML, т.е. на сайте.
+Однако в PDF это нарушает работу ссылок.
+В HTML такие якори находятся на разных страницах и никак не взаимодействуют друг с другом.
+В PDF такие якори не позволяют однозначно привязать их к определенным местам в тексте.
+Ввиду этого ссылки останутся в создаваемом документе, но не будут куда-либо переходить или выполнять любое другое действие.</p>
+</div>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Якорь &#8230;&#8203; в файле &#8230;&#8203; не найден</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">---------- Не исправлено автоматически ----------
+Якорь anchor в файле content/common/path/to/dest.md не найден <i class="conum" data-value="1"></i><b>(1)</b>
+-------------------------------------------------
+
+---------- Не исправлено автоматически ----------
+В файле content/common/path/from/source.md ссылка должна быть: <i class="conum" data-value="2"></i><b>(2)</b>
+</span><span class="gp">../to/dest/#</span>_valid_anchor_, но получено
+<span class="gp">../to/dest/#</span>_anchor/
+<span class="go">-------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что в файле <strong>&lt;2&gt;</strong> есть корректная ссылка на файл <strong>&lt;1&gt;</strong>, но указан якорь, которого нет в файле <strong>&lt;1&gt;</strong>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Не найден якорь &#8230;&#8203; в файле &#8230;&#8203;</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">---------- Не исправлено автоматически ----------
+Не найден якорь anchor в файле content/common/path/file.md.  <i class="conum" data-value="1"></i><b>(1)</b> <i class="conum" data-value="2"></i><b>(2)</b>
+Строки: 0, 1 <i class="conum" data-value="3"></i><b>(3)</b>
+-------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что в файле <strong>&lt;2&gt;</strong> есть внутренняя ссылка на якорь <strong>&lt;1&gt;</strong>, которого нет в файле.
+Ссылки обнаружены в строках <strong>&lt;3&gt;</strong>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Файл по пути &#8230;&#8203; не найден</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">---------- Не исправлено автоматически ----------
+Файл по пути content/common/path/to/file.md не найден
+-------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что ссылка указывает на файл, находящийся вне заданной директории.</p>
+</div>
+<div class="listingblock">
+<div class="title">Не удалось обработать ссылку в файле</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">---------- Не исправлено автоматически ----------
+Не удалось обработать ссылку в файле.
+</span><span class="gp">Ссылка: ../../path/to/file/#</span>anchor <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="go">Файл: content/common/another/file.md <i class="conum" data-value="2"></i><b>(2)</b>
+-------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что в файле <strong>&lt;2&gt;</strong> обнаружен текст <strong>&lt;1&gt;</strong>, попадающий под паттерн ссылки, но имеющий синтаксическую ошибку, которая не позволяет обработать этот текст далее.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_предупреждения_и_оповещения">7.4.3. Предупреждения и оповещения</h4>
+<div class="listingblock">
+<div class="title">!  В файле &#8230;&#8203; ссылка должна быть</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">!  В файле content/common/path/to/file.md ссылка должна быть: <i class="conum" data-value="1"></i><b>(1)</b>
+</span><span class="gp">../../another/file/#</span>anchor, но получено <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="gp">../and_another/file/#</span>anchor/  <span class="o">!</span> <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что в файле <strong>&lt;1&gt;</strong> обнаружена некорректная ссылка <strong>&lt;3&gt;</strong>, но удалось ее автоматически исправить на верную ссылку <strong>&lt;2&gt;</strong>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Проверка дублирования якорей отключена пользователем</div>
+<div class="content">
+<pre>Проверка дублирования якорей отключена пользователем</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что якори не анализируются.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Отображается только при отсутствии опции <code>-a</code>/<code>--anchor-disable</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">::Изменено::Файл</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">::Изменено::Файл content/common/path/to/file.md: <i class="conum" data-value="1"></i><b>(1)</b>
+</span><span class="gp">../and_another/file/#</span>anchor/ -&gt; ../../another/file/#anchor  <i class="conum" data-value="2"></i><b>(2)</b> <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что в файле <strong>&lt;1&gt;</strong> ссылка <strong>&lt;2&gt;</strong> заменена на ссылку <strong>&lt;3&gt;</strong>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Файл &#8230;&#8203; записан</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Файл content/common/path/to/file.md записан <i class="conum" data-value="1"></i><b>(1)</b>
+</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что содержимое файла <strong>&lt;1&gt;</strong> обновлено.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Отображается только при отсутствии опции <code>-d</code>/<code>--dry-run</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Работа завершена</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Работа завершена.</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что работа скрипта остановлена штатно.</p>
+</div>
+<div class="listingblock">
+<div class="title">Файлы не изменены</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">==================== Файлы не изменены ====================</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Означает, что отображенные изменения не были применены.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Отображается только при использовании опции <code>-d</code>/<code>--dry-run</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_некоторые_особенности_работы">7.5. Некоторые особенности работы</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Проверяются только Markdown- и AsciiDoc-файлы, все остальные (*.txt, без расширения, &#8230;&#8203;) игнорируются.</p>
+</li>
+<li>
+<p>При использовании в операционной системе Windows скрипт должен располагаться на том же диске (томе), что и директория, для которой он используется.
+Не устранимо ввиду принципов работы операционной системы.</p>
+</li>
+<li>
+<p>Ссылки, которые указывают на файлы, находящиеся не в заданной директории, помечаются как некорректные.</p>
+</li>
+<li>
+<p>Ссылки, начинающиеся с <code>http</code>, <code>mailto</code> и <code>/</code> игнорируются.</p>
+</li>
+<li>
+<p>Нумерация строк начинается с 0.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="list-files">8. Руководство для list-files</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_описание_5">8.1. Описание</h3>
+<div class="paragraph">
+<p>Скрипт выводит все файлы, находящиеся в директории.</p>
+</div>
+<div class="paragraph">
+<p>В результате отображается список всех файлов, удовлетворяющих требованиям фильтра.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Файлы в директории C:\Users\tarasov-a\PycharmProjects\Protei_MME\content\common\logging\:
+- content/common/logging/edr/connect.en.adoc
+- content/common/logging/edr/dedicated_bearer.en.adoc
+- content/common/logging/edr/diam.en.adoc
+- content/common/logging/edr/enodeb.en.adoc
+- content/common/logging/edr/error_code.en.adoc
+- content/common/logging/edr/gtp_c.en.adoc
+- content/common/logging/edr/gtp_c_overload.en.adoc
+- content/common/logging/edr/http.en.adoc
+- content/common/logging/edr/irat_handover.en.adoc
+- content/common/logging/edr/lte_handover.en.adoc
+- content/common/logging/edr/paging.en.adoc
+- content/common/logging/edr/reject.en.adoc
+- content/common/logging/edr/s1ap.en.adoc
+- content/common/logging/edr/s1ap_context.en.adoc
+- content/common/logging/edr/s1ap_overload.en.adoc
+- content/common/logging/edr/sgsap.en.adoc
+- content/common/logging/edr/sgsap_overload.en.adoc
+- content/common/logging/edr/tau.en.adoc
+- content/common/logging/edr/_index.en.adoc
+- content/common/logging/_index.en.adoc</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_для_чего_нужно_5">8.2. Для чего нужно?</h3>
+<div class="paragraph">
+<p>Изначально скрипт написан для удобства создания файла <code>PDF_*.yml</code>, необходимого для генерации PDF.<br>
+Однако возможно использовать и для любых других целей, задав соответствующие опции.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_как_запустить_5">8.3. Как запустить?</h3>
+<div class="paragraph">
+<p>Запускается так же, как и любые другие скрипты:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>tw_utilities.exe list-files OPTIONS</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OPTIONS&#8201;&#8212;&#8201;опции скрипта</p>
+</div>
+<div class="sect3">
+<h4 id="_опции_скрипта_5">8.3.1. Опции скрипта</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Использование:
+tw_utilities.exe list-files ROOT_DIR
+--d/--ignored-dirs DIR ... DIR | --all-dirs | -f/--ignored-files FILE ... FILE | --all-files |
+-e/--extensions "EXT ... EXT" | --all-ext | -l/--language LANG | --all-langs | -p/--prefix PFX |
+--hidden | --recursive | --keep-logs | --h/--help
+
+  Команда для вывода файлов в директории
+
+Аргументы:
+  root_dir                               Путь до директории
+
+Опции:
+  -d, --ignored-dirs DIR ... DIR         Перечень игнорируемых директорий. Может использоваться
+                                         несколько раз.
+                                         По умолчанию: _temp_folder, _temp_storage, private.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --all-dirs
+  --all-dirs BOOLEAN                     Флаг обработки всех директорий. По умолчанию: False.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --ignored-dirs
+  -f, --ignored-files FILE ... FILE      Перечень игнорируемых файлов. Может использоваться несколько
+                                         раз.
+                                         По умолчанию: README, _check_list.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --all-files
+  --all-files BOOLEAN                    Флаг обработки всех файлов.
+                                         По умолчанию: False, выводятся файлы с определенными именами.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --ignored-files
+  -e, --extensions "EXT ... EXT"         Обрабатываемые типы файлов, разделяемые пробелом.
+                                         По умолчанию: md adoc.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --all-extensions
+  --all-ext BOOLEAN                      Флаг обработки файлов всех расширений.
+                                         По умолчанию: False, вывод файлов определенных расширений.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --extensions
+  -l, --language LANG                    Язык файлов.
+                                         По умолчанию: "", вывод всех файлов независимо от языка.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --all-languages
+  --all-langs BOOLEAN                    Флаг обработки файлов всех языков.
+                                         По умолчанию: True, вывод файлов на всех языках.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --language
+  -p, --prefix PFX                       Префикс, добавляемый к названиям файлов.
+                                         По умолчанию: '- content/common/'
+  --hidden                               Флаг поиска скрытых файлов.
+                                         По умолчанию: False, исключение скрытых файлов из вывода
+  --recursive / --no-recursive           Флаг рекурсивного поиска файлов.
+                                         По умолчанию: True, поиск файлов по вложенным папкам
+  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
+                                         работы в штатном режиме.
+                                         По умолчанию: False, лог-файл и директория удаляются
+  -h, --help                             Вывести справочную информацию на экран и завершить работу
+----------------------------------------------------------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Путь может быть как абсолютным, так и относительным.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>include::docs/README_reduce_image.adoc</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="repair-svg">9. Руководство для repair-svg</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_описание_6">9.1. Описание</h3>
+<div class="paragraph">
+<p>Скрипт исправляет файлы SVG, которые некорректно отображаются при конвертации в PDF.</p>
+</div>
+<div class="paragraph">
+<p>В результате получаются пригодные файлы.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_для_чего_нужно_6">9.2. Для чего нужно?</h3>
+<div class="paragraph">
+<p>На данный момент сборка осуществляется с помощью AsciiDoc, в частности, с помощью библиотеки <code>asciidoctor-pdf</code>.
+Она использует для обработки изображений библиотеку <code>prawn</code>, которая не может корректно работать с некоторыми изображениями, в частности, с теми, что оперируют внешними ссылками <code>&lt;foreignObject /&gt;</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_как_запустить_6">9.3. Как запустить?</h3>
+<div class="paragraph">
+<p>Запускается так же, как и любые другие скрипты:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>tw_utilities.exe repair-svg OPTIONS</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OPTIONS&#8201;&#8212;&#8201;опции скрипта</p>
+</div>
+<div class="sect3">
+<h4 id="_опции_скрипта_6">9.3.1. Опции скрипта</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Использование:
+tw_utilities.exe repair-svg
+-f/--file FILE ... FILE | -d/--dir DIR | --recursive | --keep-logs | --h/--help
+
+  Команда для исправления файлов SVG
+
+Опции:
+  -f, --file FILE ... FILE               Файл для обработки. Может использоваться несколько раз
+  -d, --dir DIR                          Директория для обработки
+  --recursive / --no-recursive           Флаг рекурсивного поиска файлов.
+                                         По умолчанию: True, поиск файлов по вложенным папкам
+  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
+                                         работы в штатном режиме.
+                                         По умолчанию: False, лог-файл и директория удаляются
+  -h, --help                             Вывести справочную информацию на экран и завершить работу
+----------------------------------------------------------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Путь может быть как абсолютным, так и относительным.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="table-cols">10. Руководство для table-cols</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_описание_7">10.1. Описание</h3>
+<div class="paragraph">
+<p>Скрипт задает ширины столбцов в таблицах файлов AsciiDoc, если не задана опция <code>[cols=""]</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_для_чего_нужно_7">10.2. Для чего нужно?</h3>
+<div class="paragraph">
+<p>Если для таблицы не указаны параметры столбцов, то при обработке процессором столбцы имеют одинаковые ширины.
+Немного существует таких таблиц, для которых такая конфигурация наиболее актуальная и подходящая.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_как_запустить_7">10.3. Как запустить?</h3>
+<div class="paragraph">
+<p>Запускается так же, как и любые другие скрипты:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>tw_utilities.exe table-cols OPTIONS</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OPTIONS&#8201;&#8212;&#8201;опции скрипта</p>
+</div>
+<div class="sect3">
+<h4 id="_опции_скрипта_7">10.3.1. Опции скрипта</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Использование:
+tw_utilities.exe table-cols PATHDIR
+-f/--file FILE ... FILE | -d/--dir DIR | --recursive | -s/--max-symbols WIDTH |
+-c/--min-column WIDTH | --keep-logs | --h/--help
+
+  Команда для задания ширины столбцам таблиц
+
+Опции:
+  -f, --file FILE ... FILE               Файл для обработки. Может использоваться несколько раз
+  -d, --dir DIR                          Директория для обработки
+  --recursive / --no-recursive           Флаг рекурсивного поиска файлов.
+                                         По умолчанию: True, поиск файлов по вложенным папкам
+  -s, --max-symbols WIDTH                Максимальная ширина столбца в символах. По умолчанию: 72.
+                                         Примечание. Должно быть целым положительным числом
+  -c, --min-column WIDTH                 Минимальная ширина столбца в символах. По умолчанию: 4.
+                                         Примечание. Должно быть целым положительным числом
+  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
+                                         работы в штатном режиме.
+                                         По умолчанию: False, лог-файл и директория удаляются
+  -h, --help                             Вывести справочную информацию на экран и завершить работу
+----------------------------------------------------------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Путь может быть как абсолютным, так и относительным.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_принцип_работы_analyzer">10.4. Принцип работы Analyzer</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Для каждой ячейки вычислить минимальную ширину, необходимую для размещения текста без вынужденных разрывов.</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Ширина не может быть меньше, чем <code>--min-column</code>.
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Для каждого столбца вычислить минимальную ширину, равную максимуму из минимальных ширин ячеек.</p>
+</li>
+<li>
+<p>Для каждой ячейки вычислить рекомендуемую ширину, необходимую для размещения текста в одну строку.</p>
+</li>
+<li>
+<p>Для каждого столбца вычислить рекомендуемую ширину, равную максимуму из рекомендуемых ширин ячеек.</p>
+</li>
+<li>
+<p>Для таблицы вычислить минимальную ширину, равную сумме минимальных ширин столбцов.</p>
+</li>
+<li>
+<p>Проверить, что минимальная ширина не превышает <code>--max-symbols</code>.</p>
+</li>
+<li>
+<p>Столбцам, в которых нет ячеек с табуляцией, задать ширину, равную их рекомендуемой.</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+В таких столбцах минимальная ширина равна рекомендуемой.
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Остальным столбцам задать ширину, равную их минимальной.</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Минимальная и рекомендуемая ширина столбца не может быть меньше, чем <code>--min-column</code>.
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Если сумма заданных ширин меньше максимально допустимой, то определить доступный остаток.</p>
+</li>
+<li>
+<p>Рассчитать доли для столбцов, пропорциональные рекомендуемым ширинам за вычетом уже заданных величин.</p>
+</li>
+<li>
+<p>Добавить к каждой ширине столбцов долю от доступного остатка.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="terms">11. Руководство для terms</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_описание_8">11.1. Описание</h3>
+<div class="paragraph">
+<p>Скрипт выводит расшифровки аббревиатур и сокращений, используемых в документации продуктов сетевых и мобильных технологий.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_для_чего_нужно_8">11.2. Для чего нужно?</h3>
+<div class="paragraph">
+<p>При создании или изменении документа часто встречаются широко используемые аббревиатуры, которые не всегда с первого взгляда ясны и понятны.
+Также необходимо добавлять пояснения к сокращениям по тексту, поскольку достаточно многие имеют несколько возможных вариантов интерпретации.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_как_запустить_8">11.3. Как запустить?</h3>
+<div class="paragraph">
+<p>Запускается так же, как и любые другие скрипты:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>tw_utilities.exe terms OPTIONS</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OPTIONS&#8201;&#8212;&#8201;опции скрипта</p>
+</div>
+<div class="sect3">
+<h4 id="_опции_скрипта_8">11.3.1. Опции скрипта</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Использование:
+tw_utilities.exe terms TERMS
+-a/--all | -f/--full | -i/--info | -r/--readme | -s/--samples | --abbr | --ascii | --common |
+--keep-logs | --h/--help
+
+  Команда для вывода расшифровки аббревиатур
+
+Аргументы:
+  terms                                  Перечень запрашиваемых аббревиатур
+
+Опции:
+  -a, --all                              Флаг вывода всех сокращений.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --full-flag, --readme-flag, --samples-flag
+  -f, --full                             Флаг вывода всех сокращений с их расшифровками.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --readme-flag, --samples-flag, --all-flag
+  -i, --info                             Флаг вывода полного руководства.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --full-flag, --readme-flag, --samples-flag, --all-flag
+  -r, --readme                           Флаг вывода полного руководства.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --full-flag, --info-flag, --samples-flag, --all-flag
+  -s, --samples                          Флаг вывода примеров использования.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --full-flag, --readme-flag, --info-flag, --all-flag
+  --abbr                                 Флаг вывода сокращения для добавления в файл Markdown.
+</span><span class="gp">                                         Формат: &lt;abbr title=""&gt;</span>&lt;/abbr&gt;.
+<span class="go">                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --common-flag, --ascii-flag
+  --ascii                                Флаг вывода сокращения для добавления в файл AsciiDoc.
+</span><span class="gp">                                         Формат: pass:q[&lt;abbr title=""&gt;</span>&lt;/abbr&gt;].
+<span class="go">                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --common-flag, --abbr-flag
+  --common                               Флаг вывода сокращения в свободном виде.
+                                         Примечание. Аргумент не может использоваться одновременно с
+                                         --ascii-flag, --abbr-flag
+  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
+                                         работы в штатном режиме.
+                                         По умолчанию: False, лог-файл и директория удаляются
+  -h, --help                             Вывести справочную информацию на экран и завершить работу
+----------------------------------------------------------------------------------------------------</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="validate-yaml">12. Руководство для validate-yaml</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_описание_9">12.1. Описание</h3>
+<div class="paragraph">
+<p>Скрипт проверяет корректность секций и всех путей в файле <code>PDF_*.yml</code>.</p>
+</div>
+<div class="paragraph">
+<p>В результате отображается информация, есть ли проблемы с параметрами секций и файлами, и если они есть, то где именно.</p>
+</div>
+<div class="paragraph">
+<p>Для секций показывается некорректно заданный параметр, некорректный тип значения параметра, отсутствие обязательного параметра или отсутствие обязательной секции.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="gp">Отсутствует раздел &lt;part&gt;</span><span class="w">
+</span><span class="gp">Раздел &lt;part&gt;</span><span class="w"> </span>должен быть типа object, но получено &lt;<span class="nb">type</span><span class="o">&gt;</span>
+<span class="gp">В разделе &lt;part&gt;</span><span class="w"> </span>отсутствует секция &lt;section&gt;
+<span class="gp">В секции &lt;part&gt;</span>::&lt;section&gt; отсутствует ключ &lt;key&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_для_чего_нужно_9">12.2. Для чего нужно?</h3>
+<div class="paragraph">
+<p>Изначально скрипт написан для проверки файла <code>PDF_*.yml</code>, необходимого для генерации PDF.<br>
+Ввиду того, что генерация PDF осуществляется целой партией, bundle, то ошибка с одним проектом ведет к отбою обновления всех других.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_как_запустить_9">12.3. Как запустить?</h3>
+<div class="paragraph">
+<p>Запускается так же, как и любые другие скрипты:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>tw_utilities.exe validate-yaml OPTIONS</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OPTIONS&#8201;&#8212;&#8201;опции скрипта</p>
+</div>
+<div class="sect3">
+<h4 id="_опции_скрипта_9">12.3.1. Опции скрипта</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="go">Использование:
+tw_utilities.exe validate-yaml YAML_FILE
+-o/--output FILE | --verbose | --keep-logs | --h/--help
+
+  Команда для валидации YAML-файла, используемого при генерации PDF
+
+Аргументы:
+  yaml_file                              Путь до файла PDF_*.yml
+
+Опции:
+  -o, --output FILE                      Файл для записи вывода. По умолчанию: вывод в консоль
+  --verbose / --no-verbose               Флаг подробного вывода.
+                                         По умолчанию: False, выводятся только ошибки
+  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
+                                         работы в штатном режиме.
+                                         По умолчанию: False, лог-файл и директория удаляются
+  -h, --help                             Вывести справочную информацию на экран и завершить работу
+----------------------------------------------------------------------------------------------------</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Путь может быть как абсолютным, так и относительным.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+;(function () { /*! Asciidoctor Tabs | Copyright (c) 2018-present Dan Allen | MIT License */
+  'use strict'
+
+  var config = (document.currentScript || {}).dataset || {}
+  var forEach = Array.prototype.forEach
+
+  init(document.querySelectorAll('.tabs'))
+
+  function init (tabsBlocks) {
+    if (!tabsBlocks.length) return
+    forEach.call(tabsBlocks, function (tabs) {
+      var syncIds = tabs.classList.contains('is-sync') ? {} : undefined
+      var tablist = tabs.querySelector('.tablist ul')
+      tablist.setAttribute('role', 'tablist')
+      var start
+      forEach.call(tablist.querySelectorAll('li'), function (tab, idx) {
+        tab.tabIndex = -1
+        tab.setAttribute('role', tab.classList.add('tab') || 'tab')
+        var id, anchor, syncId
+        if (!(id = tab.id) && (anchor = tab.querySelector('a[id]'))) {
+          id = tab.id = anchor.parentNode.removeChild(anchor).id
+        }
+        var panel = id && tabs.querySelector('.tabpanel[aria-labelledby~="' + id + '"]')
+        if (!panel) return idx ? undefined : toggleSelected(tab, true) // invalid state
+        syncIds && (((syncId = tab.textContent.trim()) in syncIds) ? (syncId = undefined) : true) &&
+        (syncIds[(tab.dataset.syncId = syncId)] = tab)
+        idx || (syncIds && (start = { tab: tab, panel: panel })) ? toggleHidden(panel, true) : toggleSelected(tab, true)
+        tab.setAttribute('aria-controls', panel.id)
+        panel.setAttribute('role', 'tabpanel')
+        var onClick = syncId === undefined ? activateTab : activateTabSync
+        tab.addEventListener('click', onClick.bind({ tabs: tabs, tab: tab, panel: panel }))
+      })
+      if (!tabs.closest('.tabpanel')) {
+        forEach.call(tabs.querySelectorAll('.tabpanel table.tableblock'), function (table) {
+          var container = Object.assign(document.createElement('div'), { className: 'tablecontainer' })
+          table.parentNode.insertBefore(container, table).appendChild(table)
+        })
+      }
+      if (start) {
+        var syncGroupId
+        for (var i = 0, lst = tabs.classList, len = lst.length, className; i !== len; i++) {
+          if (!(className = lst.item(i)).startsWith('data-sync-group-id=')) continue
+          tabs.dataset.syncGroupId = syncGroupId = lst.remove(className) || className.slice(19).replace(/\u00a0/g, ' ')
+          break
+        }
+        if (syncGroupId === undefined) tabs.dataset.syncGroupId = syncGroupId = Object.keys(syncIds).sort().join('|')
+        var preferredSyncId = 'syncStorageKey' in config &&
+          window[(config.syncStorageScope || 'local') + 'Storage'].getItem(config.syncStorageKey + '-' + syncGroupId)
+        var tab = preferredSyncId && syncIds[preferredSyncId]
+        tab && Object.assign(start, { tab: tab, panel: document.getElementById(tab.getAttribute('aria-controls')) })
+        toggleSelected(start.tab, true) || toggleHidden(start.panel, false)
+      }
+    })
+    onHashChange()
+    toggleClassOnEach(tabsBlocks, 'is-loading', 'remove')
+    window.setTimeout(toggleClassOnEach.bind(null, tabsBlocks, 'is-loaded', 'add'), 0)
+    window.addEventListener('hashchange', onHashChange)
+  }
+
+  function activateTab (e) {
+    var tab = this.tab
+    var tabs = this.tabs || (this.tabs = tab.closest('.tabs'))
+    var panel = this.panel || (this.panel = document.getElementById(tab.getAttribute('aria-controls')))
+    querySelectorWithSiblings(tabs, '.tablist .tab', 'tab').forEach(function (el) {
+      toggleSelected(el, el === tab)
+    })
+    querySelectorWithSiblings(tabs, '.tabpanel', 'tabpanel').forEach(function (el) {
+      toggleHidden(el, el !== panel)
+    })
+    if (!this.isSync && 'syncStorageKey' in config && 'syncGroupId' in tabs.dataset) {
+      var storageKey = config.syncStorageKey + '-' + tabs.dataset.syncGroupId
+      window[(config.syncStorageScope || 'local') + 'Storage'].setItem(storageKey, tab.dataset.syncId)
+    }
+    if (!e) return
+    var loc = window.location
+    var hashIdx = loc.hash ? loc.href.indexOf('#') : -1
+    if (~hashIdx) window.history.replaceState(null, '', loc.href.slice(0, hashIdx))
+    e.preventDefault()
+  }
+
+  function activateTabSync (e) {
+    activateTab.call(this, e)
+    var thisTabs = this.tabs
+    var thisTab = this.tab
+    var initialY = thisTabs.getBoundingClientRect().y
+    forEach.call(document.querySelectorAll('.tabs'), function (tabs) {
+      if (tabs === thisTabs || tabs.dataset.syncGroupId !== thisTabs.dataset.syncGroupId) return
+      querySelectorWithSiblings(tabs, '.tablist .tab', 'tab').forEach(function (tab) {
+        if (tab.dataset.syncId === thisTab.dataset.syncId) activateTab.call({ tabs: tabs, tab: tab, isSync: true })
+      })
+    })
+    var shiftedBy = thisTabs.getBoundingClientRect().y - initialY
+    if (shiftedBy && (shiftedBy = Math.round(shiftedBy))) window.scrollBy({ top: shiftedBy, behavior: 'instant' })
+  }
+
+  function querySelectorWithSiblings (scope, selector, siblingClass) {
+    var el = scope.querySelector(selector)
+    if (!el) return []
+    var result = [el]
+    while ((el = el.nextElementSibling) && el.classList.contains(siblingClass)) result.push(el)
+    return result
+  }
+
+  function toggleClassOnEach (elements, className, method) {
+    forEach.call(elements, function (el) {
+      el.classList[method](className)
+    })
+  }
+
+  function toggleHidden (el, state) {
+    el.classList[(el.hidden = state) ? 'add' : 'remove']('is-hidden')
+  }
+
+  function toggleSelected (el, state) {
+    el.setAttribute('aria-selected', '' + state)
+    el.classList[state ? 'add' : 'remove']('is-selected')
+    el.tabIndex = state ? 0 : -1
+  }
+
+  function onHashChange () {
+    var id = window.location.hash.slice(1)
+    if (!id) return
+    var tab = document.getElementById(~id.indexOf('%') ? decodeURIComponent(id) : id)
+    if (!(tab && tab.classList.contains('tab'))) return
+    'syncId' in tab.dataset ? activateTabSync.call({ tab: tab }) : activateTab.call({ tab: tab })
+  }
+})()
+</script>
+</body>
+</html>

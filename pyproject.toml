@@ -8,10 +8,13 @@ readme = "README.adoc"
 
 [tool.poetry.dependencies]
 python = ">=3.9"
-loguru = ">=0.6"
+loguru = ">=0.7"
 click = ">=8.1"
 more-itertools = ">=10.5"
-pyyaml = ">6.0"
+pyyaml = ">=6.0"
+pillow = ">=11.1"
+python-slugify = ">=8.0"
+certifi = ">=2025.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.3"

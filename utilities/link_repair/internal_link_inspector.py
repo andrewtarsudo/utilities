@@ -4,7 +4,7 @@ from typing import Iterator
 
 from loguru import logger
 
-from utilities.common.errors import FileInvalidTypeError, InvalidMatchError
+from utilities.common.errors import LinkRepairFileInvalidTypeError, LinkRepairInvalidMatchError
 from utilities.link_repair.file_dict import TextFile
 
 __all__ = ["InternalLinkInspector", "internal_inspector"]
@@ -17,11 +17,11 @@ def _replace_dash_underline(match: Match) -> str:
     :type match: Match
     :return: The updated string converted to camelCase.
     :rtype: str
-    :raises: InvalidMatchError if the line does not have dashes or underlines in proper places.
+    :raises: LinkRepairInvalidMatchError if the line does not have dashes or underlines in proper places.
     """
     if not match:
         logger.error(f"В строке не найден паттерн {match.re.pattern}")
-        raise InvalidMatchError
+        raise LinkRepairInvalidMatchError
 
     else:
         return str(match.group(2).upper())
@@ -72,7 +72,7 @@ class InternalLinkInspector:
 
         else:
             logger.error(f"Файл должен быть типа TextFile, но получено {type(value)}")
-            raise FileInvalidTypeError
+            raise LinkRepairFileInvalidTypeError
 
     def modified_anchor(self, anchor: str) -> str | None:
         """Gets the possible modified original anchor.

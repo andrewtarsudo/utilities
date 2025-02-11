@@ -5,9 +5,10 @@ from pathlib import Path
 from typing import Callable, Iterable
 
 from click.core import Context
+from click.termui import pause
 from loguru import logger
 
-from utilities.common.constants import StrPath
+from utilities.common.constants import PRESS_ENTER_KEY, StrPath
 from utilities.scripts.list_files import list_files_command
 
 
@@ -19,7 +20,7 @@ class ReaderMode(Enum):
         return self._value_
 
 
-def file_reader(path: StrPath, reader_mode: str | ReaderMode, encoding: str = "utf-8"):
+def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str = "utf-8"):
     if isinstance(reader_mode, str):
         reader_mode: ReaderMode = ReaderMode[reader_mode]
 
@@ -34,23 +35,57 @@ def file_reader(path: StrPath, reader_mode: str | ReaderMode, encoding: str = "u
         return _
 
     except FileNotFoundError:
-        input(f"Файл {path} не найден")
+        logger.error(f"Файл {path} не найден")
         raise
 
     except PermissionError:
-        input(f"Недостаточно прав для записи в файл {path}")
+        from os import stat
+
+        logger.error(f"Недостаточно прав для чтения файла {path}")
+        logger.error(f"Доступ: {stat(path).st_mode}")
         raise
 
     except RuntimeError:
-        input(f"Истекло время записи в файл {path}")
+        logger.error(f"Произошла ошибка обработки во время записи файла {path}")
         raise
 
-    except UnsupportedOperation:
-        input(f"Не поддерживаемая операция с файлом {path}")
+    except UnsupportedOperation as e:
+        logger.error(f"Не поддерживаемая операция с файлом {path}: {e.strerror}")
         raise
 
     except OSError as e:
-        input(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+        logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+        raise
+
+
+def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = "utf-8"):
+    path: Path = Path(path).expanduser().resolve()
+    mode: str = "w" if path.exists() else "x"
+
+    if not isinstance(content, str):
+        content: str = "".join(content)
+
+    try:
+        with open(path, mode=mode, encoding=encoding, errors="ignore") as f:
+            f.write(content)
+
+    except PermissionError:
+        from os import stat
+
+        logger.error(f"Недостаточно прав для записи в файл {path}")
+        logger.error(f"Доступ: {stat(path).st_mode}")
+        raise
+
+    except RuntimeError:
+        logger.error(f"Произошла ошибка обработки во время записи файла {path}")
+        raise
+
+    except UnsupportedOperation as e:
+        logger.error(f"Не поддерживаемая операция с файлом {path}: {e.strerror}")
+        raise
+
+    except OSError as e:
+        logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
         raise
 
 
@@ -63,7 +98,7 @@ def get_files(
         extensions: str = "md adoc"):
     if files is None and directory is None:
         logger.error("Хотя бы один из параметров --file, --dir должен быть задан")
-        return None
+        pause(PRESS_ENTER_KEY)
 
     if files is None:
         files: list[StrPath] = []

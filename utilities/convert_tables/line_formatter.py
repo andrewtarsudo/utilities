@@ -4,7 +4,7 @@ from typing import MutableSequence
 
 from loguru import logger
 
-from utilities.common.errors import EmptyLinesError
+from utilities.common.errors import ConvertTablesEmptyLinesError
 
 
 class LineFormatter:
@@ -36,7 +36,7 @@ class LineFormatter:
     def format_lines(self, lines: MutableSequence[str] = None):
         if lines is None:
             logger.error("Нет строк для модификации")
-            raise EmptyLinesError
+            raise ConvertTablesEmptyLinesError
 
         patterns: dict[str, str] = dict()
 

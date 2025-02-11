@@ -174,7 +174,7 @@ def format_help(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
 def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
     args: list[Argument] = [
         param for param in cmd.get_params(ctx)
-        if param.param_type_name == "argument"]
+        if isinstance(param, Argument)]
 
     if args:
         formatter.width = MAX_CONTENT_WIDTH
@@ -280,11 +280,15 @@ class APIGroup(Group):
 
 
 class TermsAPIGroup(APIGroup):
-    def parse_args(self, ctx, args):
-        args: list[str] = list(map(up, args))
+    def parse_args(self, ctx: Context, args: Iterable[str]):
+        if args is None:
+            args: list[str] = []
 
-        if args is not None and all(not x.startswith("--") for x in args):
-            args.insert(0, '--common')
+        else:
+            args: list[str] = list(map(up, args))
+
+            if all(not x.startswith("--") for x in args):
+                args.insert(0, '--common')
 
         super().parse_args(ctx, args)
 
@@ -362,7 +366,13 @@ def command_line_interface(debug: bool = False, **kwargs):
         pause(PRESS_ENTER_KEY)
         ctx.exit(0)
 
+    elif ctx.invoked_subcommand == "link-repair":
+        result_file: bool = True
+        custom_logging("cli", is_debug=debug, result_file=result_file)
+
     else:
+        result_file: bool = False
+        custom_logging("cli", is_debug=debug, result_file=result_file)
         logger.debug(f"Команда: {ctx.invoked_subcommand}\nПараметры: {ctx.params}\nНеобработанные: {ctx.args}")
 
 
