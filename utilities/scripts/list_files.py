@@ -13,11 +13,12 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
 
 
 def generate_prefix(path: Path):
-    try:
-        parts: tuple[str, ...] = path.parts
-        return "- content/common/" if (parts[-2], parts[-1]) == ("content", "common") else ""
+    parts: tuple[str, ...] = path.parts
 
-    except IndexError or KeyError:
+    if "content" in parts and "common" in parts:
+        return "- content/common/"
+
+    else:
         return ""
 
 

@@ -214,6 +214,12 @@ def inspect_sections(
         if name in (*_SETTINGS_NAMES, *_RIGHTS_NAMES):
             continue
 
+        elif name.endswith("cross_docs"):
+            warnings.append(
+                f"Обнаружен раздел {name}, в котором ссылки ведут в другой проект.\n"
+                "На данный момент такие секции пропускаются при проверке")
+            continue
+
         else:
             if not isinstance(section, Mapping):
                 messages.append(f"Раздел '{name}' должна быть типа object, но получено {type(section)}")
@@ -294,13 +300,13 @@ def validate(
     paths: dict[Path, int] = {
         Path(root).joinpath(line.strip().removeprefix("- ")): index
         for index, line in enumerate(lines)
-        if line.strip().startswith("- ")
+        if line.strip().startswith("- ") and ".." not in line
     }
 
     _lines: list[str] = []
 
     for path, line_no in paths.items():
-        _result: bool = path.exists()
+        _result: bool = path.resolve().exists()
 
         _status: str = _DICT_RESULTS.get(_result).get("status")
         _color: str = _DICT_RESULTS.get(_result).get("color")
@@ -408,13 +414,13 @@ def validate_yaml_command(
     warnings, messages = inspect_legal(content, verbose, warnings, messages)
     warnings, messages = inspect_sections(content, verbose, warnings, messages)
 
-    if warnings != [] or messages != []:
+    if warnings or messages:
         echo("Предупреждения:")
         echo("\n".join(warnings))
         echo("\n".join(messages))
 
     elif not verbose:
-        echo("В файле проблемы не обнаружены")
+        echo("Проблемы с параметрами не обнаружены")
 
     lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
     validate(yaml_file.parent, lines, output, verbose)
