@@ -5,10 +5,16 @@
 @import "css/theme.css";
 
 hdlist {
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
   margin-bottom: 1.25rem;
 }
 
 .listingblock > .content > * > code {
-  font-size: 0.8rem;
+  font-color: #333333;
+}
+
+p strong,
+td.content strong,
+div.footnote strong {
+  letter-spacing: inherit!important;
 }

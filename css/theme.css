@@ -423,6 +423,7 @@ h6 {
   font-family: var(--custom-font-family-headings, -apple-system, BlinkMacSystemFont, "游ゴシック体", YuGothic, "メイリオ", Meiryo, "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
   font-weight: bold;
   line-height: 1.6666666667;
+  margin-bottom: 20px;
 }
 h1 > small,
 h2 > small,

@@ -1,6 +1,5 @@
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
 /* Uncomment the following line when using as a custom stylesheet */
-/* @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"; */
 @import url('https://fonts.googleapis.com/css2?family=PT+Mono&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700');
 *,
 ::before,
@@ -18,7 +17,7 @@ body {
   color: rgb(0 0 0 / 0.8);
   padding: 0;
   margin: 0;
-  font-family: "Noto Serif", "DejaVu Serif", serif;
+  font-family: "PT Sans", "PT Sans", sans-serif;
   font-size: inherit;
   line-height: 1;
   position: relative;
@@ -95,7 +94,7 @@ strong strong {
 code,
 kbd,
 pre {
-  font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
+  font-family: "PT Mono", "PT Mono", monospace;
   font-size: 1em;
 }
 
@@ -282,7 +281,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "PT Serif", "PT Serif", sans-serif;
+  font-family: "PT Sans", "PT Sans", sans-serif;
   font-weight: 300;
   font-style: normal;
   color: #000;
@@ -290,7 +289,6 @@ h6 {
   margin-top: 1em;
   margin-bottom: 0.5em;
   line-height: 1.2;
-  word-spacing: -0.05em;
 }
 
 h1 small,
@@ -720,7 +718,7 @@ body > div[id]::after,
 }
 
 #toc ul {
-  font-family: "Open Sans", "DejaVu Sans", sans-serif;
+  font-family: "PT Sans", "PT Sans", sans-serif;
   list-style-type: none;
 }
 
@@ -1026,7 +1024,7 @@ table.tableblock > .title,
 .hdlist > .title {
   text-rendering: optimizeLegibility;
   text-align: left;
-  font-family: "PT Serif", "PT Serif", serif;
+  font-family: "PT Sans", "PT Sans", sans-serif;
   font-size: 1rem;
   font-style: normal;
 }
@@ -2046,21 +2044,6 @@ div.footnote {
   text-rendering: optimizeLegibility;
 }
 
-h1,
-h2,
-p,
-td.content,
-span.alt,
-summary {
-  letter-spacing: -0.01em;
-}
-
-p strong,
-td.content strong,
-div.footnote strong {
-  letter-spacing: -0.005em;
-}
-
 p,
 blockquote,
 dt,
@@ -2267,10 +2250,7 @@ p.tableblock {
   }
 }
 
-.imageblock.center > title {
-  text-align: center;
-}
-
+.imageblock.center > title,
 .imageblock.center > .title {
   text-align: center;
 }
@@ -2281,7 +2261,7 @@ p.tableblock {
 }
 
 .imageblock > .title {
-  text-align: center
+  text-align: center;
 }
 
 div#red-bg.listingblock {
