@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from operator import attrgetter
+from shutil import rmtree
 from sys import platform
 from typing import Any, Iterable, Mapping
 
@@ -380,14 +381,14 @@ def command_line_interface(debug: bool = False, **kwargs):
 def clear_logs(ctx: Context):
     logger.remove()
 
-    if ctx.obj.get("keep_logs") is False:
-        NORMAL.unlink(missing_ok=True)
+    if not ctx.obj.get("keep_logs", False):
+        rmtree(NORMAL, ignore_errors=True)
 
     elif ctx.obj.get("debug") == "True":
-        echo(f"Папка с логами: {DEBUG}")
+        echo(f"Папка с логами: {DEBUG.parent}")
 
     else:
-        echo(f"Папка с логами: {NORMAL}")
+        echo(f"Папка с логами: {NORMAL.parent}")
 
     pause(PRESS_ENTER_KEY)
     ctx.exit()

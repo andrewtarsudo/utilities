@@ -20,18 +20,28 @@ if __name__ == "__main__":
         "--noconfirm",
         "--distpath",
         "./bin",
-        f"{spec_file}"]
+        f"{spec_file}", "2>pyinstaller.log"]
 
     try:
-        with open(log_file, "w", encoding="utf-8") as f:
-            run(
-                args,
-                capture_output=True,
-                encoding="utf-8",
-                check=True).check_returncode()
+        run(
+            args,
+            capture_output=True,
+            encoding="utf-8",
+            check=True).check_returncode()
 
     except CalledProcessError as e:
         print(f"{e.__class__.__name__}, код {e.returncode}:\n{e.stderr}")
+
+    except PermissionError as e:
+        from os import stat
+
+        print(f"Недостаточно прав доступа к файлу {log_file}.\nМаска: {stat(log_file).st_mode}")
+
+    except RuntimeError as e:
+        print(f"{e.__class__.__name__}, ошибка во время выполнения скрипта")
+
+    except OSError as e:
+        print(f"{e.__class__.__name__}, код {e.errno}\nОшибка {e.strerror}")
 
     else:
         print(f"Исполняемый файл {exe_file} успешно создан")
