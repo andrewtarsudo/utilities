@@ -5,7 +5,7 @@ from sys import platform
 if __name__ == "__main__":
     log_file: str = "pyinstaller.log"
 
-    if platform.startswith("msys"):
+    if platform.startswith("win"):
         spec_file: str = "utilities.exe.spec"
         exe_file: str = r".\bin\tw_utilities.exe"
 
