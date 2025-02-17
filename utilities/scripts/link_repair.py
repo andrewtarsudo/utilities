@@ -19,7 +19,7 @@ from utilities.link_repair.internal_link_inspector import internal_inspector
 from utilities.link_repair.link import Link
 from utilities.link_repair.link_fixer import link_fixer
 from utilities.link_repair.link_inspector import link_inspector
-from utilities.scripts.cli import clear_logs, command_line_interface
+from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup
 
 
 def validate_dir_path(path: StrPath | None) -> bool:
@@ -47,6 +47,7 @@ def has_no_required_files(path: StrPath) -> bool:
 
 @command_line_interface.command(
     "link-repair",
+    cls=SwitchArgsAPIGroup,
     help="Команда для проверки и исправления ссылок в файлах документации")
 @argument(
     "pathdir",

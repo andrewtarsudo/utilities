@@ -6,11 +6,12 @@ from click.types import BOOL, Path as ClickPath
 from utilities.common.constants import HELP, StrPath
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument
-from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption
+from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption, SwitchArgsAPIGroup
 
 
 @command_line_interface.command(
     "convert-tables",
+    cls=SwitchArgsAPIGroup,
     help="Команда для корректного извлечения таблиц из файлов docx в формат Markdown")
 @argument(
     "docx_file",

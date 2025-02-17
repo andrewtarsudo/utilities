@@ -12,8 +12,8 @@ separator: str = "-" * 80
 
 StrPath: TypeAlias = str | Path
 
-DEBUG: Path = Path.cwd().joinpath("_logs/utilities_debug.log")
-NORMAL: Path = Path("~/Desktop/_logs/utilities_debug.log").expanduser().resolve()
+DEBUG: Path = Path.cwd().joinpath("_logs/cli_debug.log")
+NORMAL: Path = Path("~/Desktop/_logs/cli_debug.log").expanduser().resolve()
 
 PRESS_ENTER_KEY: str = "\nНажмите ENTER, чтобы завершить работу скрипта ..."
 

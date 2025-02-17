@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from operator import attrgetter
+from os import environ
 from shutil import rmtree
 from sys import platform
 from typing import Any, Iterable, Mapping
@@ -280,18 +281,27 @@ class APIGroup(Group):
         format_args(self, ctx, formatter)
 
 
+class SwitchArgsAPIGroup(APIGroup):
+    def parse_args(self, ctx: Context, args: list[str]):
+        if not (args is None or args[0].startswith("-")):
+            root: str = args.pop(0)
+            args.append(root)
+
+        return super().parse_args(ctx, args)
+
+
 class TermsAPIGroup(APIGroup):
-    def parse_args(self, ctx: Context, args: Iterable[str]):
+    def parse_args(self, ctx: Context, args: list[str]):
         if args is None:
             args: list[str] = []
 
         else:
             args: list[str] = list(map(up, args))
 
-            if all(not x.startswith("--") for x in args):
+            if all(not x.startswith("-") for x in args):
                 args.insert(0, '--common')
 
-        super().parse_args(ctx, args)
+        return super().parse_args(ctx, args)
 
 
 class MutuallyExclusiveOption(Option):
@@ -336,14 +346,6 @@ class MutuallyExclusiveOption(Option):
     cls=APIGroup,
     help="Набор скриптов для технических писателей")
 @option(
-    "--debug", "debug",
-    is_flag=True,
-    expose_value=False,
-    required=False,
-    is_eager=False,
-    hidden=True,
-    help="Флаг активации режима отладки.\nПо умолчанию: False, отключение режима")
-@option(
     "-v", "--version",
     is_flag=True,
     expose_value=False,
@@ -354,11 +356,13 @@ class MutuallyExclusiveOption(Option):
     "-h", "--help",
     help=HELP,
     is_eager=True)
-def command_line_interface(debug: bool = False, **kwargs):
+def command_line_interface():
+    debug: bool = False if not environ.get("TW_UTILITIES_DEBUG", "") else True
+
     ctx: Context = get_current_context()
     ctx.ensure_object(dict)
-    ctx.obj = dict(**kwargs)
-    ctx.obj["debug"] = str(debug)
+    ctx.obj = dict()
+    ctx.obj["debug"] = debug
 
     custom_logging("cli", is_debug=debug)
 
@@ -369,26 +373,33 @@ def command_line_interface(debug: bool = False, **kwargs):
 
     elif ctx.invoked_subcommand == "link-repair":
         result_file: bool = True
-        custom_logging("cli", is_debug=debug, result_file=result_file)
 
     else:
         result_file: bool = False
-        custom_logging("cli", is_debug=debug, result_file=result_file)
-        logger.debug(f"Команда: {ctx.invoked_subcommand}\nПараметры: {ctx.params}\nНеобработанные: {ctx.args}")
+
+    custom_logging("cli", is_debug=debug, result_file=result_file)
 
 
 @pass_context
 def clear_logs(ctx: Context):
+    keep_logs: str = ctx.obj.get("keep_logs", "False")
+    debug: str = ctx.obj.get("debug", "False")
+
+    logger.debug(
+        f"Команда: {ctx.command_path}\n"
+        f"Параметры: {ctx.params}")
+
     logger.remove()
 
-    if not ctx.obj.get("keep_logs", False):
-        rmtree(NORMAL, ignore_errors=True)
+    if not keep_logs:
+        rmtree(NORMAL.parent, ignore_errors=True)
+        echo("Директория с журналом удалена")
 
-    elif ctx.obj.get("debug") == "True":
-        echo(f"Папка с логами: {DEBUG.parent}")
-
-    else:
+    elif not debug:
         echo(f"Папка с логами: {NORMAL.parent}")
 
+    else:
+        echo(f"Папка с логами: {DEBUG.parent}")
+
     pause(PRESS_ENTER_KEY)
-    ctx.exit()
+    ctx.exit(0)

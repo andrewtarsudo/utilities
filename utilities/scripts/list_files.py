@@ -9,7 +9,7 @@ from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 
 from utilities.common.constants import HELP, StrPath
-from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption
+from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup, MutuallyExclusiveOption
 
 
 def generate_prefix(path: Path):
@@ -24,6 +24,7 @@ def generate_prefix(path: Path):
 
 @command_line_interface.command(
     "list-files",
+    cls=SwitchArgsAPIGroup,
     help="Команда для вывода файлов в директории")
 @argument(
     "root_dir",
@@ -32,7 +33,6 @@ def generate_prefix(path: Path):
         resolve_path=True,
         path_type=Path,
         dir_okay=True),
-    default=Path.cwd(),
     required=True,
     metavar="ROOT_DIR")
 @option(

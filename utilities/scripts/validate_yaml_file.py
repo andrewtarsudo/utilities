@@ -14,7 +14,7 @@ from yaml import safe_load
 
 from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, StrPath
 from utilities.common.functions import file_reader, ReaderMode
-from utilities.scripts.cli import clear_logs, command_line_interface
+from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup
 
 _SETTINGS_NAMES: tuple[str, ...] = (
     "settings", "Settings"
@@ -333,6 +333,7 @@ def validate(
 
 @command_line_interface.command(
     "validate-yaml",
+    cls=SwitchArgsAPIGroup,
     help="Команда для валидации YAML-файла, используемого при генерации PDF")
 @argument(
     "yaml_file",
