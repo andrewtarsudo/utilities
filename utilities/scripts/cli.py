@@ -366,16 +366,15 @@ def command_line_interface():
 
     custom_logging("cli", is_debug=debug)
 
+    result_file: bool = False
+
     if ctx.invoked_subcommand is None:
         echo("Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help")
         pause(PRESS_ENTER_KEY)
         ctx.exit(0)
 
-    elif ctx.invoked_subcommand == "link-repair":
+    if ctx.invoked_subcommand == "link-repair":
         result_file: bool = True
-
-    else:
-        result_file: bool = False
 
     custom_logging("cli", is_debug=debug, result_file=result_file)
 

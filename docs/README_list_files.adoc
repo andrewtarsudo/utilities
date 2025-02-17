@@ -60,9 +60,11 @@ include::partials/run.adoc[]
 ----
 Использование:
 {name} {script-name} ROOT_DIR
---d/--ignored-dirs DIR ... DIR | --all-dirs | -f/--ignored-files FILE ... FILE | --all-files |
--e/--extensions "EXT ... EXT" | --all-ext | -l/--language LANG | --all-langs | -p/--prefix PFX |
---hidden | --recursive | --keep-logs | --h/--help
+Использование:
+tw_utilities.exe list-files <ROOT_DIR>
+-d/--ignored-dirs DIR ... DIR | --all-dirs | -f/--ignored-files FILE ... FILE | --all-files |
+-e/--extensions "EXT ... EXT" | --all-ext | -l/--language LANG | --all-langs | -i/--ignore-index |
+-p/--prefix PFX | --hidden | --recursive | --keep-logs | --h/--help
 
   Команда для вывода файлов в директории
 
@@ -103,6 +105,8 @@ include::partials/run.adoc[]
                                          По умолчанию: True, вывод файлов на всех языках.
                                          Примечание. Аргумент не может использоваться одновременно с
                                          --language
+  -i, --ignore-index                     Флаг игнорирования файлов _index любого расширения.
+                                         По умолчанию: False, файл включается в список
   -p, --prefix PFX                       Префикс, добавляемый к названиям файлов.
                                          По умолчанию: '- content/common/'
   --hidden                               Флаг поиска скрытых файлов.

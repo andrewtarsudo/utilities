@@ -173,7 +173,7 @@ include::docs/README_link_repair.adoc[]
 
 include::docs/README_list_files.adoc[]
 
-include::docs/README_reduce_image.adoc
+include::docs/README_reduce_image.adoc[]
 
 include::docs/README_repair_svg.adoc[]
 

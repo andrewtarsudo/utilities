@@ -22,6 +22,31 @@ def generate_prefix(path: Path):
         return ""
 
 
+def check_path(
+        path: Path,
+        ignored_dirs: Iterable[str],
+        ignored_files: Iterable[str],
+        extensions: Iterable[str],
+        language: str):
+    is_dir: bool = path.is_dir()
+    is_in_ignored_dirs: bool = any(part in ignored_dirs for part in path.parts)
+    has_ignored_name: bool = path.name in ignored_dirs
+    is_in_ignored_files: bool = path.stem in ignored_files
+    has_ignored_extension: bool = path.suffix not in extensions if extensions else False
+
+    if not language:
+        has_ignored_language: bool = len(path.suffixes) > 1
+
+    else:
+        has_ignored_language: bool = f".{language}" in path.suffixes
+
+    conditions: set[bool] = {
+        is_dir, is_in_ignored_dirs, has_ignored_name, is_in_ignored_files, has_ignored_extension, has_ignored_language
+    }
+
+    return not any(conditions)
+
+
 @command_line_interface.command(
     "list-files",
     cls=SwitchArgsAPIGroup,
@@ -121,6 +146,14 @@ def generate_prefix(path: Path):
     show_default=True,
     default=True)
 @option(
+    "-i", "--ignore-index", "ignore_index",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг игнорирования файлов _index любого расширения.\nПо умолчанию: False, файл включается в список",
+    show_default=True,
+    required=False,
+    default=False)
+@option(
     "-p", "--prefix", "prefix",
     cls=MutuallyExclusiveOption,
     type=STRING,
@@ -171,51 +204,55 @@ def list_files_command(
         all_extensions: bool = False,
         language: str = "",
         all_languages: bool = True,
-        prefix: str = "- content/common/",
+        prefix: str = None,
         hidden: bool = False,
+        ignore_index: bool = False,
         recursive: bool = True,
         auxiliary: bool = False,
         keep_logs: bool = False):
     root_dir: Path = root_dir.expanduser()
 
     if extensions is None and not all_extensions:
-        extensions: list[str] = [".md", ".adoc"]
+        extensions: set[str] = {".md", ".adoc"}
 
     elif extensions is None:
-        extensions: list[str] = []
+        extensions: set[str] = set()
 
     elif not all_extensions:
-        extensions: list[str] = [
+        extensions: set[str] = {
             f".{extension.removeprefix('.')}"
-            for extension in extensions.strip().split(" ")]
+            for extension in extensions.strip().split(" ")}
 
     else:
-        extensions: list[str] = []
+        extensions: set[str] = set()
 
     if ignored_files is None and all_files is None:
-        ignored_files: list[str] = ["README", "_check_list"]
+        ignored_files: set[str] = {"README", "_check_list"}
 
     elif ignored_files is None or not ignored_files or ignored_files == [""]:
-        ignored_files: list[str] = []
+        ignored_files: set[str] = set()
 
     elif all_files is None and all_files is False:
-        ignored_files: list[str] = [
-            ignored_file.split(".")[-1] for ignored_file in ignored_files]
+        ignored_files: set[str] = {
+            ignored_file.split(".")[-1] for ignored_file in ignored_files}
 
     else:
-        ignored_files: list[str] = []
+        ignored_files: set[str] = set()
+
+    if ignore_index:
+        ignored_files.add("_index")
 
     if ignored_dirs is None and all_dirs is None:
-        ignored_dirs: list[str] = ["_temp_folder", "private", "_temp_storage"]
+        ignored_dirs: set[str] = {"_temp_folder", "private", "_temp_storage"}
 
     elif ignored_dirs is None or not ignored_dirs or ignored_dirs == [""]:
-        ignored_dirs: list[str] = []
+        ignored_dirs: set[str] = set()
 
     elif all_dirs is None and all_dirs is False:
-        ignored_dirs: list[str] = [*ignored_dirs]
+        ignored_dirs: set[str] = set(ignored_dirs)
 
     else:
-        ignored_dirs: list[str] = []
+        ignored_dirs: set[str] = set()
 
     if language is None or language.lower() == "ru" or all_languages is True:
         language: str = ""
@@ -235,25 +272,7 @@ def list_files_command(
             include_hidden=hidden):
         _: Path = root_dir.joinpath(item)
 
-        if _.is_dir():
-            continue
-
-        elif any(part in ignored_dirs for part in _.parts) or _.name in ignored_dirs:
-            continue
-
-        elif _.stem in ignored_files:
-            continue
-
-        elif extensions != [] and _.suffix not in extensions:
-            continue
-
-        elif language == "" and len(_.suffixes) > 1:
-            continue
-
-        elif language != "" and f".{language}" not in _.suffixes:
-            continue
-
-        else:
+        if check_path(_, ignored_dirs, ignored_files, extensions, language):
             results.append(f"{prefix}{Path(item).as_posix()}")
 
     if not auxiliary:
