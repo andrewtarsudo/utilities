@@ -1,20 +1,12 @@
 [[terms]]
 = Руководство для terms
-:experimental:
-:icons: font
-:source-highlighter: rouge
 :imagesdir: images
-:figure-caption: Рисунок
 :stylesdir: ../css
 :stylesheet: default.css
-:nofooter:
-:toc: auto
-:toc-title: Содержание
-:sectnums:
 :pdf-themesdir: themes
 :pdf-theme: base-theme.yml
 :script-name: terms
-:name: tw_utilities.exe
+:asciidoctorconfigdir: ..
 
 == Описание
 
@@ -32,7 +24,7 @@ include::partials/run.adoc[]
 [source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name} TERMS
+{name} {script-name} <TERMS>
 -a/--all | -f/--full | -i/--info | -r/--readme | -s/--samples | --abbr | --ascii | --common |
 --keep-logs | --h/--help
 
@@ -43,34 +35,35 @@ include::partials/run.adoc[]
 
 Опции:
   -a, --all                              Флаг вывода всех сокращений.
-                                         Примечание. Аргумент не может использоваться одновременно с
-                                         --full-flag, --readme-flag, --samples-flag
+                                         Примечание. Не может использоваться одновременно с
+                                         --samples-flag, --full-flag, --readme-flag
   -f, --full                             Флаг вывода всех сокращений с их расшифровками.
-                                         Примечание. Аргумент не может использоваться одновременно с
-                                         --readme-flag, --samples-flag, --all-flag
+                                         Примечание. Не может использоваться одновременно с
+                                         --samples-flag, --all-flag, --readme-flag
   -i, --info                             Флаг вывода полного руководства.
-                                         Примечание. Аргумент не может использоваться одновременно с
-                                         --full-flag, --readme-flag, --samples-flag, --all-flag
+                                         Примечание. Не может использоваться одновременно с
+                                         --samples-flag, --all-flag, --full-flag, --readme-flag
   -r, --readme                           Флаг вывода полного руководства.
-                                         Примечание. Аргумент не может использоваться одновременно с
-                                         --full-flag, --info-flag, --samples-flag, --all-flag
+                                         Примечание. Не может использоваться одновременно с
+                                         --info-flag, --samples-flag, --all-flag, --full-flag
   -s, --samples                          Флаг вывода примеров использования.
-                                         Примечание. Аргумент не может использоваться одновременно с
-                                         --full-flag, --readme-flag, --info-flag, --all-flag
+                                         Примечание. Не может использоваться одновременно с
+                                         --info-flag, --all-flag, --full-flag, --readme-flag
   --abbr                                 Флаг вывода сокращения для добавления в файл Markdown.
                                          Формат: <abbr title=""></abbr>.
-                                         Примечание. Аргумент не может использоваться одновременно с
+                                         Примечание. Не может использоваться одновременно с
                                          --common-flag, --ascii-flag
   --ascii                                Флаг вывода сокращения для добавления в файл AsciiDoc.
                                          Формат: pass:q[<abbr title=""></abbr>].
-                                         Примечание. Аргумент не может использоваться одновременно с
+                                         Примечание. Не может использоваться одновременно с
                                          --common-flag, --abbr-flag
   --common                               Флаг вывода сокращения в свободном виде.
-                                         Примечание. Аргумент не может использоваться одновременно с
+                                         Примечание. Не может использоваться одновременно с
                                          --ascii-flag, --abbr-flag
-  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
-                                         работы в штатном режиме.
-                                         По умолчанию: False, лог-файл и директория удаляются
-  -h, --help                             Вывести справочную информацию на экран и завершить работу
-----------------------------------------------------------------------------------------------------
+  {keep-logs}
+                                         {keep-logs-cont}
+                                         {keep-logs-default}
+  {help}
+                                         {help-cont}
+-------------------------------------------------------------------------------------------------
 ----

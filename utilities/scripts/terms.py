@@ -135,8 +135,9 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     "--keep-logs",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении \nработы в штатном режиме.\n"
-         "По умолчанию: False, лог-файл и директория удаляются",
+    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
+         "\nработы в штатном режиме."
+         "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
     default=False)

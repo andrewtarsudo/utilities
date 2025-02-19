@@ -40,7 +40,7 @@ MAX_LENGTH: int = 84
         resolve_path=True,
         allow_dash=False,
         dir_okay=False),
-    help="\b\nПеречень файлов для обработки.\nМожет использоваться несколько раз",
+    help="\b\nФайлов для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
@@ -57,7 +57,9 @@ MAX_LENGTH: int = 84
 @option(
     "--recursive/--no-recursive",
     type=BOOL,
-    help="\b\nФлаг рекурсивного поиска файлов.\nПо умолчанию: True, поиск файлов по вложенным папкам",
+    is_flag=True,
+    help="\b\nФлаг рекурсивного поиска файлов."
+         "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
     default=True)
@@ -65,8 +67,9 @@ MAX_LENGTH: int = 84
     "--keep-logs",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении \nработы в штатном режиме.\n"
-         "По умолчанию: False, лог-файл и директория удаляются",
+    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
+         "\nработы в штатном режиме."
+         "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
     default=False)

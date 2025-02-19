@@ -1,5 +1,4 @@
 @import "css/font-awesome.css"
-@import "css/footer.css"
 @import "css/doc.css";
 @import "css/default.css";
 @import "css/theme.css";
@@ -17,4 +16,9 @@ p strong,
 td.content strong,
 div.footnote strong {
   letter-spacing: inherit!important;
+}
+
+#toctitle {
+  font-size: 24px;
+  font-weight: bold;
 }

@@ -12,14 +12,25 @@ from utilities.common.constants import HELP, StrPath
 from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup, MutuallyExclusiveOption
 
 
-def generate_prefix(path: Path):
+def check_content_common(path: Path):
     parts: tuple[str, ...] = path.parts
 
-    if "content" in parts and "common" in parts:
-        return "- content/common/"
+    for index, part in enumerate(parts[:-1]):
+        if part == "content" and parts[index + 1] == "common":
+            return index
 
     else:
-        return ""
+        return -1
+
+
+def generate_base_root(path: Path, content_common_index: int):
+    parts: tuple[str, ...] = path.parts
+
+    if content_common_index == -1:
+        return path
+
+    else:
+        return path.relative_to(Path().joinpath("/".join(parts[:content_common_index]))).as_posix()
 
 
 def check_path(
@@ -65,8 +76,8 @@ def check_path(
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_dirs"],
     type=STRING,
-    help="\b\nПеречень игнорируемых директорий. Может использоваться \nнесколько раз.\nПо умолчанию: _temp_folder, "
-         "_temp_storage, private",
+    help="\b\nПеречень игнорируемых директорий. Может использоваться \nнесколько раз."
+         "\nПо умолчанию: _temp_folder, _temp_storage, private",
     multiple=True,
     required=False,
     metavar="DIR ... DIR",
@@ -87,7 +98,9 @@ def check_path(
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_files"],
     type=STRING,
-    help="\b\nПеречень игнорируемых файлов. Может использоваться несколько \nраз.\nПо умолчанию: README, _check_list",
+    help="\b\nПеречень игнорируемых файлов. Может использоваться"
+         "\nнесколько раз."
+         "\nПо умолчанию: README, _check_list",
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
@@ -98,7 +111,9 @@ def check_path(
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["ignored_files"],
     type=BOOL,
-    help="\b\nФлаг обработки всех файлов.\nПо умолчанию: False, выводятся файлы с определенными именами",
+    help="\b\nФлаг обработки всех файлов."
+         "\nПо умолчанию: False, выводятся файлы только"
+         "\nс определенными именами",
     multiple=False,
     required=False,
     show_default=True,
@@ -108,7 +123,8 @@ def check_path(
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_extensions"],
     type=STRING,
-    help="\b\nОбрабатываемые типы файлов, разделяемые пробелом.\nПо умолчанию: md adoc",
+    help="\b\nОбрабатываемые типы файлов, разделяемые пробелом."
+         "\nПо умолчанию: md adoc",
     multiple=False,
     required=False,
     metavar="\"EXT ... EXT\"",
@@ -119,7 +135,9 @@ def check_path(
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["extensions"],
     type=BOOL,
-    help="\b\nФлаг обработки файлов всех расширений.\nПо умолчанию: False, вывод файлов определенных расширений",
+    help="\b\nФлаг обработки файлов всех расширений."
+         "\nПо умолчанию: False, выводятся файлы только"
+         "\nс определенными расширениями",
     multiple=False,
     required=False,
     show_default=True,
@@ -129,7 +147,7 @@ def check_path(
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_languages"],
     type=STRING,
-    help="\b\nЯзык файлов.\nПо умолчанию: \"\", вывод всех файлов независимо от языка",
+    help="\b\nЯзык файлов.\nПо умолчанию: \"\", выводятся файлы на всех языках",
     multiple=False,
     required=False,
     metavar="LANG",
@@ -140,7 +158,8 @@ def check_path(
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["language"],
     type=BOOL,
-    help="\b\nФлаг обработки файлов всех языков.\nПо умолчанию: True, вывод файлов на всех языках",
+    help="\b\nФлаг обработки файлов всех языков."
+         "\nПо умолчанию: True, выводятся файлы на всех языках",
     multiple=False,
     required=False,
     show_default=True,
@@ -149,25 +168,41 @@ def check_path(
     "-i", "--ignore-index", "ignore_index",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг игнорирования файлов _index любого расширения.\nПо умолчанию: False, файл включается в список",
+    help="\b\nФлаг игнорирования файлов _index любого расширения."
+         "\nПо умолчанию: False, файл включается в список",
     show_default=True,
     required=False,
     default=False)
 @option(
     "-p", "--prefix", "prefix",
-    cls=MutuallyExclusiveOption,
     type=STRING,
-    help="\b\nПрефикс, добавляемый к названиям файлов.\nПо умолчанию: '- content/common/'",
+    help="\b\nПрефикс, добавляемый к названиям файлов."
+         "\nПо умолчанию: если в пути есть 'content' и 'common',"
+         "\nто путь, пригодный для добавления в YAML-файл для PDF;"
+         "\nиначе -- ''."
+         "\nПримечание. Если задано --no-prefix, то игнорируется",
     multiple=False,
     required=False,
     metavar="PFX",
     show_default=True,
     default=None)
 @option(
+    "-n", "--no-prefix", "no_prefix",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг вывода исключительно относительных путей до файлов"
+         "\nбез префиксов."
+         "\nПо умолчанию: False, префикс задается опцией --prefix."
+         "\nПримечание. Имеет приоритет над опцией --prefix",
+    show_default=True,
+    required=False,
+    default=False)
+@option(
     "--hidden",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг поиска скрытых файлов.\nПо умолчанию: False, исключение скрытых файлов из вывода",
+    help="\b\nФлаг поиска скрытых файлов."
+         "\nПо умолчанию: False, скрытые файлы игнорируются",
     show_default=True,
     required=False,
     default=False)
@@ -175,7 +210,8 @@ def check_path(
     "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг рекурсивного поиска файлов.\nПо умолчанию: True, поиск файлов по вложенным папкам",
+    help="\b\nФлаг рекурсивного поиска файлов."
+         "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
     default=True)
@@ -183,8 +219,9 @@ def check_path(
     "--keep-logs",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении \nработы в штатном режиме.\n"
-         "По умолчанию: False, лог-файл и директория удаляются",
+    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
+         "\nработы в штатном режиме."
+         "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
     default=False)
@@ -205,6 +242,7 @@ def list_files_command(
         language: str = "",
         all_languages: bool = True,
         prefix: str = None,
+        no_prefix: bool = False,
         hidden: bool = False,
         ignore_index: bool = False,
         recursive: bool = True,
@@ -260,8 +298,17 @@ def list_files_command(
     else:
         language: str = language.lower()
 
-    if prefix is None:
-        prefix: str = generate_prefix(root_dir)
+    content_common_index: int = check_content_common(root_dir)
+
+    if no_prefix:
+        prefix: str = ""
+
+    elif prefix is None:
+        if content_common_index > 0:
+            prefix: str = f"- {generate_base_root(root_dir, content_common_index)}/"
+
+        else:
+            prefix: str = ""
 
     results: list[str] = []
 

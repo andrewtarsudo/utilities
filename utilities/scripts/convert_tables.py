@@ -31,7 +31,8 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
         resolve_path=True,
         allow_dash=False,
         dir_okay=True),
-    help="\b\nДиректория для хранения таблиц. По умолчанию: ./tables/.\nЕсли не существует, то будет создана",
+    help="\b\nДиректория для таблиц. По умолчанию: ./tables/."
+         "\nЕсли не существует, то будет создана",
     multiple=False,
     required=False,
     metavar="DIR_TABLES",
@@ -44,7 +45,8 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
         resolve_path=True,
         allow_dash=False,
         dir_okay=True),
-    help="\b\nВременная директория для скрипта. По умолчанию: ./_temp/.\nЕсли не существует, то будет создана",
+    help="\b\nВременная директория. По умолчанию: ./_temp/."
+         "\nЕсли не существует, то будет создана",
     multiple=False,
     required=False,
     metavar="TEMP_DIR",
@@ -52,16 +54,17 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
 @option(
     "-e", "--escape/--no-escape", "escape",
     type=BOOL,
-    help="\b\nФлаг экранирования символов '<', '>'.\n"
-         "По умолчанию: True, добавление '\\' перед символами",
+    help="\b\nФлаг экранирования символов '<', '>'."
+         "\nПо умолчанию: True, добавление '\\' перед символами",
     show_default=True,
     required=False,
     default=True)
 @option(
     "-r", "--remove/--no-remove", "remove",
     type=BOOL,
-    help="\b\nФлаг удаления всех множественных пробелов и пробелов \nперед знаками препинания.\n"
-         "По умолчанию: True, удаление всех дополнительных пробелов",
+    help="\b\nФлаг удаления всех множественных пробелов и пробелов"
+         "\nперед знаками препинания."
+         "\nПо умолчанию: True, удаление всех лишних пробелов",
     show_default=True,
     required=False,
     default=False)
@@ -70,10 +73,10 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["keep"],
     type=BOOL,
-    help="\b\nФлаг удаления лишних пробелов и экранирования символов.\n"
-         "По умолчанию: не задано, обработка определяется параметрами \n"
-         "--preserve и --escape.\n"
-         "Имеет приоритет выше, чем у опций --preserve и --escape",
+    help="\b\nФлаг удаления лишних пробелов и экранирования символов."
+         "\nПо умолчанию: не задано, определяется параметрами"
+         "\n--escape и --remove."
+         "\nПриоритет выше, чем у опций --escape и --remove",
     show_default=True,
     required=False,
     default=None)
@@ -82,9 +85,10 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["fix"],
     type=BOOL,
-    help="\b\nФлаг извлечения текста без дополнительной обработки.\n"
-         "По умолчанию: не задано, обработка определяется параметрами \n--preserve и --escape.\n"
-         "Имеет приоритет выше, чем у опций --preserve и --escape",
+    help="\b\nФлаг извлечения текста без дополнительной обработки."
+         "\nПо умолчанию: не задано, определяется параметрами"
+         "\n--escape и --remove."
+         "\nПриоритет выше, чем у опций --escape и --remove",
     show_default=True,
     required=False,
     default=None)
@@ -92,8 +96,9 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
     "--keep-logs",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении \nработы в штатном режиме.\n"
-         "По умолчанию: False, лог-файл и директория удаляются",
+    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
+         "\nработы в штатном режиме."
+         "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
     default=False)

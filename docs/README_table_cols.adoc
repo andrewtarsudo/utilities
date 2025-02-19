@@ -1,20 +1,12 @@
 [[table-cols]]
 = Руководство для table-cols
-:experimental:
-:icons: font
-:source-highlighter: rouge
 :imagesdir: images
-:figure-caption: Рисунок
 :stylesdir: ../css
 :stylesheet: default.css
-:nofooter:
-:toc: auto
-:toc-title: Содержание
-:sectnums:
 :pdf-themesdir: themes
 :pdf-theme: base-theme.yml
-:name: tw_utilities.exe
 :script-name: table-cols
+:asciidoctorconfigdir: ..
 
 == Описание
 
@@ -32,26 +24,29 @@ include::partials/run.adoc[]
 [source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name} PATHDIR
--f/--file FILE ... FILE | -d/--dir DIR | --recursive | -s/--max-symbols WIDTH |
--c/--min-column WIDTH | --keep-logs | --h/--help
+{name} {script-name}
+-f/--file FILE ... FILE | -d/--dir DIR | -s/--max-symbols WIDTH | -c/--min-column WIDTH |
+--recursive | --keep-logs | --h/--help
 
   Команда для задания ширины столбцам таблиц
 
 Опции:
   -f, --file FILE ... FILE               Файл для обработки. Может использоваться несколько раз
   -d, --dir DIR                          Директория для обработки
-  --recursive / --no-recursive           Флаг рекурсивного поиска файлов.
-                                         По умолчанию: True, поиск файлов по вложенным папкам
-  -s, --max-symbols WIDTH                Максимальная ширина столбца в символах. По умолчанию: 72.
+  -s, --max-symbols WIDTH                Максимальная ширина столбца в символах.
+                                         По умолчанию: 68.
                                          Примечание. Должно быть целым положительным числом
-  -c, --min-column WIDTH                 Минимальная ширина столбца в символах. По умолчанию: 4.
+  -c, --min-column WIDTH                 Минимальная ширина столбца в символах.
+                                         По умолчанию: 4.
                                          Примечание. Должно быть целым положительным числом
-  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
-                                         работы в штатном режиме.
-                                         По умолчанию: False, лог-файл и директория удаляются
-  -h, --help                             Вывести справочную информацию на экран и завершить работу
-----------------------------------------------------------------------------------------------------
+  {recursive}
+                                         {recursive-note}
+  {keep-logs}
+                                         {keep-logs-cont}
+                                         {keep-logs-default}
+  {help}
+                                         {help-cont}
+-------------------------------------------------------------------------------------------------
 ----
 
 NOTE: Путь может быть как абсолютным, так и относительным.

@@ -63,7 +63,7 @@ def has_no_required_files(path: StrPath) -> bool:
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг поиска повторяющихся якорей.\n"
-         "По умолчанию: True, поиск дублирующихся якорей осуществляется",
+         "По умолчанию: True, дублирующийся якори обрабатываются",
     show_default=True,
     required=False,
     default=True)
@@ -71,8 +71,9 @@ def has_no_required_files(path: StrPath) -> bool:
     "-d", "--dry-run",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг вывода некорректных ссылок на экран без изменения файлов.\n"
-         "По умолчанию: False, файлы перезаписываются",
+    help="\b\nФлаг вывода некорректных ссылок на экран без изменения"
+         "\nфайлов."
+         "\nПо умолчанию: False, файлы перезаписываются",
     show_default=True,
     required=False,
     default=False)
@@ -80,8 +81,8 @@ def has_no_required_files(path: StrPath) -> bool:
     "-n", "--no-result",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг удаления файла с результатами работы скрипта по завершении \n"
-         "работы в штатном режиме.\n"
+    help="\b\nФлаг удаления файла с результатами работы скрипта по"
+         "\nзавершении работы в штатном режиме.\n"
          "По умолчанию: False, файл сохраняется",
     show_default=True,
     required=False,
@@ -91,7 +92,7 @@ def has_no_required_files(path: StrPath) -> bool:
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг раздельной обработки файлов на различных языках.\n"
-         "По умолчанию: True, файлы на русском и английском \nобрабатываются отдельно",
+         "По умолчанию: True, файлы обрабатываются отдельно",
     show_default=True,
     required=False,
     default=True)
@@ -99,8 +100,9 @@ def has_no_required_files(path: StrPath) -> bool:
     "--skip-en",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг обработки файлов только на русском языке.\n"
-         "По умолчанию: False, обрабатываются файлы на обоих языках",
+    help="\b\nФлаг обработки файлов только на русском языке."
+         "\nПо умолчанию: False, обрабатываются файлы на обоих"
+         "\nязыках",
     show_default=True,
     required=False,
     default=False)
@@ -108,8 +110,9 @@ def has_no_required_files(path: StrPath) -> bool:
     "--keep-logs",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении работы \nв штатном режиме.\n"
-         "По умолчанию: False, лог-файл и директория удаляются",
+    help="\b\nФлаг сохранения директории с лог-файлом"
+         "\nпо завершении работы в штатном режиме."
+         "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
     default=False)

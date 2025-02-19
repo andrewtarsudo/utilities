@@ -47,7 +47,8 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
     "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг рекурсивного поиска файлов.\nПо умолчанию: True, поиск файлов по вложенным папкам",
+    help="\b\nФлаг рекурсивного поиска файлов."
+         "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
     default=True)
@@ -55,8 +56,9 @@ from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
     "--keep-logs",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении \nработы в штатном режиме.\n"
-         "По умолчанию: False, лог-файл и директория удаляются",
+    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
+         "\nработы в штатном режиме."
+         "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
     default=False)

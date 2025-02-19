@@ -18,8 +18,8 @@ from utilities.common.constants import args_help_dict, DEBUG, HELP, NORMAL, PRES
 from utilities.common.custom_logger import custom_logging
 
 COL_MAX: int = 39
-MAX_CONTENT_WIDTH: int = 100
-TERMINAL_WIDTH: int = 100
+MAX_CONTENT_WIDTH: int = 96
+TERMINAL_WIDTH: int = 96
 
 SEPARATOR: str = "-" * MAX_CONTENT_WIDTH
 
@@ -316,7 +316,7 @@ class MutuallyExclusiveOption(Option):
             _: dict[str, str] = {
                 "help": (
                     f"{_help}.\n"
-                    f"Примечание. Аргумент не может использоваться одновременно с \n"
+                    f"Примечание. Не может использоваться одновременно с \n"
                     f"{exclusive_options}")}
             kwargs.update(_)
 

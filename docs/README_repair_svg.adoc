@@ -1,20 +1,12 @@
 [[repair-svg]]
 = Руководство для repair-svg
-:experimental:
-:icons: font
-:source-highlighter: rouge
 :imagesdir: images
-:figure-caption: Рисунок
 :stylesdir: ../css
 :stylesheet: default.css
-:nofooter:
-:toc: auto
-:toc-title: Содержание
-:sectnums:
 :pdf-themesdir: themes
 :pdf-theme: base-theme.yml
 :script-name: repair-svg
-:name: tw_utilities.exe
+:asciidoctorconfigdir: ..
 
 == Описание
 
@@ -42,13 +34,14 @@ include::partials/run.adoc[]
 Опции:
   -f, --file FILE ... FILE               Файл для обработки. Может использоваться несколько раз
   -d, --dir DIR                          Директория для обработки
-  --recursive / --no-recursive           Флаг рекурсивного поиска файлов.
-                                         По умолчанию: True, поиск файлов по вложенным папкам
-  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
-                                         работы в штатном режиме.
-                                         По умолчанию: False, лог-файл и директория удаляются
-  -h, --help                             Вывести справочную информацию на экран и завершить работу
-----------------------------------------------------------------------------------------------------
+  {recursive}
+                                         {recursive-note}
+  {keep-logs}
+                                         {keep-logs-cont}
+                                         {keep-logs-default}
+  {help}
+                                         {help-cont}
+-------------------------------------------------------------------------------------------------
 ----
 
 NOTE: Путь может быть как абсолютным, так и относительным.

@@ -77,14 +77,6 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
     metavar="DIR",
     default=None)
 @option(
-    "--recursive/--no-recursive",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг рекурсивного поиска файлов.\nПо умолчанию: True, поиск файлов по вложенным папкам",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
     "--dry-run",
     type=BOOL,
     is_flag=True,
@@ -94,11 +86,21 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
     required=False,
     default=False)
 @option(
+    "--recursive/--no-recursive",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг рекурсивного поиска файлов."
+         "\nПо умолчанию: True, вложенные файлы учитываются",
+    show_default=True,
+    required=False,
+    default=True)
+@option(
     "--keep-logs",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении \nработы в штатном режиме.\n"
-         "По умолчанию: False, лог-файл и директория удаляются",
+    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
+         "\nработы в штатном режиме."
+         "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
     default=False)

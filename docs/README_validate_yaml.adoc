@@ -1,20 +1,12 @@
 [[validate-yaml]]
 = Руководство для validate-yaml
-:experimental:
-:icons: font
-:source-highlighter: rouge
 :imagesdir: images
-:figure-caption: Рисунок
 :stylesdir: ../css
 :stylesheet: default.css
-:nofooter:
-:toc: auto
-:toc-title: Содержание
-:sectnums:
 :pdf-themesdir: themes
 :pdf-theme: base-theme.yml
 :script-name: validate-yaml
-:name: tw_utilities.exe
+:asciidoctorconfigdir: ..
 
 == Описание
 
@@ -44,7 +36,7 @@ include::partials/run.adoc[]
 [source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name} YAML_FILE
+{name} {script-name} <YAML_FILE>
 -o/--output FILE | --verbose | --keep-logs | --h/--help
 
   Команда для валидации YAML-файла, используемого при генерации PDF
@@ -56,11 +48,12 @@ include::partials/run.adoc[]
   -o, --output FILE                      Файл для записи вывода. По умолчанию: вывод в консоль
   --verbose / --no-verbose               Флаг подробного вывода.
                                          По умолчанию: False, выводятся только ошибки
-  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
-                                         работы в штатном режиме.
-                                         По умолчанию: False, лог-файл и директория удаляются
-  -h, --help                             Вывести справочную информацию на экран и завершить работу
-----------------------------------------------------------------------------------------------------
+  {keep-logs}
+                                         {keep-logs-cont}
+                                         {keep-logs-default}
+  {help}
+                                         {help-cont}
+------------------------------------------------------------------------------------------------
 ----
 
 NOTE: Путь может быть как абсолютным, так и относительным.

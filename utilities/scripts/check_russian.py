@@ -42,33 +42,36 @@ RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъы
         resolve_path=True,
         allow_dash=False,
         dir_okay=False),
-    help="\b\nПеречень файлов для обработки.\nМожет использоваться несколько раз",
+    help="\b\nФайл для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
     default=None)
 @option(
-    "--recursive/--no-recursive",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг рекурсивного поиска файлов.\nПо умолчанию: True, поиск файлов по вложенным папкам",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
     "--verbose/--no-verbose",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг подробного вывода.\nПо умолчанию: False, выводятся только ошибки",
+    help="\b\nФлаг подробного вывода."
+         "\nПо умолчанию: False, выводятся только ошибки",
     show_default=True,
     required=False,
     default=False)
 @option(
+    "--recursive/--no-recursive",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг рекурсивного поиска файлов."
+         "\nПо умолчанию: True, вложенные файлы учитываются",
+    show_default=True,
+    required=False,
+    default=True)
+@option(
     "--keep-logs",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении \nработы в штатном режиме.\n"
-         "По умолчанию: False, лог-файл и директория удаляются",
+    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
+         "\nработы в штатном режиме."
+         "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
     default=False)

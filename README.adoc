@@ -1,18 +1,10 @@
 = Руководство пользователя
-:experimental:
-:icons: font
-:source-highlighter: rouge
 :imagesdir: docs/images
-:figure-caption: Рисунок
-:stylesdir: ./css/
+:stylesdir: css
 :stylesheet: general.css
-:nofooter:
-:toc: auto
-:toc-title: Содержание
-:sectnums:
 :pdf-themesdir: themes
 :pdf-theme: base-theme.yml
-:name: tw_utilities.exe
+:asciidoctorconfigdir: .
 
 == Общая информация
 
@@ -53,10 +45,10 @@ $ <path/to/{name}> COMMAND OPTIONS
 
 Для использования любой команды необходимо в терминале ввести путь до исполняемого файла, команду, обязательные аргументы и требуемые опции.
 
-[source,console]
+[source,console,subs="attributes+"]
 ----
 Использование:
-tw_utilities
+{name}
 list-files | check-russian | convert-tables | format-code | link-repair | reduce-image | repair-svg | table-cols | terms | validate-yaml
 -v/--version | --h/--help
 
@@ -65,12 +57,13 @@ list-files | check-russian | convert-tables | format-code | link-repair | reduce
 
 Опции:
   -v, --version                          Вывести версию скрипта на экран и завершить работу
-  -h, --help                             Вывести справочную информацию на экран и завершить работу
+  -h, --help                             Вывести справочную информацию на экран и завершить
+                                         работу
 
 Подкоманды:
   check-russian                          Команда для проверки наличия непереведенных слов
-  convert-tables                         Команда для корректного извлечения таблиц из файлов docx в
-                                         формат Markdown
+  convert-tables                         Команда для корректного извлечения таблиц из файлов
+                                         docx в формат Markdown
   format-code                            Команда для форматирования блоков кода
   link-repair                            Команда для проверки и исправления ссылок в файлах
                                          документации
@@ -81,7 +74,7 @@ list-files | check-russian | convert-tables | format-code | link-repair | reduce
   terms                                  Команда для вывода расшифровки аббревиатур
   validate-yaml                          Команда для валидации YAML-файла, используемого при
                                          генерации PDF
-----------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
 ----
 
 === Примеры

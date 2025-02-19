@@ -43,18 +43,11 @@ from utilities.table_cols.file import AsciiDocFile
     metavar="DIR",
     default=None)
 @option(
-    "--recursive/--no-recursive",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг рекурсивного поиска файлов.\nПо умолчанию: True, поиск файлов по вложенным папкам",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
     "-s", "--max-symbols",
     type=INT,
-    help=f"\b\nМаксимальная ширина столбца в символах. По умолчанию: {MAX_SYMBOLS}.\n"
-         "Примечание. Должно быть целым положительным числом",
+    help=f"\b\nМаксимальная ширина столбца в символах."
+         f"\nПо умолчанию: {MAX_SYMBOLS}."
+         f"\nПримечание. Должно быть целым положительным числом",
     multiple=False,
     required=False,
     metavar="WIDTH",
@@ -62,18 +55,29 @@ from utilities.table_cols.file import AsciiDocFile
 @option(
     "-c", "--min-column",
     type=INT,
-    help=f"\b\nМинимальная ширина столбца в символах. По умолчанию: {MIN_COLUMN}.\n"
-         "Примечание. Должно быть целым положительным числом",
+    help=f"\b\nМинимальная ширина столбца в символах."
+         f"\nПо умолчанию: {MIN_COLUMN}."
+         f"\nПримечание. Должно быть целым положительным числом",
     multiple=False,
     required=False,
     metavar="WIDTH",
     default=MIN_COLUMN)
 @option(
+    "--recursive/--no-recursive",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг рекурсивного поиска файлов."
+         "\nПо умолчанию: True, вложенные файлы учитываются",
+    show_default=True,
+    required=False,
+    default=True)
+@option(
     "--keep-logs",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении \nработы в штатном режиме.\n"
-         "По умолчанию: False, лог-файл и директория удаляются",
+    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
+         "\nработы в штатном режиме."
+         "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
     default=False)
