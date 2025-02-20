@@ -5,6 +5,10 @@ description = "Command line interface commands for technical writers"
 authors = ["Andrew Tarasov <tarasov-a@protei.ru>"]
 license = "MIT"
 readme = "README.adoc"
+repository = "https://gitlab.com/tech_writers_protei/utilities/"
+packages = [
+  { include = "utilities" }
+]
 
 [tool.poetry.dependencies]
 python = ">=3.9"
@@ -15,6 +19,7 @@ pyyaml = ">=6.0"
 pillow = ">=11.1"
 python-slugify = ">=8.0"
 certifi = ">=2025.1"
+pip-system-certs = { version = ">=4.0", markers = "sys_platform == 'win32'" }
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.3"

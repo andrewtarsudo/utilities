@@ -4,12 +4,11 @@ from typing import Iterable
 
 from click.core import Context
 from click.decorators import help_option, option, pass_context
-from click.termui import pause
 from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
 from utilities.common import ConvertTablesNonIntegerLineLengthError, ConvertTablesNonPositiveLineLengthError
-from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
+from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, pretty_print, StrPath
 from utilities.common.functions import file_reader, file_writer, get_files, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 
@@ -93,46 +92,49 @@ def format_code_command(
         logger.error(f"Максимальная длина должна быть целым числом, однако получено {type(length)}")
         raise ConvertTablesNonIntegerLineLengthError
 
-    files: list[StrPath] | None = get_files(ctx, files=files, directory=directory, recursive=recursive)
-
-    if files is None:
-        ctx.obj["keep_logs"] = keep_logs
-        pause(PRESS_ENTER_KEY)
-        ctx.invoke(clear_logs)
+    files: list[StrPath] | None = get_files(
+        ctx,
+        files=files,
+        directory=directory,
+        recursive=recursive,
+        language=None)
 
     patterns: dict[str, str] = {
         MD_EXTENSION: r"```\S*\n(.*?)\n```",
         ADOC_EXTENSION: r"(?:-{4}|={4}|\.{4})([\s\S]+)(?:-{4}|={4}|\.{4})"
     }
 
-    for file in files:
-        try:
-            _content: str = file_reader(file, ReaderMode.STRING)
+    if files is not None and files:
+        for file in files:
+            logger.debug(f"Файл {file}")
 
-            _result: list[str] = []
+            try:
+                _content: str = file_reader(file, ReaderMode.STRING)
 
-            for code in finditer(patterns.get(file.suffix), _content):
-                lines: list[str] = code.group(1).splitlines()
+                _result: list[str] = []
 
-                for line in lines:
-                    _: list[str] = split(line, length=length)
-                    _result.append("\n".join(_))
+                for code in finditer(patterns.get(file.suffix), _content):
+                    lines: list[str] = code.group(1).splitlines()
 
-            file_writer(file, "\n\n".join(_result))
+                    for line in lines:
+                        _: list[str] = split(line, length=length)
+                        _result.append(pretty_print(_))
 
-            logger.info(f"Файл {file.name} успешно обработан")
+                file_writer(file, pretty_print(_result))
 
-        except PermissionError:
-            logger.error(f"Недостаточно прав для чтения/записи в файл {file.name}")
-            continue
+                logger.info(f"Файл {file.name} успешно обработан")
 
-        except RuntimeError:
-            logger.error(f"Истекло время чтения/записи файл {file.name}")
-            continue
+            except PermissionError:
+                logger.error(f"Недостаточно прав для чтения/записи в файл {file.name}")
+                continue
 
-        except OSError as e:
-            logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
-            continue
+            except RuntimeError:
+                logger.error(f"Истекло время чтения/записи файл {file.name}")
+                continue
+
+            except OSError as e:
+                logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+                continue
 
     ctx.obj["keep_logs"] = keep_logs
     ctx.invoke(clear_logs)

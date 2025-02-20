@@ -12,7 +12,7 @@ from click.utils import echo
 from loguru import logger
 from yaml import safe_load
 
-from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, StrPath
+from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup
 
@@ -325,7 +325,7 @@ def validate(
 
         with open(out, mode) as f:
             f.write(
-                "\n".join(_lines).
+                pretty_print(_lines).
                 replace(PASS_COLOR, "").
                 replace(FAIL_COLOR, "").
                 replace(NORMAL_COLOR, ""))
@@ -417,9 +417,9 @@ def validate_yaml_command(
     warnings, messages = inspect_sections(content, verbose, warnings, messages)
 
     if warnings or messages:
-        echo("Предупреждения:")
-        echo("\n".join(warnings))
-        echo("\n".join(messages))
+        logger.warning("Предупреждения:")
+        logger.warning(pretty_print(warnings))
+        logger.warning(pretty_print(messages))
 
     elif not verbose:
         echo("Проблемы с параметрами не обнаружены")

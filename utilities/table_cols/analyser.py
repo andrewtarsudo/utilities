@@ -69,6 +69,8 @@ class TableAnalyser:
         else:
             self._is_valid = True
 
+        logger.debug(f"{self._table_id}: {self._is_valid}")
+
     def find_base_column_width(self, column_parameters: TableColumnParameters):
         """Determines the column width to use as a base.
 

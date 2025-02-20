@@ -133,7 +133,7 @@ def link_repair_command(
     result_file_path: Path = Path.cwd().joinpath("results.txt")
 
     if not validate_dir_path(pathdir):
-        logger.critical(f"Путь {pathdir} не существует или указывает не на директорию")
+        logger.error(f"Путь {pathdir} не существует или указывает не на директорию")
         pause(PRESS_ENTER_KEY)
         ctx.exit(0)
 

@@ -15,7 +15,11 @@ if __name__ == "__main__":
         spec_file: str = "utilities.spec"
         exe_file: str = r"./bin/tw_utilities"
 
-    args: list[str] = [
+    venv: list[str] = [
+        "poetry",
+        "shell"]
+
+    install: list[str] = [
         "poetry",
         "run",
         "pyinstaller",
@@ -27,7 +31,7 @@ if __name__ == "__main__":
 
     try:
         _: CompletedProcess = run(
-            args,
+            install,
             encoding="utf-8",
             check=True)
 

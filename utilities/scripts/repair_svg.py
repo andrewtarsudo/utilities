@@ -90,6 +90,8 @@ def repair_svg_command(
         for file in files:
             file: Path = Path(file).expanduser().resolve()
 
+            logger.debug(f"Файл {file}")
+
             if not file.exists(follow_symlinks=True):
                 echo(f"Указан не существующий файл {file}")
                 continue

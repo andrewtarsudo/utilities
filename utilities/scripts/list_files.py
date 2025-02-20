@@ -7,8 +7,9 @@ from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
+from loguru import logger
 
-from utilities.common.constants import HELP, StrPath
+from utilities.common.constants import HELP, pretty_print, StrPath
 from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup, MutuallyExclusiveOption
 
 
@@ -38,22 +39,34 @@ def check_path(
         ignored_dirs: Iterable[str],
         ignored_files: Iterable[str],
         extensions: Iterable[str],
-        language: str):
+        language: str | None):
     is_dir: bool = path.is_dir()
     is_in_ignored_dirs: bool = any(part in ignored_dirs for part in path.parts)
     has_ignored_name: bool = path.name in ignored_dirs
     is_in_ignored_files: bool = path.stem in ignored_files
     has_ignored_extension: bool = path.suffix not in extensions if extensions else False
 
-    if not language:
+    if language is None:
+        has_ignored_language: bool = False
+
+    elif not language:
         has_ignored_language: bool = len(path.suffixes) == 1
 
     else:
         has_ignored_language: bool = f".{language}" not in path.suffixes
 
-    conditions: set[bool] = {
+    conditions: list[bool] = [
         is_dir, is_in_ignored_dirs, has_ignored_name, is_in_ignored_files, has_ignored_extension, has_ignored_language
-    }
+    ]
+
+    logger.debug(
+        f"Проверка пути {path}:"
+        f"\nis_dir = {is_dir}"
+        f"\nis_in_ignored_dirs = {is_in_ignored_dirs}"
+        f"\nhas_ignored_name = {has_ignored_name}"
+        f"\nis_in_ignored_files = {is_in_ignored_files}"
+        f"\nhas_ignored_extension = {has_ignored_extension}"
+        f"\nhas_ignored_language = {has_ignored_language}")
 
     return not any(conditions)
 
@@ -152,7 +165,7 @@ def check_path(
     required=False,
     metavar="LANG",
     show_default=True,
-    default="")
+    default=None)
 @option(
     "--all-langs", "all_languages",
     cls=MutuallyExclusiveOption,
@@ -239,7 +252,7 @@ def list_files_command(
         all_files: bool = False,
         extensions: str = None,
         all_extensions: bool = False,
-        language: str = "",
+        language: str = None,
         all_languages: bool = True,
         prefix: str = None,
         no_prefix: bool = False,
@@ -292,11 +305,14 @@ def list_files_command(
     else:
         ignored_dirs: set[str] = set()
 
-    if language is None or language.lower() == "ru" or all_languages is True:
-        language: str = ""
+    if language is None:
+        language: str | None = None
+
+    elif language.lower() == "ru" or all_languages is True:
+        language: str | None = ""
 
     else:
-        language: str = language.lower()
+        language: str | None = language.lower()
 
     content_common_index: int = check_content_common(root_dir)
 
@@ -310,20 +326,39 @@ def list_files_command(
         else:
             prefix: str = ""
 
+    logger.debug(
+        f"ignored_dirs = {ignored_dirs}"
+        f"\nall_dirs = {all_dirs}"
+        f"\nignored_files = {ignored_files}"
+        f"\nall_files = {all_files}"
+        f"\nextensions = {extensions}"
+        f"\nall_extensions = {all_extensions}"
+        f"\nlanguage = {language}"
+        f"\nall_languages = {all_languages}"
+        f"\nprefix = {prefix}"
+        f"\nno_prefix = {no_prefix}"
+        f"\nhidden = {hidden}"
+        f"\nignore_index = {ignore_index}"
+        f"\nrecursive = {recursive}"
+        f"\nauxiliary = {auxiliary}"
+        f"\nkeep_logs = {keep_logs}")
+
     results: list[str] = []
 
     for item in iglob(
-            "**",
+            "**/*",
             root_dir=root_dir,
             recursive=recursive,
             include_hidden=hidden):
         _: Path = root_dir.joinpath(item)
 
+        logger.debug(f"Файл {item}")
+
         if check_path(_, ignored_dirs, ignored_files, extensions, language):
             results.append(f"{prefix}{Path(item).as_posix()}")
 
     if not auxiliary:
-        echo("\n".join(results))
+        echo(pretty_print(results))
         ctx.obj["keep_logs"] = keep_logs
         ctx.invoke(clear_logs)
 

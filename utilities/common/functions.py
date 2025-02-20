@@ -8,7 +8,7 @@ from click.core import Context
 from click.termui import pause
 from loguru import logger
 
-from utilities.common.constants import PRESS_ENTER_KEY, StrPath
+from utilities.common.constants import PRESS_ENTER_KEY, pretty_print, StrPath
 from utilities.scripts.list_files import list_files_command
 
 
@@ -94,7 +94,7 @@ def get_files(
         files: Iterable[StrPath] = None,
         directory: StrPath = None,
         recursive: bool = True,
-        language: str = "",
+        language: str | None = None,
         extensions: str = "md adoc"):
     if files is None and directory is None:
         logger.error("Хотя бы один из параметров --file, --dir должен быть задан")
@@ -109,7 +109,11 @@ def get_files(
     if directory is not None:
         directory: Path = Path(directory).expanduser()
 
-        all_languages: bool = not bool(language)
+        if language is None:
+            all_languages: bool = False
+
+        else:
+            all_languages: bool = not bool(language)
 
         listed_files: list[str] = ctx.invoke(
             list_files_command,
@@ -124,5 +128,7 @@ def get_files(
             auxiliary=True)
 
         files.extend(map(directory.joinpath, listed_files))
+
+    logger.debug(f"get_files:\n{pretty_print(files)}")
 
     return files

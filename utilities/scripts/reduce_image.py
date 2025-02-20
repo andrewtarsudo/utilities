@@ -7,6 +7,7 @@ from click.core import Context
 from click.decorators import help_option, option, pass_context
 from click.termui import echo
 from click.types import BOOL, Path as ClickPath
+from loguru import logger
 from PIL import Image
 
 from utilities.common.constants import HELP, separator, StrPath
@@ -132,6 +133,8 @@ def reduce_image_command(
         for file in files:
             file: Path = Path(file).expanduser().resolve()
 
+            logger.debug(f"Файл {file}")
+
             current_size: int = getsize(file)
             before += current_size
 
@@ -139,7 +142,7 @@ def reduce_image_command(
             new_size: int = getsize(result)
 
             after += new_size
-            echo(f"Файл {file.name}: {file_size(current_size)} -> {file_size(new_size)}")
+            logger.info(f"Файл {file.name}: {file_size(current_size)} -> {file_size(new_size)}")
 
             if result.stem.startswith("temp_file"):
                 result.unlink(missing_ok=True)

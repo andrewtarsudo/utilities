@@ -16,10 +16,6 @@ if __name__ == '__main__':
     if not faulthandler.is_enabled():
         faulthandler.enable()
 
-    import sys
-
-    sys.tracebacklimit = 0
-
     from utilities.scripts.cli import command_line_interface
 
     command_line_interface()

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from operator import attrgetter
-from os import environ
 from shutil import rmtree
 from sys import platform
 from typing import Any, Iterable, Mapping
 
+from click import BOOL
 from click.core import Argument, Command, Context, Group, Option, Parameter
 from click.decorators import group, help_option, option, pass_context
 from click.exceptions import UsageError
@@ -42,6 +42,10 @@ def wrap_line(line: str):
         line: str = f"{line[:index + 1]}\n{wrap_line(line[index + 2:])}"
 
     return line
+
+
+def add_brackets(value: str):
+    return f"<{value}>"
 
 
 def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
@@ -83,7 +87,7 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     name: str = ctx.command_path.replace("__main__.py", f"tw_utilities{suffix}")
 
     if commands is not None and commands != dict():
-        commands_str: str = " | ".join(commands)
+        commands_str: str = wrap_line(" | ".join(map(add_brackets, commands)))
         formatter.write(
             f"Использование:\n{name}\n"
             f"{commands_str}\n{wrap_line(opts_str)}\n{wrap_line(args_str)}\n")
@@ -370,12 +374,21 @@ class MutuallyExclusiveOption(Option):
     is_eager=True,
     help="Вывести версию скрипта на экран и завершить работу",
     callback=print_version)
+@option(
+    "--debug",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг активации режима отладки."
+         "\nПо умолчанию: False, режим отключен",
+    show_default=True,
+    required=False,
+    default=False,
+    hidden=True)
 @help_option(
     "-h", "--help",
     help=HELP,
     is_eager=True)
-def command_line_interface():
-    debug: bool = False if not environ.get("TW_UTILITIES_DEBUG", "") else True
+def command_line_interface(debug: bool = False):
     ctx: Context = get_current_context()
 
     try:

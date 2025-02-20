@@ -138,6 +138,8 @@ class AsciiDocFile:
             if len(table.table_cells) > 0:
                 self._tables.append((table, start, stop))
 
+                logger.debug(f"Таблица {name}, номер {index}")
+
             else:
                 _: str = "\n".join(iter(table))
 

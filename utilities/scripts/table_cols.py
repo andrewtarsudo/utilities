@@ -3,8 +3,8 @@ from typing import Iterable
 
 from click.core import Context
 from click.decorators import help_option, option, pass_context
-from click.termui import echo
 from click.types import BOOL, INT, Path as ClickPath
+from loguru import logger
 
 from utilities.common.constants import HELP, MAX_SYMBOLS, MIN_COLUMN, StrPath
 from utilities.common.functions import file_reader, get_files, ReaderMode
@@ -105,6 +105,7 @@ def table_cols_command(
         table_analyser: TableAnalyser = TableAnalyser(max_symbols=max_symbols, min_column=min_column)
 
         for file in files:
+            logger.debug(f"Файл {file}")
             content: list[str] = file_reader(file, ReaderMode.LINES, encoding="utf-8")
             ascii_doc_file: AsciiDocFile = AsciiDocFile(file, content=content)
             ascii_doc_file.set_tables()
@@ -112,7 +113,7 @@ def table_cols_command(
             ascii_doc_file.replace_tables()
             ascii_doc_file.save()
 
-            echo(f"Файл {file} обработан и сохранен")
+            logger.info(f"Файл {file} обработан и сохранен")
 
     ctx.obj["keep_logs"] = keep_logs
     ctx.invoke(clear_logs)

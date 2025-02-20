@@ -9,7 +9,7 @@ from click.types import BOOL
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import HELP, PRESS_ENTER_KEY
+from utilities.common.constants import HELP, PRESS_ENTER_KEY, pretty_print
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.scripts import APIGroup
 from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption
@@ -204,16 +204,16 @@ def terms_command(
                 terms_print.extend(ascii_doc_table.get(term))
 
         if abbr_flag:
-            result: str = "\n".join(map(lambda x: x.abbr(), terms_print))
+            result: str = pretty_print(map(lambda x: x.abbr(), terms_print))
 
         elif ascii_flag:
-            result: str = "\n".join(map(lambda x: x.adoc(), terms_print))
+            result: str = pretty_print(map(lambda x: x.adoc(), terms_print))
 
         elif common_flag:
-            result: str = "\n".join(map(lambda x: x.formatted(), terms_print))
+            result: str = pretty_print(map(lambda x: x.formatted(), terms_print))
 
         else:
-            result: str = "\n".join(map(lambda x: x.formatted(), terms_print))
+            result: str = pretty_print(map(lambda x: x.formatted(), terms_print))
 
     logger.success(result)
 
