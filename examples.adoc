@@ -1,0 +1,494 @@
+[source,console]
+----
+tw_utilities.exe check-russian --dir ../SB/content/common/ --verbose
+
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/basics/lifecycle.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/basics/high_availability.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/basics/licensing.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/basics/_index.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/basics/requirements_hw_sw.en.md найдены кириллические буквы в строках: 20
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/basics/general.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/basics/internal_architecture.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/basics/algorithm.en.md найдены кириллические буквы в строках: 46
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/basics/functionalities.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/basics/terms.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/protei_cpe.cfg.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/http.cfg.en.md найдены кириллические буквы в строках: 40
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/smpp.cfg.en.md найдены кириллические буквы в строках: 26
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/repo.xml.en.md найдены кириллические буквы в строках: 32, 50, 51, 52, 75
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/sn.cfg.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/brt.cfg.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/protei.cfg.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/congestion.cfg.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/protei_cpe_adv.cfg.en.md найдены кириллические буквы в строках: 27, 28, 30, 31, 32
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/sb.cfg.en.md найдены кириллические буквы в строках: 40, 41, 50, 51, 70, 94, 129, 164
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/jdbc.xml.en.md найдены кириллические буквы в строках: 32, 33, 34, 46, 64, 65, 66, 67, 68, 69, 79, 80, 81, 82, 83
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/_index.pdf.en.md найдены кириллические буквы в строках: 86
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/trace.cfg.en.md найдены кириллические буквы в строках: 23, 26, 326, 328, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/logic_line.cfg.en.md найдены кириллические буквы в строках: 20, 38, 41, 55, 81
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/sb-mib.properties.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/ap_dictionary.cfg.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/_index.en.md найдены кириллические буквы в строках: 85
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/winter.properties.en.md найдены кириллические буквы в строках: 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/logback.xml.en.md найдены кириллические буквы в строках: 39, 40, 51, 52, 63, 64, 65, 77, 78, 79, 90, 103, 104, 105, 116, 117, 129, 130, 131, 142
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/ap.cfg.en.md найдены кириллические буквы в строках: 26, 37, 55
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/vm.cfg.en.md найдены кириллические буквы в строках: 19, 30, 65
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/sb.properties.en.md найдены кириллические буквы в строках: 29
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/brt_call.cfg.en.md найдены кириллические буквы в строках: 20, 29
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/password_change_rules.xml.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/om_interface.cfg.en.md найдены кириллические буквы в строках: 16, 17, 25
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/sb_core.xml.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/password_rules.xml.en.md найдены кириллические буквы в строках: 19
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/config/filtering.cfg.en.md найдены кириллические буквы в строках: 24, 27
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/modules.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/access_policy.en.adoc найдены кириллические буквы в строках: 28, 29
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/service_topics/about_services.en.adoc не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/service_topics/create_service.en.adoc не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/service_topics/remove_service.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/service_topics/setting_signal_pars.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/service_topics/setting_prompts_pars.en.md найдены кириллические буквы в строках: 73
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/service_topics/_index.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/service_topics/edit_service.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/numbers.en.md найдены кириллические буквы в строках: 118
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/users.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/_index.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/functionalities_WI.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/web/limits.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/_index.en.md найдены кириллические буквы в строках: 30
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/logging/outgoing_call_cdr.en.md найдены кириллические буквы в строках: 12
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/logging/service_counters_cdr.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/logging/appendix0/appendix_init_service_type.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/logging/appendix0/appendix_event_type.en.md найдены кириллические буквы в строках: 40
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/logging/appendix0/appendix_action_type.en.md найдены кириллические буквы в строках: 3
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/logging/appendix0/_index.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/logging/appendix0/appendix_event_cdr_status.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/logging/appendix0/appendix_state_type.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/logging/_index.pdf.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/logging/_index.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/logging/event_cdr.en.md не найдены кириллические буквы
+В файле /Users/andrewtarasov/Desktop/projects/SB/content/common/logging/common_cdr.en.md найдены кириллические буквы в строках: 41
+----
+
+[source,console]
+----
+tw_utilities.exe format-code --dir ../MME/content/common/
+
+Файл system_management.en.md успешно обработан
+
+Файл performance_kpi.en.md успешно обработан
+
+Файл backup_recovery.en.md успешно обработан
+
+Файл cli.en.md успешно обработан
+
+Файл api.en.md успешно обработан
+
+Файл installation.en.md успешно обработан
+
+Файл _index.en.md успешно обработан
+
+Файл update.en.md успешно обработан
+
+Файл add_imsi.en.md успешно обработан
+
+Файл lifecycle.en.md успешно обработан
+
+Файл network_architecture.en.md успешно обработан
+
+Файл _index.en.md успешно обработан
+
+Файл requirements_hw_sw.en.md успешно обработан
+
+Файл general.en.md успешно обработан
+
+Файл specifications.en.md успешно обработан
+
+Файл internal_architecture.en.md успешно обработан
+
+Файл functionalities.en.md успешно обработан
+
+Файл long_mnc.en.md успешно обработан
+
+Файл http.en.md успешно обработан
+
+Файл ue_trace.en.md успешно обработан
+
+Файл metrics.en.md успешно обработан
+
+Файл ap.en.md успешно обработан
+
+Файл trace.en.md успешно обработан
+
+Файл sgsap.en.md успешно обработан
+
+Файл protei.en.md успешно обработан
+
+Файл sgsap.en.md успешно обработан
+
+Файл _index.en.md успешно обработан
+
+Файл diameter.en.md успешно обработан
+
+Файл watchdog.en.md успешно обработан
+
+Файл plmn.en.md успешно обработан
+
+Файл s1ap.en.md успешно обработан
+
+Файл _index.en.md успешно обработан
+
+Файл pcap.en.md успешно обработан
+
+Файл diameter.en.md успешно обработан
+
+Файл dns.en.md успешно обработан
+
+Файл qos_rules.en.md успешно обработан
+
+Файл tac_rules.en.md успешно обработан
+
+Файл apn_rules.en.md успешно обработан
+
+Файл forbidden_imei_rules.en.md успешно обработан
+
+Файл emergency_numbers.en.md успешно обработан
+
+Файл _index.en.md успешно обработан
+
+Файл zc_rules.en.md успешно обработан
+
+Файл code_mapping_rules.en.md успешно обработан
+
+Файл imsi_rules.en.md успешно обработан
+
+Файл emergency_pdn.en.md успешно обработан
+
+Файл rac_rules.en.md успешно обработан
+
+Файл mme.en.md успешно обработан
+
+Файл sgd.en.md успешно обработан
+
+Файл gtp_c.en.md успешно обработан
+
+Файл _index.en.adoc успешно обработан
+
+Файл enodeb.en.adoc успешно обработан
+
+Файл sgsap.en.adoc успешно обработан
+
+Файл connect.en.adoc успешно обработан
+
+Файл reject.en.adoc успешно обработан
+
+Файл irat_handover.en.adoc успешно обработан
+
+Файл error_code.en.adoc успешно обработан
+
+Файл diam.en.adoc успешно обработан
+
+Файл dedicated_bearer.en.adoc успешно обработан
+
+Файл s1ap.en.adoc успешно обработан
+
+Файл _index.en.adoc успешно обработан
+
+Файл gtp_c.en.adoc успешно обработан
+
+Файл sgsap_overload.en.adoc успешно обработан
+
+Файл gtp_c_overload.en.adoc успешно обработан
+
+Файл http.en.adoc успешно обработан
+
+Файл s1ap_overload.en.adoc успешно обработан
+
+Ошибка разбиения файла на части
+
+Ошибка OSError: None
+
+Файл paging.en.adoc успешно обработан
+
+Файл lte_handover.en.adoc успешно обработан
+
+Файл s1ap_context.en.adoc успешно обработан
+
+Файл MME_s1_Bearer_Modification.en.md успешно обработан
+
+Файл MME_handover.en.md успешно обработан
+
+Файл MME_s1_Attach.en.md успешно обработан
+
+Файл MME_users.en.md успешно обработан
+
+Файл MME_resource.en.md успешно обработан
+
+Файл MME_sgs_Interface.en.md успешно обработан
+
+Файл MME_s1_Bearer_Activation.en.md успешно обработан
+
+Файл MME_Diameter.en.md успешно обработан
+
+Файл MME_s1_Service.en.md успешно обработан
+
+Файл MME_paging.en.md успешно обработан
+
+Файл MME_s1_Detach.en.md успешно обработан
+
+Файл MME_s1_Security.en.md успешно обработан
+
+Файл _index.en.md успешно обработан
+
+Файл MME_s11_Interface.en.md успешно обработан
+
+Файл MME_S6a_interface.en.md успешно обработан
+
+Файл MME_sv_Interface.en.md успешно обработан
+
+Файл MME_tau.en.md успешно обработан
+
+Файл MME_s1_Interface.en.md успешно обработан
+
+Файл MME_s1_Bearer_Deactivation.en.md успешно обработан
+
+Файл _index.en.adoc успешно обработан
+----
+
+[source,console]
+----
+tw_utilities.exe link-repair ../MME/content/common/
+
+Найдены повторяющиеся якори:
+balancer
+src-port
+
+Якорь balancer повторяется в файлах:
+content/common/config/sgsap.md
+content/common/config/s1ap.md
+--------------------------------------------------------------------------------
+Якорь src-port повторяется в файлах:
+content/common/config/component/diameter.md
+content/common/config/component/sgsap.md
+
+balancer -> balancer-sgsap, в файле content/common/config/sgsap.md в строках: [24, 99]
+
+balancer -> balancer-s1ap, в файле content/common/config/s1ap.md в строках: [20, 21, 53]
+
+src-port -> src-port-diameter, в файле content/common/config/component/diameter.md в строках: [71, 228, 230, 242]
+
+src-port -> src-port-sgsap, в файле content/common/config/component/sgsap.md в строках: [40]
+
+Не найден якорь imsi-rules в файле content/common/config/plmn.md
+Ссылка ../../config/plmn/#imsi-rules в файле content/common/oam/add_imsi.md
+
+Не найден якорь detach_by_imsi_prefix в файле content/common/oam/api.md.
+Строки: 54
+
+В файле content/common/config/s1ap.md найден якорь
+sctp-additional-info вместо sctp_additional_info
+
+sctp_additional_info -> sctp-additional-info, в файле content/common/config/s1ap.md в строках: 22
+
+sctp_additional_info -> sctp-additional-info, в файле content/common/config/s1ap.md в строках: 23
+
+Файл content/common/config/s1ap.md:
+sctp_additional_info -> sctp-additional-info
+
+Не найден якорь metrics в файле content/common/config/metrics.md.
+Строки: 46, 57, 48, 37, 59, 50, 61, 52, 54, 45, 56, 60, 47, 58, 51, 49, 62, 55, 53
+
+Не найден якорь max-connection-count в файле content/common/config/ap.md.
+Строки: 109
+
+Не найден якорь application-address в файле content/common/config/ap.md.
+Строки: 108
+
+Не найден якорь cyclic-walk-tree в файле content/common/config/ap.md.
+Строки: 115
+
+В файле content/common/config/component/diameter.md ссылка должна быть:
+../../../oam/system_management/, но получено
+../../oam/system_management/
+
+../../oam/system_management/ -> ../../../oam/system_management/, в файле content/common/config/component/diameter.md в строках: 9
+
+Не найден якорь origin-host-diam в файле content/common/config/diameter.md
+Ссылка ../../diameter/#origin-host-diam в файле content/common/config/component/diameter.md
+
+Не найден якорь origin-realm-diam в файле content/common/config/diameter.md
+Ссылка ../../diameter/#origin-realm-diam в файле content/common/config/component/diameter.md
+
+Не найден якорь replace-origin-identities в файле content/common/config/diameter.md
+Ссылка ../../diameter/#replace-origin-identities в файле content/common/config/component/diameter.md
+
+Не найден якорь appl-timeout в файле content/common/config/diameter.md
+Ссылка ../../diameter/#appl-timeout в файле content/common/config/component/diameter.md
+
+Не найден якорь watchdog-timeout в файле content/common/config/diameter.md
+Ссылка ../../diameter/#watchdog-timeout в файле content/common/config/component/diameter.md
+
+Не найден якорь reconnect-timeout в файле content/common/config/diameter.md
+Ссылка ../../diameter/#reconnect-timeout в файле content/common/config/component/diameter.md
+
+Не найден якорь on-busy-reconnect-timeout в файле content/common/config/diameter.md
+Ссылка ../../diameter/#on-busy-reconnect-timeout в файле content/common/config/component/diameter.md
+
+Не найден якорь on-shutdown-reconnect-timeout в файле content/common/config/diameter.md
+Ссылка ../../diameter/#on-shutdown-reconnect-timeout в файле content/common/config/component/diameter.md
+
+Не найден якорь response-timeout в файле content/common/config/diameter.md
+Ссылка ../../diameter/#response-timeout в файле content/common/config/component/diameter.md
+
+Не найден якорь breakdown-timeout в файле content/common/config/diameter.md
+Ссылка ../../diameter/#breakdown-timeout в файле content/common/config/component/diameter.md
+
+Не найден якорь statistic-timeout в файле content/common/config/diameter.md
+Ссылка ../../diameter/#statistic-timeout в файле content/common/config/component/diameter.md
+
+Не найден якорь local_host в файле content/common/config/diameter.md
+Ссылка ../../diameter/#local_host в файле content/common/config/component/diameter.md
+
+Не найден якорь local_port в файле content/common/config/diameter.md
+Ссылка ../../diameter/#local_port в файле content/common/config/component/diameter.md
+
+Не найден якорь local_interfaces в файле content/common/config/diameter.md
+Ссылка ../../diameter/#local_interfaces в файле content/common/config/component/diameter.md
+
+Не найден якорь local_host в файле content/common/config/diameter.md
+Ссылка ../../diameter/#local_host в файле content/common/config/component/diameter.md
+
+Не найден якорь local_host в файле content/common/config/diameter.md
+Ссылка ../../diameter/#local_host в файле content/common/config/component/diameter.md
+
+Не найден якорь peer-table в файле content/common/config/component/sgsap.md.
+Строки: 18
+
+В файле content/common/config/component/sgsap.md ссылка должна быть:
+../../../oam/system_management/, но получено
+../../oam/system_management/
+
+../../oam/system_management/ -> ../../../oam/system_management/, в файле content/common/config/component/sgsap.md в строках: 12
+
+Не удалось обработать ссылку в файле.
+Ссылка: ../served_plmn/#mcc
+Файл: content/common/config/rules/rac_rules.md
+
+Не удалось обработать ссылку в файле.
+Ссылка: ../served_plmn/#mnc
+Файл: content/common/config/rules/rac_rules.md
+
+Не найден якорь imsiRules в файле content/common/config/plmn.md
+Ссылка ../../plmn/#imsiRules в файле content/common/config/rules/imsi_rules.md
+
+В файле content/common/config/plmn.md найден якорь
+tac_rules вместо tac-rules
+
+В файле content/common/config/plmn.md найден якорь
+tac_rules вместо tac-rules
+
+Не найден якорь imsi-rules-imsi в файле content/common/config/rules/imsi_rules.md
+Ссылка ../imsi_rules/#imsi-rules-imsi в файле content/common/config/rules/tac_rules.md
+
+Не найден якорь pgw_served_plmn в файле content/common/config/plmn.md
+Ссылка ../../plmn/#pgw_served_plmn в файле content/common/config/rules/apn_rules.md
+
+Не найден якорь gtp-c-edr в файле content/common/logging/edr/gtp_c.md
+Ссылка ../gtp_c/#gtp-c-edr в файле content/common/logging/edr/connect.en.adoc
+
+Не найден якорь error-codes в файле content/common/logging/edr/error_code.md
+Ссылка ../error_code/#error-codes в файле content/common/logging/edr/tau.en.adoc
+
+Не найден якорь diam-edr в файле content/common/logging/edr/diam.md
+Ссылка ../diam/#diam-edr в файле content/common/logging/edr/tau.en.adoc
+
+Не удалось обработать ссылку в файле.
+Ссылка: ../../../config/diam_dest/#dest-realm
+Файл: content/common/logging/stat/MME_Diameter.md
+
+Работа завершена.
+
+==================== Файлы изменены ====================
+----
+
+[source,console]
+----
+tw_utilities.exe reduce-image --dir ../PCRF/content/common/
+
+Файл MAIN_PAGE2.drawio.png: 623.91 Кб -> 331.06 Кб
+Файл EXTRA_SCRIPT_WITH_ONLINE.drawio.png: 135.55 Кб -> 66.72 Кб
+Файл EXTRA_SCRIPT_NIGHT.drawio.png: 155.28 Кб -> 83.51 Кб
+Файл EXTRA_SCRIPT_EXTENTION.drawio.png: 145.40 Кб -> 73.76 Кб
+Файл EXTRA_SCRIPT_WITHOUT_ONLINE.drawio.png: 164.10 Кб -> 85.03 Кб
+Файл MAIN_SCRIPT.drawio.png: 193.74 Кб -> 102.97 Кб
+--------------------------------------------------------------------------------
+Итоговое изменение: 1.38 Мб -> 743.06 Кб
+----
+
+[source,console]
+----
+tw_utilities.exe repair-svg --dir ../PCRF/content/common/
+
+Файл LIFECYCLE_EN.drawio.svg успешно обработан
+
+Файл NETWORK_ARCHITECTURE_2G_3G.drawio.svg успешно обработан
+
+Файл INTERNAL_ARCHITECTURE.drawio.svg успешно обработан
+
+Файл LIFECYCLE.drawio.svg успешно обработан
+
+Файл NETWORK_ARCHITECTURE_ISP.drawio.svg успешно обработан
+
+Файл RESERVATION.drawio.svg успешно обработан
+
+Файл NETWORK_ARCHITECTURE_4G.drawio.svg успешно обработан
+
+Файл MAIN_SCRIPT.drawio.svg успешно обработан
+
+Файл EXTRA_SCRIPT_WITHOUT_ONLINE.drawio.svg успешно обработан
+
+Файл EXTRA_SCRIPT_EXTENTION.drawio.svg успешно обработан
+
+Файл EXTRA_SCRIPT_NIGHT.drawio.svg успешно обработан
+
+Файл EXTRA_SCRIPT_WITH_ONLINE.drawio.svg успешно обработан
+----
+
+[source,console]
+----
+tw_utilities.exe validate-yaml ../SGSN/PDF_Protei_SGSN.yml --verbose
+
+Предупреждения:
+
+Раздел 'settings' задан корректно
+Раздел 'Rights' задан корректно
+Секция Basics задана корректно
+Секция OAM задана корректно
+Секция OAM/API задана корректно
+Секция Logging задана корректно
+Секция Logging/xDR задана корректно
+ 17  content/common/_index.md........................................................OK
+ 21  content/common/basics/general.adoc..............................................OK
+ 23  content/common/basics/functionalities.adoc......................................OK
+ 24  content/common/basics/network_architecture.adoc.................................OK
+ 25  content/common/basics/internal_architecture.adoc................................OK
+ 26  content/common/basics/lifecycle.adoc............................................OK
+ 27  content/common/basics/specifications.adoc.......................................OK
+ 37  content/common/oam/_index.md....................................................OK
+ 40  content/common/oam/system_management.md.........................................OK
+ 41  content/common/oam/update.md....................................................OK
+ 46  content/common/oam/api/_index.md................................................OK
+ 50  content/common/oam/api/clear_dns_cache.md.......................................OK
+ 51  content/common/oam/api/deactivate_pdp_context.md................................OK
+ 52  content/common/oam/api/detach.md................................................OK
+ 53  content/common/oam/api/get_gtp_peers.md.........................................OK
+ 54  content/common/oam/api/get_profile.md...........................................OK
+ 55  content/common/oam/api/get_profile_count.md.....................................OK
+ 56  content/common/oam/api/iu_release.md............................................OK
+ 57  content/common/oam/api/multi_offloading.md......................................OK
+ 58  content/common/oam/api/nse_info.md..............................................OK
+ 59  content/common/oam/api/single_offloading.md.....................................OK
+104  content/common/logging/_index.md................................................OK
+111  content/common/logging/edr/edr.md...............................................OK
+112  content/common/logging/edr/s_cdr.md.............................................OK
+113  content/common/logging/edr/gtp_c_edr.md.........................................OK
+----
