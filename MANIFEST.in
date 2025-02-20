@@ -1,7 +1,8 @@
 include __main__.py
-graft utilities/*.py
+graft utilities
 include pyproject.toml
 include README.adoc
 graft docs/*.adoc
+graft sources
 include LICENSE
 include MANIFEST.in

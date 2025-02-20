@@ -49,7 +49,8 @@ $ <path/to/{name}> COMMAND OPTIONS
 ----
 Использование:
 {name}
-list-files | check-russian | convert-tables | format-code | link-repair | reduce-image | repair-svg | table-cols | terms | validate-yaml
+list-files | check-russian | convert-tables | format-code | link-repair | reduce-image
+| repair-svg | table-cols | terms | validate-yaml
 -v/--version | --h/--help
 
 
