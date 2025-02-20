@@ -80,7 +80,7 @@ def repair_svg_command(
         recursive=recursive,
         extensions="svg")
 
-    if files is not None:
+    if files is not None and files:
         FOREIGN_OBJECT: str = "<foreignObject.*?</foreignObject>"
         TEXT: str = (
             r"<a\s?transform=\"translate(0,-5)\"\s?xlink:href=\"https://www.drawio.com/doc/faq/svg-export-text-problems"

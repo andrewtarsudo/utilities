@@ -46,10 +46,10 @@ def check_path(
     has_ignored_extension: bool = path.suffix not in extensions if extensions else False
 
     if not language:
-        has_ignored_language: bool = len(path.suffixes) > 1
+        has_ignored_language: bool = len(path.suffixes) == 1
 
     else:
-        has_ignored_language: bool = f".{language}" in path.suffixes
+        has_ignored_language: bool = f".{language}" not in path.suffixes
 
     conditions: set[bool] = {
         is_dir, is_in_ignored_dirs, has_ignored_name, is_in_ignored_files, has_ignored_extension, has_ignored_language

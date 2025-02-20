@@ -101,7 +101,7 @@ def table_cols_command(
         recursive=recursive,
         extensions="adoc")
 
-    if files is not None:
+    if files is not None and files:
         table_analyser: TableAnalyser = TableAnalyser(max_symbols=max_symbols, min_column=min_column)
 
         for file in files:

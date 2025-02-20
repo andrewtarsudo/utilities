@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-from subprocess import CalledProcessError, run
+from subprocess import CalledProcessError, CompletedProcess, run
 from sys import platform
 
 if __name__ == "__main__":
@@ -22,14 +22,16 @@ if __name__ == "__main__":
         "--noconfirm",
         "--distpath",
         "./bin",
-        f"{spec_file}", "2>pyinstaller.log"]
+        f"{spec_file}",
+        f"2>{log_file}"]
 
     try:
-        run(
+        _: CompletedProcess = run(
             args,
-            capture_output=True,
             encoding="utf-8",
-            check=True).check_returncode()
+            check=True)
+
+        _.check_returncode()
 
     except CalledProcessError as e:
         print(f"{e.__class__.__name__}, код {e.returncode}:\n{e.stderr}")

@@ -178,7 +178,7 @@ class LoggerConfiguration:
             return {
                 "sink": sysout,
                 "level": _logging_level,
-                "format": self.__class__._COLORED_FORMAT,
+                "format": self.__class__._USER_FORMAT,
                 "colorize": True,
                 "filter": _to_stream,
                 "backtrace": False,

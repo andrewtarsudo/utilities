@@ -110,6 +110,7 @@ def get_files(
         directory: Path = Path(directory).expanduser()
 
         all_languages: bool = not bool(language)
+        print(all_languages)
 
         listed_files: list[str] = ctx.invoke(
             list_files_command,

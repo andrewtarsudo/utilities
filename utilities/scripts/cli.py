@@ -14,6 +14,7 @@ from click.termui import pause
 from click.utils import echo
 from loguru import logger
 
+from utilities.common import BaseError, NoArgumentsOptionsError
 from utilities.common.constants import args_help_dict, DEBUG, HELP, NORMAL, PRESS_ENTER_KEY
 from utilities.common.custom_logger import custom_logging
 
@@ -280,6 +281,23 @@ class APIGroup(Group):
     def format_args(self, ctx: Context, formatter: HelpFormatter):
         format_args(self, ctx, formatter)
 
+    def parse_args(self, ctx: Context, args: list[str]) -> list[str]:
+        if args is None or not args:
+            logger.error(f"Для команды {ctx.command_path} не задано ни одного аргумента или опции")
+            raise NoArgumentsOptionsError
+
+        else:
+            return super().parse_args(ctx, args)
+
+    def invoke(self, ctx: Context) -> Any:
+        try:
+            super().invoke(ctx)
+
+        except BaseError as e:
+            logger.error(f"Ошибка {e.__class__.__name__}")
+            pause(PRESS_ENTER_KEY)
+            ctx.exit(1)
+
 
 class SwitchArgsAPIGroup(APIGroup):
     def parse_args(self, ctx: Context, args: list[str]):
@@ -358,25 +376,31 @@ class MutuallyExclusiveOption(Option):
     is_eager=True)
 def command_line_interface():
     debug: bool = False if not environ.get("TW_UTILITIES_DEBUG", "") else True
-
     ctx: Context = get_current_context()
-    ctx.ensure_object(dict)
-    ctx.obj = dict()
-    ctx.obj["debug"] = debug
 
-    custom_logging("cli", is_debug=debug)
+    try:
+        ctx.ensure_object(dict)
+        ctx.obj = dict()
+        ctx.obj["debug"] = debug
 
-    result_file: bool = False
+        custom_logging("cli", is_debug=debug)
 
-    if ctx.invoked_subcommand is None:
-        echo("Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help")
+        result_file: bool = False
+
+        if ctx.invoked_subcommand is None:
+            echo("Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help")
+            pause(PRESS_ENTER_KEY)
+            ctx.exit(0)
+
+        if ctx.invoked_subcommand == "link-repair":
+            result_file: bool = True
+
+        custom_logging("cli", is_debug=debug, result_file=result_file)
+
+    except BaseError as e:
+        logger.error(f"Ошибка {e.__class__.__name__}")
         pause(PRESS_ENTER_KEY)
-        ctx.exit(0)
-
-    if ctx.invoked_subcommand == "link-repair":
-        result_file: bool = True
-
-    custom_logging("cli", is_debug=debug, result_file=result_file)
+        ctx.exit(1)
 
 
 @pass_context
@@ -392,7 +416,6 @@ def clear_logs(ctx: Context):
 
     if not keep_logs:
         rmtree(NORMAL.parent, ignore_errors=True)
-        echo("Директория с журналом удалена")
 
     elif not debug:
         echo(f"Папка с логами: {NORMAL.parent}")

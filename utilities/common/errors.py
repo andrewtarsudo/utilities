@@ -137,3 +137,7 @@ class TableColsTableColumnInvalidNameError(TableColsError):
 
 class TableColsTableColumnInvalidIdentifierError(TableColsError):
     """Specified column identifier has an invalid type."""
+
+
+class NoArgumentsOptionsError(BaseError):
+    """No argument or option is specified."""

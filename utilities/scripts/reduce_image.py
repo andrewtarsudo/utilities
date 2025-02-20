@@ -125,7 +125,7 @@ def reduce_image_command(
         recursive=recursive,
         extensions=extensions)
 
-    if files is not None:
+    if files is not None and files:
         before: int = 0
         after: int = 0
 
