@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+from pathlib import Path
 from subprocess import CalledProcessError, run
 from sys import platform
 
 if __name__ == "__main__":
     log_file: str = "pyinstaller.log"
+    print(f"log: {Path(log_file).resolve()}")
 
     if platform.startswith("win"):
         spec_file: str = "utilities.exe.spec"
