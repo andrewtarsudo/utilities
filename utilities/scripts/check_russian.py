@@ -40,7 +40,8 @@ def wrap_iterable(
         values: Iterable[str], *,
         is_color: bool = True,
         is_success: bool = False):
-    return [wrap_text(value, is_color=is_color, is_success=is_success) for value in values]
+    lines: list[str] = [wrap_text(value, is_color=is_color, is_success=is_success) for value in values]
+    return pretty_print(lines)
 
 
 def find_first_russian_char(line: str):
@@ -81,10 +82,9 @@ def file_inspection(path: str, is_color: bool = True):
         return f"{separator}\nВ файле {path} найдены кириллические буквы:\n{pretty_print(results)}"
 
     elif results and is_color:
-        return wrap_text(
-            f"В файле {path} найдены кириллические буквы:\n{pretty_print(wrap_iterable(results, is_color=is_color, is_success=False))}",
-            is_color=is_color,
-            is_success=False)
+        return pretty_print(
+            (wrap_text(f"В файле {path} найдены кириллические буквы:", is_color=is_color, is_success=False),
+             wrap_iterable(results, is_color=is_color, is_success=False)))
 
 
 @command_line_interface.command(
