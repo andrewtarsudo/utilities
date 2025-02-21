@@ -288,6 +288,7 @@ class APIGroup(Group):
     def parse_args(self, ctx: Context, args: list[str]) -> list[str]:
         if args is None or not args:
             logger.error(f"Для команды {ctx.command_path} не задано ни одного аргумента или опции")
+            logger.error(f"Для вызова справки используется\n{ctx.command_path} --help")
             raise NoArgumentsOptionsError
 
         else:
