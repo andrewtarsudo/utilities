@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from operator import attrgetter
+from pathlib import Path
 from shutil import rmtree
 from sys import platform
 from typing import Any, Iterable, Mapping
@@ -420,14 +421,19 @@ def command_line_interface(debug: bool = False):
 
 @pass_context
 def clear_logs(ctx: Context):
-    keep_logs: str = ctx.obj.get("keep_logs", "False")
-    debug: str = ctx.obj.get("debug", "False")
+    keep_logs: bool = ctx.obj.get("keep_logs", False)
+    debug: bool = ctx.obj.get("debug", False)
+    no_result: bool = ctx.obj.get("no_result", False)
+    result_file: Path = ctx.obj.get("result_file", None)
 
     logger.debug(
         f"Команда: {ctx.command_path}\n"
         f"Параметры: {ctx.params}")
 
     logger.remove()
+
+    if no_result and result_file is not None:
+        result_file.unlink(missing_ok=True)
 
     if not keep_logs:
         rmtree(NORMAL.parent, ignore_errors=True)

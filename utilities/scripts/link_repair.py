@@ -273,13 +273,10 @@ def link_repair_command(
     else:
         logger.info("==================== Файлы изменены ====================", result=True)
 
-    # delete result file
     if not no_result:
-        result_file_path.unlink(True)
-        logger.debug("Файл results.txt был удален")
-
-    else:
         logger.info(f"Файл results.txt находится здесь:\n{result_file_path}")
 
     ctx.obj["keep_logs"] = keep_logs
+    ctx.obj["no_result"] = no_result
+    ctx.obj["result_file"] = result_file_path
     ctx.invoke(clear_logs)
