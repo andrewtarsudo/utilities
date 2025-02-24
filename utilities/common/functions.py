@@ -129,6 +129,6 @@ def get_files(
 
         files.extend(map(directory.joinpath, listed_files))
 
-    logger.debug(f"get_files:\n{pretty_print(files)}")
+    logger.debug(f"Обрабатываемые файлы:\n{pretty_print(files)}")
 
     return files

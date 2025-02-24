@@ -4,19 +4,19 @@ from shutil import rmtree
 from sys import platform
 from typing import Any, Iterable, Mapping
 
-from click import BOOL
 from click.core import Argument, Command, Context, Group, Option, Parameter
 from click.decorators import group, help_option, option, pass_context
 from click.exceptions import UsageError
 from click.formatting import HelpFormatter
 from click.globals import get_current_context
 from click.termui import pause
+from click.types import BOOL
 from click.utils import echo
 from loguru import logger
 
-from utilities.common import BaseError, NoArgumentsOptionsError
 from utilities.common.constants import args_help_dict, DEBUG, HELP, NORMAL, PRESS_ENTER_KEY
 from utilities.common.custom_logger import custom_logging
+from utilities.common.errors import BaseError, NoArgumentsOptionsError
 
 COL_MAX: int = 39
 MAX_CONTENT_WIDTH: int = 96
@@ -24,7 +24,7 @@ TERMINAL_WIDTH: int = 96
 
 SEPARATOR: str = "-" * MAX_CONTENT_WIDTH
 
-__version__: str = "1.1.0"
+__version__: str = "1.1.1"
 
 
 def up(value: str):
@@ -390,6 +390,7 @@ class MutuallyExclusiveOption(Option):
     help=HELP,
     is_eager=True)
 def command_line_interface(debug: bool = False):
+    echo(f"Версия: {__version__}")
     ctx: Context = get_current_context()
 
     try:

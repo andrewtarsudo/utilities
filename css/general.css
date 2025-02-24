@@ -1,4 +1,4 @@
-@import "css/font-awesome.css"
+@import "css/font-awesome.css";
 @import "css/doc.css";
 @import "css/default.css";
 @import "css/theme.css";
@@ -21,4 +21,8 @@ div.footnote strong {
 #toctitle {
   font-size: 24px;
   font-weight: bold;
+}
+
+.green-bg {
+  background-color: green;
 }

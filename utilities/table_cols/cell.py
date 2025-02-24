@@ -94,7 +94,7 @@ class TableCell:
             allow_unicode=True,
             stopwords=["br"])
 
-        if _ == "":
+        if not _:
             return ""
 
         else:
@@ -106,7 +106,7 @@ class TableCell:
         return self._row_modifier * self._column_modifier
 
     def __bool__(self):
-        return self._text is not None and self._text != ""
+        return self._text is not None and bool(self._text)
 
     def is_spaced(self) -> bool:
         """Indicates if the text has spaces.
@@ -157,7 +157,7 @@ class TableCell:
 
         Based on the maximum length of separate words.
         """
-        if not bool(self):
+        if not bool(self) or not self.processed_text():
             return 0
 
         elif self.is_spaced():

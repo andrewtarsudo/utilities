@@ -7,7 +7,7 @@ from typing import Iterable, Iterator, Mapping, Pattern
 
 from loguru import logger
 
-from utilities.common import TableColsTableColumnIndexError, TableColsTableColumnInvalidIdentifierError, \
+from utilities.common.errors import TableColsTableColumnIndexError, TableColsTableColumnInvalidIdentifierError, \
     TableColsTableColumnInvalidNameError
 from utilities.table_cols.cell import TableCell
 from utilities.table_cols.column import TableColumn

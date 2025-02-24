@@ -1,0 +1,35 @@
+:asciidoctorconfigdir: ../..
+
+[source,console,subs="attributes+"]
+----
+{name} check-russian --dir {sb} --verbose
+----
+
+// tag::fail-single[]
+[source.red-background,console,subs="attributes+"]
+----
+В файле {sb}_index.en.md найдены кириллические буквы:
+Строка 30, символ 1: Е
+----
+// end::fail-single[]
+
+// tag::ok[]
+[source.green-background,console,subs="attributes+"]
+----
+В файле {sb}basics/lifecycle.en.md не найдены кириллические буквы
+В файле {sb}basics/high_availability.en.md не найдены кириллические буквы
+В файле {sb}basics/licensing.en.md не найдены кириллические буквы
+----
+// end::ok[]
+
+// tag::fail-multiple[]
+[source.red-background,console,subs="attributes+"]
+----
+В файле {sb}config/repo.xml.en.md найдены кириллические буквы:
+Строка 32, символ 12: М
+Строка 50, символ 24: О
+Строка 51, символ 23: О
+Строка 52, символ 18: О
+Строка 75, символ 59: и
+----
+// end::fail-multiple[]

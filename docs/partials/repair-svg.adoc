@@ -1,0 +1,30 @@
+:asciidoctorconfigdir: ../..
+
+[source,console,subs="attributes+"]
+----
+tw_utilities.exe repair-svg --dir {pcrf}
+
+Файл LIFECYCLE_EN.drawio.svg успешно обработан
+
+Файл NETWORK_ARCHITECTURE_2G_3G.drawio.svg успешно обработан
+
+Файл INTERNAL_ARCHITECTURE.drawio.svg успешно обработан
+
+Файл LIFECYCLE.drawio.svg успешно обработан
+
+Файл NETWORK_ARCHITECTURE_ISP.drawio.svg успешно обработан
+
+Файл RESERVATION.drawio.svg успешно обработан
+
+Файл NETWORK_ARCHITECTURE_4G.drawio.svg успешно обработан
+
+Файл MAIN_SCRIPT.drawio.svg успешно обработан
+
+Файл EXTRA_SCRIPT_WITHOUT_ONLINE.drawio.svg успешно обработан
+
+Файл EXTRA_SCRIPT_EXTENTION.drawio.svg успешно обработан
+
+Файл EXTRA_SCRIPT_NIGHT.drawio.svg успешно обработан
+
+Файл EXTRA_SCRIPT_WITH_ONLINE.drawio.svg успешно обработан
+----

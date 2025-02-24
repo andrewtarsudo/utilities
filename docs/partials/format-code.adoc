@@ -1,0 +1,28 @@
+:asciidoctorconfigdir: ../..
+
+[source,console,subs="attributes+"]
+----
+{name} format-code --dir {mme}
+
+Файл system_management.en.md успешно обработан
+
+Файл performance_kpi.en.md успешно обработан
+
+Файл backup_recovery.en.md успешно обработан
+
+Файл cli.en.md успешно обработан
+
+Файл api.en.md успешно обработан
+
+Файл installation.en.md успешно обработан
+
+Файл _index.en.md успешно обработан
+
+Файл update.en.md успешно обработан
+
+Файл add_imsi.en.md успешно обработан
+
+Файл lifecycle.en.md успешно обработан
+
+Файл network_architecture.en.md успешно обработан
+----

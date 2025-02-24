@@ -4,7 +4,7 @@ if __name__ == '__main__':
 
     if hexversion < 0x30900f0:
         from sys import version
-        from utilities.common import InvalidPythonVersion
+        from utilities.common.errors import InvalidPythonVersion
 
         print(
             f"Текущая версия Python {version} слишком стара. "

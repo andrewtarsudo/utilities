@@ -1,0 +1,27 @@
+:asciidoctorconfigdir: ../..
+
+[source,console,subs="attributes+"]
+----
+{name} list-files --dir {mme} --language en
+Файлы в директории {mme}:
+- content/common/logging/edr/connect.en.adoc
+- content/common/logging/edr/dedicated_bearer.en.adoc
+- content/common/logging/edr/diam.en.adoc
+- content/common/logging/edr/enodeb.en.adoc
+- content/common/logging/edr/error_code.en.adoc
+- content/common/logging/edr/gtp_c.en.adoc
+- content/common/logging/edr/gtp_c_overload.en.adoc
+- content/common/logging/edr/http.en.adoc
+- content/common/logging/edr/irat_handover.en.adoc
+- content/common/logging/edr/lte_handover.en.adoc
+- content/common/logging/edr/paging.en.adoc
+- content/common/logging/edr/reject.en.adoc
+- content/common/logging/edr/s1ap.en.adoc
+- content/common/logging/edr/s1ap_context.en.adoc
+- content/common/logging/edr/s1ap_overload.en.adoc
+- content/common/logging/edr/sgsap.en.adoc
+- content/common/logging/edr/sgsap_overload.en.adoc
+- content/common/logging/edr/tau.en.adoc
+- content/common/logging/edr/_index.en.adoc
+- content/common/logging/_index.en.adoc
+----

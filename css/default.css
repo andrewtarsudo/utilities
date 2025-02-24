@@ -2264,14 +2264,16 @@ p.tableblock {
   text-align: center;
 }
 
-div#red-bg.listingblock {
+.red-bg.listingblock {
   background: #fa0000;
   line-height: 0;
   margin-bottom: 0;
+  margin-top: 0;
 }
 
-div#green-bg.listingblock {
-  background: #00fa00;
+.green-bg.listingblock {
+  margin-bottom: 0;
+  background-color: #00fa00;
   line-height: 1;
   margin-top: 0;
 }

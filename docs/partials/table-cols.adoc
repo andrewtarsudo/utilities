@@ -1,0 +1,70 @@
+:asciidoctorconfigdir: ../..
+
+[source,console,subs="attributes+"]
+----
+{name} table-cols --dir {pcrf}
+
+Файл {pcrf}basics/network_architecture.adoc обработан и сохранен
+
+Файл {pcrf}basics/internal_architecture.adoc обработан и сохранен
+
+Файл {pcrf}basics/high_availability.adoc обработан и сохранен
+
+Файл {pcrf}web/panels.adoc обработан и сохранен
+
+Файл {pcrf}web/authorization.adoc обработан и сохранен
+
+Файл {pcrf}web/main_page.adoc обработан и сохранен
+
+Файл {pcrf}web/actions.adoc обработан и сохранен
+
+Файл {pcrf}web/informational_windows.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/acc_files/packet_GPRS.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/acc_files/sim_card.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/acc_files/group_sim_cards.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/acc_files/_index.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/acc_files/schedule_black_list.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/management/_index.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/find_sim_card/_index.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/operators.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/APN.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/location.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/not_profile.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/service.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/imei_rules.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/QoSP.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/currency.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/schedule.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/network.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/imei_base.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/RAT_TYPE.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/country.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/dictionary/cell_group.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/setting/_index.adoc обработан и сохранен
+
+Файл {pcrf}web/sections/tariffication/_index.adoc обработан и сохранен
+
+Файл {pcrf}description/call_flow.adoc обработан и сохранен
+----

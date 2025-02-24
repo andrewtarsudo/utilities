@@ -14,3 +14,6 @@
 :keep-logs-default: По умолчанию: False, лог-файл и директория удаляются
 :help: -h, --help                             Вывести справочную информацию на экран и завершить
 :help-cont: работу
+:sb: ../SB/content/common/
+:mme: ../MME/content/common/
+:pcrf: ../PCRF/content/common/

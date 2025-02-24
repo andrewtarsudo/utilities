@@ -7,7 +7,7 @@ from click.decorators import help_option, option, pass_context
 from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
-from utilities.common import ConvertTablesNonIntegerLineLengthError, ConvertTablesNonPositiveLineLengthError
+from utilities.common.errors import ConvertTablesNonIntegerLineLengthError, ConvertTablesNonPositiveLineLengthError
 from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, pretty_print, StrPath
 from utilities.common.functions import file_reader, file_writer, get_files, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface

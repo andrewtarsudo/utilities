@@ -6,7 +6,7 @@ from typing import Iterable, Iterator
 
 from loguru import logger
 
-from utilities.common import TableColsTableBorderNotClosedError
+from utilities.common.errors import TableColsTableBorderNotClosedError
 from utilities.common.functions import file_writer
 from utilities.table_cols import TableAnalyser
 from utilities.table_cols.column import TableColumn
@@ -158,8 +158,12 @@ class AsciiDocFile:
 
     def fix_tables(self, table_analyser: TableAnalyser):
         """Adds the 'cols' option if not specified."""
+        table: Table
         for table, *_ in self._tables:
             table_analyser.nullify()
+
+            logger.debug(repr(table))
+            logger.debug(str(table))
 
             # skip table_cols if it has spanned cells
             if table.has_horizontal_span():
@@ -190,6 +194,7 @@ class AsciiDocFile:
                 table_analyser.set_base_column_widths()
                 table_analyser.distribute_rest()
                 table.options["cols"] = str(table_analyser)
+                logger.debug(f"Столбцы: {str(table_analyser)}")
 
     def save(self):
         file_writer(self._path, self._content)

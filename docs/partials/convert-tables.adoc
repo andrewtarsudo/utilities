@@ -1,0 +1,7 @@
+:asciidoctorconfigdir: ../..
+
+[source,console,subs="attributes+"]
+----
+{name} convert-tables "../projects/Protei_MME.docx"
+В директорию /Users/andrewtarasov/PycharmProjects/utilities/tables записано 105 обработанных таблиц
+----

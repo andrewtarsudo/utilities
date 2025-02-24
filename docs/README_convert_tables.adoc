@@ -65,3 +65,7 @@ include::partials/run.adoc[]
 ----
 
 NOTE: Путь может быть как абсолютным, так и относительным.
+
+=== Примеры
+
+include::partials/convert-tables.adoc[]
