@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-from re import finditer, match, Match
-from typing import Iterable
+from re import finditer
 
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
@@ -10,12 +9,7 @@ from loguru import logger
 
 from utilities.common.constants import HELP, StrPath
 from utilities.common.functions import file_reader, file_writer, get_files, pretty_print, ReaderMode
-from utilities.scripts import command_line_interface
-from utilities.scripts.cli import clear_logs, SwitchArgsAPIGroup
-
-
-def flatten_iter(values: Iterable[Iterable[StrPath]]) -> list[StrPath]:
-    return [_ for value in values for _ in value]
+from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup
 
 
 class File:
@@ -28,23 +22,22 @@ class File:
     def __iter__(self):
         return iter(self._content)
 
-    @property
-    def is_index(self):
+    def __bool__(self):
         return self._path.stem.removeprefix("_") == "index"
 
     @property
-    def links(self) -> list[Path]:
+    def full_links(self) -> list[Path]:
         return []
 
     def fix_link(self, link: str):
-        return Path(link) if self.is_index else Path(link.removeprefix("../"))
+        return Path(link).resolve() if bool(self) else Path(link.removeprefix("../"))
 
 
 class MdFile(File):
     pattern = r"!\[.*?\]\((.+?)\)"
 
     @property
-    def links(self):
+    def full_links(self):
         return [
             self.fix_link(m.group(1))
             for line in iter(self)
@@ -52,23 +45,23 @@ class MdFile(File):
 
 
 class AsciiDocFile(File):
-    pattern = r"image::?(.+?)\[.*?\]"
+    pattern = r"image:+(.+?)\[.*?\]"
 
     @property
     def imagesdir(self):
         for line in iter(self):
-            m: Match = match(r"^.*:imagesdir:\s*([\w_/.-]+)", line)
-
-            if m:
-                return Path(m.group(1))
+            if line.startswith("ifndef::imagesdir") and ":imagesdir:" in (
+                    line_shorten := line.removeprefix("ifndef::imagesdir")):
+                imagesdir: str = line_shorten.removeprefix("[:imagesdir:").strip().removesuffix("]")
+                return self._path.parent.joinpath(imagesdir).resolve()
 
         else:
-            return Path(self._path.parent)
+            return Path(self._path.parent).resolve()
 
     @property
-    def links(self):
+    def full_links(self):
         return [
-            self.imagesdir.joinpath(m.group(1))
+            self.imagesdir.joinpath(m.group(1)).resolve()
             for line in iter(self)
             for m in finditer(self.__class__.pattern, line)]
 
@@ -142,7 +135,8 @@ def filter_images_command(
         keep_logs: bool = False):
     messages: list[str] = []
 
-    extensions: str = "png jpg jpeg bmp"
+    project_dir: Path = Path(project_dir)
+    extensions: str = "png jpg jpeg bmp PNG JPG JPEG BMP"
 
     images: list[StrPath] | None = get_files(
         ctx,
@@ -151,32 +145,43 @@ def filter_images_command(
         language=None,
         extensions=extensions)
 
-    logger.debug(pretty_print(images))
+    images_paths_names: dict[Path, str] = {
+        project_dir.joinpath(image): image.name for image in images}
 
-    md_files: list[StrPath] | None = get_files(
+    md_paths: list[StrPath] | None = get_files(
         ctx,
         directory=project_dir,
         recursive=True,
+        language=None,
         extensions="md")
+    md_files: list[MdFile] = [MdFile(md_path) for md_path in md_paths]
 
-    logger.debug(pretty_print(md_files))
-
-    adoc_files: list[StrPath] | None = get_files(
+    adoc_paths: list[StrPath] | None = get_files(
         ctx,
         directory=project_dir,
         recursive=True,
+        language=None,
         extensions="adoc")
 
-    logger.debug(pretty_print(adoc_files))
+    adoc_files: list[AsciiDocFile] = [AsciiDocFile(adoc_path) for adoc_path in adoc_paths]
 
-    md_links: list[list[Path]] = [MdFile(md_path).links for md_path in md_files]
-    adoc_links: list[list[Path]] = [AsciiDocFile(adoc_path).links for adoc_path in adoc_files]
-    links: set[Path] = set(flatten_iter([*md_links, *adoc_links]))
+    links_paths_names: dict[Path, str] = {
+        Path(full_link).resolve(): full_link.name for file in [*md_files, *adoc_files] for full_link in file.full_links}
 
-    unused_images: set[Path] = set(images).difference(links)
+    def get_key_by_value(value, d: dict):
+        for _, _v in d.items():
+            if _v == value:
+                return _
 
-    if unused_images:
-        _: list[Path] = [unused_image.relative_to(project_dir) for unused_image in unused_images]
+        else:
+            return None
+
+    for k, v in links_paths_names.items():
+        images_paths_names.pop(k, None)
+        images_paths_names.pop(get_key_by_value(v, images_paths_names), None)
+
+    if images_paths_names:
+        _: list[Path] = [unused_image.relative_to(project_dir) for unused_image in images_paths_names]
         message: str = f"Неиспользуемые изображения:\n{pretty_print(_)}"
 
         messages.append(message)
@@ -192,7 +197,7 @@ def filter_images_command(
             messages.append(f"\nФайл {output} записан")
 
         if not dry_run:
-            for image in unused_images:
+            for image in images_paths_names:
                 image.unlink(missing_ok=True)
 
             messages.append("\nНеиспользуемые изображения удалены")
