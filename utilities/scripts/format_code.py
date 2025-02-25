@@ -7,9 +7,9 @@ from click.decorators import help_option, option, pass_context
 from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
-from utilities.common.errors import ConvertTablesNonIntegerLineLengthError, ConvertTablesNonPositiveLineLengthError
-from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, pretty_print, StrPath
-from utilities.common.functions import file_reader, file_writer, get_files, ReaderMode
+from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatCodeNonPositiveLineLengthError
+from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, StrPath
+from utilities.common.functions import file_reader, file_writer, get_files, pretty_print, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 
 MAX_LENGTH: int = 84
@@ -39,7 +39,7 @@ MAX_LENGTH: int = 84
         resolve_path=True,
         allow_dash=False,
         dir_okay=False),
-    help="\b\nФайлов для обработки. Может использоваться несколько раз",
+    help="\b\nФайлы для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
@@ -47,8 +47,8 @@ MAX_LENGTH: int = 84
 @option(
     "-l", "--length",
     type=INT,
-    help=f"\b\nМаксимальная длина строки. По умолчанию: {MAX_LENGTH}\n"
-         "Примечание. Должно быть целым положительным числом",
+    help=f"\b\nМаксимальная длина строки. По умолчанию: {MAX_LENGTH}"
+         f"\nПримечание. Должно быть целым положительным числом",
     multiple=False,
     required=False,
     metavar="LEN",
@@ -86,11 +86,11 @@ def format_code_command(
         keep_logs: bool = False):
     if length < 0:
         logger.error(f"Максимальная длина не может быть неположительным числом, однако получено {length}")
-        raise ConvertTablesNonPositiveLineLengthError
+        raise FormatCodeNonPositiveLineLengthError
 
     elif not isinstance(length, int):
         logger.error(f"Максимальная длина должна быть целым числом, однако получено {type(length)}")
-        raise ConvertTablesNonIntegerLineLengthError
+        raise FormatCodeNonIntegerLineLengthError
 
     files: list[StrPath] | None = get_files(
         ctx,

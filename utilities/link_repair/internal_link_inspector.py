@@ -45,8 +45,7 @@ def _iter_internal_options(line: str) -> Iterator[str]:
 
 
 class InternalLinkInspector:
-    """
-    Class to represent the inspector for internal links having only anchors.
+    """Class to represent the inspector for internal links having only anchors.
 
     :param _text_file: The markdown file to inspect internal links.
     :type _text_file : TextFile or None

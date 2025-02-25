@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence, TypeAlias
+from typing import Any, Mapping, Sequence, TypeAlias
 
 from yaml import safe_load
 
@@ -47,11 +47,3 @@ class ArgsHelpDict(dict):
 
 
 args_help_dict: ArgsHelpDict = ArgsHelpDict()
-
-
-def pretty_print(values: Iterable[str | Path] = None):
-    if values is None or not values:
-        return ""
-
-    else:
-        return "\n".join(map(str, values))

@@ -25,7 +25,7 @@ TERMINAL_WIDTH: int = 96
 
 SEPARATOR: str = "-" * MAX_CONTENT_WIDTH
 
-__version__: str = "1.1.1"
+__version__: str = "1.1.2"
 
 
 def up(value: str):
@@ -391,7 +391,7 @@ class MutuallyExclusiveOption(Option):
     help=HELP,
     is_eager=True)
 def command_line_interface(debug: bool = False):
-    echo(f"Версия: {__version__}")
+
     ctx: Context = get_current_context()
 
     try:
@@ -427,6 +427,7 @@ def clear_logs(ctx: Context):
     result_file: Path = ctx.obj.get("result_file", None)
 
     logger.debug(
+        f"Версия: {__version__}\n"
         f"Команда: {ctx.command_path}\n"
         f"Параметры: {ctx.params}")
 

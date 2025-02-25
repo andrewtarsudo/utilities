@@ -9,8 +9,8 @@ from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import HELP, pretty_print, StrPath
-from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup, MutuallyExclusiveOption
+from utilities.common.constants import HELP, StrPath
+from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption, SwitchArgsAPIGroup
 
 
 def check_content_common(path: Path):
@@ -358,7 +358,7 @@ def list_files_command(
             results.append(f"{prefix}{Path(item).as_posix()}")
 
     if not auxiliary:
-        echo(pretty_print(results))
+        echo("\n".join(results))
         ctx.obj["keep_logs"] = keep_logs
         ctx.invoke(clear_logs)
 

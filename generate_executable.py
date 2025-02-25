@@ -15,10 +15,6 @@ if __name__ == "__main__":
         spec_file: str = "utilities.spec"
         exe_file: str = r"./bin/tw_utilities"
 
-    venv: list[str] = [
-        "poetry",
-        "shell"]
-
     install: list[str] = [
         "poetry",
         "run",
@@ -27,7 +23,7 @@ if __name__ == "__main__":
         "--distpath",
         "./bin",
         f"{spec_file}",
-        f"2>{log_file}"]
+        f"2> {log_file}"]
 
     try:
         _: CompletedProcess = run(

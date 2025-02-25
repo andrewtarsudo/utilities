@@ -9,8 +9,8 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, separator, StrPath
-from utilities.common.functions import file_reader, get_files, ReaderMode
+from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, separator, StrPath
+from utilities.common.functions import file_reader, get_files, pretty_print, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
 
 RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"

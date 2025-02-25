@@ -11,7 +11,7 @@ from loguru import logger
 
 from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.common.errors import LinkRepairInvalidFileDictAttributeError, LinkRepairInvalidStorageAttributeError
-from utilities.common.functions import file_reader, ReaderMode
+from utilities.common.functions import file_reader, file_writer, ReaderMode
 from utilities.link_repair.const import FileLanguage, prepare_logging
 from utilities.link_repair.file_dict import FileDict, FileLinkItem, TextFile
 from utilities.link_repair.general_storage import Storage
@@ -212,7 +212,7 @@ def link_repair_command(
         link_fixer.fix_links()
 
         if not dry_run:
-            dir_file.write()
+            file_writer(dir_file.full_path, dir_file.content, encoding="utf-8")
 
         dir_file._content = file_reader(dir_file.full_path, ReaderMode.LINES, encoding="utf-8")
 
@@ -263,7 +263,7 @@ def link_repair_command(
 
         # update file content
         if not dry_run:
-            dir_file.write()
+            file_writer(dir_file.full_path, dir_file.content, encoding="utf-8")
 
     echo("Работа завершена.\n")
 

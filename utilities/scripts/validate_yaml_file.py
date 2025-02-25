@@ -12,8 +12,8 @@ from click.utils import echo
 from loguru import logger
 from yaml import safe_load
 
-from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
-from utilities.common.functions import file_reader, ReaderMode
+from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, StrPath
+from utilities.common.functions import file_reader, pretty_print, ReaderMode
 from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup
 
 _SETTINGS_NAMES: tuple[str, ...] = (

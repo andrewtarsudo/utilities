@@ -1,0 +1,42 @@
+:asciidoctorconfigdir: ../..
+
+[source,console,subs="attributes+"]
+----
+{name} filter-images {pcrf} --dry-run
+
+Неиспользуемые изображения:
+web/sections/acc_files/images/ACCFILE.png
+web/sections/find_sim_card/images/FIND_SIM.png
+web/images/QUESTION_MARK.jpeg
+web/images/MENU_MANAGEMENT.png
+web/sections/acc_files/images/SORT_PAC.png
+web/images/SIM_MENU.png
+web/sections/dictionary/image/NEW_IMEI_BASE_OPERATORS.png
+web/images/MESSAGE_DELETE.png
+web/sections/dictionary/images/NEW_CURRENCY.png
+description/images/MAIN_SCRIPT.drawio.png
+description/images/EXTRA_SCRIPT_NIGHT.drawio.png
+web/images/MENU_SIM.png
+web/sections/tariffication/images/TARIFFICATION.png
+web/images/IMPORT.png
+web/images/MENU_DICTIONARY.png
+web/sections/dictionary/images/IMEI_RULES.png
+web/images/CALENDAR.png
+web/sections/acc_files/images/MANAGE_ENCLOSED_PAC.png
+web/sections/acc_files/images/NEW_FUNCTION_PACKET_GPRS.png
+web/images/RIGHT_MARK.jpeg
+web/sections/acc_files/images/POLITIC_NOTIFICATION.png
+web/sections/tariffication/images/BLOCK_OF_RULES.png
+web/sections/dictionary/images/CURRENCY.png
+web/sections/acc_files/images/RULES.png
+description/images/EXTRA_SCRIPT_WITH_ONLINE.drawio.png
+web/images/LEFT_MARK.jpeg
+web/sections/dictionary/images/SCHEDULE.png
+web/images/INTERNAL_ERROR.png
+web/images/AUTHORIZATION_TAB.png
+web/sections/tariffication/images/SORT_PLAN.png
+
+Файл /Users/andrewtarasov/PycharmProjects/utilities/result.txt записан
+
+Неиспользуемые изображения не удалены, поскольку использована опция --dry-run
+----

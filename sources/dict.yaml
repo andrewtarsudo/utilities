@@ -13,3 +13,6 @@ link-repair:
 
 convert-tables:
   docx_file: "Путь до файла Word в формате *.docx или *.docm"
+
+filter-images:
+  project_dir: "Путь до директории проекта"

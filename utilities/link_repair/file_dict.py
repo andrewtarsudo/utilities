@@ -173,57 +173,16 @@ class TextFile(DirFile):
     def __iter__(self):
         return iter(self._content)
 
-    def write(self):
-        """
-        Writing the file content.
-
-        The method tries to open the file and write all lines.
-
-        Handling PermissionError, RuntimeError, FileNotFoundError, OSError.
-
-        """
-        _message: str = "В файл не внесены никакие изменения"
-
-        if not self._is_changed:
-            logger.debug(f"В файле {self.rel_path} нет изменений")
-            return
-
-        try:
-            with open(self._full_path, "w+", encoding="utf-8") as f:
-                f.write("".join(self._content))
-            _message: str = f"Файл {self.rel_path} записан\n"
-
-        except PermissionError:
-            logger.error(f"Недостаточно прав для записи в файл {self.rel_path}")
-
-        except RuntimeError:
-            logger.error(f"Истекло время ожидания ответа во время записи файла {self.rel_path}")
-
-        except FileNotFoundError:
-            logger.error(f"Файл {self.rel_path} был найден, но в течение работы скрипта был изменен")
-
-        except OSError as exc:
-            logger.error(
-                f"Ошибка при работе с системой для файла {self.rel_path}, {exc.__class__.__name__}.\n"
-                f"{exc.strerror}")
-
-        finally:
-            logger.debug(_message)
-
     def iter_anchors(self) -> Iterator[str]:
-        """
-        Iteration of the anchors in the text file.
+        """Iterates the anchors in the text file.
 
-        Returns
-        -------
-        Iterator[str]
-            The anchor iterator.
-
+        :return: The anchor iterator.
+        :rtype: Iterator[str]
         """
         return iter(self._anchors)
 
     def iter_links(self) -> Iterator[FileLinkItem]:
-        """Iterates of the links in the text file.
+        """Iterates the links in the text file.
 
         :return: The link item iterator.
         :rtype: Iterator[FileLinkItem]
@@ -231,7 +190,7 @@ class TextFile(DirFile):
         return iter(self._links)
 
     def _iter_internal_links(self) -> Iterator[_InternalLink]:
-        """Iterates of the internal links in the text file.
+        """Iterates the internal links in the text file.
 
         :return: The internal link item iterator.
         :rtype: Iterator[_InternalLink]
@@ -274,20 +233,22 @@ class TextFile(DirFile):
         if isinstance(value, bool):
             self._is_changed = value
 
-    def update_line(self, line_number: int | Iterable[int], old_line: str, new_line: str, *, is_boundary: bool = False):
-        """
-        The modification of the line in the text file.
+    def update_line(
+            self,
+            line_number: int | Iterable[int],
+            old_line: str,
+            new_line: str, *,
+            is_boundary: bool = False):
+        """Modifies the line in the text file.
 
-        Parameters
-        ----------
-        line_number : int | Iterable[int]
-            The line index or indexes in the text file.
-        old_line : str
-            The current line in the text file.
-        new_line : str
-            The text to replace in the text file.
-        is_boundary : bool
-            The flag to use boundaries for anchors.
+        :param line_number: The line index or indexes in the text file.
+        :type line_number: int | Iterable[int]
+        :param old_line: The current line in the text file.
+        :type old_line: str
+        :param new_line: The text to replace in the text file.
+        :type new_line: str
+        :param is_boundary: The flag to use boundaries for anchors.
+        :type is_boundary: bool
         """
         if not self._is_changed:
             self._is_changed = True
@@ -344,26 +305,27 @@ class TextFile(DirFile):
         """Specifies the 'imagesdir' value if given."""
         pass
 
+    @property
+    def content(self):
+        return self._content
 
+
+# noinspection PyUnresolvedReferences
 class MdFile(TextFile):
-    """
-    The markdown file in the directory.
+    """Class to represent the Markdown file in the directory.
 
-    Attributes
-    ----------
-    _root_dir : str or Path
-        The path to the directory.
-    _content : list[str]
-        The lines inside the file.
-    _links : list[FileLinkItem]
-        The links inside the file.
-    _internal_links : set[_InternalLink]
-        The internal links inside the file.
-    _anchors : list[str]
-        The anchors inside the file.
-    _is_changed : bool
-        The flag of changes in the file.
-
+    :param _root_dir: The path to the directory.
+    :type _root_dir: str or Path
+    :param _content: The lines inside the file.
+    :type _content: list[str]
+    :param _links: The links inside the file.
+    :type _links: list[FileLinkItem]
+    :param _internal_links: The internal links inside the file.
+    :type _internal_links: set[_InternalLink]
+    :param _anchors: The anchors inside the file.
+    :type _anchors: list[str]
+    :param _is_changed: The flag of changes in the file.
+    :type _is_changed: bool
     """
     _pattern_anchor: list[Boundary] = [Boundary("{#", "}"), Boundary("<a name=\"", "\">"), Boundary("#")]
 
@@ -371,10 +333,7 @@ class MdFile(TextFile):
         super().__init__(root_dir, full_path, md_file_pattern)
 
     def set_anchors(self):
-        """
-        Specifying the anchors in the Markdown file.
-
-        """
+        """Specifies the anchors in the Markdown file."""
         for line in iter(self):
             _m: list[str] = findall(self._patterns.pattern_anchor, line.removesuffix("\n"))
 
@@ -384,10 +343,7 @@ class MdFile(TextFile):
         logger.debug(f"File {self.rel_path}, anchors:\n{prepare_logging(self._anchors)}")
 
     def set_links(self):
-        """
-        Specifying the links in the Markdown file.
-
-        """
+        """Specifies the links in the Markdown file."""
         for index, line in enumerate(iter(self)):
             for _m in finditer(self._patterns.pattern_link, line.removesuffix("\n")):
                 _link_to: str = _m.group(1)
@@ -405,10 +361,7 @@ class MdFile(TextFile):
             f"links:\n{prepare_logging(_.link.link_to for _ in self.iter_links())}")
 
     def set_internal_links(self):
-        """
-        Specifying the internal links in the Markdown file.
-
-        """
+        """Specifies the internal links in the Markdown file."""
         for index, line in enumerate(iter(self)):
             for _m in finditer(self._patterns.pattern_internal_link, line.removesuffix("\n")):
                 _anchor: str = _m.group(1)
@@ -420,25 +373,22 @@ class MdFile(TextFile):
             f"internal links:\n{prepare_logging(_.anchor for _ in self._iter_internal_links())}")
 
 
+# noinspection PyUnresolvedReferences
 class AsciiDocFile(TextFile):
-    """
-    The AsciiDoc file in the directory.
+    """Class to represent the AsciiDoc file in the directory.
 
-    Attributes
-    ----------
-    _root_dir : str or Path
-        The path to the directory.
-    _content : list[str]
-        The lines inside the file.
-    _links : list[FileLinkItem]
-        The links inside the file.
-    _internal_links : set[_InternalLink]
-        The internal links inside the file.
-    _anchors : list[str]
-        The anchors inside the file.
-    _is_changed : bool
-        The flag of changes in the file.
-
+    :param _root_dir: The path to the directory.
+    :type _root_dir: str or Path
+    :param _content: The lines inside the file.
+    :type _content: list[str]
+    :param _links: The links inside the file.
+    :type _links: list[FileLinkItem]
+    :param _internal_links: The internal links inside the file.
+    :type _internal_links: set[_InternalLink]
+    :param _anchors: The anchors inside the file.
+    :type _anchors: list[str]
+    :param _is_changed: The flag of changes in the file.
+    :type _is_changed: bool
     """
     _pattern_anchor: list[Boundary] = [Boundary("[#", "]"), Boundary("[[", "]]"), Boundary("#"), Boundary("<<", ",")]
 
@@ -447,10 +397,7 @@ class AsciiDocFile(TextFile):
         self._imagesdir: str | None = "./"
 
     def set_imagesdir(self):
-        """
-        Specifying the 'imagesdir' value if given.
-
-        """
+        """Specifies the 'imagesdir' value if given."""
         for line in iter(self):
             if ":imagesdir:" not in line:
                 continue
@@ -462,10 +409,7 @@ class AsciiDocFile(TextFile):
                 break
 
     def set_anchors(self):
-        """
-        Specifying the anchors in the AsciiDoc file.
-
-        """
+        """Specifies the anchors in the AsciiDoc file."""
         for line in iter(self):
             _m: list[str] = findall(self._patterns.pattern_anchor, line.removesuffix("\n"))
 
@@ -476,10 +420,7 @@ class AsciiDocFile(TextFile):
             f"File {self.rel_path}, anchors:\n{prepare_logging(self._anchors)}")
 
     def set_links(self):
-        """
-        Specifying the links in the AsciiDoc file.
-
-        """
+        """Specifies the links in the AsciiDoc file."""
         for index, line in enumerate(iter(self)):
             for _m in finditer(self._patterns.pattern_link, line.removesuffix("\n")):
                 if "image" in f"{_m.string}":
@@ -502,10 +443,7 @@ class AsciiDocFile(TextFile):
             f"links:\n{prepare_logging(_.link.link_to for _ in self.iter_links())}")
 
     def set_internal_links(self):
-        """
-        Specifying the internal links in the AsciiDoc file.
-
-        """
+        """Specifies the internal links in the AsciiDoc file."""
         for index, line in enumerate(iter(self)):
             for _m in finditer(self._patterns.pattern_internal_link, line.removesuffix("\n")):
                 _anchor: str = _m.group(1)
@@ -518,21 +456,14 @@ class AsciiDocFile(TextFile):
 
 
 def get_file(root_dir: StrPath, full_path: StrPath) -> MdFile | AsciiDocFile:
-    """
-    Specifying the type of the file.
+    """Specifies the type of the file.
 
-    Attributes
-    ----------
-    root_dir : str or Path
-        The path to the directory.
-    full_path : str or Path
-        The absolute path to the file.
-
-    Returns
-    -------
-    MdFile or AsciiDocFile
-        The specified file according to the extension.
-
+    :param root_dir: The path to the directory.
+    :type root_dir: str or Path
+    :param full_path: The absolute path to the file.
+    :type full_path: str or Path
+    :return: The specified file according to the extension.
+    :rtype: MdFile or AsciiDocFile
     """
     if full_path.suffix == MD_EXTENSION:
         return MdFile(root_dir, full_path)
@@ -541,17 +472,14 @@ def get_file(root_dir: StrPath, full_path: StrPath) -> MdFile | AsciiDocFile:
         return AsciiDocFile(root_dir, full_path)
 
 
+# noinspection PyUnresolvedReferences
 class FileDict:
-    """
-    The dictionary of the files inside the directory.
+    """Class to represent the dictionary of the files inside the directory.
 
-    Attributes
-    ----------
-    _root_dir : StrPath
-        The directory path.
-    _dict_files : dict[Path, TextFile]
-        The dictionary of the paths and the files.
-
+    :param _root_dir: The directory path.
+    :type _root_dir: StrPath
+    :param _dict_files: The dictionary of the paths and the files.
+    :type _dict_files: dict[Path, TextFile]
     """
 
     def __init__(self, root_dir: StrPath):
@@ -633,11 +561,8 @@ class FileDict:
             logger.exception(f"Элемент {item} должен быть типа str или Path, но получено {type(item)}", result=True)
             return
 
-        # if item not in self:
-        #     _relpath: str = self._root_dir.parent.parent.relative_to(item).as_posix()
-        #     # _relpath: str = relpath(item, self._root_dir.parent.parent).replace("\\", "/")
-
-        return self._dict_files.get(Path(item))
+        else:
+            return self._dict_files.get(Path(item))
 
     def get(self, item):
         return self.__getitem__(item)

@@ -121,7 +121,7 @@ def _to_stream(record: dict) -> bool:
         The check result for the message.
 
     """
-    return record["level"].no >= 10
+    return record["level"].no >= 20
 
 
 def _to_result(record: dict) -> bool:

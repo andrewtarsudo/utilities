@@ -8,7 +8,7 @@ from click.core import Context
 from click.termui import pause
 from loguru import logger
 
-from utilities.common.constants import PRESS_ENTER_KEY, pretty_print, StrPath
+from utilities.common.constants import PRESS_ENTER_KEY, StrPath
 from utilities.scripts.list_files import list_files_command
 
 
@@ -87,6 +87,14 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
     except OSError as e:
         logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
         raise
+
+
+def pretty_print(values: Iterable[str | Path] = None):
+    if values is None or not values:
+        return ""
+
+    else:
+        return "\n".join(map(str, values))
 
 
 def get_files(
