@@ -15,7 +15,7 @@ from click.types import BOOL
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import args_help_dict, DEBUG, HELP, NORMAL, PRESS_ENTER_KEY
+from utilities.common.constants import __version__, args_help_dict, DEBUG, HELP, NORMAL, PRESS_ENTER_KEY
 from utilities.common.custom_logger import custom_logging
 from utilities.common.errors import BaseError, NoArgumentsOptionsError
 
@@ -24,8 +24,6 @@ MAX_CONTENT_WIDTH: int = 96
 TERMINAL_WIDTH: int = 96
 
 SEPARATOR: str = "-" * MAX_CONTENT_WIDTH
-
-__version__: str = "1.1.2"
 
 
 def up(value: str):

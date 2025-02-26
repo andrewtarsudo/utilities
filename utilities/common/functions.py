@@ -2,13 +2,15 @@
 from enum import Enum
 from io import UnsupportedOperation
 from pathlib import Path
+from shutil import rmtree
 from typing import Callable, Iterable
 
+from click import echo, pass_context
 from click.core import Context
 from click.termui import pause
 from loguru import logger
 
-from utilities.common.constants import PRESS_ENTER_KEY, StrPath
+from utilities.common.constants import __version__, DEBUG, NORMAL, PRESS_ENTER_KEY, StrPath
 from utilities.scripts.list_files import list_files_command
 
 
@@ -140,3 +142,33 @@ def get_files(
     logger.debug(f"Обрабатываемые файлы:\n{pretty_print(files)}")
 
     return files
+
+
+@pass_context
+def clear_logs(ctx: Context):
+    keep_logs: bool = ctx.obj.get("keep_logs", False)
+    debug: bool = ctx.obj.get("debug", False)
+    no_result: bool = ctx.obj.get("no_result", False)
+    result_file: Path = ctx.obj.get("result_file", None)
+
+    logger.debug(
+        f"Версия: {__version__}\n"
+        f"Команда: {ctx.command_path}\n"
+        f"Параметры: {ctx.params}")
+
+    logger.remove()
+
+    if no_result and result_file is not None:
+        result_file.unlink(missing_ok=True)
+
+    if not keep_logs:
+        rmtree(NORMAL.parent, ignore_errors=True)
+
+    elif not debug:
+        echo(f"Папка с логами: {NORMAL.parent}")
+
+    else:
+        echo(f"Папка с логами: {DEBUG.parent}")
+
+    pause(PRESS_ENTER_KEY)
+    ctx.exit(0)

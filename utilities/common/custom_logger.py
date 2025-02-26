@@ -10,7 +10,8 @@ from warnings import simplefilter
 
 from loguru import logger
 
-from utilities.common.constants import DEBUG, NORMAL
+from utilities.common.errors import BaseError
+from utilities.common.constants import DEBUG, NORMAL, PRESS_ENTER_KEY
 
 HandlerType: Type[str] = Literal["stream", "file_rotating", "result_file"]
 LoggingLevel: Type[str] = Literal["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"]
@@ -235,6 +236,15 @@ class LoggerConfiguration:
             return
 
 
+def onerror(e: BaseException):
+    from sys import exit
+
+    logger.debug(f"Скрипт завершает работу ввиду {e.__class__.__name__}: {str(e)}")
+    logger.remove()
+    input(PRESS_ENTER_KEY)
+    exit(1)
+
+
 def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = False):
     """Specifies the loguru Logger.
 
@@ -279,4 +289,4 @@ def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = Fal
     # add the basic log messages to the logger
     basicConfig(handlers=[InterceptHandler()], level=0)
 
-    logger.catch(level="ERROR")
+    logger.catch(level="ERROR", exclude=BaseError, reraise=True)

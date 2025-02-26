@@ -406,28 +406,33 @@ def validate_yaml_command(
     except UnsupportedOperation:
         logger.error(f"Не поддерживаемая операция с файлом {yaml_file}")
 
+    except UnboundLocalError as e:
+        logger.error(f"Ошибка присваивания {e.name}")
+
     except OSError as e:
         logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
 
-    warnings: list[str] = []
-    messages: list[str] = []
+    else:
+        warnings: list[str] = []
+        messages: list[str] = []
 
-    warnings, messages = inspect_settings(content, verbose, warnings, messages)
-    warnings, messages = inspect_legal(content, verbose, warnings, messages)
-    warnings, messages = inspect_sections(content, verbose, warnings, messages)
+        warnings, messages = inspect_settings(content, verbose, warnings, messages)
+        warnings, messages = inspect_legal(content, verbose, warnings, messages)
+        warnings, messages = inspect_sections(content, verbose, warnings, messages)
 
-    if warnings or messages:
-        logger.warning("Предупреждения:")
-        logger.warning(pretty_print(warnings))
-        logger.warning(pretty_print(messages))
+        if warnings or messages:
+            logger.warning("Предупреждения:")
+            logger.warning(pretty_print(warnings))
+            logger.warning(pretty_print(messages))
 
-    elif not verbose:
-        echo("Проблемы с параметрами не обнаружены")
+        elif not verbose:
+            echo("Проблемы с параметрами не обнаружены")
 
-    lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
-    validate(yaml_file.parent, lines, output, verbose)
+        lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
+        validate(yaml_file.parent, lines, output, verbose)
 
-    echo(output)
+        echo(output)
 
-    ctx.obj["keep_logs"] = keep_logs
-    ctx.invoke(clear_logs)
+    finally:
+        ctx.obj["keep_logs"] = keep_logs
+        ctx.invoke(clear_logs)
