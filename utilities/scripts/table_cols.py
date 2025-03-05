@@ -7,8 +7,9 @@ from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
 from utilities.common.constants import HELP, MAX_SYMBOLS, MIN_COLUMN, StrPath
-from utilities.common.functions import file_reader, get_files, ReaderMode
+from utilities.common.functions import file_reader, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.scripts.list_files import get_files
 from utilities.table_cols import TableAnalyser
 from utilities.table_cols.file import AsciiDocFile
 

@@ -12,9 +12,11 @@ from click.utils import echo
 from loguru import logger
 from yaml import safe_load
 
-from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, StrPath
-from utilities.common.functions import file_reader, pretty_print, ReaderMode
+from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
+from utilities.common.functions import file_reader, ReaderMode
 from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup
+
+_ALLOWED_KEYS: tuple[str, ...] = ("title", "index", "files")
 
 _SETTINGS_NAMES: tuple[str, ...] = (
     "settings", "Settings"
@@ -42,6 +44,15 @@ def determine_key(item: Mapping, keys: Iterable[str]):
 
     else:
         return None
+
+
+def detect_extra_keys(item: Mapping[str, Any]):
+    extra_keys: set[str] | None = set(item.keys()).difference(_ALLOWED_KEYS)
+
+    if not extra_keys:
+        extra_keys: set[str] | None = None
+
+    return extra_keys
 
 
 def inspect_settings(
@@ -187,6 +198,10 @@ def inspect_legal(
                     f"но получено {index[0]}")
                 __is_ok: bool = False
 
+        if (extra_keys := detect_extra_keys({**rights})) is not None:
+            warnings.append(
+            f"В разделе Rights обнаружены посторонние ключи:\n{pretty_print(extra_keys)}")
+
         if __is_ok and verbose:
             messages.append("Раздел 'Rights' задан корректно")
 
@@ -228,25 +243,30 @@ def inspect_sections(
                 __is_ok: bool = True
 
                 if "title" in section.keys():
-                    title: dict[str, str | bool] = section.get("title")
+                    title: dict[str, str | bool] = section.get("title", dict())
 
-                    if "title-files" in title:
-                        title_files = title.get("title-files")
+                    if title is None:
+                        warnings.append(f"В разделе {name} объявлена секция title, хотя она пуста")
+                        __is_ok: bool = False
 
-                        if not isinstance(title_files, bool):
-                            messages.append(
-                                f"Значение ключа '{name}::title::title-files' должно быть типа bool, "
-                                f"но получено {type(title_files)}")
-                            __is_ok: bool = False
+                    else:
+                        if "title-files" in title:
+                            title_files = title.get("title-files")
 
-                    if "value" in title.keys():
-                        value = title.get("value")
+                            if not isinstance(title_files, bool):
+                                messages.append(
+                                    f"Значение ключа '{name}::title::title-files' должно быть типа bool, "
+                                    f"но получено {type(title_files)}")
+                                __is_ok: bool = False
 
-                        if not isinstance(value, str):
-                            messages.append(
-                                f"Значение ключа '{name}::title::value' должно быть типа str, "
-                                f"но получено {type(value)}")
-                            __is_ok: bool = False
+                        if "value" in title.keys():
+                            value = title.get("value")
+
+                            if not isinstance(value, str):
+                                messages.append(
+                                    f"Значение ключа '{name}::title::value' должно быть типа str, "
+                                    f"но получено {type(value)}")
+                                __is_ok: bool = False
 
                 if "index" in section.keys():
                     index = section.get("index")
@@ -269,7 +289,7 @@ def inspect_sections(
                             f"но получено {len(index)}")
                         __is_ok: bool = False
 
-                if "files" in section:
+                if "files" in section.keys():
                     files = section.get("files")
 
                     if not isinstance(files, list):
@@ -284,6 +304,10 @@ def inspect_sections(
                             f"но получено {get_args(files)}")
                         __is_ok: bool = False
 
+                if (extra_keys := detect_extra_keys({**section})) is not None:
+                    warnings.append(
+                        f"В разделе {name} обнаружены посторонние ключи:\n{pretty_print(extra_keys)}")
+
                 if __is_ok and verbose:
                     messages.append(f"Секция {name} задана корректно")
 
@@ -297,15 +321,15 @@ def validate(
         verbose: bool = False):
     max_length: int = max(map(len, lines)) + 5
 
-    paths: dict[Path, int] = {
-        Path(root).joinpath(line.strip().removeprefix("- ")): index
+    paths: dict[int, Path] = {
+        index: Path(root).joinpath(line.strip().removeprefix("- "))
         for index, line in enumerate(lines)
         if line.strip().startswith("- ") and ".." not in line
     }
 
     _lines: list[str] = []
 
-    for path, line_no in paths.items():
+    for line_no, path in paths.items():
         _result: bool = path.resolve().exists()
 
         _status: str = _DICT_RESULTS.get(_result).get("status")

@@ -7,9 +7,10 @@ from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
-from utilities.common.constants import HELP, StrPath
-from utilities.common.functions import file_reader, file_writer, get_files, pretty_print, ReaderMode
+from utilities.common.constants import HELP, pretty_print, StrPath
+from utilities.common.functions import file_reader, file_writer, ReaderMode
 from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup
+from utilities.scripts.list_files import get_files
 
 
 class File:

@@ -5,13 +5,13 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Callable, Iterable
 
-from click import echo, pass_context
 from click.core import Context
+from click.decorators import pass_context
 from click.termui import pause
+from click.utils import echo
 from loguru import logger
 
 from utilities.common.constants import __version__, DEBUG, NORMAL, PRESS_ENTER_KEY, StrPath
-from utilities.scripts.list_files import list_files_command
 
 
 class ReaderMode(Enum):
@@ -91,57 +91,7 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
         raise
 
 
-def pretty_print(values: Iterable[str | Path] = None):
-    if values is None or not values:
-        return ""
 
-    else:
-        return "\n".join(map(str, values))
-
-
-def get_files(
-        ctx: Context, *,
-        files: Iterable[StrPath] = None,
-        directory: StrPath = None,
-        recursive: bool = True,
-        language: str | None = None,
-        extensions: str = "md adoc"):
-    if files is None and directory is None:
-        logger.error("Хотя бы один из параметров --file, --dir должен быть задан")
-        pause(PRESS_ENTER_KEY)
-
-    if files is None:
-        files: list[StrPath] = []
-
-    else:
-        files: list[StrPath] = [*files]
-
-    if directory is not None:
-        directory: Path = Path(directory).expanduser()
-
-        if language is None:
-            all_languages: bool = False
-
-        else:
-            all_languages: bool = not bool(language)
-
-        listed_files: list[str] = ctx.invoke(
-            list_files_command,
-            root_dir=directory,
-            all_dirs=True,
-            all_languages=all_languages,
-            language=language,
-            extensions=extensions,
-            prefix="",
-            hidden=False,
-            recursive=recursive,
-            auxiliary=True)
-
-        files.extend(map(directory.joinpath, listed_files))
-
-    logger.debug(f"Обрабатываемые файлы:\n{pretty_print(files)}")
-
-    return files
 
 
 @pass_context

@@ -236,15 +236,6 @@ class LoggerConfiguration:
             return
 
 
-def onerror(e: BaseException):
-    from sys import exit
-
-    logger.debug(f"Скрипт завершает работу ввиду {e.__class__.__name__}: {str(e)}")
-    logger.remove()
-    input(PRESS_ENTER_KEY)
-    exit(1)
-
-
 def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = False):
     """Specifies the loguru Logger.
 

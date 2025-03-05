@@ -10,8 +10,8 @@ from click.utils import echo
 from loguru import logger
 
 from utilities.common.constants import HELP, StrPath
-from utilities.common.functions import get_files
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.scripts.list_files import get_files
 
 
 @command_line_interface.command(

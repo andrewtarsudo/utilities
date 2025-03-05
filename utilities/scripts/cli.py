@@ -305,7 +305,7 @@ class APIGroup(Group):
 
 class SwitchArgsAPIGroup(APIGroup):
     def parse_args(self, ctx: Context, args: list[str]):
-        if not (args is None or args[0].startswith("-")):
+        if args and not args[0].startswith("-"):
             root: str = args.pop(0)
             args.append(root)
 

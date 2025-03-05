@@ -8,9 +8,10 @@ from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
 from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatCodeNonPositiveLineLengthError
-from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, StrPath
-from utilities.common.functions import file_reader, file_writer, get_files, pretty_print, ReaderMode
+from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, pretty_print, StrPath
+from utilities.common.functions import file_reader, file_writer, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.scripts.list_files import get_files
 
 MAX_LENGTH: int = 84
 

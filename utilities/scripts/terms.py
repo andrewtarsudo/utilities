@@ -9,10 +9,9 @@ from click.types import BOOL
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import HELP, PRESS_ENTER_KEY
-from utilities.common.functions import file_reader, pretty_print, ReaderMode
-from utilities.scripts import APIGroup
-from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption
+from utilities.common.constants import HELP, PRESS_ENTER_KEY, pretty_print
+from utilities.common.functions import file_reader, ReaderMode
+from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, MutuallyExclusiveOption
 from utilities.terms.ascii_doc_table_terms import AsciiDocTableTerms
 from utilities.terms.git_manager import git_manager
 from utilities.terms.table import Term

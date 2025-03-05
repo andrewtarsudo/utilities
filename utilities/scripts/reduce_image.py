@@ -11,8 +11,8 @@ from loguru import logger
 from PIL import Image
 
 from utilities.common.constants import HELP, separator, StrPath
-from utilities.common.functions import get_files
 from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.scripts.list_files import get_files
 
 
 def file_size(value: int) -> str:

@@ -3,13 +3,14 @@ from collections.abc import Iterable
 from glob import iglob
 from pathlib import Path
 
+from click import pause
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import HELP, StrPath
+from utilities.common.constants import HELP, PRESS_ENTER_KEY, pretty_print, StrPath
 from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption, SwitchArgsAPIGroup
 
 
@@ -364,3 +365,48 @@ def list_files_command(
 
     else:
         return results
+
+
+def get_files(
+        ctx: Context, *,
+        files: Iterable[StrPath] = None,
+        directory: StrPath = None,
+        recursive: bool = True,
+        language: str | None = None,
+        extensions: str = "md adoc"):
+    if files is None and directory is None:
+        logger.error("Хотя бы один из параметров --file, --dir должен быть задан")
+        pause(PRESS_ENTER_KEY)
+
+    if files is None:
+        files: list[StrPath] = []
+
+    else:
+        files: list[StrPath] = [*files]
+
+    if directory is not None:
+        directory: Path = Path(directory).expanduser()
+
+        if language is None:
+            all_languages: bool = False
+
+        else:
+            all_languages: bool = not bool(language)
+
+        listed_files: list[str] = ctx.invoke(
+            list_files_command,
+            root_dir=directory,
+            all_dirs=True,
+            all_languages=all_languages,
+            language=language,
+            extensions=extensions,
+            prefix="",
+            hidden=False,
+            recursive=recursive,
+            auxiliary=True)
+
+        files.extend(map(directory.joinpath, listed_files))
+
+    logger.debug(f"Обрабатываемые файлы:\n{pretty_print(files)}")
+
+    return files
