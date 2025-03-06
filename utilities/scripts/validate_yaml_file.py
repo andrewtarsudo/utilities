@@ -200,7 +200,7 @@ def inspect_legal(
 
         if (extra_keys := detect_extra_keys({**rights})) is not None:
             warnings.append(
-            f"В разделе Rights обнаружены посторонние ключи:\n{pretty_print(extra_keys)}")
+                f"В разделе Rights обнаружены посторонние ключи:\n{pretty_print(extra_keys)}")
 
         if __is_ok and verbose:
             messages.append("Раздел 'Rights' задан корректно")
@@ -268,10 +268,35 @@ def inspect_sections(
                                     f"но получено {type(value)}")
                                 __is_ok: bool = False
 
+                        if "level" in title.keys():
+                            level = title.get("level")
+
+                            if not isinstance(level, int):
+                                messages.append(
+                                    f"Значение ключа '{name}::title::level' должно быть типа int, "
+                                    f"но получено {type(level)}")
+                                __is_ok: bool = False
+
+                            elif level < 0:
+                                messages.append(
+                                    f"Значение ключа '{name}::title::level' должно быть неотрицательным, "
+                                    f"но получено {level}")
+                                __is_ok: bool = False
+
+                            elif level > 5:
+                                warnings.append(
+                                    f"Значение ключа '{name}::title::level' должно быть целым числом, диапазон: [0-5], "
+                                    f"но получено {level}")
+                                __is_ok: bool = False
+
                 if "index" in section.keys():
                     index = section.get("index")
 
-                    if not isinstance(index, list):
+                    if index is None:
+                        warnings.append(f"В разделе {name} объявлена секция index, хотя она пуста")
+                        __is_ok: bool = False
+
+                    elif not isinstance(index, list):
                         messages.append(
                             f"Значение ключа '{name}::index' должно быть типа list, "
                             f"но получено {get_origin(index)}")
