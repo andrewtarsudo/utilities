@@ -51,9 +51,13 @@ class ArgsHelpDict(dict):
 args_help_dict: ArgsHelpDict = ArgsHelpDict()
 
 
+def prettify(value: Any):
+    return str(value).strip()
+
+
 def pretty_print(values: Iterable[str | Path] = None):
     if values is None or not values:
         return ""
 
     else:
-        return "\n".join(map(str, values))
+        return "\n".join(map(prettify, values))

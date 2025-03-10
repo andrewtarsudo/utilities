@@ -137,7 +137,7 @@ def filter_images_command(
     messages: list[str] = []
 
     project_dir: Path = Path(project_dir)
-    extensions: str = "png jpg jpeg bmp PNG JPG JPEG BMP"
+    extensions: str = "png jpg jpeg bmp svg PNG JPG JPEG BMP SVG"
 
     images: list[StrPath] | None = get_files(
         ctx,
