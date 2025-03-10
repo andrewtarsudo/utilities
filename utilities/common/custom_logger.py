@@ -10,8 +10,8 @@ from warnings import simplefilter
 
 from loguru import logger
 
+from utilities.common.constants import DEBUG, NORMAL
 from utilities.common.errors import BaseError
-from utilities.common.constants import DEBUG, NORMAL, PRESS_ENTER_KEY
 
 HandlerType: Type[str] = Literal["stream", "file_rotating", "result_file"]
 LoggingLevel: Type[str] = Literal["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"]

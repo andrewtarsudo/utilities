@@ -91,9 +91,6 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
         raise
 
 
-
-
-
 @pass_context
 def clear_logs(ctx: Context):
     keep_logs: bool = ctx.obj.get("keep_logs", False)

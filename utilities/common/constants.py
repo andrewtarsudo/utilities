@@ -25,7 +25,7 @@ ADOC_EXTENSION: str = ".adoc"
 MAX_SYMBOLS: int = 68
 MIN_COLUMN = 4
 
-__version__: str = "1.1.2"
+__version__: str = "1.1.3"
 
 
 class ArgsHelpDict(dict):

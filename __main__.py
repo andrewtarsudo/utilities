@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 if __name__ == '__main__':
     from sys import hexversion
 
@@ -15,6 +16,10 @@ if __name__ == '__main__':
 
     if not faulthandler.is_enabled():
         faulthandler.enable()
+
+    from sys import stdout
+
+    stdout.reconfigure(encoding="utf-8")
 
     from utilities.scripts.cli import command_line_interface
 

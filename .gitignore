@@ -46,3 +46,4 @@ fonts/
 themes/
 css/
 pyinstaller.log
+flake8.txt

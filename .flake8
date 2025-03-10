@@ -1,0 +1,24 @@
+[flake8]
+count = True
+exclude =
+    .git,
+    .idea,
+    auxiliary,
+    __pycache__,
+    css,
+    docs,
+    fonts,
+    sources,
+    tests,
+    themes,
+    venv,
+    generate_executable.py
+filename =
+    __main__.py,
+    utilities/*
+format = %(path)s::%(row)d,%(col)d::%(code)s::%(text)s
+show-source = True
+hang-closing = True
+max-line-length = 120
+statistics = True
+tee = False
