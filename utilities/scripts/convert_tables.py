@@ -1,122 +1,94 @@
 # -*- coding: utf-8 -*-
-from click.core import Context
-from click.decorators import argument, help_option, option, pass_context
-from click.types import BOOL, Path as ClickPath
+from pathlib import Path
 
-from utilities.common.constants import HELP, StrPath
+from click.core import Context
+from typer.main import Typer
+from typer.params import Argument, Option
+from typing_extensions import Annotated
+
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument
-from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption, SwitchArgsAPIGroup
+from utilities.scripts.cli import clear_logs
+
+convert_tables: Typer = Typer()
 
 
-@command_line_interface.command(
+@convert_tables.command(
     "convert-tables",
-    cls=SwitchArgsAPIGroup,
     help="Команда для корректного извлечения таблиц из файлов docx в формат Markdown")
-@argument(
-    "docx_file",
-    type=ClickPath(
-        exists=True,
-        file_okay=True,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=False),
-    required=True,
-    metavar="DOCX_FILE")
-@option(
-    "-p", "--parse", "tables_dir",
-    type=ClickPath(
-        exists=False,
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
-    help="\b\nДиректория для таблиц. По умолчанию: ./tables/."
-         "\nЕсли не существует, то будет создана",
-    multiple=False,
-    required=False,
-    metavar="DIR_TABLES",
-    default="./tables/")
-@option(
-    "-t", "--temp", "temp_dir",
-    type=ClickPath(
-        exists=False,
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
-    help="\b\nВременная директория. По умолчанию: ./_temp/."
-         "\nЕсли не существует, то будет создана",
-    multiple=False,
-    required=False,
-    metavar="TEMP_DIR",
-    default="./_temp/")
-@option(
-    "-e", "--escape/--no-escape", "escape",
-    type=BOOL,
-    help="\b\nФлаг экранирования символов '<', '>'."
-         "\nПо умолчанию: True, добавление '\\' перед символами",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
-    "-r", "--remove/--no-remove", "remove",
-    type=BOOL,
-    help="\b\nФлаг удаления всех множественных пробелов и пробелов"
-         "\nперед знаками препинания."
-         "\nПо умолчанию: True, удаление всех лишних пробелов",
-    show_default=True,
-    required=False,
-    default=False)
-@option(
-    "-f", "--fix/--no-fix", "fix",
-    cls=MutuallyExclusiveOption,
-    mutually_exclusive=["keep"],
-    type=BOOL,
-    help="\b\nФлаг удаления лишних пробелов и экранирования символов."
-         "\nПо умолчанию: не задано, определяется параметрами"
-         "\n--escape и --remove."
-         "\nПриоритет выше, чем у опций --escape и --remove",
-    show_default=True,
-    required=False,
-    default=None)
-@option(
-    "-k", "--keep/--no-keep", "keep",
-    cls=MutuallyExclusiveOption,
-    mutually_exclusive=["fix"],
-    type=BOOL,
-    help="\b\nФлаг извлечения текста без дополнительной обработки."
-         "\nПо умолчанию: не задано, определяется параметрами"
-         "\n--escape и --remove."
-         "\nПриоритет выше, чем у опций --escape и --remove",
-    show_default=True,
-    required=False,
-    default=None)
-@option(
-    "--keep-logs",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
-    show_default=True,
-    required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
-@pass_context
 def convert_tables_command(
         ctx: Context,
-        docx_file: StrPath,
-        tables_dir: StrPath = "./tables/",
-        temp_dir: StrPath = "./_temp/",
-        remove: bool = False,
-        escape: bool = True,
-        fix: bool = None,
-        keep: bool = None,
-        keep_logs: bool = False):
+        docx_file: Annotated[
+            Path,
+            Argument(
+                metavar="DOCX_FILE",
+                help="Путь до файла Word в формате *.docx или *.docm",
+                exists=True,
+                file_okay=True,
+                dir_okay=False,
+                resolve_path=True,
+                allow_dash=False)],
+        tables_dir: Annotated[
+            Path,
+            Option(
+                "--parse", "-p",
+                help="Директория для таблиц. По умолчанию: ./tables/."
+                     "\nЕсли не существует, то будет создана",
+                file_okay=False,
+                dir_okay=True,
+                resolve_path=True,
+                allow_dash=False)] = "./tables/",
+        temp_dir: Annotated[
+            Path,
+            Option(
+                "--temp-dir", "-t",
+                help="Временная директория. По умолчанию: ./_temp/."
+                     "\nЕсли не существует, то будет создана",
+                exists=True,
+                file_okay=False,
+                dir_okay=True,
+                resolve_path=True,
+                allow_dash=False)] = "./_temp/",
+        remove: Annotated[
+            bool,
+            Option(
+                "--remove/--no-remove", "-r/-R",
+                show_default=True,
+                help="Флаг удаления всех множественных пробелов и пробелов"
+                     "\nперед знаками препинания."
+                     "\nПо умолчанию: True, удаление всех лишних пробелов")] = False,
+        escape: Annotated[
+            bool,
+            Option(
+                "--escape/--no-escape", "-e/-E",
+                show_default=True,
+                help="Флаг экранирования символов '<', '>'."
+                     "\nПо умолчанию: True, добавление '\\' перед символами")] = True,
+        fix: Annotated[
+            bool,
+            Option(
+                "--fix/--no-fix", "-f/-F",
+                show_default=True,
+                help="Флаг удаления лишних пробелов и экранирования символов."
+                     "\nПо умолчанию: не задано, определяется параметрами"
+                     "\n--escape и --remove."
+                     "\nПриоритет выше, чем у опций --escape и --remove")] = None,
+        keep: Annotated[
+            bool,
+            Option(
+                "--keep/--no-keep", "-k/-K",
+                show_default=True,
+                help="Флаг извлечения текста без дополнительной обработки."
+                     "\nПо умолчанию: не задано, определяется параметрами"
+                     "\n--escape и --remove."
+                     "\nПриоритет выше, чем у опций --escape и --remove")] = None,
+        keep_logs: Annotated[
+            bool,
+            Option(
+                "--keep-logs",
+                show_default=True,
+                help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
     if fix:
         remove_spaces: bool = True
         escape_chars: bool = True
