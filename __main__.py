@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import shellingham
 
 if __name__ == '__main__':
     from sys import hexversion
@@ -18,6 +19,8 @@ if __name__ == '__main__':
         faulthandler.enable()
 
     from sys import stdout
+
+    print(shellingham.detect_shell())
 
     stdout.reconfigure(encoding="utf-8")
 

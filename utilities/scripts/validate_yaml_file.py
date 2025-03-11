@@ -469,8 +469,6 @@ def validate_yaml_command(
         warnings, messages = inspect_legal(content, verbose, warnings, messages)
         warnings, messages = inspect_sections(content, verbose, warnings, messages)
 
-        echo("")
-
         if warnings:
             logger.warning("Предупреждения:")
             logger.warning(pretty_print(warnings))
@@ -484,7 +482,8 @@ def validate_yaml_command(
         lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
         validate(yaml_file.parent, lines, output, verbose)
 
-        echo(output)
+        if output is not None:
+            echo(f"Файл с результатами: {output.resolve()}")
 
     finally:
         ctx.obj["keep_logs"] = keep_logs
