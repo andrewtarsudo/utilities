@@ -9,6 +9,8 @@ from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 from loguru import logger
+from typer import Option
+from typing_extensions import Annotated
 
 from utilities.common.constants import HELP, PRESS_ENTER_KEY, pretty_print, StrPath
 from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption, SwitchArgsAPIGroup
@@ -259,9 +261,20 @@ def list_files_command(
         no_prefix: bool = False,
         hidden: bool = False,
         ignore_index: bool = False,
-        recursive: bool = True,
         auxiliary: bool = False,
-        keep_logs: bool = False):
+        recursive: Annotated[
+            bool,
+            Option(
+                "--recursive/--no-recursive", "-r/-R",
+                show_default=True,
+                help="Флаг рекурсивного поиска файлов.\nПо умолчанию: True, вложенные файлы учитываются")] = True,
+        keep_logs: Annotated[
+            bool,
+            Option(
+                "--keep-logs",
+                show_default=True,
+                help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
     root_dir: Path = root_dir.expanduser()
 
     if extensions is None and not all_extensions:

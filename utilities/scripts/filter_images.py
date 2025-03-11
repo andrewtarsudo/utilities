@@ -3,14 +3,17 @@ from pathlib import Path
 from re import finditer
 
 from click.core import Context
-from click.decorators import argument, help_option, option, pass_context
-from click.types import BOOL, Path as ClickPath
 from loguru import logger
+from typer.main import Typer
+from typer.params import Argument, Option
+from typing_extensions import Annotated
 
-from utilities.common.constants import HELP, pretty_print, StrPath
+from utilities.common.constants import pretty_print, StrPath
 from utilities.common.functions import file_reader, file_writer, ReaderMode
-from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup
+from utilities.scripts.cli import clear_logs
 from utilities.scripts.list_files import get_files
+
+filter_images: Typer = Typer()
 
 
 class File:
@@ -67,73 +70,51 @@ class AsciiDocFile(File):
             for m in finditer(self.__class__.pattern, line)]
 
 
-@command_line_interface.command(
-    "filter-images",
-    cls=SwitchArgsAPIGroup,
+@filter_images.command(
+    name="filter-images",
     help="Команда для удаления неиспользуемых изображений")
-@argument(
-    "project_dir",
-    type=ClickPath(
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
-    required=True,
-    metavar="PROJECT_DIR")
-@option(
-    "-d", "--dry-run",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг вывода некорректных ссылок на экран без изменения"
-         "\nфайлов."
-         "\nПо умолчанию: False, файлы удаляются",
-    show_default=True,
-    required=False,
-    default=False)
-@option(
-    "-o", "--output", "output",
-    type=ClickPath(
-        file_okay=True,
-        readable=True,
-        resolve_path=True,
-        allow_dash=True,
-        dir_okay=False),
-    help="\b\nФайл для записи вывода. По умолчанию: вывод в консоль",
-    multiple=False,
-    required=False,
-    metavar="FILE",
-    default=None)
-@option(
-    "--recursive/--no-recursive",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг рекурсивного поиска файлов."
-         "\nПо умолчанию: True, вложенные файлы учитываются",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
-    "--keep-logs",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
-    show_default=True,
-    required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
-@pass_context
 def filter_images_command(
         ctx: Context,
-        project_dir: StrPath,
-        dry_run: bool = False,
-        output: StrPath = None,
-        recursive: bool = True,
-        keep_logs: bool = False):
+        project_dir: Annotated[
+            Path,
+            Argument(
+                metavar="PROJECT_DIR",
+                help="Путь до директории проекта",
+                exists=True,
+                file_okay=False,
+                dir_okay=True,
+                resolve_path=True,
+                allow_dash=False)],
+        dry_run: Annotated[
+            bool,
+            Option(
+                "-d/-D", "--dry-run/--no-dry-run",
+                show_default=True,
+                help="Флаг вывода изменений размеров файлов без их изменения."
+                     "\nПо умолчанию: False, файлы перезаписываются")] = False,
+        output: Annotated[
+            Path,
+            Option(
+                "-o", "--output",
+                metavar="FILE",
+                help="Файл для записи вывода. По умолчанию: вывод в консоль",
+                file_okay=True,
+                dir_okay=False,
+                resolve_path=True,
+                allow_dash=False)] = None,
+        recursive: Annotated[
+            bool,
+            Option(
+                "--recursive/--no-recursive", "-r/-R",
+                show_default=True,
+                help="Флаг рекурсивного поиска файлов.\nПо умолчанию: True, вложенные файлы учитываются")] = True,
+        keep_logs: Annotated[
+            bool,
+            Option(
+                "--keep-logs",
+                show_default=True,
+                help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
     messages: list[str] = []
 
     project_dir: Path = Path(project_dir)

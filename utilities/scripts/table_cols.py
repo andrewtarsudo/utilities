@@ -49,22 +49,24 @@ def table_cols_command(
                 "--recursive/--no-recursive", "-r/-R",
                 show_default=True,
                 help="Флаг рекурсивного поиска файлов.\nПо умолчанию: True, вложенные файлы учитываются")] = True,
-        max_symbols: Annotated[int, Option(
-            MAX_SYMBOLS,
-            "-s", "--max-symbols",
-            metavar="WIDTH",
-            help=f"Максимальная ширина столбца в символах."
-                 f"\nПо умолчанию: {MAX_SYMBOLS}."
-                 f"\nПримечание. Должно быть целым положительным числом",
-            show_default=True)] = MAX_SYMBOLS,
-        min_column: Annotated[int, Option(
-            MIN_COLUMN,
-            "-c", "--min-column",
-            metavar="WIDTH",
-            help=f"Минимальная ширина столбца в символах."
-                 f"\nПо умолчанию: {MIN_COLUMN}."
-                 f"\nПримечание. Должно быть целым положительным числом",
-            show_default=True)] = MIN_COLUMN,
+        max_symbols: Annotated[
+            int,
+            Option(
+                "-s", "--max-symbols",
+                metavar="WIDTH",
+                help=f"Максимальная ширина столбца в символах."
+                     f"\nПо умолчанию: {MAX_SYMBOLS}."
+                     f"\nПримечание. Должно быть целым положительным числом",
+                show_default=True)] = MAX_SYMBOLS,
+        min_column: Annotated[
+            int,
+            Option(
+                "-c", "--min-column",
+                metavar="WIDTH",
+                help=f"Минимальная ширина столбца в символах."
+                     f"\nПо умолчанию: {MIN_COLUMN}."
+                     f"\nПримечание. Должно быть целым положительным числом",
+                show_default=True)] = MIN_COLUMN,
         keep_logs: Annotated[
             bool,
             Option(

@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 from os.path import getsize
 from pathlib import Path
-from typing import Iterable
 
 from click.core import Context
-from click.decorators import help_option, option, pass_context
 from click.termui import echo
-from click.types import BOOL, Path as ClickPath
 from loguru import logger
 from PIL import Image
+from typer.main import Typer
+from typer.params import Option
+from typing_extensions import Annotated, List
 
-from utilities.common.constants import HELP, separator, StrPath
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.common.constants import separator, StrPath
+from utilities.scripts.cli import clear_logs
 from utilities.scripts.list_files import get_files
+
+reduce_image: Typer = Typer()
 
 
 def file_size(value: int) -> str:
@@ -48,75 +50,52 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
     return destination
 
 
-@command_line_interface.command(
-    "reduce-image",
-    cls=APIGroup,
+@reduce_image.command(
+    name="reduce-image",
     help="Команда для уменьшения размера изображений JPG, PNG")
-@option(
-    "-f", "--file", "files",
-    type=ClickPath(
-        file_okay=True,
-        readable=True,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=False),
-    help="\b\nФайл для обработки. Может использоваться несколько раз",
-    multiple=True,
-    required=False,
-    metavar="FILE ... FILE",
-    default=None)
-@option(
-    "-d", "--dir", "directory",
-    type=ClickPath(
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
-    help="Директория для обработки",
-    multiple=False,
-    required=False,
-    metavar="DIR",
-    default=None)
-@option(
-    "--dry-run",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг вывода изменений размеров файлов без их изменения.\n"
-         "По умолчанию: False, файлы перезаписываются",
-    show_default=True,
-    required=False,
-    default=False)
-@option(
-    "--recursive/--no-recursive",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг рекурсивного поиска файлов."
-         "\nПо умолчанию: True, вложенные файлы учитываются",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
-    "--keep-logs",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
-    show_default=True,
-    required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
-@pass_context
 def reduce_image_command(
         ctx: Context,
-        files: Iterable[StrPath] = None,
-        directory: StrPath = None,
-        recursive: bool = True,
-        dry_run: bool = False,
-        keep_logs: bool = False):
+        files: Annotated[
+            List[Path],
+            Option(
+                "--file", "-f",
+                help="Файл для обработки. Может использоваться несколько раз",
+                metavar="FILE .. FILE",
+                exists=True,
+                file_okay=True,
+                dir_okay=False,
+                resolve_path=True,
+                allow_dash=False)] = None,
+        directory: Annotated[
+            Path,
+            Option(
+                "--dir", "-d",
+                help="Директория для обработки",
+                exists=True,
+                file_okay=False,
+                dir_okay=True,
+                resolve_path=True,
+                allow_dash=False)] = None,
+        dry_run: Annotated[
+            bool,
+            Option(
+                "-d/-D", "--dry-run/--no-dry-run",
+                show_default=True,
+                help="Флаг вывода изменений размеров файлов без их изменения."
+                     "\nПо умолчанию: False, файлы перезаписываются")] = False,
+        recursive: Annotated[
+            bool,
+            Option(
+                "--recursive/--no-recursive", "-r/-R",
+                show_default=True,
+                help="Флаг рекурсивного поиска файлов.\nПо умолчанию: True, вложенные файлы учитываются")] = True,
+        keep_logs: Annotated[
+            bool,
+            Option(
+                "--keep-logs",
+                show_default=True,
+                help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
     extensions: str = "png jpg jpeg bmp"
 
     files: list[StrPath] | None = get_files(

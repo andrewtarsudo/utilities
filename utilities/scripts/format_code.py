@@ -1,90 +1,73 @@
 # -*- coding: utf-8 -*-
+from pathlib import Path
 from re import finditer, Match
 from typing import Iterable
 
 from click.core import Context
-from click.decorators import help_option, option, pass_context
-from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
+from typer.main import Typer
+from typer.params import Option
+from typing_extensions import Annotated, List
 
+from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, pretty_print, StrPath
 from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatCodeNonPositiveLineLengthError
-from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, pretty_print, StrPath
 from utilities.common.functions import file_reader, file_writer, ReaderMode
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.scripts.cli import clear_logs
 from utilities.scripts.list_files import get_files
 
 MAX_LENGTH: int = 84
 
+format_code: Typer = Typer()
 
-@command_line_interface.command(
-    "format-code",
-    cls=APIGroup,
-    help="Команда для форматирования блоков кода")
-@option(
-    "-d", "--dir", "directory",
-    type=ClickPath(
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
-    help="Директория для обработки",
-    multiple=False,
-    required=False,
-    metavar="DIR",
-    default=None)
-@option(
-    "-f", "--file", "files",
-    type=ClickPath(
-        file_okay=True,
-        readable=True,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=False),
-    help="\b\nФайлы для обработки. Может использоваться несколько раз",
-    multiple=True,
-    required=False,
-    metavar="FILE ... FILE",
-    default=None)
-@option(
-    "-l", "--length",
-    type=INT,
-    help=f"\b\nМаксимальная длина строки. По умолчанию: {MAX_LENGTH}"
-         f"\nПримечание. Должно быть целым положительным числом",
-    multiple=False,
-    required=False,
-    metavar="LEN",
-    default=MAX_LENGTH)
-@option(
-    "--recursive/--no-recursive",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг рекурсивного поиска файлов."
-         "\nПо умолчанию: True, вложенные файлы учитываются",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
-    "--keep-logs",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
-    show_default=True,
-    required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
-@pass_context
+
+@format_code.command(
+    name="format-code",
+    help="Команда для форматирования блоков кода"
+)
 def format_code_command(
         ctx: Context,
-        directory: StrPath = None,
-        files: Iterable[StrPath] = None,
-        recursive: bool = True,
-        length: int = MAX_LENGTH,
-        keep_logs: bool = False):
+        files: Annotated[
+            List[Path],
+            Option(
+                "--file", "-f",
+                help="Файл для обработки. Может использоваться несколько раз",
+                metavar="FILE .. FILE",
+                exists=True,
+                file_okay=True,
+                dir_okay=False,
+                resolve_path=True,
+                allow_dash=False)] = None,
+        directory: Annotated[
+            Path,
+            Option(
+                "--dir", "-d",
+                help="Директория для обработки",
+                exists=True,
+                file_okay=False,
+                dir_okay=True,
+                resolve_path=True,
+                allow_dash=False)] = None,
+        length: Annotated[
+            int,
+            Option(
+                "-l", "--length",
+                metavar="WIDTH",
+                help=f"Максимальная длина строки. По умолчанию: {MAX_LENGTH}"
+                     f"\nПримечание. Должно быть целым положительным числом",
+                show_default=True)] = MAX_LENGTH,
+        recursive: Annotated[
+            bool,
+            Option(
+                "--recursive/--no-recursive", "-r/-R",
+                show_default=True,
+                help="Флаг рекурсивного поиска файлов.\nПо умолчанию: True, вложенные файлы учитываются")] = True,
+        keep_logs: Annotated[
+            bool,
+            Option(
+                "--keep-logs",
+                show_default=True,
+                help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
     if length < 0:
         logger.error(f"Максимальная длина не может быть неположительным числом, однако получено {length}")
         raise FormatCodeNonPositiveLineLengthError
