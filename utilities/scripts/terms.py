@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Annotated, Any
 
 from click.core import Context, Parameter
-from click.decorators import argument, help_option, option, pass_context
+from click.exceptions import Exit
 from click.termui import pause
-from click.types import BOOL
 from click.utils import echo
 from loguru import logger
+from typer.main import Typer
+from typer.params import Argument, Option
+from typing_extensions import List
 
-from utilities.common.constants import HELP, PRESS_ENTER_KEY, pretty_print
-from utilities.common.functions import file_reader, ReaderMode, clear_logs
+from utilities.common.constants import PRESS_ENTER_KEY, pretty_print
+from utilities.common.functions import clear_logs, file_reader, ReaderMode
 from utilities.terms.ascii_doc_table_terms import AsciiDocTableTerms
 from utilities.terms.git_manager import git_manager
 from utilities.terms.table import Term
@@ -19,6 +21,11 @@ _SOURCES: Path = Path(__file__).parent.parent.parent.joinpath("sources")
 INFO_FILE: Path = _SOURCES.joinpath("help.txt")
 README_FILE: Path = _SOURCES.joinpath("readme.txt")
 SAMPLES_FILE: Path = _SOURCES.joinpath("samples.txt")
+
+terms: Typer = Typer(
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help="Команда для вывода расшифровки аббревиатур")
 
 
 # noinspection PyUnusedLocal
@@ -36,126 +43,76 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     result: str = file_reader(path, ReaderMode.STRING)
     echo(result)
     pause(PRESS_ENTER_KEY)
-    ctx.exit(0)
+    Exit(0)
 
 
-@command_line_interface.command(
-    "terms",
-    cls=APIGroup,
+@terms.command(
+    name="terms",
     help="Команда для вывода расшифровки аббревиатур")
-@argument(
-    "terms",
-    required=False,
-    metavar="TERMS",
-    nargs=-1,
-    default=None)
-@option(
-    "-a", "--all", "all_flag",
-    is_flag=True,
-    cls=MutuallyExclusiveOption,
-    mutually_exclusive=["full_flag", "readme_flag", "samples_flag"],
-    help="\b\nФлаг вывода всех сокращений",
-    show_default=True,
-    required=False,
-    is_eager=True,
-    default=False)
-@option(
-    "-f", "--full", "full_flag",
-    is_flag=True,
-    cls=MutuallyExclusiveOption,
-    mutually_exclusive=["all_flag", "readme_flag", "samples_flag"],
-    help="\b\nФлаг вывода всех сокращений с их расшифровками",
-    show_default=True,
-    required=False,
-    is_eager=True,
-    default=False)
-@option(
-    "-i", "--info", "info_flag",
-    is_flag=True,
-    cls=MutuallyExclusiveOption,
-    mutually_exclusive=["full_flag", "all_flag", "samples_flag", "readme_flag"],
-    help="\b\nФлаг вывода полного руководства",
-    show_default=True,
-    required=False,
-    is_eager=True,
-    callback=print_file,
-    default=False)
-@option(
-    "-r", "--readme", "readme_flag",
-    is_flag=True,
-    cls=MutuallyExclusiveOption,
-    mutually_exclusive=["full_flag", "all_flag", "samples_flag", "info_flag"],
-    help="\b\nФлаг вывода полного руководства",
-    show_default=True,
-    required=False,
-    is_eager=True,
-    callback=print_file,
-    default=False)
-@option(
-    "-s", "--samples", "samples_flag",
-    is_flag=True,
-    cls=MutuallyExclusiveOption,
-    mutually_exclusive=["full_flag", "readme_flag", "all_flag", "info_flag"],
-    help="\b\nФлаг вывода примеров использования",
-    show_default=True,
-    required=False,
-    is_eager=True,
-    callback=print_file,
-    default=False)
-@option(
-    "--abbr", "abbr_flag",
-    is_flag=True,
-    cls=MutuallyExclusiveOption,
-    mutually_exclusive=["ascii_flag", "common_flag"],
-    help="\b\nФлаг вывода сокращения для добавления в файл Markdown.\nФормат: <abbr title=\"\"></abbr>",
-    show_default=True,
-    required=False,
-    default=False)
-@option(
-    "--ascii", "ascii_flag",
-    is_flag=True,
-    cls=MutuallyExclusiveOption,
-    mutually_exclusive=["abbr_flag", "common_flag"],
-    help="\b\nФлаг вывода сокращения для добавления в файл AsciiDoc.\nФормат: pass:q[<abbr title=\"\"></abbr>]",
-    show_default=True,
-    required=False,
-    default=False)
-@option(
-    "--common", "common_flag",
-    is_flag=True,
-    cls=MutuallyExclusiveOption,
-    mutually_exclusive=["abbr_flag", "ascii_flag"],
-    help="\b\nФлаг вывода сокращения в свободном виде",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
-    "--keep-logs",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
-    show_default=True,
-    required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
-@pass_context
 def terms_command(
         ctx: Context,
-        terms: Iterable[str] = None, *,
-        all_flag: bool = False,
-        full_flag: bool = False,
-        info_flag: bool = False,
-        readme_flag: bool = False,
-        samples_flag: bool = False,
-        abbr_flag: bool = False,
-        ascii_flag: bool = False,
-        keep_logs: bool = False,
-        common_flag: bool = False):
+        acronyms: Annotated[
+            List[str],
+            Argument(
+                metavar="TERM .. TERM",
+                help="Перечень запрашиваемых аббревиатур")] = None, *,
+        all_flag: Annotated[
+            bool,
+            Option(
+                "-a", "--all",
+                show_default=True,
+                help="Флаг вывода всех сокращений")] = False,
+        full_flag: Annotated[
+            bool,
+            Option(
+                "-f", "--full",
+                show_default=True,
+                help="Флаг вывода всех сокращений с их расшифровками")] = False,
+        info_flag: Annotated[
+            bool,
+            Option(
+                "-i", "--info",
+                show_default=True,
+                help="Флаг вывода полного руководства")] = False,
+        readme_flag: Annotated[
+            bool,
+            Option(
+                "-r", "--readme",
+                show_default=True,
+                help="Флаг вывода полного руководства")] = False,
+        samples_flag: Annotated[
+            bool,
+            Option(
+                "-s", "--samples",
+                show_default=True,
+                help="Флаг вывода примеров использования")] = False,
+        abbr_flag: Annotated[
+            bool,
+            Option(
+                "--abbr",
+                show_default=True,
+                help="Флаг вывода сокращения для добавления в файл Markdown."
+                     "\nФормат: <abbr title=\"\"></abbr>")] = False,
+        ascii_flag: Annotated[
+            bool,
+            Option(
+                "--ascii",
+                show_default=True,
+                help="Флаг вывода сокращения для добавления в файл AsciiDoc."
+                     "\nФормат: pass:q[<abbr title=\"\"></abbr>]")] = False,
+        keep_logs: Annotated[
+            bool,
+            Option(
+                "--keep-logs",
+                show_default=True,
+                help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False,
+        common_flag: Annotated[
+            bool,
+            Option(
+                "--common",
+                show_default=True,
+                help="Флаг вывода сокращения в свободном виде")] = False):
     git_manager.set_content_git_pages()
     git_manager.compare()
     git_manager.set_terms()
@@ -182,17 +139,17 @@ def terms_command(
     elif samples_flag:
         result: str = file_reader(SAMPLES_FILE, ReaderMode.STRING)
 
-    elif terms is None or not terms:
+    elif acronyms is None or not acronyms:
         echo("Не задана ни одна аббревиатура")
         result: str = ""
 
     else:
         terms_print: list[Term] = []
 
-        if isinstance(terms, str):
-            terms: list[str] = [terms]
+        if isinstance(acronyms, str):
+            acronyms: list[str] = [acronyms]
 
-        for term in terms:
+        for term in acronyms:
             term: str = term.upper()
 
             if term not in ascii_doc_table.terms_short():

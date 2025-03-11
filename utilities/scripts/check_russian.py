@@ -12,13 +12,15 @@ from typer.params import Option
 from typing_extensions import Annotated, List
 
 from utilities.common.constants import FAIL_COLOR, NORMAL_COLOR, PASS_COLOR, pretty_print, separator, StrPath
-from utilities.common.functions import file_reader, ReaderMode
-from utilities.common.functions import clear_logs
+from utilities.common.functions import file_reader, ReaderMode, clear_logs
 from utilities.scripts.list_files import get_files
 
 RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
 
-check_russian: Typer = Typer(rich_markup_mode="rich")
+check_russian: Typer = Typer(
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help="Команда для проверки наличия непереведенных слов")
 
 
 def wrap_text(

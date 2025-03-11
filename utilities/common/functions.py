@@ -6,7 +6,7 @@ from shutil import rmtree
 from typing import Callable, Iterable
 
 from click.core import Context
-from click.decorators import pass_context
+from click.exceptions import Exit
 from click.termui import pause
 from click.utils import echo
 from loguru import logger
@@ -91,7 +91,6 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
         raise
 
 
-@pass_context
 def clear_logs(ctx: Context):
     keep_logs: bool = ctx.obj.get("keep_logs", False)
     debug: bool = ctx.obj.get("debug", False)
@@ -118,4 +117,4 @@ def clear_logs(ctx: Context):
         echo(f"Папка с логами: {DEBUG.parent}")
 
     pause(PRESS_ENTER_KEY)
-    ctx.exit(0)
+    Exit(0)

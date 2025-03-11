@@ -35,7 +35,10 @@ _DICT_RESULTS: dict[bool, dict[str, str]] = {
     }
 }
 
-validate_yaml: Typer = Typer()
+validate_yaml: Typer = Typer(
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help="Команда для валидации YAML-файла, используемого при генерации PDF")
 
 
 def determine_key(item: Mapping, keys: Iterable[str]):
@@ -279,13 +282,13 @@ def inspect_sections(
                                 __is_ok: bool = False
 
                             elif level < 0:
-                                messages.append(
+                                warnings.append(
                                     f"Значение ключа '{name}::title::level' должно быть неотрицательным, "
                                     f"но получено {level}")
                                 __is_ok: bool = False
 
                             elif level > 5:
-                                messages.append(
+                                warnings.append(
                                     f"Значение ключа '{name}::title::level' должно быть целым числом, диапазон: [0-5], "
                                     f"но получено {level}")
                                 __is_ok: bool = False

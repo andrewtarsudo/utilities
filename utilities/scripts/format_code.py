@@ -16,13 +16,15 @@ from utilities.scripts.list_files import get_files
 
 MAX_LENGTH: int = 84
 
-format_code: Typer = Typer()
+format_code: Typer = Typer(
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help="Команда для форматирования блоков кода")
 
 
 @format_code.command(
     name="format-code",
-    help="Команда для форматирования блоков кода"
-)
+    help="Команда для форматирования блоков кода")
 def format_code_command(
         ctx: Context,
         files: Annotated[

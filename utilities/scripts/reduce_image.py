@@ -14,7 +14,10 @@ from utilities.common.constants import separator, StrPath
 from utilities.common.functions import clear_logs
 from utilities.scripts.list_files import get_files
 
-reduce_image: Typer = Typer()
+reduce_image: Typer = Typer(
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help="Команда для уменьшения размера изображений JPG, PNG")
 
 
 def file_size(value: int) -> str:

@@ -10,10 +10,13 @@ from typing_extensions import Annotated, List
 from utilities.common.constants import MAX_SYMBOLS, MIN_COLUMN, StrPath
 from utilities.common.functions import file_reader, ReaderMode, clear_logs
 from utilities.scripts.list_files import get_files
-from utilities.table_cols import TableAnalyser
+from utilities.table_cols.analyser import TableAnalyser
 from utilities.table_cols.file import AsciiDocFile
 
-table_cols: Typer = Typer()
+table_cols: Typer = Typer(
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help="Команда для задания ширины столбцам таблиц")
 
 
 @table_cols.command(

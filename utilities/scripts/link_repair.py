@@ -4,14 +4,16 @@ from os.path import relpath
 from pathlib import Path
 
 from click.core import Context
-from click.decorators import argument, help_option, option, pass_context
+from click.exceptions import Exit
 from click.termui import echo, pause
-from click.types import BOOL, Path as ClickPath
 from loguru import logger
+from typer.main import Typer
+from typer.params import Argument, Option
+from typing_extensions import Annotated
 
-from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
+from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.common.errors import LinkRepairInvalidFileDictAttributeError, LinkRepairInvalidStorageAttributeError
-from utilities.common.functions import file_reader, file_writer, ReaderMode
+from utilities.common.functions import clear_logs, file_reader, file_writer, ReaderMode
 from utilities.link_repair.const import FileLanguage, prepare_logging
 from utilities.link_repair.file_dict import FileDict, FileLinkItem, TextFile
 from utilities.link_repair.general_storage import Storage
@@ -19,7 +21,11 @@ from utilities.link_repair.internal_link_inspector import internal_inspector
 from utilities.link_repair.link import Link
 from utilities.link_repair.link_fixer import link_fixer
 from utilities.link_repair.link_inspector import link_inspector
-from utilities.common.functions import clear_logs
+
+link_repair: Typer = Typer(
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help="Команда для проверки и исправления ссылок в файлах документации")
 
 
 def validate_dir_path(path: StrPath | None) -> bool:
@@ -45,103 +51,77 @@ def has_no_required_files(path: StrPath) -> bool:
     return bool_md and bool_adoc
 
 
-@command_line_interface.command(
-    "link-repair",
-    cls=SwitchArgsAPIGroup,
+@link_repair.command(
+    name="link-repair",
     help="Команда для проверки и исправления ссылок в файлах документации")
-@argument(
-    "pathdir",
-    type=ClickPath(
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
-    required=True,
-    metavar="PATHDIR")
-@option(
-    "-a", "--anchor-disable", "anchor_validation",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг поиска повторяющихся якорей.\n"
-         "По умолчанию: True, дублирующийся якори обрабатываются",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
-    "-d", "--dry-run",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг вывода некорректных ссылок на экран без изменения"
-         "\nфайлов."
-         "\nПо умолчанию: False, файлы перезаписываются",
-    show_default=True,
-    required=False,
-    default=False)
-@option(
-    "-n", "--no-result",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг удаления файла с результатами работы скрипта по"
-         "\nзавершении работы в штатном режиме.\n"
-         "По умолчанию: False, файл сохраняется",
-    show_default=True,
-    required=False,
-    default=False)
-@option(
-    "-s", "--separate", "separate_languages",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг раздельной обработки файлов на различных языках.\n"
-         "По умолчанию: True, файлы обрабатываются отдельно",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
-    "--skip-en",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг обработки файлов только на русском языке."
-         "\nПо умолчанию: False, обрабатываются файлы на обоих"
-         "\nязыках",
-    show_default=True,
-    required=False,
-    default=False)
-@option(
-    "--keep-logs",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом"
-         "\nпо завершении работы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
-    show_default=True,
-    required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
-@pass_context
 def link_repair_command(
         ctx: Context,
-        pathdir: Path,
-        dry_run: bool = False,
-        no_result: bool = False,
-        anchor_validation: bool = True,
-        separate_languages: bool = True,
-        skip_en: bool = False,
-        keep_logs: bool = False):
+        pathdir: Annotated[
+            Path, Argument(
+                metavar="PATHDIR",
+                file_okay=False,
+                dir_okay=True,
+                exists=True,
+                allow_dash=False,
+                resolve_path=True,
+                help="Путь до директории для обработки *.md- и *.adoc-файлов")],
+        dry_run: Annotated[
+            bool,
+            Option(
+                "-d/-D", "--dry-run/--no-dry-run",
+                show_default=True,
+                help="Флаг вывода некорректных ссылок на экран без изменения"
+                     "\nфайлов."
+                     "\nПо умолчанию: False, файлы перезаписываются")] = False,
+        no_result: Annotated[
+            bool,
+            Option(
+                "-n", "--no-result",
+                show_default=True,
+                help="\b\nФлаг удаления файла с результатами работы скрипта по"
+                     "\nзавершении работы в штатном режиме.\n"
+                     "По умолчанию: False, файл сохраняется")] = False,
+        anchor_validation: Annotated[
+            bool,
+            Option(
+                "-a", "--anchor-disable",
+                show_default=True,
+                help="Флаг поиска повторяющихся якорей.\n"
+                     "По умолчанию: True, дублирующийся якори обрабатываются")] = True,
+        separate_languages: Annotated[
+            bool,
+            Option(
+                "-s", "--separate",
+                show_default=True,
+                help="\b\nФлаг раздельной обработки файлов на различных языках.\n"
+                     "По умолчанию: True, файлы обрабатываются отдельно")] = True,
+        skip_en: Annotated[
+            bool,
+            Option(
+                "--skip-en",
+                show_default=True,
+                help="\b\nФлаг обработки файлов только на русском языке."
+                     "\nПо умолчанию: False, обрабатываются файлы на обоих"
+                     "\nязыках")] = False,
+        keep_logs: Annotated[
+            bool,
+            Option(
+                "--keep-logs",
+                show_default=True,
+                help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
     result_file_path: Path = Path.cwd().joinpath("results.txt")
 
     if not validate_dir_path(pathdir):
         logger.error(f"Путь {pathdir} не существует или указывает не на директорию")
         pause(PRESS_ENTER_KEY)
-        ctx.exit(0)
+        Exit(0)
 
     if has_no_required_files(pathdir):
         logger.warning(
             f"В директории {pathdir} не найдены файлы с расширением {MD_EXTENSION}, {ADOC_EXTENSION}")
         pause(PRESS_ENTER_KEY)
-        ctx.exit(0)
+        Exit(0)
 
     _base_dir: Path = Path(pathdir).parent.parent.resolve()
 

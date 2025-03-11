@@ -10,7 +10,10 @@ from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument
 from utilities.common.functions import clear_logs
 
-convert_tables: Typer = Typer()
+convert_tables: Typer = Typer(
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help="Команда для корректного извлечения таблиц из файлов docx в формат Markdown")
 
 
 @convert_tables.command(

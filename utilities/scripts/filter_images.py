@@ -12,7 +12,10 @@ from utilities.common.constants import pretty_print, StrPath
 from utilities.common.functions import file_reader, file_writer, ReaderMode, clear_logs
 from utilities.scripts.list_files import get_files
 
-filter_images: Typer = Typer()
+filter_images: Typer = Typer(
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help="Команда для удаления неиспользуемых изображений")
 
 
 class File:

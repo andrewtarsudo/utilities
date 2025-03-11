@@ -21,7 +21,6 @@ if __name__ == '__main__':
 
     stdout.reconfigure(encoding="utf-8")
 
-    # from utilities.scripts.cli import command_line_interface
     from utilities.scripts.main import main
 
     app = main()

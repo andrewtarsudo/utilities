@@ -13,7 +13,10 @@ from utilities.common.constants import StrPath
 from utilities.common.functions import clear_logs
 from utilities.scripts.list_files import get_files
 
-repair_svg: Typer = Typer()
+repair_svg: Typer = Typer(
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help="Команда для исправления файлов SVG")
 
 
 @repair_svg.command(
