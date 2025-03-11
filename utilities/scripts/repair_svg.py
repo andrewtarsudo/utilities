@@ -10,7 +10,7 @@ from typer.models import Context
 from typing_extensions import Annotated, List
 
 from utilities.common.constants import StrPath
-from utilities.scripts.cli import clear_logs
+from utilities.common.functions import clear_logs
 from utilities.scripts.list_files import get_files
 
 repair_svg: Typer = Typer()

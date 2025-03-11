@@ -13,5 +13,5 @@ version: Typer = Typer()
     help="Вывести версию скрипта на экран и завершить работу")
 def version_command():
     print(f"Версия {__version__}")
-    Prompt.ask(PRESS_ENTER_KEY, )
+    Prompt.ask(PRESS_ENTER_KEY)
     raise Exit(0)

@@ -13,8 +13,7 @@ from typer.params import Argument, Option
 from yaml import safe_load
 
 from utilities.common.constants import FAIL_COLOR, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
-from utilities.common.functions import file_reader, ReaderMode
-from utilities.scripts.cli import clear_logs
+from utilities.common.functions import file_reader, ReaderMode, clear_logs
 
 _ALLOWED_KEYS: tuple[str, ...] = ("title", "index", "files")
 
@@ -131,70 +130,70 @@ def inspect_legal(
         rights: dict[str, dict[str, str | bool] | list[str]] = content.get(_)
 
         if not isinstance(rights, Mapping):
-            messages.append(f"Раздел 'Rights' должен быть типа object, но получено {type(rights)}")
+            warnings.append(f"Раздел 'Rights' должен быть типа object, но получено {type(rights)}")
             __is_ok: bool = False
 
         if "title" not in rights:
-            messages.append("В разделе 'Rights' отсутствует секция 'title'")
+            warnings.append("В разделе 'Rights' отсутствует секция 'title'")
             __is_ok: bool = False
 
         else:
             title: dict[str, str | bool] = rights.get("title")
 
             if "title-files" not in title:
-                messages.append("В секции 'Rights::title' отсутствует ключ 'title-files'")
+                warnings.append("В секции 'Rights::title' отсутствует ключ 'title-files'")
                 __is_ok: bool = False
 
             else:
                 title_files = title.get("title-files")
 
                 if not isinstance(title_files, bool) or title_files is not False:
-                    messages.append(
+                    warnings.append(
                         f"Значение ключа 'Rights::title::title-files' должно быть false, "
                         f"но получено {title_files}")
                     __is_ok: bool = False
 
             if "value" not in title:
-                messages.append("В секции 'Rights::title' отсутствует ключ 'value'")
+                warnings.append("В секции 'Rights::title' отсутствует ключ 'value'")
                 __is_ok: bool = False
 
             else:
                 value = title.get("value")
 
                 if not isinstance(value, str) or value not in ("Юридическая информация", "Legal Information"):
-                    messages.append(
+                    warnings.append(
                         "Значение ключа 'Rights::title::value' должно быть "
                         "'Юридическая информация' или 'Legal Information', "
                         f"но получено {value}")
                     __is_ok: bool = False
 
         if "index" not in rights:
-            messages.append("В разделе 'Rights' отсутствует секция 'index'")
+            warnings.append("В разделе 'Rights' отсутствует секция 'index'")
             __is_ok: bool = False
 
         else:
             index = rights.get("index")
 
             if not isinstance(index, list):
-                messages.append(
+                warnings.append(
                     f"Значение ключа 'Rights::index' должно быть типа list, "
                     f"но получено {get_origin(index)}")
                 __is_ok: bool = False
 
             elif not isinstance(index[0], str):
-                messages.append(
+                warnings.append(
                     f"Все значения ключа 'Rights::index' должны быть типа str, "
                     f"но получено {get_args(index)}")
                 __is_ok: bool = False
 
             elif len(index) != 1:
-                messages.append(
+                warnings.append(
                     f"Количество значений 'Rights::index' должно быть 1, "
                     f"но получено {len(index)}")
                 __is_ok: bool = False
 
             elif not index[0].startswith("content/common/_index"):
-                messages.append(
+                warnings.append(
                     f"Значение ключа 'Rights::index' должно быть 'content/common/_index.md' "
                     f"или 'content/common/_index.adoc', "
                     f"но получено {index[0]}")
@@ -256,7 +255,7 @@ def inspect_sections(
                             title_files = title.get("title-files")
 
                             if not isinstance(title_files, bool):
-                                messages.append(
+                                warnings.append(
                                     f"Значение ключа '{name}::title::title-files' должно быть типа bool, "
                                     f"но получено {type(title_files)}")
                                 __is_ok: bool = False
@@ -265,7 +264,7 @@ def inspect_sections(
                             value = title.get("value")
 
                             if not isinstance(value, str):
-                                messages.append(
+                                warnings.append(
                                     f"Значение ключа '{name}::title::value' должно быть типа str, "
                                     f"но получено {type(value)}")
                                 __is_ok: bool = False
@@ -274,7 +273,7 @@ def inspect_sections(
                             level = title.get("level")
 
                             if not isinstance(level, int):
-                                messages.append(
+                                warnings.append(
                                     f"Значение ключа '{name}::title::level' должно быть типа int, "
                                     f"но получено {type(level)}")
                                 __is_ok: bool = False
@@ -286,7 +285,7 @@ def inspect_sections(
                                 __is_ok: bool = False
 
                             elif level > 5:
-                                warnings.append(
+                                messages.append(
                                     f"Значение ключа '{name}::title::level' должно быть целым числом, диапазон: [0-5], "
                                     f"но получено {level}")
                                 __is_ok: bool = False
@@ -299,19 +298,19 @@ def inspect_sections(
                         __is_ok: bool = False
 
                     elif not isinstance(index, list):
-                        messages.append(
+                        warnings.append(
                             f"Значение ключа '{name}::index' должно быть типа list, "
                             f"но получено {get_origin(index)}")
                         __is_ok: bool = False
 
                     elif not all(isinstance(item, str) for item in index):
-                        messages.append(
+                        warnings.append(
                             f"Все значения ключа '{name}::index' должны быть типа str, "
                             f"но получено {get_args(index)}")
                         __is_ok: bool = False
 
                     elif len(index) != 1:
-                        messages.append(
+                        warnings.append(
                             f"Количество значений '{name}::index' должно быть 1, "
                             f"но получено {len(index)}")
                         __is_ok: bool = False
@@ -320,13 +319,13 @@ def inspect_sections(
                     files = section.get("files")
 
                     if not isinstance(files, list):
-                        messages.append(
+                        warnings.append(
                             f"Значение ключа '{name}::files' должно быть типа list, "
                             f"но получено {get_origin(files)}")
                         __is_ok: bool = False
 
                     elif not all(isinstance(file, str) for file in files):
-                        messages.append(
+                        warnings.append(
                             f"Все значения ключа '{name}::files' должны быть типа str, "
                             f"но получено {get_args(files)}")
                         __is_ok: bool = False
@@ -336,7 +335,7 @@ def inspect_sections(
                         f"В разделе {name} обнаружены посторонние ключи:\n{pretty_print(extra_keys)}")
 
                 if __is_ok and verbose:
-                    messages.append(f"Секция {name} задана корректно")
+                    messages.append(f"Раздел {name} задан корректно")
 
     return warnings, messages
 
@@ -364,7 +363,7 @@ def validate(
 
         _path: str = path.relative_to(root).as_posix()
 
-        _line = f"{_color}{line_no + 1:>3}  {_path:.<{max_length}}{_status:.>6}{NORMAL_COLOR}"
+        _line = f"{_color}{line_no + 1:>4}  {_path:.<{max_length}}{_status:.>6}{NORMAL_COLOR}"
         _lines.append(_line)
 
         if verbose or _status == "NOT OK":
@@ -431,21 +430,27 @@ def validate_yaml_command(
 
     except FileNotFoundError:
         logger.error(f"Файл {yaml_file} не найден")
+        raise
 
     except PermissionError:
         logger.error(f"Недостаточно прав для чтения файла {yaml_file}")
+        raise
 
     except RuntimeError:
         logger.error(f"Истекло время чтения файла {yaml_file}")
+        raise
 
     except UnsupportedOperation:
         logger.error(f"Не поддерживаемая операция с файлом {yaml_file}")
+        raise
 
     except UnboundLocalError as e:
         logger.error(f"Ошибка присваивания {e.name}")
+        raise
 
     except OSError as e:
         logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+        raise
 
     else:
         warnings: list[str] = []
@@ -466,7 +471,8 @@ def validate_yaml_command(
         lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
         validate(yaml_file.parent, lines, output, verbose)
 
-        echo(output)
+        if output:
+            echo(f"Файл с результатами: {output.resolve()}")
 
     finally:
         ctx.obj["keep_logs"] = keep_logs

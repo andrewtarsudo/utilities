@@ -19,7 +19,7 @@ from utilities.link_repair.internal_link_inspector import internal_inspector
 from utilities.link_repair.link import Link
 from utilities.link_repair.link_fixer import link_fixer
 from utilities.link_repair.link_inspector import link_inspector
-from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup
+from utilities.common.functions import clear_logs
 
 
 def validate_dir_path(path: StrPath | None) -> bool:

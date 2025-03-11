@@ -11,8 +11,7 @@ from typing_extensions import Annotated, List
 
 from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, pretty_print, StrPath
 from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatCodeNonPositiveLineLengthError
-from utilities.common.functions import file_reader, file_writer, ReaderMode
-from utilities.scripts.cli import clear_logs
+from utilities.common.functions import file_reader, file_writer, ReaderMode, clear_logs
 from utilities.scripts.list_files import get_files
 
 MAX_LENGTH: int = 84

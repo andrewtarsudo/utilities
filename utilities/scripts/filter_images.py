@@ -9,8 +9,7 @@ from typer.params import Argument, Option
 from typing_extensions import Annotated
 
 from utilities.common.constants import pretty_print, StrPath
-from utilities.common.functions import file_reader, file_writer, ReaderMode
-from utilities.scripts.cli import clear_logs
+from utilities.common.functions import file_reader, file_writer, ReaderMode, clear_logs
 from utilities.scripts.list_files import get_files
 
 filter_images: Typer = Typer()

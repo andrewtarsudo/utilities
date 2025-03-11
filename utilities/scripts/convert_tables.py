@@ -8,7 +8,7 @@ from typing_extensions import Annotated
 
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument
-from utilities.scripts.cli import clear_logs
+from utilities.common.functions import clear_logs
 
 convert_tables: Typer = Typer()
 

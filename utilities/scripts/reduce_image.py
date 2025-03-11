@@ -11,7 +11,7 @@ from typer.params import Option
 from typing_extensions import Annotated, List
 
 from utilities.common.constants import separator, StrPath
-from utilities.scripts.cli import clear_logs
+from utilities.common.functions import clear_logs
 from utilities.scripts.list_files import get_files
 
 reduce_image: Typer = Typer()

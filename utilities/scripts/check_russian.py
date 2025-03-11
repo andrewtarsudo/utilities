@@ -13,7 +13,7 @@ from typing_extensions import Annotated, List
 
 from utilities.common.constants import FAIL_COLOR, NORMAL_COLOR, PASS_COLOR, pretty_print, separator, StrPath
 from utilities.common.functions import file_reader, ReaderMode
-from utilities.scripts.cli import clear_logs
+from utilities.common.functions import clear_logs
 from utilities.scripts.list_files import get_files
 
 RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"

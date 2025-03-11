@@ -13,7 +13,7 @@ from typer import Option
 from typing_extensions import Annotated
 
 from utilities.common.constants import HELP, PRESS_ENTER_KEY, pretty_print, StrPath
-from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption, SwitchArgsAPIGroup
+from utilities.common.functions import clear_logs
 
 
 def check_content_common(path: Path):
