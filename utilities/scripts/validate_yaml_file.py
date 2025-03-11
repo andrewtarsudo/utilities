@@ -3,18 +3,18 @@ from io import UnsupportedOperation
 from os import system
 from pathlib import Path
 from sys import platform
-from typing import Any, get_args, get_origin, Iterable, Mapping
+from typing import Annotated, Any, get_args, get_origin, Iterable, Mapping
 
 from click.core import Context
-from click.decorators import argument, help_option, option, pass_context
-from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
+from typer.main import Typer
+from typer.params import Argument, Option
 from yaml import safe_load
 
-from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
+from utilities.common.constants import FAIL_COLOR, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
 from utilities.common.functions import file_reader, ReaderMode
-from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup
+from utilities.scripts.cli import clear_logs
 
 _ALLOWED_KEYS: tuple[str, ...] = ("title", "index", "files")
 
@@ -35,6 +35,8 @@ _DICT_RESULTS: dict[bool, dict[str, str]] = {
         "color": FAIL_COLOR
     }
 }
+
+validate_yaml: Typer = Typer()
 
 
 def determine_key(item: Mapping, keys: Iterable[str]):
@@ -380,60 +382,44 @@ def validate(
                 replace(NORMAL_COLOR, ""))
 
 
-@command_line_interface.command(
-    "validate-yaml",
-    cls=SwitchArgsAPIGroup,
+@validate_yaml.command(
+    name="validate-yaml",
     help="Команда для валидации YAML-файла, используемого при генерации PDF")
-@argument(
-    "yaml_file",
-    type=ClickPath(
-        file_okay=True,
-        readable=True,
-        allow_dash=False,
-        dir_okay=False),
-    required=True)
-@option(
-    "-o", "--output", "output",
-    type=ClickPath(
-        file_okay=True,
-        readable=True,
-        resolve_path=True,
-        allow_dash=True,
-        dir_okay=False),
-    help="\b\nФайл для записи вывода. По умолчанию: вывод в консоль",
-    multiple=False,
-    required=False,
-    metavar="FILE",
-    default=None)
-@option(
-    "--verbose/--no-verbose",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг подробного вывода.\nПо умолчанию: False, выводятся только ошибки",
-    show_default=True,
-    required=False,
-    default=False)
-@option(
-    "--keep-logs",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
-    show_default=True,
-    required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
-@pass_context
 def validate_yaml_command(
         ctx: Context,
-        yaml_file: StrPath,
-        output: StrPath = None,
-        verbose: bool = False,
-        keep_logs: bool = False):
+        yaml_file: Annotated[
+            Path,
+            Argument(
+                metavar="YAML_FILE",
+                help="Путь до файла PDF_*.yml",
+                exists=True,
+                file_okay=True,
+                dir_okay=False,
+                resolve_path=True,
+                allow_dash=False)],
+        output: Annotated[
+            Path,
+            Option(
+                "-o", "--output",
+                metavar="FILE",
+                help="Файл для записи вывода. По умолчанию: вывод в консоль",
+                file_okay=True,
+                dir_okay=False,
+                resolve_path=True,
+                allow_dash=False)] = None,
+        verbose: Annotated[
+            bool,
+            Option(
+                "--verbose/--quiet", "-v/-q",
+                show_default=True,
+                help="Флаг подробного вывода.\nПо умолчанию: False, выводятся только ошибки")] = False,
+        keep_logs: Annotated[
+            bool,
+            Option(
+                "--keep-logs",
+                show_default=True,
+                help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
     if platform.startswith("win"):
         system("color")
 

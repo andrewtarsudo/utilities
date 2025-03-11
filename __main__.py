@@ -21,9 +21,11 @@ if __name__ == '__main__':
 
     stdout.reconfigure(encoding="utf-8")
 
-    from utilities.scripts.cli import command_line_interface
+    # from utilities.scripts.cli import command_line_interface
+    from utilities.scripts.main import main
 
-    command_line_interface()
+    app = main()
+    app()
 
     if faulthandler.is_enabled():
         faulthandler.disable()

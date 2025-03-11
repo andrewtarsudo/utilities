@@ -1,20 +1,24 @@
 # -*- coding: utf-8 -*-
 from os import system
+from pathlib import Path
 from sys import platform
 from typing import Iterable
 
-from click.core import Context
-from click.decorators import help_option, option, pass_context
-from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
+from typer.main import Typer
+from typer.models import Context
+from typer.params import Option
+from typing_extensions import Annotated, List
 
-from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, separator, StrPath
+from utilities.common.constants import FAIL_COLOR, NORMAL_COLOR, PASS_COLOR, pretty_print, separator, StrPath
 from utilities.common.functions import file_reader, ReaderMode
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.scripts.cli import clear_logs
 from utilities.scripts.list_files import get_files
 
 RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+
+check_russian: Typer = Typer(rich_markup_mode="rich")
 
 
 def wrap_text(
@@ -90,77 +94,51 @@ def file_inspection(path: str, is_color: bool = True):
                  is_success=False)))
 
 
-@command_line_interface.command(
-    "check-russian",
-    cls=APIGroup,
+@check_russian.command(
+    name="check-russian",
     help="Команда для проверки наличия непереведенных слов")
-@option(
-    "-d", "--dir", "directory",
-    type=ClickPath(
-        exists=True,
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
-    help="Директория для обработки",
-    multiple=False,
-    required=False,
-    metavar="DIR",
-    default=None)
-@option(
-    "-f", "--file", "files",
-    type=ClickPath(
-        exists=True,
-        file_okay=True,
-        readable=True,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=False),
-    help="\b\nФайл для обработки. Может использоваться несколько раз",
-    multiple=True,
-    required=False,
-    metavar="FILE ... FILE",
-    default=None)
-@option(
-    "--verbose/--no-verbose",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг подробного вывода."
-         "\nПо умолчанию: False, выводятся только ошибки",
-    show_default=True,
-    required=False,
-    default=False)
-@option(
-    "--recursive/--no-recursive",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг рекурсивного поиска файлов."
-         "\nПо умолчанию: True, вложенные файлы учитываются",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
-    "--keep-logs",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
-    show_default=True,
-    required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
-@pass_context
 def check_russian_command(
         ctx: Context,
-        files: Iterable[StrPath] = None,
-        directory: StrPath = None,
-        recursive: bool = True,
-        verbose: bool = False,
-        keep_logs: bool = False):
+        files: Annotated[
+            List[Path],
+            Option(
+                "--file", "-f",
+                help="Файл для обработки. Может использоваться несколько раз",
+                metavar="FILE .. FILE",
+                exists=True,
+                file_okay=True,
+                dir_okay=False,
+                resolve_path=True,
+                allow_dash=False)] = None,
+        directory: Annotated[
+            Path,
+            Option(
+                "--dir", "-d",
+                help="Директория для обработки",
+                exists=True,
+                file_okay=False,
+                dir_okay=True,
+                resolve_path=True,
+                allow_dash=False)] = None,
+        recursive: Annotated[
+            bool,
+            Option(
+                "--recursive/--no-recursive", "-r/-R",
+                show_default=True,
+                help="Флаг рекурсивного поиска файлов.\nПо умолчанию: True, вложенные файлы учитываются")] = True,
+        verbose: Annotated[
+            bool,
+            Option(
+                "--verbose/--quiet", "-v/-q",
+                show_default=True,
+                help="Флаг подробного вывода.\nПо умолчанию: False, выводятся только ошибки")] = False,
+        keep_logs: Annotated[
+            bool,
+            Option(
+                "--keep-logs",
+                show_default=True,
+                help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
     if platform.startswith("win"):
         system("color")
 

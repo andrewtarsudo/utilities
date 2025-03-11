@@ -1,100 +1,79 @@
 # -*- coding: utf-8 -*-
-from typing import Iterable
+from pathlib import Path
 
 from click.core import Context
-from click.decorators import help_option, option, pass_context
-from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
+from typer.main import Typer
+from typer.params import Option
+from typing_extensions import Annotated, List
 
-from utilities.common.constants import HELP, MAX_SYMBOLS, MIN_COLUMN, StrPath
+from utilities.common.constants import MAX_SYMBOLS, MIN_COLUMN, StrPath
 from utilities.common.functions import file_reader, ReaderMode
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.scripts.cli import clear_logs
 from utilities.scripts.list_files import get_files
 from utilities.table_cols import TableAnalyser
 from utilities.table_cols.file import AsciiDocFile
 
+table_cols: Typer = Typer()
 
-@command_line_interface.command(
-    "table-cols",
-    cls=APIGroup,
+
+@table_cols.command(
+    name="table-cols",
     help="Команда для задания ширины столбцам таблиц")
-@option(
-    "-f", "--file", "files",
-    type=ClickPath(
-        file_okay=True,
-        readable=True,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=False),
-    help="\b\nФайл для обработки. Может использоваться несколько раз",
-    multiple=True,
-    required=False,
-    metavar="FILE ... FILE",
-    default=None)
-@option(
-    "-d", "--dir", "directory",
-    type=ClickPath(
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
-    help="Директория для обработки",
-    multiple=False,
-    required=False,
-    metavar="DIR",
-    default=None)
-@option(
-    "-s", "--max-symbols",
-    type=INT,
-    help=f"\b\nМаксимальная ширина столбца в символах."
-         f"\nПо умолчанию: {MAX_SYMBOLS}."
-         f"\nПримечание. Должно быть целым положительным числом",
-    multiple=False,
-    required=False,
-    metavar="WIDTH",
-    default=MAX_SYMBOLS)
-@option(
-    "-c", "--min-column",
-    type=INT,
-    help=f"\b\nМинимальная ширина столбца в символах."
-         f"\nПо умолчанию: {MIN_COLUMN}."
-         f"\nПримечание. Должно быть целым положительным числом",
-    multiple=False,
-    required=False,
-    metavar="WIDTH",
-    default=MIN_COLUMN)
-@option(
-    "--recursive/--no-recursive",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг рекурсивного поиска файлов."
-         "\nПо умолчанию: True, вложенные файлы учитываются",
-    show_default=True,
-    required=False,
-    default=True)
-@option(
-    "--keep-logs",
-    type=BOOL,
-    is_flag=True,
-    help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
-    show_default=True,
-    required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
-@pass_context
 def table_cols_command(
         ctx: Context,
-        files: Iterable[StrPath] = None,
-        directory: StrPath = None,
-        recursive: bool = True,
-        max_symbols: int = MAX_SYMBOLS,
-        min_column: int = MIN_COLUMN,
-        keep_logs: bool = False):
+        files: Annotated[
+            List[Path],
+            Option(
+                "--file", "-f",
+                help="Файл для обработки. Может использоваться несколько раз",
+                metavar="FILE .. FILE",
+                exists=True,
+                file_okay=True,
+                dir_okay=False,
+                resolve_path=True,
+                allow_dash=False)] = None,
+        directory: Annotated[
+            Path,
+            Option(
+                "--dir", "-d",
+                help="Директория для обработки",
+                exists=True,
+                file_okay=False,
+                dir_okay=True,
+                resolve_path=True,
+                allow_dash=False)] = None,
+        recursive: Annotated[
+            bool,
+            Option(
+                "--recursive/--no-recursive", "-r/-R",
+                show_default=True,
+                help="Флаг рекурсивного поиска файлов.\nПо умолчанию: True, вложенные файлы учитываются")] = True,
+        max_symbols: Annotated[
+            int,
+            Option(
+                "-s", "--max-symbols",
+                metavar="WIDTH",
+                help=f"Максимальная ширина столбца в символах."
+                     f"\nПо умолчанию: {MAX_SYMBOLS}."
+                     f"\nПримечание. Должно быть целым положительным числом",
+                show_default=True)] = MAX_SYMBOLS,
+        min_column: Annotated[
+            int,
+            Option(
+                "-c", "--min-column",
+                metavar="WIDTH",
+                help=f"Минимальная ширина столбца в символах."
+                     f"\nПо умолчанию: {MIN_COLUMN}."
+                     f"\nПримечание. Должно быть целым положительным числом",
+                show_default=True)] = MIN_COLUMN,
+        keep_logs: Annotated[
+            bool,
+            Option(
+                "--keep-logs",
+                show_default=True,
+                help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
     files: list[StrPath] | None = get_files(
         ctx,
         files=files,
