@@ -68,7 +68,8 @@ def reduce_image_command(
                 file_okay=True,
                 dir_okay=False,
                 resolve_path=True,
-                allow_dash=False)] = None,
+                allow_dash=False,
+                rich_help_panel="Опции")] = None,
         directory: Annotated[
             Path,
             Option(
@@ -78,27 +79,31 @@ def reduce_image_command(
                 file_okay=False,
                 dir_okay=True,
                 resolve_path=True,
-                allow_dash=False)] = None,
+                allow_dash=False,
+                rich_help_panel="Опции")] = None,
         dry_run: Annotated[
             bool,
             Option(
                 "-d/-D", "--dry-run/--no-dry-run",
                 show_default=True,
                 help="Флаг вывода изменений размеров файлов без их изменения."
-                     "\nПо умолчанию: False, файлы перезаписываются")] = False,
+                     "\nПо умолчанию: False, файлы перезаписываются",
+                rich_help_panel="Опции")] = False,
         recursive: Annotated[
             bool,
             Option(
                 "--recursive/--no-recursive", "-r/-R",
                 show_default=True,
-                help="Флаг рекурсивного поиска файлов.\nПо умолчанию: True, вложенные файлы учитываются")] = True,
+                help="Флаг рекурсивного поиска файлов.\nПо умолчанию: True, вложенные файлы учитываются",
+                rich_help_panel="Опции")] = True,
         keep_logs: Annotated[
             bool,
             Option(
                 "--keep-logs",
                 show_default=True,
                 help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
-                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
+                     "\nПо умолчанию: False, лог-файл и директория удаляются",
+                rich_help_panel="Опции")] = False):
     extensions: str = "png jpg jpeg bmp"
 
     files: list[StrPath] | None = get_files(

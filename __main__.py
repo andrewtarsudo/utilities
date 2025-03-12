@@ -19,12 +19,23 @@ if __name__ == '__main__':
 
     from sys import stdout
 
-    stdout.reconfigure(encoding="utf-8")
+    try:
+        from shellingham import detect_shell, ShellDetectionFailure
+
+        shell, _ = detect_shell()
+
+    except ShellDetectionFailure:
+        shell = None
+
+    if shell in ("powershell", "pwsh") or shell is None:
+        stdout.reconfigure(encoding="cp1251")
+
+    else:
+        stdout.reconfigure(encoding="utf-8")
 
     from utilities.scripts.main import main
 
-    app = main()
-    app()
+    main()
 
     if faulthandler.is_enabled():
         faulthandler.disable()

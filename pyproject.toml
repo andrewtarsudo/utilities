@@ -13,13 +13,14 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.9"
 loguru = ">=0.7"
-click = ">=8.1"
 more-itertools = ">=10.5"
 pyyaml = ">=6.0"
 pillow = ">=11.1"
 python-slugify = ">=8.0"
 certifi = { version = ">=2025.1", markers = "sys_platform != 'win32'" }
 pip-system-certs = { version = ">=4.0", markers = "sys_platform == 'win32'" }
+typer = ">=0.15"
+shellingham = ">=1.5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.3"
