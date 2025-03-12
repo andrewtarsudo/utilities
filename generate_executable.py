@@ -35,17 +35,21 @@ if __name__ == "__main__":
 
     except CalledProcessError as e:
         print(f"{e.__class__.__name__}, код {e.returncode}:\n{e.stderr}")
+        raise
 
     except PermissionError as e:
         from os import stat
 
         print(f"Недостаточно прав доступа к файлу {log_file}.\nМаска: {stat(log_file).st_mode}")
+        raise
 
     except RuntimeError as e:
         print(f"{e.__class__.__name__}, ошибка во время выполнения скрипта")
+        raise
 
     except OSError as e:
         print(f"{e.__class__.__name__}, код {e.errno}\nОшибка {e.strerror}")
+        raise
 
     else:
         print(f"Исполняемый файл {exe_file} успешно создан")
