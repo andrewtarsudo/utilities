@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-from typing import Annotated, Any
 
-from click.core import Context, Parameter
-from click.exceptions import Exit
-from click.termui import pause
-from click.utils import echo
+from click.core import Context
 from loguru import logger
+from rich import print
 from typer.main import Typer
 from typer.params import Argument, Option
-from typing_extensions import List
+from typing_extensions import Annotated, List
 
-from utilities.common.constants import PRESS_ENTER_KEY, pretty_print
+from utilities.common.constants import pretty_print
 from utilities.common.functions import clear_logs, file_reader, ReaderMode
 from utilities.terms.ascii_doc_table_terms import AsciiDocTableTerms
 from utilities.terms.git_manager import git_manager
@@ -28,24 +25,6 @@ terms: Typer = Typer(
     help="Команда для вывода расшифровки аббревиатур")
 
 
-# noinspection PyUnusedLocal
-def print_file(ctx: Context, param: Parameter, value: Any):
-    if not value or ctx.resilient_parsing:
-        return
-
-    command_files: dict[str, Path] = {
-        "info_flag": INFO_FILE,
-        "readme_flag": README_FILE,
-        "samples_flag": SAMPLES_FILE}
-
-    path: Path = command_files.get(param.name)
-
-    result: str = file_reader(path, ReaderMode.STRING)
-    echo(result)
-    pause(PRESS_ENTER_KEY)
-    Exit(0)
-
-
 @terms.command(
     name="terms",
     help="Команда для вывода расшифровки аббревиатур")
@@ -54,7 +33,7 @@ def terms_command(
         acronyms: Annotated[
             List[str],
             Argument(
-                metavar="TERM .. TERM",
+                metavar="TERM ... TERM",
                 help="Перечень запрашиваемых аббревиатур")] = None, *,
         all_flag: Annotated[
             bool,
@@ -140,7 +119,7 @@ def terms_command(
         result: str = file_reader(SAMPLES_FILE, ReaderMode.STRING)
 
     elif acronyms is None or not acronyms:
-        echo("Не задана ни одна аббревиатура")
+        print("Не задана ни одна аббревиатура")
         result: str = ""
 
     else:

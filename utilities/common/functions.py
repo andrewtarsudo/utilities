@@ -5,11 +5,12 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Callable, Iterable
 
+from click import get_current_context
 from click.core import Context
 from click.exceptions import Exit
-from click.termui import pause
-from click.utils import echo
 from loguru import logger
+from rich import print
+from rich.prompt import Prompt
 
 from utilities.common.constants import __version__, DEBUG, NORMAL, PRESS_ENTER_KEY, StrPath
 
@@ -91,7 +92,8 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
         raise
 
 
-def clear_logs(ctx: Context):
+def clear_logs():
+    ctx: Context = get_current_context()
     keep_logs: bool = ctx.obj.get("keep_logs", False)
     debug: bool = ctx.obj.get("debug", False)
     no_result: bool = ctx.obj.get("no_result", False)
@@ -111,10 +113,10 @@ def clear_logs(ctx: Context):
         rmtree(NORMAL.parent, ignore_errors=True)
 
     elif not debug:
-        echo(f"Папка с логами: {NORMAL.parent}")
+        print(f"Папка с логами: {NORMAL.parent}")
 
     else:
-        echo(f"Папка с логами: {DEBUG.parent}")
+        print(f"Папка с логами: {DEBUG.parent}")
 
-    pause(PRESS_ENTER_KEY)
-    Exit(0)
+    Prompt.ask(PRESS_ENTER_KEY)
+    raise Exit(0)

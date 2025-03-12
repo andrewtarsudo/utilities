@@ -2,11 +2,10 @@
 from pathlib import Path
 from re import DOTALL, MULTILINE, sub
 
-from click.utils import echo
 from loguru import logger
-from typer.params import Option
 from typer.main import Typer
 from typer.models import Context
+from typer.params import Option
 from typing_extensions import Annotated, List
 
 from utilities.common.constants import StrPath
@@ -29,7 +28,7 @@ def repair_svg_command(
             Option(
                 "--file", "-f",
                 help="Файл для обработки. Может использоваться несколько раз",
-                metavar="FILE .. FILE",
+                metavar="FILE ... FILE",
                 exists=True,
                 file_okay=True,
                 dir_okay=False,
@@ -63,7 +62,7 @@ def repair_svg_command(
         files=files,
         directory=directory,
         recursive=recursive,
-        extensions="svg")
+        extensions="svg SVG")
 
     if files is not None and files:
         FOREIGN_OBJECT: str = "<foreignObject.*?</foreignObject>"
@@ -77,44 +76,31 @@ def repair_svg_command(
 
             logger.debug(f"Файл {file}")
 
-            if not file.exists(follow_symlinks=True):
-                echo(f"Указан не существующий файл {file}")
+            try:
+                with open(file, "rb") as fr:
+                    svg: str = fr.read().decode()
+
+                svg: str = sub(TEXT, "", svg, flags=DOTALL | MULTILINE)
+                svg: str = sub(FOREIGN_OBJECT, "", svg, flags=DOTALL | MULTILINE)
+                svg: str = sub(FEATURES, "", svg, flags=DOTALL | MULTILINE)
+                svg: str = svg.replace("switch>", "g>")
+
+                with open(file, "wb") as fw:
+                    fw.write(svg.encode())
+
+                logger.info(f"Файл {file.name} успешно обработан")
+
+            except PermissionError:
+                logger.error(f"Недостаточно прав для чтения/записи в файл {file.name}")
                 continue
 
-            elif not file.is_file():
-                echo(f"Путь {file} указывает не на файл")
+            except RuntimeError:
+                logger.error(f"Истекло время чтения/записи файл {file.name}")
                 continue
 
-            elif file.suffix != ".svg":
-                echo(f"Указанный файл {file.name} имеет расширение не SVG")
+            except OSError as e:
+                logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
                 continue
-
-            else:
-                try:
-                    with open(file, "rb") as fr:
-                        svg: str = fr.read().decode()
-
-                    svg: str = sub(TEXT, "", svg, flags=DOTALL | MULTILINE)
-                    svg: str = sub(FOREIGN_OBJECT, "", svg, flags=DOTALL | MULTILINE)
-                    svg: str = sub(FEATURES, "", svg, flags=DOTALL | MULTILINE)
-                    svg: str = svg.replace("switch>", "g>")
-
-                    with open(file, "wb") as fw:
-                        fw.write(svg.encode())
-
-                    logger.info(f"Файл {file.name} успешно обработан")
-
-                except PermissionError:
-                    logger.error(f"Недостаточно прав для чтения/записи в файл {file.name}")
-                    continue
-
-                except RuntimeError:
-                    logger.error(f"Истекло время чтения/записи файл {file.name}")
-                    continue
-
-                except OSError as e:
-                    logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
-                    continue
 
     ctx.obj["keep_logs"] = keep_logs
     ctx.invoke(clear_logs)

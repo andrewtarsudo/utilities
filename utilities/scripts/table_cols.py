@@ -10,10 +10,12 @@ from typing_extensions import Annotated, List
 from utilities.common.constants import MAX_SYMBOLS, MIN_COLUMN, StrPath
 from utilities.common.functions import file_reader, ReaderMode, clear_logs
 from utilities.scripts.list_files import get_files
+from utilities.scripts.main_group import MainGroup
 from utilities.table_cols.analyser import TableAnalyser
 from utilities.table_cols.file import AsciiDocFile
 
 table_cols: Typer = Typer(
+    cls=MainGroup,
     add_help_option=True,
     rich_markup_mode="rich",
     help="Команда для задания ширины столбцам таблиц")
@@ -29,7 +31,7 @@ def table_cols_command(
             Option(
                 "--file", "-f",
                 help="Файл для обработки. Может использоваться несколько раз",
-                metavar="FILE .. FILE",
+                metavar="FILE ... FILE",
                 exists=True,
                 file_okay=True,
                 dir_okay=False,

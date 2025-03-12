@@ -4,10 +4,6 @@ from typing import Any, Iterable, Mapping, Sequence, TypeAlias
 
 from yaml import safe_load
 
-FAIL_COLOR: str = '\033[41m'
-PASS_COLOR: str = '\033[42m'
-NORMAL_COLOR: str = '\033[0m'
-
 separator: str = "-" * 80
 
 StrPath: TypeAlias = str | Path
@@ -15,7 +11,7 @@ StrPath: TypeAlias = str | Path
 DEBUG: Path = Path.cwd().joinpath("_logs/cli_debug.log")
 NORMAL: Path = Path("~/Desktop/_logs/cli_debug.log").expanduser().resolve()
 
-PRESS_ENTER_KEY: str = "\nНажмите ENTER, чтобы завершить работу скрипта ..."
+PRESS_ENTER_KEY: str = "\nНажмите ENTER, чтобы завершить работу скрипта"
 
 HELP: str = """Вывести справочную информацию на экран и завершить работу"""
 

@@ -9,6 +9,7 @@ from typing import Any, Literal, NamedTuple, Type
 from warnings import simplefilter
 
 from loguru import logger
+from rich import print
 
 from utilities.common.constants import DEBUG, NORMAL
 from utilities.common.errors import BaseError

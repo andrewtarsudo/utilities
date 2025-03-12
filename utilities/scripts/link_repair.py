@@ -5,8 +5,9 @@ from pathlib import Path
 
 from click.core import Context
 from click.exceptions import Exit
-from click.termui import echo, pause
 from loguru import logger
+from rich import print
+from rich.prompt import Prompt
 from typer.main import Typer
 from typer.params import Argument, Option
 from typing_extensions import Annotated
@@ -114,14 +115,14 @@ def link_repair_command(
 
     if not validate_dir_path(pathdir):
         logger.error(f"Путь {pathdir} не существует или указывает не на директорию")
-        pause(PRESS_ENTER_KEY)
-        Exit(0)
+        Prompt.ask(PRESS_ENTER_KEY)
+        raise Exit(0)
 
     if has_no_required_files(pathdir):
         logger.warning(
             f"В директории {pathdir} не найдены файлы с расширением {MD_EXTENSION}, {ADOC_EXTENSION}")
-        pause(PRESS_ENTER_KEY)
-        Exit(0)
+        Prompt.ask(PRESS_ENTER_KEY)
+        raise Exit(0)
 
     _base_dir: Path = Path(pathdir).parent.parent.resolve()
 
@@ -245,7 +246,7 @@ def link_repair_command(
         if not dry_run:
             file_writer(dir_file.full_path, dir_file.content, encoding="utf-8")
 
-    echo("Работа завершена.\n")
+    print("Работа завершена.\n")
 
     if dry_run:
         logger.info("==================== Файлы не изменены ====================", result=True)

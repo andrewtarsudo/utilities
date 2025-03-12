@@ -2,18 +2,19 @@
 from io import UnsupportedOperation
 from os import system
 from pathlib import Path
+from re import sub
 from sys import platform
 from typing import Annotated, Any, get_args, get_origin, Iterable, Mapping
 
 from click.core import Context
-from click.utils import echo
 from loguru import logger
+from rich import print
 from typer.main import Typer
 from typer.params import Argument, Option
 from yaml import safe_load
 
-from utilities.common.constants import FAIL_COLOR, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
-from utilities.common.functions import file_reader, ReaderMode, clear_logs
+from utilities.common.constants import pretty_print, StrPath
+from utilities.common.functions import clear_logs, file_reader, ReaderMode
 
 _ALLOWED_KEYS: tuple[str, ...] = ("title", "index", "files")
 
@@ -24,14 +25,17 @@ _RIGHTS_NAMES: tuple[str, ...] = (
     "rights", "Rights"
 )
 
+OK_COLOR: str = "green"
+NOT_OK_COLOR: str = "red"
+
 _DICT_RESULTS: dict[bool, dict[str, str]] = {
     True: {
         "status": "OK",
-        "color": PASS_COLOR
+        "color": OK_COLOR
     },
     False: {
         "status": "NOT OK",
-        "color": FAIL_COLOR
+        "color": NOT_OK_COLOR
     }
 }
 
@@ -57,6 +61,10 @@ def detect_extra_keys(item: Mapping[str, Any]):
         extra_keys: set[str] | None = None
 
     return extra_keys
+
+
+def strip_line(line: str):
+    return sub(r"\[/?.*?]", "", line)
 
 
 def inspect_settings(
@@ -101,7 +109,7 @@ def inspect_settings(
                     __is_ok: bool = False
 
         if __is_ok and verbose:
-            messages.append("Раздел 'settings' задан корректно")
+            messages.append("Раздел settings задан корректно")
 
     return warnings, messages
 
@@ -207,7 +215,7 @@ def inspect_legal(
                 f"В разделе Rights обнаружены посторонние ключи:\n{pretty_print(extra_keys)}")
 
         if __is_ok and verbose:
-            messages.append("Раздел 'Rights' задан корректно")
+            messages.append("Раздел Rights задан корректно")
 
     return warnings, messages
 
@@ -366,22 +374,18 @@ def validate(
 
         _path: str = path.relative_to(root).as_posix()
 
-        _line = f"{_color}{line_no + 1:>4}  {_path:.<{max_length}}{_status:.>6}{NORMAL_COLOR}"
+        _line = f"[{_color}]{line_no + 1:>4}  {_path:.<{max_length}}{_status:.>6}[/{_color}]"
         _lines.append(_line)
 
         if verbose or _status == "NOT OK":
-            echo(_line)
+            print(_line)
 
     if out is not None and out:
         out: Path = Path(out).expanduser()
         mode: str = "w" if out.exists() else "x"
 
         with open(out, mode) as f:
-            f.write(
-                pretty_print(_lines).
-                replace(PASS_COLOR, "").
-                replace(FAIL_COLOR, "").
-                replace(NORMAL_COLOR, ""))
+            f.write(strip_line(pretty_print(_lines)))
 
 
 @validate_yaml.command(
@@ -469,13 +473,13 @@ def validate_yaml_command(
             logger.warning(pretty_print(messages))
 
         elif not verbose:
-            echo("Проблемы с параметрами не обнаружены")
+            print("Проблемы с параметрами не обнаружены")
 
         lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
         validate(yaml_file.parent, lines, output, verbose)
 
         if output:
-            echo(f"Файл с результатами: {output.resolve()}")
+            print(f"\nФайл с результатами: {output.resolve()}")
 
     finally:
         ctx.obj["keep_logs"] = keep_logs

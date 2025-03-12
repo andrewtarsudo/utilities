@@ -3,10 +3,10 @@ from collections.abc import Iterable
 from glob import iglob
 from pathlib import Path
 
-from click.termui import pause
 from click.core import Context
-from click.utils import echo
+from click.termui import pause
 from loguru import logger
+from rich import print
 from typer.main import Typer
 from typer.params import Argument, Option
 from typing_extensions import Annotated, List
@@ -101,7 +101,7 @@ def list_files_command(
                 exists=True,
                 allow_dash=False,
                 show_default=True,
-                metavar="DIR .. DIR",
+                metavar="DIR ... DIR",
                 resolve_path=True,
                 help="Перечень игнорируемых директорий. Может использоваться \nнесколько раз."
                      "\nПо умолчанию: _temp_folder, _temp_storage, private")] = None,
@@ -120,7 +120,7 @@ def list_files_command(
                 exists=True,
                 allow_dash=False,
                 show_default=True,
-                metavar="FILE .. FILE",
+                metavar="FILE ... FILE",
                 resolve_path=True,
                 help="Перечень игнорируемых файлов. Может использоваться"
                      "\nнесколько раз."
@@ -138,7 +138,7 @@ def list_files_command(
                 "-e", "--extensions",
                 help="Обрабатываемые типы файлов, разделяемые пробелом."
                      "\nПо умолчанию: md adoc",
-                metavar="\"EXT .. EXT\"",
+                metavar="\"EXT ... EXT\"",
                 show_default=True)] = None,
         all_extensions: Annotated[
             bool,
@@ -307,7 +307,7 @@ def list_files_command(
             results.append(f"{prefix}{Path(item).as_posix()}")
 
     if not auxiliary:
-        echo("\n".join(results))
+        print(pretty_print(results))
         ctx.obj["keep_logs"] = keep_logs
         ctx.invoke(clear_logs)
 

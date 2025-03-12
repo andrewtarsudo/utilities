@@ -3,9 +3,9 @@ from os.path import getsize
 from pathlib import Path
 
 from click.core import Context
-from click.termui import echo
 from loguru import logger
 from PIL import Image
+from rich import print
 from typer.main import Typer
 from typer.params import Option
 from typing_extensions import Annotated, List
@@ -63,7 +63,7 @@ def reduce_image_command(
             Option(
                 "--file", "-f",
                 help="Файл для обработки. Может использоваться несколько раз",
-                metavar="FILE .. FILE",
+                metavar="FILE ... FILE",
                 exists=True,
                 file_okay=True,
                 dir_okay=False,
@@ -134,11 +134,11 @@ def reduce_image_command(
             if result.stem.startswith("temp_file"):
                 result.unlink(missing_ok=True)
 
-        echo(separator)
-        echo(f"Итоговое изменение: {file_size(before)} -> {file_size(after)}")
+        print(separator)
+        print(f"Итоговое изменение: {file_size(before)} -> {file_size(after)}")
 
     if dry_run:
-        echo("Файлы не были изменены, поскольку использована опция --dry-run")
+        print("Файлы не были изменены, поскольку использована опция --dry-run")
 
     ctx.obj["keep_logs"] = keep_logs
     ctx.invoke(clear_logs)

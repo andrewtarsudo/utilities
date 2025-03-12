@@ -32,7 +32,7 @@ def format_code_command(
             Option(
                 "--file", "-f",
                 help="Файл для обработки. Может использоваться несколько раз",
-                metavar="FILE .. FILE",
+                metavar="FILE ... FILE",
                 exists=True,
                 file_okay=True,
                 dir_okay=False,

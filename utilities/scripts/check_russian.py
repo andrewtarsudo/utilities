@@ -4,14 +4,14 @@ from pathlib import Path
 from sys import platform
 from typing import Iterable
 
-from click.utils import echo
+from rich import print
 from loguru import logger
 from typer.main import Typer
 from typer.models import Context
 from typer.params import Option
 from typing_extensions import Annotated, List
 
-from utilities.common.constants import FAIL_COLOR, NORMAL_COLOR, PASS_COLOR, pretty_print, separator, StrPath
+from utilities.common.constants import pretty_print, separator, StrPath
 from utilities.common.functions import file_reader, ReaderMode, clear_logs
 from utilities.scripts.list_files import get_files
 
@@ -28,12 +28,12 @@ def wrap_text(
         is_color: bool = True,
         is_success: bool = False):
     if is_color and is_success:
-        prefix: str = PASS_COLOR
-        postfix: str = NORMAL_COLOR
+        prefix: str = "[green]"
+        postfix: str = "[/green]"
 
     elif is_color and not is_success:
-        prefix: str = FAIL_COLOR
-        postfix: str = NORMAL_COLOR
+        prefix: str = "[red]"
+        postfix: str = "[/red]"
 
     else:
         prefix: str = ""
@@ -106,7 +106,7 @@ def check_russian_command(
             Option(
                 "--file", "-f",
                 help="Файл для обработки. Может использоваться несколько раз",
-                metavar="FILE .. FILE",
+                metavar="FILE ... FILE",
                 exists=True,
                 file_okay=True,
                 dir_okay=False,
@@ -174,7 +174,7 @@ def check_russian_command(
         else:
             final: str = pretty_print(result)
 
-        echo(final)
+        print(final)
 
     else:
         logger.warning("Не найдено ни одного подходящего файла")
