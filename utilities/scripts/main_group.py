@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from operator import attrgetter
 from sys import platform
-from typing import Iterable
+from typing import Any, Iterable
 
 from click.core import Argument, Command, Option, Parameter
 from click.formatting import HelpFormatter
@@ -9,7 +9,6 @@ from click.globals import get_current_context
 from loguru import logger
 from typer.core import TyperGroup
 from typer.models import Context
-from typer.rich_utils import rich_format_help
 
 from utilities.common.constants import args_help_dict, HELP
 from utilities.common.errors import NoArgumentsOptionsError
@@ -217,6 +216,10 @@ def recursive_help(cmd: Command, parent: Context = None, lines: Iterable[str] = 
 
 
 class MainGroup(TyperGroup):
+    def __init__(self, **attrs: Any):
+        super().__init__(**attrs)
+        self.add_help_option = False
+
     def parse_args(self, ctx: Context, args: list[str]) -> list[str]:
         if args is None or not args:
             logger.error(f"Для команды {ctx.command_path} не задано ни одного аргумента или опции")
@@ -245,24 +248,25 @@ class MainGroup(TyperGroup):
         format_epilog(self, ctx, formatter)
 
     def format_help(self, ctx: Context, formatter: HelpFormatter) -> None:
-        if self.rich_markup_mode is None:
-            self.format_usage(ctx, formatter)
-            self.format_help_text(ctx, formatter)
-            self.format_args(ctx, formatter)
-            self.format_options(ctx, formatter)
-            self.format_epilog(ctx, formatter)
+        self.add_help_option = False
+        # if self.rich_markup_mode is not None:
+        self.format_usage(ctx, formatter)
+        self.format_help_text(ctx, formatter)
+        self.format_args(ctx, formatter)
+        self.format_options(ctx, formatter)
+        self.format_epilog(ctx, formatter)
 
-            if hasattr(self, "commands"):
-                formatter.write(f"{SEPARATOR}\n\n")
-
-                for command_name in sorted(self.commands):
-                    command: Command = self.commands.get(command_name)
-
-                    if not command.hidden:
-                        formatter.write(recursive_help(command, ctx))
-
-        else:
-            return rich_format_help(
-                obj=self,
-                ctx=ctx,
-                markup_mode=self.rich_markup_mode)
+        #     if hasattr(self, "commands"):
+        #         formatter.write(f"{SEPARATOR}\n\n")
+        #
+        #         for command_name in sorted(self.commands):
+        #             command: Command = self.commands.get(command_name)
+        #
+        #             if not command.hidden:
+        #                 formatter.write(recursive_help(command, ctx))
+        #
+        # else:
+        #     return rich_format_help(
+        #         obj=self,
+        #         ctx=ctx,
+        #         markup_mode=self.rich_markup_mode)

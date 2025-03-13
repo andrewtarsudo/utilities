@@ -22,9 +22,11 @@ from utilities.link_repair.internal_link_inspector import internal_inspector
 from utilities.link_repair.link import Link
 from utilities.link_repair.link_fixer import link_fixer
 from utilities.link_repair.link_inspector import link_inspector
+from utilities.scripts.main_group import MainGroup
 
 link_repair: Typer = Typer(
-    add_help_option=True,
+    cls=MainGroup,
+    add_help_option=False,
     rich_markup_mode="rich",
     help="Команда для проверки и исправления ссылок в файлах документации")
 
@@ -53,6 +55,7 @@ def has_no_required_files(path: StrPath) -> bool:
 
 
 @link_repair.command(
+    add_help_option=False,
     name="link-repair",
     help="Команда для проверки и исправления ссылок в файлах документации")
 def link_repair_command(
@@ -110,7 +113,14 @@ def link_repair_command(
                 "--keep-logs",
                 show_default=True,
                 help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
-                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False,
+        help_option: Annotated[
+            bool,
+            Option(
+                "-h", "--help",
+                show_default=False,
+                help="Показать справку и закрыть окно",
+                is_eager=True)] = False):
     result_file_path: Path = Path.cwd().joinpath("results.txt")
 
     if not validate_dir_path(pathdir):

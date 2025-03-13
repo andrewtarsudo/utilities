@@ -15,6 +15,7 @@ from yaml import safe_load
 
 from utilities.common.constants import pretty_print, StrPath
 from utilities.common.functions import clear_logs, file_reader, ReaderMode
+from utilities.scripts.main_group import MainGroup
 
 _ALLOWED_KEYS: tuple[str, ...] = ("title", "index", "files")
 
@@ -40,7 +41,8 @@ _DICT_RESULTS: dict[bool, dict[str, str]] = {
 }
 
 validate_yaml: Typer = Typer(
-    add_help_option=True,
+    cls=MainGroup,
+    add_help_option=False,
     rich_markup_mode="rich",
     help="Команда для валидации YAML-файла, используемого при генерации PDF")
 
@@ -389,6 +391,7 @@ def validate(
 
 
 @validate_yaml.command(
+    add_help_option=False,
     name="validate-yaml",
     help="Команда для валидации YAML-файла, используемого при генерации PDF")
 def validate_yaml_command(
@@ -398,6 +401,7 @@ def validate_yaml_command(
             Argument(
                 metavar="YAML_FILE",
                 help="Путь до файла PDF_*.yml",
+                show_default=False,
                 exists=True,
                 file_okay=True,
                 dir_okay=False,
@@ -425,7 +429,14 @@ def validate_yaml_command(
                 "--keep-logs",
                 show_default=True,
                 help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
-                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False,
+        help_option: Annotated[
+            bool,
+            Option(
+                "-h", "--help",
+                show_default=False,
+                help="Показать справку и закрыть окно",
+                is_eager=True)] = False):
     if platform.startswith("win"):
         system("color")
 

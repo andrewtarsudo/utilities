@@ -11,14 +11,17 @@ from typing_extensions import Annotated, List
 from utilities.common.constants import StrPath
 from utilities.common.functions import clear_logs
 from utilities.scripts.list_files import get_files
+from utilities.scripts.main_group import MainGroup
 
 repair_svg: Typer = Typer(
-    add_help_option=True,
+    cls=MainGroup,
+    add_help_option=False,
     rich_markup_mode="rich",
     help="Команда для исправления файлов SVG")
 
 
 @repair_svg.command(
+    add_help_option=False,
     name="repair-svg",
     help="Команда для исправления файлов SVG")
 def repair_svg_command(
@@ -56,51 +59,62 @@ def repair_svg_command(
                 "--keep-logs",
                 show_default=True,
                 help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
-                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
-    files: list[StrPath] | None = get_files(
-        ctx,
-        files=files,
-        directory=directory,
-        recursive=recursive,
-        extensions="svg SVG")
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False,
+        help_option: Annotated[
+            bool,
+            Option(
+                "-h", "--help",
+                show_default=False,
+                help="Показать справку и закрыть окно",
+                is_eager=True)] = False):
+    if help_option:
+        ctx.command.get_help(ctx)
 
-    if files is not None and files:
-        FOREIGN_OBJECT: str = "<foreignObject.*?</foreignObject>"
-        TEXT: str = (
-            r"<a\s?transform=\"translate(0,-5)\"\s?xlink:href=\"https://www.drawio.com/doc/faq/svg-export-text-problems"
-            "\".*?</a>")
-        FEATURES: str = r"<g>\s?<g\s?requiredFeatures=\"http://www.w3.org/TR/SVG11/feature#Extensibility\"/>\s?</g>"
+    else:
+        files: list[StrPath] | None = get_files(
+            ctx,
+            files=files,
+            directory=directory,
+            recursive=recursive,
+            extensions="svg SVG")
 
-        for file in files:
-            file: Path = Path(file).expanduser().resolve()
+        if files is not None and files:
+            FOREIGN_OBJECT: str = "<foreignObject.*?</foreignObject>"
+            TEXT: str = (
+                r"<a\s?transform=\"translate(0,-5)\"\s?xlink:href=\"https://www.drawio.com/doc/faq/svg-export-text-problems"
+                "\".*?</a>")
+            FEATURES: str = r"<g>\s?<g\s?requiredFeatures=\"http://www.w3.org/TR/SVG11/feature#Extensibility\"/>\s?</g>"
 
-            logger.debug(f"Файл {file}")
+            for file in files:
+                file: Path = Path(file).expanduser().resolve()
 
-            try:
-                with open(file, "rb") as fr:
-                    svg: str = fr.read().decode()
+                logger.debug(f"Файл {file}")
 
-                svg: str = sub(TEXT, "", svg, flags=DOTALL | MULTILINE)
-                svg: str = sub(FOREIGN_OBJECT, "", svg, flags=DOTALL | MULTILINE)
-                svg: str = sub(FEATURES, "", svg, flags=DOTALL | MULTILINE)
-                svg: str = svg.replace("switch>", "g>")
+                try:
+                    with open(file, "rb") as fr:
+                        svg: str = fr.read().decode()
 
-                with open(file, "wb") as fw:
-                    fw.write(svg.encode())
+                    svg: str = sub(TEXT, "", svg, flags=DOTALL | MULTILINE)
+                    svg: str = sub(FOREIGN_OBJECT, "", svg, flags=DOTALL | MULTILINE)
+                    svg: str = sub(FEATURES, "", svg, flags=DOTALL | MULTILINE)
+                    svg: str = svg.replace("switch>", "g>")
 
-                logger.info(f"Файл {file.name} успешно обработан")
+                    with open(file, "wb") as fw:
+                        fw.write(svg.encode())
 
-            except PermissionError:
-                logger.error(f"Недостаточно прав для чтения/записи в файл {file.name}")
-                continue
+                    logger.info(f"Файл {file.name} успешно обработан")
 
-            except RuntimeError:
-                logger.error(f"Истекло время чтения/записи файл {file.name}")
-                continue
+                except PermissionError:
+                    logger.error(f"Недостаточно прав для чтения/записи в файл {file.name}")
+                    continue
 
-            except OSError as e:
-                logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
-                continue
+                except RuntimeError:
+                    logger.error(f"Истекло время чтения/записи файл {file.name}")
+                    continue
+
+                except OSError as e:
+                    logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+                    continue
 
     ctx.obj["keep_logs"] = keep_logs
     ctx.invoke(clear_logs)

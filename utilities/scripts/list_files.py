@@ -13,9 +13,11 @@ from typing_extensions import Annotated, List
 
 from utilities.common.constants import PRESS_ENTER_KEY, pretty_print, StrPath
 from utilities.common.functions import clear_logs
+from utilities.scripts.main_group import MainGroup
 
 list_files: Typer = Typer(
-    add_help_option=True,
+    cls=MainGroup,
+    add_help_option=False,
     rich_markup_mode="rich",
     help="Команда для вывода файлов в директории")
 
@@ -79,6 +81,7 @@ def check_path(
 
 
 @list_files.command(
+    add_help_option=False,
     name="list-files",
     help="Команда для вывода файлов в директории")
 def list_files_command(

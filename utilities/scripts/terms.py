@@ -10,6 +10,7 @@ from typing_extensions import Annotated, List
 
 from utilities.common.constants import pretty_print
 from utilities.common.functions import clear_logs, file_reader, ReaderMode
+from utilities.scripts.main_group import MainGroup
 from utilities.terms.ascii_doc_table_terms import AsciiDocTableTerms
 from utilities.terms.git_manager import git_manager
 from utilities.terms.table import Term
@@ -20,12 +21,14 @@ README_FILE: Path = _SOURCES.joinpath("readme.txt")
 SAMPLES_FILE: Path = _SOURCES.joinpath("samples.txt")
 
 terms: Typer = Typer(
-    add_help_option=True,
+    cls=MainGroup,
+    add_help_option=False,
     rich_markup_mode="rich",
     help="Команда для вывода расшифровки аббревиатур")
 
 
 @terms.command(
+    add_help_option=False,
     name="terms",
     help="Команда для вывода расшифровки аббревиатур")
 def terms_command(
@@ -34,64 +37,81 @@ def terms_command(
             List[str],
             Argument(
                 metavar="TERM ... TERM",
-                help="Перечень запрашиваемых аббревиатур")] = None, *,
+                help="Перечень запрашиваемых аббревиатур",
+                rich_help_panel="Аргументы")] = None, *,
         all_flag: Annotated[
             bool,
             Option(
                 "-a", "--all",
                 show_default=True,
-                help="Флаг вывода всех сокращений")] = False,
+                help="Флаг вывода всех сокращений",
+                rich_help_panel="Опции")] = False,
         full_flag: Annotated[
             bool,
             Option(
                 "-f", "--full",
                 show_default=True,
-                help="Флаг вывода всех сокращений с их расшифровками")] = False,
+                help="Флаг вывода всех сокращений с их расшифровками",
+                rich_help_panel="Опции")] = False,
         info_flag: Annotated[
             bool,
             Option(
                 "-i", "--info",
                 show_default=True,
-                help="Флаг вывода полного руководства")] = False,
+                help="Флаг вывода полного руководства",
+                rich_help_panel="Опции")] = False,
         readme_flag: Annotated[
             bool,
             Option(
                 "-r", "--readme",
                 show_default=True,
-                help="Флаг вывода полного руководства")] = False,
+                help="Флаг вывода полного руководства",
+                rich_help_panel="Опции")] = False,
         samples_flag: Annotated[
             bool,
             Option(
                 "-s", "--samples",
                 show_default=True,
-                help="Флаг вывода примеров использования")] = False,
+                help="Флаг вывода примеров использования",
+                rich_help_panel="Опции")] = False,
         abbr_flag: Annotated[
             bool,
             Option(
                 "--abbr",
                 show_default=True,
                 help="Флаг вывода сокращения для добавления в файл Markdown."
-                     "\nФормат: <abbr title=\"\"></abbr>")] = False,
+                     "\nФормат: <abbr title=\"\"></abbr>",
+                rich_help_panel="Опции")] = False,
         ascii_flag: Annotated[
             bool,
             Option(
                 "--ascii",
                 show_default=True,
                 help="Флаг вывода сокращения для добавления в файл AsciiDoc."
-                     "\nФормат: pass:q[<abbr title=\"\"></abbr>]")] = False,
+                     "\nФормат: pass:q[<abbr title=\"\"></abbr>]",
+                rich_help_panel="Опции")] = False,
         keep_logs: Annotated[
             bool,
             Option(
                 "--keep-logs",
                 show_default=True,
                 help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
-                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False,
+                     "\nПо умолчанию: False, лог-файл и директория удаляются",
+                rich_help_panel="Опции")] = False,
         common_flag: Annotated[
             bool,
             Option(
                 "--common",
                 show_default=True,
-                help="Флаг вывода сокращения в свободном виде")] = False):
+                help="Флаг вывода сокращения в свободном виде",
+                rich_help_panel="Опции")] = False,
+        help_option: Annotated[
+            bool,
+            Option(
+                "-h", "--help",
+                show_default=False,
+                help="Показать справку и закрыть окно",
+                is_eager=True)] = False):
     git_manager.set_content_git_pages()
     git_manager.compare()
     git_manager.set_terms()

@@ -13,9 +13,11 @@ from typing_extensions import Annotated, List
 from utilities.common.constants import separator, StrPath
 from utilities.common.functions import clear_logs
 from utilities.scripts.list_files import get_files
+from utilities.scripts.main_group import MainGroup
 
 reduce_image: Typer = Typer(
-    add_help_option=True,
+    cls=MainGroup,
+    add_help_option=False,
     rich_markup_mode="rich",
     help="Команда для уменьшения размера изображений JPG, PNG")
 
@@ -54,6 +56,7 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
 
 
 @reduce_image.command(
+    add_help_option=False,
     name="reduce-image",
     help="Команда для уменьшения размера изображений JPG, PNG")
 def reduce_image_command(
@@ -103,7 +106,14 @@ def reduce_image_command(
                 show_default=True,
                 help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
                      "\nПо умолчанию: False, лог-файл и директория удаляются",
-                rich_help_panel="Опции")] = False):
+                rich_help_panel="Опции")] = False,
+        help_option: Annotated[
+            bool,
+            Option(
+                "-h", "--help",
+                show_default=False,
+                help="Показать справку и закрыть окно",
+                is_eager=True)] = False):
     extensions: str = "png jpg jpeg bmp"
 
     files: list[StrPath] | None = get_files(

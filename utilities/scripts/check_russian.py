@@ -14,11 +14,13 @@ from typing_extensions import Annotated, List
 from utilities.common.constants import pretty_print, separator, StrPath
 from utilities.common.functions import file_reader, ReaderMode, clear_logs
 from utilities.scripts.list_files import get_files
+from utilities.scripts.main_group import MainGroup
 
 RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
 
 check_russian: Typer = Typer(
-    add_help_option=True,
+    cls=MainGroup,
+    add_help_option=False,
     rich_markup_mode="rich",
     help="Команда для проверки наличия непереведенных слов")
 
@@ -97,6 +99,7 @@ def file_inspection(path: str, is_color: bool = True):
 
 
 @check_russian.command(
+    add_help_option=False,
     name="check-russian",
     help="Команда для проверки наличия непереведенных слов")
 def check_russian_command(
@@ -140,7 +143,14 @@ def check_russian_command(
                 "--keep-logs",
                 show_default=True,
                 help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
-                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False,
+        help_option: Annotated[
+            bool,
+            Option(
+                "-h", "--help",
+                show_default=False,
+                help="Показать справку и закрыть окно",
+                is_eager=True)] = False):
     if platform.startswith("win"):
         system("color")
 

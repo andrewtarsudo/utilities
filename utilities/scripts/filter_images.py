@@ -11,9 +11,11 @@ from typing_extensions import Annotated
 from utilities.common.constants import pretty_print, StrPath
 from utilities.common.functions import file_reader, file_writer, ReaderMode, clear_logs
 from utilities.scripts.list_files import get_files
+from utilities.scripts.main_group import MainGroup
 
 filter_images: Typer = Typer(
-    add_help_option=True,
+    cls=MainGroup,
+    add_help_option=False,
     rich_markup_mode="rich",
     help="Команда для удаления неиспользуемых изображений")
 
@@ -73,6 +75,7 @@ class AsciiDocFile(File):
 
 
 @filter_images.command(
+    add_help_option=False,
     name="filter-images",
     help="Команда для удаления неиспользуемых изображений")
 def filter_images_command(
@@ -116,7 +119,14 @@ def filter_images_command(
                 "--keep-logs",
                 show_default=True,
                 help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
-                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False,
+        help_option: Annotated[
+            bool,
+            Option(
+                "-h", "--help",
+                show_default=False,
+                help="Показать справку и закрыть окно",
+                is_eager=True)] = False):
     messages: list[str] = []
 
     project_dir: Path = Path(project_dir)

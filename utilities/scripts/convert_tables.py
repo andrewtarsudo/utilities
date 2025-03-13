@@ -9,15 +9,18 @@ from typing_extensions import Annotated
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument
 from utilities.common.functions import clear_logs
+from utilities.scripts.main_group import MainGroup
 
 convert_tables: Typer = Typer(
-    add_help_option=True,
+    cls=MainGroup,
+    add_help_option=False,
     rich_markup_mode="rich",
     help="Команда для корректного извлечения таблиц из файлов docx в формат Markdown")
 
 
 @convert_tables.command(
-    "convert-tables",
+    add_help_option=False,
+    name="convert-tables",
     help="Команда для корректного извлечения таблиц из файлов docx в формат Markdown")
 def convert_tables_command(
         ctx: Context,
@@ -91,7 +94,14 @@ def convert_tables_command(
                 "--keep-logs",
                 show_default=True,
                 help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
-                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False,
+        help_option: Annotated[
+            bool,
+            Option(
+                "-h", "--help",
+                show_default=False,
+                help="Показать справку и закрыть окно",
+                is_eager=True)] = False):
     if fix:
         remove_spaces: bool = True
         escape_chars: bool = True

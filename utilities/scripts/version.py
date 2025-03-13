@@ -9,6 +9,7 @@ version: Typer = Typer()
 
 
 @version.command(
+    add_help_option=False,
     name="version",
     help="Вывести версию скрипта на экран и завершить работу")
 def version_command():

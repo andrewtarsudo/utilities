@@ -16,12 +16,13 @@ from utilities.table_cols.file import AsciiDocFile
 
 table_cols: Typer = Typer(
     cls=MainGroup,
-    add_help_option=True,
+    add_help_option=False,
     rich_markup_mode="rich",
     help="Команда для задания ширины столбцам таблиц")
 
 
 @table_cols.command(
+    add_help_option=False,
     name="table-cols",
     help="Команда для задания ширины столбцам таблиц")
 def table_cols_command(
@@ -77,7 +78,14 @@ def table_cols_command(
                 "--keep-logs",
                 show_default=True,
                 help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
-                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False,
+        help_option: Annotated[
+            bool,
+            Option(
+                "-h", "--help",
+                show_default=False,
+                help="Показать справку и закрыть окно",
+                is_eager=True)] = False):
     files: list[StrPath] | None = get_files(
         ctx,
         files=files,

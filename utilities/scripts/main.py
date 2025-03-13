@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from click.exceptions import Exit
 from click.globals import get_current_context
 from loguru import logger
@@ -7,7 +8,8 @@ from rich.prompt import Prompt
 from typer.main import Typer
 from typer.models import Context
 
-from utilities.common import BaseError, custom_logging
+from utilities.common.errors import BaseError
+from utilities.common.custom_logger import custom_logging
 from utilities.common.constants import PRESS_ENTER_KEY
 from utilities.scripts.check_russian import check_russian
 from utilities.scripts.convert_tables import convert_tables
@@ -23,21 +25,21 @@ from utilities.scripts.terms import terms
 from utilities.scripts.validate_yaml_file import validate_yaml
 from utilities.scripts.version import version
 
-app: Typer = Typer(cls=MainGroup)
+app: Typer = Typer(cls=MainGroup, add_help_option=False)
 
 
 def main():
-    app.add_typer(check_russian, cls=MainGroup)
-    app.add_typer(convert_tables, cls=MainGroup)
-    app.add_typer(filter_images, cls=MainGroup)
-    app.add_typer(format_code, cls=MainGroup)
-    app.add_typer(link_repair, cls=MainGroup)
-    app.add_typer(list_files, cls=MainGroup)
-    app.add_typer(reduce_image, cls=MainGroup)
-    app.add_typer(repair_svg, cls=MainGroup)
-    app.add_typer(table_cols, cls=MainGroup)
-    app.add_typer(terms, cls=MainGroup)
-    app.add_typer(validate_yaml, cls=MainGroup)
+    app.add_typer(check_russian, cls=MainGroup, add_help_option=False)
+    app.add_typer(convert_tables, cls=MainGroup, add_help_option=False)
+    app.add_typer(filter_images, cls=MainGroup, add_help_option=False)
+    app.add_typer(format_code, cls=MainGroup, add_help_option=False)
+    app.add_typer(link_repair, cls=MainGroup, add_help_option=False)
+    app.add_typer(list_files, cls=MainGroup, add_help_option=False)
+    app.add_typer(reduce_image, cls=MainGroup, add_help_option=False)
+    app.add_typer(repair_svg, cls=MainGroup, add_help_option=False)
+    app.add_typer(table_cols, cls=MainGroup, add_help_option=False)
+    app.add_typer(terms, cls=MainGroup, add_help_option=False)
+    app.add_typer(validate_yaml, cls=MainGroup, add_help_option=False)
     app.add_typer(version)
     return app()
 

@@ -13,16 +13,19 @@ from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, pretty_prin
 from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatCodeNonPositiveLineLengthError
 from utilities.common.functions import file_reader, file_writer, ReaderMode, clear_logs
 from utilities.scripts.list_files import get_files
+from utilities.scripts.main_group import MainGroup
 
 MAX_LENGTH: int = 84
 
 format_code: Typer = Typer(
-    add_help_option=True,
+    cls=MainGroup,
+    add_help_option=False,
     rich_markup_mode="rich",
     help="Команда для форматирования блоков кода")
 
 
 @format_code.command(
+    add_help_option=False,
     name="format-code",
     help="Команда для форматирования блоков кода")
 def format_code_command(
@@ -68,7 +71,14 @@ def format_code_command(
                 "--keep-logs",
                 show_default=True,
                 help="Флаг сохранения директории с лог-файлом по завершении\nработы в штатном режиме."
-                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False):
+                     "\nПо умолчанию: False, лог-файл и директория удаляются")] = False,
+        help_option: Annotated[
+            bool,
+            Option(
+                "-h", "--help",
+                show_default=False,
+                help="Показать справку и закрыть окно",
+                is_eager=True)] = False):
     if length < 0:
         logger.error(f"Максимальная длина не может быть неположительным числом, однако получено {length}")
         raise FormatCodeNonPositiveLineLengthError
