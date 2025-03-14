@@ -55,7 +55,7 @@ MAX_LENGTH: int = 84
     metavar="LEN",
     default=MAX_LENGTH)
 @option(
-    "--recursive/--no-recursive",
+    "--recursive/--no-recursive", "-r/-R",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
@@ -64,7 +64,7 @@ MAX_LENGTH: int = 84
     required=False,
     default=True)
 @option(
-    "--keep-logs",
+    "--keep-logs/--remove-logs", "-k/-K",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"

@@ -64,7 +64,7 @@ from utilities.table_cols.file import AsciiDocFile
     metavar="WIDTH",
     default=MIN_COLUMN)
 @option(
-    "--recursive/--no-recursive",
+    "--recursive/--no-recursive", "-r/-R",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
@@ -73,7 +73,7 @@ from utilities.table_cols.file import AsciiDocFile
     required=False,
     default=True)
 @option(
-    "--keep-logs",
+    "--keep-logs/--remove-logs", "-k/-K",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"

@@ -52,7 +52,7 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
     metavar="TEMP_DIR",
     default="./_temp/")
 @option(
-    "-e", "--escape/--no-escape", "escape",
+    "-e/-E", "--escape/--no-escape", "escape",
     type=BOOL,
     help="\b\nФлаг экранирования символов '<', '>'."
          "\nПо умолчанию: True, добавление '\\' перед символами",
@@ -60,7 +60,7 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
     required=False,
     default=True)
 @option(
-    "-r", "--remove/--no-remove", "remove",
+    "-r/-R", "--remove/--no-remove", "remove",
     type=BOOL,
     help="\b\nФлаг удаления всех множественных пробелов и пробелов"
          "\nперед знаками препинания."
@@ -69,7 +69,7 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
     required=False,
     default=False)
 @option(
-    "-f", "--fix/--no-fix", "fix",
+    "--fix/--no-fix", "fix",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["keep"],
     type=BOOL,
@@ -81,7 +81,7 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
     required=False,
     default=None)
 @option(
-    "-k", "--keep/--no-keep", "keep",
+    "--keep/--no-keep", "keep",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["fix"],
     type=BOOL,
@@ -93,7 +93,7 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
     required=False,
     default=None)
 @option(
-    "--keep-logs",
+    "--keep-logs/--remove-logs", "-k/-K",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"

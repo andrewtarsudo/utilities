@@ -190,7 +190,7 @@ ij_python_use_continuation_indent_for_collection_and_comprehensions = false
 ij_python_use_continuation_indent_for_parameters = true
 ij_python_wrap_long_lines = false
 
-[{*.toml,Cargo.lock,Cargo.toml.orig,Gopkg.lock,Pipfile,poetry.lock}]
+[{*.toml,Cargo.lock,Cargo.toml.orig,Gopkg.lock,Pipfile,poetry.lock,uv.lock}]
 ij_toml_keep_indents_on_empty_lines = false
 indent_size = 2
 ij_any_spaces_within_braces = true

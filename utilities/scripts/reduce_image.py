@@ -78,7 +78,7 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
     metavar="DIR",
     default=None)
 @option(
-    "--dry-run",
+    "--dry-run/--no-dry-run",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг вывода изменений размеров файлов без их изменения.\n"
@@ -87,7 +87,7 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
     required=False,
     default=False)
 @option(
-    "--recursive/--no-recursive",
+    "--recursive/--no-recursive", "-r/-R",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
@@ -96,7 +96,7 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
     required=False,
     default=True)
 @option(
-    "--keep-logs",
+    "--keep-logs/--remove-logs", "-k/-K",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"
