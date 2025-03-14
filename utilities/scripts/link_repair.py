@@ -59,7 +59,7 @@ def has_no_required_files(path: StrPath) -> bool:
     required=True,
     metavar="PATHDIR")
 @option(
-    "-a", "--anchor-disable", "anchor_validation",
+    "-a/-A", "--anchor/--no-anchor", "anchor_validation",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг поиска повторяющихся якорей.\n"
@@ -68,7 +68,7 @@ def has_no_required_files(path: StrPath) -> bool:
     required=False,
     default=True)
 @option(
-    "-d", "--dry-run",
+    "-d/-D", "--dry-run/--no-dry-run",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг вывода некорректных ссылок на экран без изменения"
@@ -78,7 +78,7 @@ def has_no_required_files(path: StrPath) -> bool:
     required=False,
     default=False)
 @option(
-    "-n", "--no-result",
+    "-n/-N", "--no-result/--with-result",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг удаления файла с результатами работы скрипта по"
@@ -88,7 +88,7 @@ def has_no_required_files(path: StrPath) -> bool:
     required=False,
     default=False)
 @option(
-    "-s", "--separate", "separate_languages",
+    "-s/-S", "--separate/--together", "separate_languages",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг раздельной обработки файлов на различных языках.\n"
@@ -97,7 +97,7 @@ def has_no_required_files(path: StrPath) -> bool:
     required=False,
     default=True)
 @option(
-    "--skip-en",
+    "-e/-E", "--skip-en/--no-skip-en",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг обработки файлов только на русском языке."
@@ -107,7 +107,7 @@ def has_no_required_files(path: StrPath) -> bool:
     required=False,
     default=False)
 @option(
-    "--keep-logs",
+    "--keep-logs/--remove-logs", "-k/-K",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом"

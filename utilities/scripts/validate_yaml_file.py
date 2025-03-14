@@ -406,7 +406,7 @@ def validate(
     metavar="FILE",
     default=None)
 @option(
-    "--verbose/--no-verbose",
+    "-v/-V", "--verbose/--no-verbose",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг подробного вывода.\nПо умолчанию: False, выводятся только ошибки",
@@ -414,7 +414,7 @@ def validate(
     required=False,
     default=False)
 @option(
-    "--keep-logs",
+    "--keep-logs/--remove-logs", "-k/-K",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"

@@ -81,7 +81,7 @@ class AsciiDocFile(File):
     required=True,
     metavar="PROJECT_DIR")
 @option(
-    "-d", "--dry-run",
+    "-d/-D", "--dry-run/--no-dry-run",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг вывода некорректных ссылок на экран без изменения"
@@ -104,7 +104,7 @@ class AsciiDocFile(File):
     metavar="FILE",
     default=None)
 @option(
-    "--recursive/--no-recursive",
+    "--recursive/--no-recursive", "-r/-R",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
@@ -113,7 +113,7 @@ class AsciiDocFile(File):
     required=False,
     default=True)
 @option(
-    "--keep-logs",
+    "--keep-logs/--remove-logs", "-k/-K",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"

@@ -179,7 +179,7 @@ def check_path(
     show_default=True,
     default=True)
 @option(
-    "-i", "--ignore-index", "ignore_index",
+    "-i/-I", "--ignore-index/--keep-index", "ignore_index",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг игнорирования файлов _index любого расширения."
@@ -201,7 +201,7 @@ def check_path(
     show_default=True,
     default=None)
 @option(
-    "-n", "--no-prefix", "no_prefix",
+    "-n/-N", "--no-prefix/--with-prefix", "no_prefix",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг вывода исключительно относительных путей до файлов"
@@ -212,7 +212,7 @@ def check_path(
     required=False,
     default=False)
 @option(
-    "--hidden",
+    "-H", "--hidden",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг поиска скрытых файлов."
@@ -221,7 +221,7 @@ def check_path(
     required=False,
     default=False)
 @option(
-    "--recursive/--no-recursive",
+    "--recursive/--no-recursive", "-r/-R",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
@@ -230,7 +230,7 @@ def check_path(
     required=False,
     default=True)
 @option(
-    "--keep-logs",
+    "--keep-logs/--remove-logs", "-k/-K",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"

@@ -122,7 +122,7 @@ def file_inspection(path: str, is_color: bool = True):
     metavar="FILE ... FILE",
     default=None)
 @option(
-    "--verbose/--no-verbose",
+    "--verbose/--quiet", "-v/-q",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг подробного вывода."
@@ -131,7 +131,7 @@ def file_inspection(path: str, is_color: bool = True):
     required=False,
     default=False)
 @option(
-    "--recursive/--no-recursive",
+    "--recursive/--no-recursive", "-r/-R",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
@@ -140,7 +140,7 @@ def file_inspection(path: str, is_color: bool = True):
     required=False,
     default=True)
 @option(
-    "--keep-logs",
+    "--keep-logs/--remove-logs", "-k/-K",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"
