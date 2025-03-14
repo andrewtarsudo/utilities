@@ -64,7 +64,7 @@ from utilities.table_cols.file import AsciiDocFile
     metavar="WIDTH",
     default=MIN_COLUMN)
 @option(
-    "--recursive/--no-recursive", "-r/-R",
+    "-r/-R", "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
@@ -73,7 +73,18 @@ from utilities.table_cols.file import AsciiDocFile
     required=False,
     default=True)
 @option(
-    "--keep-logs/--remove-logs", "-k/-K",
+    "-o/-O", "--add-options/--no-options", "add_options",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг добавления опций таблицы."
+         "\nПо умолчанию: True, добавляются:"
+         "\n* options=\"header\";"
+         "\n* width=\"100%\"",
+    show_default=True,
+    required=False,
+    default=True)
+@option(
+    "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"
@@ -94,7 +105,16 @@ def table_cols_command(
         recursive: bool = True,
         max_symbols: int = MAX_SYMBOLS,
         min_column: int = MIN_COLUMN,
+        add_options: bool = True,
         keep_logs: bool = False):
+    if add_options:
+        options: dict[str, str] | None = {
+            "width": "100%",
+            "options": "header"}
+
+    else:
+        options: dict[str, str] | None = None
+
     files: list[StrPath] | None = get_files(
         ctx,
         files=files,
@@ -110,7 +130,7 @@ def table_cols_command(
             content: list[str] = file_reader(file, ReaderMode.LINES, encoding="utf-8")
             ascii_doc_file: AsciiDocFile = AsciiDocFile(file, content=content)
             ascii_doc_file.set_tables()
-            ascii_doc_file.fix_tables(table_analyser)
+            ascii_doc_file.fix_tables(table_analyser, options)
             ascii_doc_file.replace_tables()
             ascii_doc_file.save()
 

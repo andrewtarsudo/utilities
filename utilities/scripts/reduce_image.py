@@ -87,7 +87,7 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
     required=False,
     default=False)
 @option(
-    "--recursive/--no-recursive", "-r/-R",
+    "-r/-R", "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
@@ -96,7 +96,7 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
     required=False,
     default=True)
 @option(
-    "--keep-logs/--remove-logs", "-k/-K",
+    "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"

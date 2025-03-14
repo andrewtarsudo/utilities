@@ -2,7 +2,7 @@
 from pathlib import Path
 from re import finditer
 from string import digits
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, Mapping
 
 from loguru import logger
 
@@ -156,7 +156,7 @@ class AsciiDocFile:
 
         self._content = lines
 
-    def fix_tables(self, table_analyser: TableAnalyser):
+    def fix_tables(self, table_analyser: TableAnalyser, options: Mapping[str, str] = None):
         """Adds the 'cols' option if not specified."""
         table: Table
         for table, *_ in self._tables:
@@ -186,6 +186,17 @@ class AsciiDocFile:
                 continue
 
             else:
+                if options is None:
+                    logger.debug("Опции не заданы, поэтому данный шаг пропущен")
+
+                else:
+                    for k, v in options.items():
+                        if k not in table.options:
+                            table.options[k] = v
+
+                        else:
+                            logger.debug(f"Опции {k} уже задано значение {table.options.get(k)} в таблице {table.name} файла {self._path}")
+
                 table_column: TableColumn
                 table_analyser._column_parameters = [
                     table_column.column_parameters() for table_column in table.iter_column_items()]

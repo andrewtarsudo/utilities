@@ -131,7 +131,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     required=False,
     default=True)
 @option(
-    "--keep-logs/--remove-logs", "-k/-K",
+    "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"

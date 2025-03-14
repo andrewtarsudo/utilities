@@ -414,7 +414,7 @@ def validate(
     required=False,
     default=False)
 @option(
-    "--keep-logs/--remove-logs", "-k/-K",
+    "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"

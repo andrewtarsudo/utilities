@@ -44,7 +44,7 @@ from utilities.scripts.list_files import get_files
     metavar="DIR",
     default=None)
 @option(
-    "--recursive/--no-recursive", "-r/-R",
+    "-r/-R", "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
@@ -53,7 +53,7 @@ from utilities.scripts.list_files import get_files
     required=False,
     default=True)
 @option(
-    "--keep-logs/--remove-logs", "-k/-K",
+    "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"

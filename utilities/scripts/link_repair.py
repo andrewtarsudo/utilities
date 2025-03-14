@@ -97,7 +97,7 @@ def has_no_required_files(path: StrPath) -> bool:
     required=False,
     default=True)
 @option(
-    "-e/-E", "--skip-en/--no-skip-en",
+    "-e/-E", "--skip-en/--keep-en",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг обработки файлов только на русском языке."
@@ -107,7 +107,7 @@ def has_no_required_files(path: StrPath) -> bool:
     required=False,
     default=False)
 @option(
-    "--keep-logs/--remove-logs", "-k/-K",
+    "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом"
