@@ -2,10 +2,11 @@
 from enum import Enum
 from typing import Any, Iterable
 
-from utilities.common.constants import separator
+from utilities.common.shared import separator
 
 
 class FileLanguage(Enum):
+    """Class to represent the file language."""
     RU = "russian"
     EN = "english"
     RU_EN = "russian+english"
@@ -18,21 +19,14 @@ class FileLanguage(Enum):
 
 
 def prepare_logging(items: Iterable[Any] = None, sep: str = None) -> str:
-    """
-    Internal method to prepare elements for logging.
+    """Prepares elements for logging.
 
-    Parameters
-    ----------
-    items : Iterable[Any]
-        The elements to log.
-    sep : str
-        The separator between the log messages.
-
-    Returns
-    -------
-    str
-        The line to add to the logger.
-
+    :param items: The elements to log.
+    :type items: Iterable[Any]
+    :param sep: The separator between the log messages.
+    :type sep: str
+    :return: The line to add to the logger.
+    :rtype: str
     """
     if items is None:
         _str_items: str = ""

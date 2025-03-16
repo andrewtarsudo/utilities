@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from gc import collect
 from operator import attrgetter
 from pathlib import Path
 from shutil import rmtree
@@ -10,16 +11,16 @@ from click.decorators import group, help_option, option, pass_context
 from click.exceptions import UsageError
 from click.formatting import HelpFormatter
 from click.globals import get_current_context
-from click.termui import pause
+from click.termui import pause, style
 from click.types import BOOL
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import __version__, args_help_dict, DEBUG, HELP, NORMAL, PRESS_ENTER_KEY
 from utilities.common.custom_logger import custom_logging
 from utilities.common.errors import BaseError, NoArgumentsOptionsError
+from utilities.common.shared import __version__, args_help_dict, DEBUG, HELP, NORMAL, PRESS_ENTER_KEY, pretty_print
 
-COL_MAX: int = 39
+COL_MAX: int = 51
 MAX_CONTENT_WIDTH: int = 96
 TERMINAL_WIDTH: int = 96
 
@@ -30,8 +31,13 @@ def up(value: str):
     return value.upper() if not value.startswith("--") else value
 
 
-def underscore_to_dash(value: str, *, prefix: bool = True):
-    return f'{int(prefix) * "--"}{value.replace("_", "-")}'
+def prepare_option(value: str, *, prefix: bool = True, remove_suffix: str | None = "-flag"):
+    value: str = value.replace("_", "-")
+
+    if remove_suffix is not None:
+        value: str = value.removesuffix(remove_suffix)
+
+    return style(f'{int(prefix) * "--"}{value}', fg="magenta", bold=True)
 
 
 def wrap_line(line: str):
@@ -65,7 +71,7 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
                 _metavar: str = f" {param.make_metavar()}"
 
             elif param.name in ("version", "help"):
-                _metavar: str = f""
+                _metavar: str = ""
 
             else:
                 _metavar: str = ""
@@ -88,13 +94,17 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     if commands is not None and commands != dict():
         commands_str: str = wrap_line(" | ".join(map(add_brackets, commands)))
         formatter.write(
-            f"Использование:\n{name}\n"
-            f"{commands_str}\n{wrap_line(opts_str)}\n{wrap_line(args_str)}\n")
+            f"{style('Использование', fg='bright_cyan', bold=True)}:"
+            f"\n{name}"
+            f"\n{commands_str}"
+            f"\n{wrap_line(opts_str)}"
+            f"\n{wrap_line(args_str)}\n")
 
     else:
-
         formatter.write(
-            f"Использование:\n{name} {args_str}\n{wrap_line(opts_str)}\n")
+            f"{style('Использование', fg='bright_cyan', bold=True)}:"
+            f"\n{name} {args_str}"
+            f"\n{wrap_line(opts_str)}\n")
 
 
 def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
@@ -118,7 +128,7 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
             option_help: str = option_help[:_index]
 
         finally:
-            return _, option_help
+            return style(_, fg="cyan", bold=True), option_help
 
     rows: list[tuple[str, str]] = []
 
@@ -130,12 +140,12 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
                 rows.append(rv)
 
         else:
-            rows.append(("-h, --help", HELP))
+            rows.append((style("-h, --help", fg="cyan", bold=True), HELP))
 
     if rows:
         formatter.width = MAX_CONTENT_WIDTH
 
-        with formatter.section("Опции"):
+        with formatter.section(style("Опции", fg="blue", bold=True)):
             opt_names: list[str] = [item[0] for item in rows]
 
             col_spacing: int = COL_MAX - max(map(len, opt_names))
@@ -155,14 +165,14 @@ def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter
     commands: dict[str, Command] = getattr(cmd, "commands", dict())
 
     if commands != dict():
-        with formatter.section("Подкоманды"):
+        with formatter.section(style("Подкоманды", fg="green", bold=True)):
             rows: list[tuple[str, str]] = [
-                (sub.name, sub.help)
+                (style(sub.name, fg="green", bold=True), style(sub.help, fg="green", bold=True))
                 for sub in sorted(commands.values(), key=attrgetter("name"))
                 if not sub.hidden]
 
             sub_names: list[str] = [sub.name for sub in commands.values() if not sub.hidden]
-            col_spacing: int = COL_MAX - max(map(len, sub_names))
+            col_spacing: int = COL_MAX - 2 * max(map(len, sub_names)) + 1
             col_max: int = MAX_CONTENT_WIDTH
 
             formatter.write_dl(rows, col_max, col_spacing)
@@ -184,18 +194,21 @@ def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
 
     if args:
         formatter.width = MAX_CONTENT_WIDTH
+        asterisk: str = style("(*)", fg="red", bold=True)
 
         keys: list[str] = [item.removesuffix(".exe") for item in ctx.command_path.split(" ")]
         rows: list[tuple[str, str]] = [
-            (arg.name, args_help_dict.get_multiple_keys(keys=keys).get(arg.name))
+            (
+                f"{style(arg.name, fg='cyan', bold=True)} {asterisk}",
+                args_help_dict.get_multiple_keys(keys=keys).get(arg.name))
             for arg in args]
 
         args_names: list[str] = [arg.name for arg in args]
 
-        col_spacing: int = COL_MAX - max(map(len, args_names))
+        col_spacing: int = COL_MAX - args_help_dict.max_key - max(map(len, args_names))
         col_max: int = MAX_CONTENT_WIDTH
 
-        with formatter.section("Аргументы"):
+        with formatter.section(style("Аргументы", fg="blue", bold=True)):
             formatter.write_dl(rows, col_max, col_spacing)
 
 
@@ -223,14 +236,14 @@ def recursive_help(cmd: Command, parent: Context = None, lines: Iterable[str] = 
         terminal_width=TERMINAL_WIDTH,
         max_content_width=MAX_CONTENT_WIDTH)
 
-    lines.append(f"{get_help(cmd, ctx)}\n{SEPARATOR}\n\n")
+    lines.append(f"{get_help(cmd, ctx)}\n{SEPARATOR}")
     commands: dict[str, Command] = getattr(cmd, "commands", dict())
 
     for sub in commands.values():
         if not sub.hidden:
             recursive_help(sub, ctx, lines)
 
-    return "\n".join(lines)
+    return f"{pretty_print(lines)}\n\n"
 
 
 # noinspection PyUnusedLocal
@@ -328,12 +341,12 @@ class TermsAPIGroup(APIGroup):
 
 class MutuallyExclusiveOption(Option):
     def __init__(self, *args, **kwargs):
-        self.mutually_exclusive: set[str] = set(kwargs.pop("mutually_exclusive", []))
+        self.mutually_exclusive: tuple[str, ...] = tuple(kwargs.pop("mutually_exclusive", tuple()))
 
         _help: str = kwargs.get("help", "")
 
         if self.mutually_exclusive:
-            exclusive_options: str = ", ".join(map(underscore_to_dash, self.mutually_exclusive))
+            exclusive_options: str = ", ".join(map(prepare_option, self.mutually_exclusive))
 
             _: dict[str, str] = {
                 "help": (
@@ -349,18 +362,18 @@ class MutuallyExclusiveOption(Option):
             ctx: Context,
             opts: Mapping[str, Any],
             args: Iterable[str]) -> tuple[Any, list[str]]:
-        if self.mutually_exclusive.intersection(opts) and self.name in opts:
-            exclusive_options: str = ", ".join(map(underscore_to_dash, self.mutually_exclusive))
+        if set(self.mutually_exclusive).intersection(opts) and self.name in opts:
+            exclusive_options: str = ", ".join(map(prepare_option, self.mutually_exclusive))
 
             raise UsageError(
                 f"Ошибка в задании команды: `{self.name}` не может использоваться одновременно с "
-                f"`{exclusive_options}`."
-            )
+                f"`{exclusive_options}`.")
 
         else:
             args: list[str] = [*args]
             ctx.terminal_width = TERMINAL_WIDTH
             ctx.max_content_width = MAX_CONTENT_WIDTH
+
             return super().handle_parse_result(ctx, opts, args)
 
 
@@ -388,8 +401,7 @@ class MutuallyExclusiveOption(Option):
     "-h", "--help",
     help=HELP,
     is_eager=True)
-def command_line_interface(debug: bool = False):
-
+def cli(debug: bool = False):
     ctx: Context = get_current_context()
 
     try:
@@ -444,4 +456,5 @@ def clear_logs(ctx: Context):
         echo(f"Папка с логами: {DEBUG.parent}")
 
     pause(PRESS_ENTER_KEY)
+    collect()
     ctx.exit(0)

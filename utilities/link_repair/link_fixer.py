@@ -22,12 +22,14 @@ class LinkFixer:
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return True
+
         else:
             return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
             return False
+
         else:
             return NotImplemented
 
@@ -77,7 +79,7 @@ class LinkFixer:
                         f"Строка: {link.index}", result=True)
 
         if self.text_file.is_changed is False:
-            logger.debug(f"file {self.text_file.rel_path}, no missing slashes to fix")
+            logger.debug(f"В файле {self.text_file.rel_path} нет недостающих '/'")
 
     def _fix_missing_slashes_before_hash(self):
         """Fixes errors when the link has an anchor with no slash before."""
@@ -94,7 +96,7 @@ class LinkFixer:
                     raise LinkRepairInvalidHashCharIndexError
 
                 elif index == -1:
-                    logger.debug(f"Link {link} is internal")
+                    logger.debug(f"Ссылка {link} внутренняя")
                     continue
 
                 elif _[index] != "/":
@@ -109,7 +111,7 @@ class LinkFixer:
                     continue
 
         if self.text_file.is_changed is False:
-            logger.debug(f"file {self.text_file.rel_path}, no missing slashes to fix")
+            logger.debug(f"В файле {self.text_file.rel_path} нет недостающих '/'")
 
     def fix_links(self):
         """Fixes errors and updating the text."""

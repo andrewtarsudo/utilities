@@ -3,7 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import NamedTuple
 
-from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
+from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION, StrPath
 
 __all__ = ["Link"]
 
@@ -51,27 +51,45 @@ class Link(NamedTuple):
         else:
             _real_link_to_file: str = self.link_to_file
 
-        return self.from_file.joinpath(_real_link_to_file).resolve()
+        return (self
+                .from_file
+                .joinpath(_real_link_to_file)
+                .resolve())
 
     @property
     def anchor(self) -> str | None:
         """Gets the anchor from the link if any."""
-        return self.link_to.rsplit("#", 1)[-1].removesuffix("/") if bool(self) else None
+        if bool(self):
+            return self.link_to.rsplit("#", 1)[-1].removesuffix("/")
+
+        else:
+            return None
 
     @property
     def stem(self) -> str:
         """Gets the origin stem of the path to the destination file from the link."""
-        return self.origin_destination_path().name.removesuffix(MD_EXTENSION).removesuffix(ADOC_EXTENSION)
+        return (self
+                .origin_destination_path()
+                .name
+                .removesuffix(MD_EXTENSION)
+                .removesuffix(ADOC_EXTENSION))
 
     @property
     def parent_stem(self) -> str:
         """Gets the stem of the destination file parent from the link."""
-        return self.origin_destination_path().parent.name
+        return (self
+                .origin_destination_path()
+                .parent
+                .name)
 
     @property
     def grandparent_stem(self) -> str:
         """Gets the stem of the destination file grandparent from the link."""
-        return self.origin_destination_path().parent.parent.name
+        return (self
+                .origin_destination_path()
+                .parent
+                .parent
+                .name)
 
     @property
     def from_type(self) -> _LinkType:
@@ -95,7 +113,14 @@ class Link(NamedTuple):
     @property
     def link_to_file(self) -> str:
         """Gets the link to the file with no anchor."""
-        return self.link_to.rsplit("#", 1)[0].removesuffix("/") if bool(self) else self.link_to.removesuffix("/")
+        if bool(self):
+            return (self
+                    .link_to
+                    .rsplit("#", 1)[0]
+                    .removesuffix("/"))
+
+        else:
+            return self.link_to.removesuffix("/")
 
     @property
     def is_component(self) -> bool:

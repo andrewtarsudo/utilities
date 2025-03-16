@@ -86,10 +86,10 @@ class GitManager:
             self.output_if_different("Версия не последняя")
 
         elif not Path(self.TEMP_TERMS_BASIC).exists():
-            self.output_if_different(f"Файл с терминами не найден")
+            self.output_if_different("Файл с терминами не найден")
 
         else:
-            logger.info(f"Версия актуальна")
+            logger.info("Версия актуальна")
 
     def set_terms(self):
         file_writer(self.TEMP_TERMS_BASIC, self._content_git_terms.content)

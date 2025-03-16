@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
+from click.termui import style
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 
-from utilities.common.constants import HELP, StrPath
+from utilities.common.shared import HELP, StrPath
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument
-from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption, SwitchArgsAPIGroup
+from utilities.scripts.cli import clear_logs, cli, MutuallyExclusiveOption, SwitchArgsAPIGroup
 
 
-@command_line_interface.command(
+@cli.command(
     "convert-tables",
     cls=SwitchArgsAPIGroup,
     help="Команда для корректного извлечения таблиц из файлов docx в формат Markdown")
@@ -75,8 +76,8 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
     type=BOOL,
     help="\b\nФлаг удаления лишних пробелов и экранирования символов."
          "\nПо умолчанию: не задано, определяется параметрами"
-         "\n--escape и --remove."
-         "\nПриоритет выше, чем у опций --escape и --remove",
+         f"\n{style('--escape', fg='magenta')} и {style('--remove', fg='magenta')}."
+         f"\nПриоритет выше, чем у опций {style('--escape', fg='magenta')} и {style('--remove', fg='magenta')}",
     show_default=True,
     required=False,
     default=None)
@@ -87,8 +88,8 @@ from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyEx
     type=BOOL,
     help="\b\nФлаг извлечения текста без дополнительной обработки."
          "\nПо умолчанию: не задано, определяется параметрами"
-         "\n--escape и --remove."
-         "\nПриоритет выше, чем у опций --escape и --remove",
+         f"\n{style('--escape', fg='magenta')} и {style('--remove', fg='magenta')}."
+         f"\nПриоритет выше, чем у опций {style('--escape', fg='magenta')} и {style('--remove', fg='magenta')}",
     show_default=True,
     required=False,
     default=None)

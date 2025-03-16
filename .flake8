@@ -12,13 +12,17 @@ exclude =
     tests,
     themes,
     venv,
-    generate_executable.py
+    .venv,
+    generate_executable.py,
+    run_flake8.py
 filename =
     __main__.py,
-    utilities/*
-format = %(path)s::%(row)d,%(col)d::%(code)s::%(text)s
+    utilities
+format = pylint
 show-source = True
 hang-closing = True
 max-line-length = 120
+indent-size = 4
+disable-noqa = True
 statistics = True
 tee = False

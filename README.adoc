@@ -202,3 +202,20 @@ include::docs/README_terms.adoc[]
 include::docs/README_validate_yaml.adoc[]
 
 :leveloffset: -1
+
+
+pypy: 268 мс
+pypy: 281 мс
+pypy: 264 мс
+
+pypy: 1998 мс
+pypy: 2050 мс
+pypy: 2006 мс
+
+cpython: 113 мс
+cpython: 66 мс
+cpython: 76 мс
+
+cpython: 1731 мс
+cpython: 1328 мс
+cpython: 1625 мс

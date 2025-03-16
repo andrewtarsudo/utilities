@@ -5,7 +5,7 @@ from typing import NamedTuple
 
 from loguru import logger
 
-from utilities.common.constants import StrPath
+from utilities.common.shared import StrPath
 from utilities.common.errors import TermsInvalidTypeVersionError, TermsInvalidVersionError
 from utilities.common.functions import file_reader, ReaderMode
 

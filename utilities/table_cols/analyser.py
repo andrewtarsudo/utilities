@@ -20,7 +20,7 @@ The general steps:
 
 from loguru import logger
 
-from utilities.common.constants import MAX_SYMBOLS, MIN_COLUMN
+from utilities.common.shared import MAX_SYMBOLS, MIN_COLUMN
 from utilities.table_cols.column import TableColumnParameters
 
 

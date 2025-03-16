@@ -9,7 +9,7 @@ from click.termui import echo, pause
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
-from utilities.common.constants import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
+from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.common.errors import LinkRepairInvalidFileDictAttributeError, LinkRepairInvalidStorageAttributeError
 from utilities.common.functions import file_reader, file_writer, ReaderMode
 from utilities.link_repair.const import FileLanguage, prepare_logging
@@ -19,7 +19,7 @@ from utilities.link_repair.internal_link_inspector import internal_inspector
 from utilities.link_repair.link import Link
 from utilities.link_repair.link_fixer import link_fixer
 from utilities.link_repair.link_inspector import link_inspector
-from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup
+from utilities.scripts.cli import clear_logs, cli, SwitchArgsAPIGroup
 
 
 def validate_dir_path(path: StrPath | None) -> bool:
@@ -45,7 +45,7 @@ def has_no_required_files(path: StrPath) -> bool:
     return bool_md and bool_adoc
 
 
-@command_line_interface.command(
+@cli.command(
     "link-repair",
     cls=SwitchArgsAPIGroup,
     help="Команда для проверки и исправления ссылок в файлах документации")

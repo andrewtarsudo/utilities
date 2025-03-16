@@ -9,9 +9,9 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, separator, StrPath
+from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, separator, StrPath
 from utilities.common.functions import file_reader, ReaderMode
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.scripts.cli import APIGroup, clear_logs, cli
 from utilities.scripts.list_files import get_files
 
 RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
@@ -90,7 +90,7 @@ def file_inspection(path: str, is_color: bool = True):
                  is_success=False)))
 
 
-@command_line_interface.command(
+@cli.command(
     "check-russian",
     cls=APIGroup,
     help="Команда для проверки наличия непереведенных слов")

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from contextlib import ContextDecorator
 from time import perf_counter_ns
-from typing import Any
+from types import TracebackType
+from typing import Any, ContextManager
 
-from loguru import logger
+from click.termui import echo
 
 from utilities.common.errors import TimerRunningError, TimerStoppedError
 
@@ -32,14 +32,21 @@ def process_timing(value: int):
     return f"Время выполнения: {ms_str}{s_str}{m_str}"
 
 
-class Timer(ContextDecorator):
+class Timer(ContextManager):
     """Time your code using a class, context manager, or decorator"""
+    _instance = None
 
-    def __init__(self, is_logged: bool = True):
-        super().__init__()
-        self._start_time: int | None = None
-        self._end_time: int | None = None
-        self._is_logged: bool = is_logged
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._start_time = None
+            cls._instance._end_time = None
+            cls._instance._elapsed_time = 0
+
+            for k, v in kwargs.items():
+                setattr(cls._instance, f"_{k}", v)
+
+        return cls._instance
 
     def start(self) -> None:
         """Start a new timer"""
@@ -47,27 +54,43 @@ class Timer(ContextDecorator):
             raise TimerRunningError
 
         self._start_time = perf_counter_ns()
+        self._end_time = None
 
-    def stop(self) -> float:
+    def pause(self):
+        if self._start_time is None:
+            raise TimerStoppedError
+
+        self._end_time = perf_counter_ns()
+        self._elapsed_time += self._end_time - self._start_time
+        self._start_time = None
+
+    def stop(self):
         """Stop the timer, and report the elapsed time"""
         if self._start_time is None:
             raise TimerStoppedError
 
         # Calculate elapsed time
-        elapsed_time: int = perf_counter_ns() - self._start_time
-        self._start_time = None
+        self.pause()
 
         # Report elapsed time
-        if self._is_logged:
-            logger.info(process_timing(elapsed_time))
-
-        return elapsed_time
+        echo(process_timing(self._elapsed_time))
+        self._start_time = None
+        self._end_time = None
+        self._elapsed_time = 0
 
     def __enter__(self):
         """Start a new timer as a context manager"""
         self.start()
         return self
 
-    def __exit__(self, *exc_info: Any) -> None:
+    def __exit__(
+            self,
+            exc_type: type[BaseException] | None,
+            exc_value: BaseException | None,
+            traceback: TracebackType | None, /) -> None:
         """Stop the context manager timer"""
-        self.stop()
+        echo(
+            f"{exc_type.__class__.__name__}, {str(exc_value)}"
+            f"\n{traceback.tb_lineno}{traceback.tb_lasti}"
+            f"\n{traceback.tb_frame}")
+        self.pause()

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from os.path import relpath
 from pathlib import Path
 from re import compile, findall, finditer, Match, Pattern, search
 from typing import Iterable, Iterator, NamedTuple
 
 from loguru import logger
 
-from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
+from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION, StrPath
 from utilities.common.errors import LinkRepairInternalLinkAnchorError, LinkRepairLineInvalidTypeError
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.link_repair.const import FileLanguage, prepare_logging
@@ -18,6 +17,15 @@ _MD_ANCHOR_A_ID: str = r"(?<=<a\sid=\")[^\"]+(?=\">)"
 
 
 class FilePattern(NamedTuple):
+    """Class to represent the patterns to get link parts of specified types.
+
+    :param pattern_anchor: The pattern to get the link anchor.
+    :type pattern_anchor: str
+    :param pattern_link: The pattern to get the link.
+    :type pattern_link: str
+    :param pattern_internal_link: The pattern to get the internal link.
+    :type pattern_internal_link: str
+    """
     pattern_anchor: str
     pattern_link: str
     pattern_internal_link: str
@@ -26,8 +34,7 @@ class FilePattern(NamedTuple):
         return (
             f"ANCHOR: {self.pattern_anchor}\n"
             f"LINK: {self.pattern_link}\n"
-            f"INTERNAL_LINK: {self.pattern_internal_link}"
-        )
+            f"INTERNAL_LINK: {self.pattern_internal_link}")
 
     __repr__ = __str__
 
@@ -44,6 +51,13 @@ ascii_doc_file_pattern: FilePattern = FilePattern(
 
 
 class Boundary(NamedTuple):
+    """Class to represent the prefix and the suffix.
+
+    :param before: The prefix.
+    :type before: str
+    :param after: The suffix.
+    :type after: str
+    """
     before: str = ""
     after: str = ""
 
@@ -70,16 +84,12 @@ class _InternalLink(NamedTuple):
 
 
 class FileLinkItem(NamedTuple):
-    """
-    The instance to bind the link with the file.
+    """Class to represent the instance to bind the link with the file.
 
-    Attributes
-    ----------
-    index : int
-        The index of the line in the file.
-    link : Link
-        The link from the file.
-
+    :param index: The index of the line in the file.
+    :type index: int
+    :param link: The link from the file.
+    :type link: Link
     """
     index: int
     link: Link
@@ -92,16 +102,12 @@ class FileLinkItem(NamedTuple):
 
 
 class DirFile:
-    """
-    The file in the directory.
+    """Class to represent the file in the directory.
 
-    Attributes
-    ----------
-    _root_dir : str or Path
-        The path to the directory.
-    _full_path: str or Path
-        The full path to the file.
-
+    :param _root_dir: The path to the directory.
+    :type _root_dir: str or Path
+    :param _full_path: The full path to the file.
+    :type _full_path: str or Path
     """
 
     def __init__(self, root_dir: StrPath, full_path: StrPath):
@@ -119,16 +125,8 @@ class DirFile:
 
     @property
     def rel_path(self) -> str:
-        """
-        The path to the file relative to the directory path.
-
-        Returns
-        -------
-        str
-            The relative path string.
-
-        """
-        return relpath(self._full_path, self._root_dir.parent.parent).replace("\\", "/")
+        """Specifies the path to the file relative to the directory path."""
+        return self._full_path.relative_to(self._root_dir.parent.parent).as_posix()
 
     @property
     def full_path(self):
@@ -136,6 +134,21 @@ class DirFile:
 
 
 class TextFile(DirFile):
+    """Class to represent the text file in the directory.
+
+    :param _content: The lines of the file.
+    :type _content: list[str]
+    :param _links: The links instances.
+    :type _links: list[FileLinkItem]
+    :param _internal_links: The internal links.
+    :type _internal_links: set[_InternalLink]
+    :param _anchors: The link anchors.
+    :type _anchors: set[str]
+    :param _is_changed: The flag if the file has been modified.
+    :type _is_changed: bool
+    :param _patterns: The patterns that used for the file.
+    :type _patterns: FilePattern or None
+    """
     _pattern_anchor: list[Boundary] = []
     IGNORED_LINKS: tuple[str, ...] = ("http", "mailto", "/", "#")
 
@@ -276,6 +289,13 @@ class TextFile(DirFile):
         logger.success(f"{old_line} -> {new_line}, в файле {self.rel_path} в строках: {line_number}\n")
 
     def find_anchor(self, anchor: str) -> list[int]:
+        """Searches for the indexes of the anchor.
+
+        :param anchor: The specified anchor.
+        :type anchor: str
+        :return: The indexes.
+        :rtype: list[int]
+        """
         return [
             index for index, line in enumerate(iter(self))
             if any(boundary.bound(anchor) in line for boundary in self._pattern_anchor)]
@@ -327,7 +347,10 @@ class MdFile(TextFile):
     :param _is_changed: The flag of changes in the file.
     :type _is_changed: bool
     """
-    _pattern_anchor: list[Boundary] = [Boundary("{#", "}"), Boundary("<a name=\"", "\">"), Boundary("#")]
+    _pattern_anchor: list[Boundary] = [
+        Boundary("{#", "}"),
+        Boundary("<a name=\"", "\">"),
+        Boundary("#")]
 
     def __init__(self, root_dir: StrPath, full_path: StrPath):
         super().__init__(root_dir, full_path, md_file_pattern)
@@ -390,7 +413,11 @@ class AsciiDocFile(TextFile):
     :param _is_changed: The flag of changes in the file.
     :type _is_changed: bool
     """
-    _pattern_anchor: list[Boundary] = [Boundary("[#", "]"), Boundary("[[", "]]"), Boundary("#"), Boundary("<<", ",")]
+    _pattern_anchor: list[Boundary] = [
+        Boundary("[#", "]"),
+        Boundary("[[", "]]"),
+        Boundary("#"),
+        Boundary("<<", ",")]
 
     def __init__(self, root_dir: StrPath, full_path: StrPath):
         super().__init__(root_dir, full_path, ascii_doc_file_pattern)
@@ -503,18 +530,21 @@ class FileDict:
     def __contains__(self, item):
         if not isinstance(item, (str, Path)):
             return False
+
         else:
             return Path(item) in self._dict_files
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return True
+
         else:
             return False
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
             return False
+
         else:
             return True
 

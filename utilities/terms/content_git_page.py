@@ -4,7 +4,7 @@ from typing import NamedTuple
 
 from loguru import logger
 
-from utilities.common.constants import StrPath
+from utilities.common.shared import StrPath
 from utilities.common.errors import TermsInvalidProjectIdError
 from utilities.common.functions import file_writer
 from utilities.terms.const import CustomPort, CustomScheme
@@ -73,8 +73,8 @@ class ContentGitPage(NamedTuple):
 
         logger.debug(f"Response: {self.content is not None}")
 
-    def __getitem__(self, item):
-        return self.content[item]
+    # def __getitem__(self, item):
+    #     return self.content[item]
 
     def __len__(self):
         return len(self.content)

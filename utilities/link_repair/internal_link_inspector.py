@@ -48,7 +48,7 @@ class InternalLinkInspector:
     """Class to represent the inspector for internal links having only anchors.
 
     :param _text_file: The markdown file to inspect internal links.
-    :type _text_file : TextFile or None
+    :type _text_file: TextFile or None
     """
 
     def __init__(self):
@@ -131,6 +131,7 @@ class InternalLinkInspector:
             else:
                 _indexes: str = ", ".join(
                     str(_internal_link.index) for _internal_link in self._text_file.get_internal_links(_anchor))
+
                 logger.error(
                     f"Не найден якорь {_anchor} в файле {self._text_file.rel_path}.\n"
                     f"Строки: {_indexes}", result=True)

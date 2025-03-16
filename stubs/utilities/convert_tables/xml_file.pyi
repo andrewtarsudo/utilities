@@ -1,0 +1,88 @@
+# -*- coding: utf-8 -*-
+from pathlib import Path
+from typing import Iterator
+from utilities.common.shared import StrPath as StrPath
+from utilities.common.functions import file_writer as file_writer
+from utilities.convert_tables.line_formatter import LineFormatter as LineFormatter
+from utilities.convert_tables.qualified_name import fqdn as fqdn
+from utilities.convert_tables.xml_formatter import get_all_text as get_all_text
+from xml.etree.ElementTree import Element
+
+
+class CoreDocument:
+    file: Path
+    temp_dir: Path
+
+    def __init__(self, file: StrPath, temp_dir: StrPath) -> None: ...
+
+    def unarchive(self) -> None: ...
+
+    def delete_temp_archive(self) -> None: ...
+
+    @property
+    def name(self): ...
+
+
+class UnzippedFile:
+    def __init__(self, name: str, core_document: CoreDocument) -> None: ...
+
+    @property
+    def full_path(self) -> Path: ...
+
+
+class XmlFile(UnzippedFile):
+    content: Element
+
+    def __init__(self, name: str, core_document: CoreDocument) -> None: ...
+
+    def read(self) -> None: ...
+
+    def get_children_elements(self, tag: str) -> list[Element]: ...
+
+
+class XmlFilePart:
+    content: Element | None
+
+    def __init__(self, tag: str, parent: Element, idx: int | None = None) -> None: ...
+
+    def read(self) -> None: ...
+
+    def get_children_elements(self, tag: str | None = None) -> list[Element]: ...
+
+
+class XmlDocument(XmlFile):
+    tables_dir: Path
+
+    def __init__(self, core_document: CoreDocument, tables_dir: StrPath) -> None: ...
+
+    def __len__(self) -> int: ...
+
+    def __iter__(self) -> Iterator['XmlTable']: ...
+
+    def parse_document(self, line_formatter: LineFormatter): ...
+
+
+class XmlTable(XmlFilePart):
+    def __init__(self, xml_document: XmlDocument, table_index: int) -> None: ...
+
+    def __iter__(self): ...
+
+    @property
+    def xml_rows(self) -> list['XmlTableRow']: ...
+
+    def __len__(self) -> int: ...
+
+    def set_lines(self, line_formatter: LineFormatter): ...
+
+    @property
+    def md_table_path(self): ...
+
+    def write_to_file(self) -> None: ...
+
+
+class XmlTableRow(XmlFilePart):
+    def __init__(self, xml_table: XmlTable, row_index: int) -> None: ...
+
+    def __len__(self) -> int: ...
+
+    def cells_text(self) -> list[str]: ...

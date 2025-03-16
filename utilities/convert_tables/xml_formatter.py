@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from enum import StrEnum
+from enum import Enum
 from typing import Iterable
 
 from xml.etree.ElementTree import Element
@@ -7,7 +7,7 @@ from xml.etree.ElementTree import Element
 from utilities.convert_tables.qualified_name import _ns, fqdn
 
 
-class Formatting(StrEnum):
+class Formatting(Enum):
     BOLD = "bold"
     ITALIC = "italic"
     SUPERSCRIPT = "superscript"
@@ -25,8 +25,7 @@ class Formatting(StrEnum):
             fqdn("w:b"): "bold",
             fqdn("w:i"): "italic",
             fqdn("superscript"): "superscript",
-            fqdn("subscript"): "subscript"
-        }
+            fqdn("subscript"): "subscript"}
         return cls(_conversion_dict.get(tag))
 
 
@@ -36,8 +35,7 @@ def frame_line(line: str, formatting: Iterable[Formatting]) -> str:
         Formatting.ITALIC: ("_", "_"),
         Formatting.SUPERSCRIPT: ("<sup>", "</sup>"),
         Formatting.SUBSCRIPT: ("<sub>", "</sub>"),
-        Formatting.NONE: ("", "")
-    }
+        Formatting.NONE: ("", "")}
 
     for _format in formatting:
         prefix, suffix = formatting_dict.get(_format)
@@ -57,11 +55,8 @@ def find_children(element: Element, tags: Iterable[str] = None) -> set[str] | No
 
 def get_run_text(r: Element) -> dict[str, list[Formatting]]:
     tags: tuple[str, ...] = (fqdn("w:b"), fqdn("w:i"), fqdn("w:vertAlign"))
-
     r_pr: Element | None = r.find(fqdn("w:rPr"), _ns)
-
     t: Element | None = r.find(fqdn("w:t"), _ns)
-
     text: str = t.text if t is not None else ""
 
     if r_pr is None:
@@ -71,11 +66,11 @@ def get_run_text(r: Element) -> dict[str, list[Formatting]]:
 
     if fqdn("w:vertAlign") in _formats:
         vert_align: Element = r_pr.find(fqdn("w:vertAlign"), _ns)
-
         w_val: str = vert_align.get(fqdn("w:val"))
 
         if w_val != "baseline":
             _formats.append(w_val)
+
         _formats.remove(fqdn("w:vertAlign"))
 
     if not _formats:
@@ -91,6 +86,7 @@ def get_paragraph_text(p: Element) -> str:
         frame_line(k, v)
         for r in p.findall(fqdn("w:r"), _ns)
         for k, v in get_run_text(r).items()]
+
     return "".join(lines)
 
 

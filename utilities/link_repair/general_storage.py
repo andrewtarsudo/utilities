@@ -6,7 +6,7 @@ from typing import Iterator, Iterable, Any
 
 from loguru import logger
 
-from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
+from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION, StrPath
 
 
 def unique(values: Iterable[Any] = None) -> list[Any]:
@@ -50,7 +50,21 @@ def with_grandparent(path: StrPath) -> str:
 
 
 class GeneralStorage:
-    """The storage of the file names."""
+    """Class to represent the storage of the file names.
+
+    :param _root_dir: The path to the project directory.
+    :type _root_dir: Path
+    :param _dirindexes: The dictionary of the 'index.*' files.
+    :type _dirindexes: dict[str, Path]
+    :param _dir_indexes: The dictionary of the '_index.*' files.
+    :type _dir_indexes: dict[str, Path]
+    :param _non_text_files: The dictionary of the images and files with no text lines.
+    :type _non_text_files: dict[str, Path]
+    :param _text_files: The dictionary of the common text files.
+    :type _text_files: dict[str, Path]
+    :param _component_storages: The dictionary of the component files.
+    :type _component_storages: dict[str, Path]
+    """
 
     def __init__(self, root_dir: StrPath):
         self._root_dir: Path = Path(root_dir).resolve()
@@ -69,16 +83,20 @@ class GeneralStorage:
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self._root_dir == other._root_dir
+
         elif issubclass(self.__class__, other.__class__) or issubclass(other.__class__, self.__class__):
             return self._root_dir == other.root_dir
+
         else:
             return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
             return self._root_dir != other._root_dir
+
         elif issubclass(self.__class__, other.__class__) or issubclass(other.__class__, self.__class__):
             return self._root_dir != other.root_dir
+
         else:
             return NotImplemented
 
@@ -88,12 +106,10 @@ class GeneralStorage:
                 *self._dir_indexes.values(),
                 *self._dirindexes.values(),
                 *self._text_files.values(),
-                *self._non_text_files.values()
-            ]
-        )
+                *self._non_text_files.values()])
 
     def join_path(self, path: StrPath) -> Path:
-        """Generates the path basing on the root_dir.
+        """Specifies the path basing on the root_dir.
 
         :param path: The path to add to the root_dir.
         :type path: str or Path
@@ -101,7 +117,7 @@ class GeneralStorage:
         return self._root_dir.joinpath(path).resolve()
 
     def parent_name(self, path: StrPath) -> str:
-        """Generates the file parent name.
+        """Specifies the file parent name.
 
         :param path: The path to the file.
         :type path: str or Path
@@ -109,7 +125,7 @@ class GeneralStorage:
         return self.join_path(path).parent.name
 
     def grandparent_name(self, path: StrPath):
-        """Generates the file grandparent name.
+        """Specifies the file grandparent name.
 
         :param path: The path to the file.
         :type path: str or Path
@@ -117,7 +133,7 @@ class GeneralStorage:
         return self.join_path(path).parent.parent.name
 
     def prepare(self):
-        """Generates the dictionaries."""
+        """Specifies the dictionaries."""
         _dir_indexes: list[Path] = []
         _dirindexes: list[Path] = []
         _text_files: list[Path] = []
@@ -128,10 +144,13 @@ class GeneralStorage:
 
             if _path.suffix not in (MD_EXTENSION, ADOC_EXTENSION):
                 _non_md_files.append(_path)
+
             elif _path.stem == "_index":
                 _dir_indexes.append(_path)
+
             elif _path.stem == "index":
                 _dirindexes.append(_path)
+
             else:
                 _text_files.append(_path)
 
@@ -139,10 +158,9 @@ class GeneralStorage:
         self._set_dirindexes(_dirindexes)
         self._set_text_files(_text_files)
         self._set_non_text_files(_non_md_files)
-        return
 
     def _set_dir_indexes(self, paths: Iterable[Path]):
-        """Generates the '_dir_indexes' dictionary.
+        """Specifies the '_dir_indexes' dictionary.
 
         :param paths: The paths to the directories with the '_index.md' or '_index.adoc' file.
         :type paths: Iterable[Path]
@@ -162,14 +180,12 @@ class GeneralStorage:
         _unique_parents_md: list[str] = unique(
             iter(
                 f"{self.grandparent_name(_)}/{self.parent_name(_)}"
-                for _ in iglob("**/_index.md", root_dir=self._root_dir, recursive=True))
-        )
+                for _ in iglob("**/_index.md", root_dir=self._root_dir, recursive=True)))
 
         _unique_parents_adoc: list[str] = unique(
             iter(
                 f"{self.grandparent_name(_)}/{self.parent_name(_)}"
-                for _ in iglob("**/_index.adoc", root_dir=self._root_dir, recursive=True))
-        )
+                for _ in iglob("**/_index.adoc", root_dir=self._root_dir, recursive=True)))
 
         _unique_parents: list[str] = [*_unique_parents_md, *_unique_parents_adoc]
 
@@ -186,10 +202,8 @@ class GeneralStorage:
             else:
                 self._dir_indexes[with_grandparent(_path)] = self.join_path(_path)
 
-        return
-
     def _set_dirindexes(self, paths: Iterable[Path]):
-        """Generates the '_dirindexes' dictionary.
+        """Specifies the '_dirindexes' dictionary.
 
         :param paths: The paths to the directories with the 'index.md' file.
         :type paths: Iterable[Path]
@@ -209,14 +223,12 @@ class GeneralStorage:
         _unique_parents_md: list[str] = unique(
             iter(
                 f"{self.grandparent_name(_)}/{self.parent_name(_)}"
-                for _ in iglob("**/index.md", root_dir=self._root_dir, recursive=True))
-        )
+                for _ in iglob("**/index.md", root_dir=self._root_dir, recursive=True)))
 
         _unique_parents_adoc: list[str] = unique(
             iter(
                 f"{self.grandparent_name(_)}/{self.parent_name(_)}"
-                for _ in iglob("**/index.adoc", root_dir=self._root_dir, recursive=True))
-        )
+                for _ in iglob("**/index.adoc", root_dir=self._root_dir, recursive=True)))
 
         _unique_parents: list[str] = [*_unique_parents_md, *_unique_parents_adoc]
 
@@ -233,10 +245,8 @@ class GeneralStorage:
             else:
                 self._dirindexes[with_grandparent(_path)] = self.join_path(_path)
 
-        return
-
     def _set_text_files(self, paths: Iterable[Path]):
-        """Generates the '_text_files' dictionary.
+        """Specifies the '_text_files' dictionary.
 
         :param paths: The paths to the Markdown files.
         :type paths: Iterable[Path]
@@ -284,7 +294,7 @@ class GeneralStorage:
         return
 
     def _set_non_text_files(self, paths: Iterable[Path]):
-        """Generates the '_non_text_files' dictionary.
+        """Specifies the '_non_text_files' dictionary.
 
         :param paths: The paths to the non-Markdown and non-AsciiDoc files.
         :type paths: Iterable[Path]
@@ -310,7 +320,6 @@ class GeneralStorage:
 
     @property
     def root_dir(self):
-        """ """
         return self._root_dir
 
     @property
@@ -320,6 +329,8 @@ class GeneralStorage:
 
 
 class ComponentStorage(GeneralStorage):
+    """Class to represent the storage of the component."""
+
     def __init__(self, root_dir: StrPath, name: str):
         root_dir: Path = Path(root_dir).joinpath("components").joinpath(name)
         super().__init__(root_dir)
@@ -328,25 +339,27 @@ class ComponentStorage(GeneralStorage):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self._name == other._name
+
         else:
             return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
             return self._name != other._name
+
         else:
             return NotImplemented
 
     def __contains__(self, item):
         if isinstance(item, StrPath):
-            item: Path = Path(item)
-            return self._name in item.parents
+            return self._name in Path(item).parents
+
         else:
             return False
 
 
 class Storage(GeneralStorage):
-    """The main storage of all file names."""
+    """Class to represent the main storage of all file names."""
 
     def __init__(self, root_dir: StrPath):
         super().__init__(root_dir)
@@ -371,14 +384,15 @@ class Storage(GeneralStorage):
     def _component_storage_names(self):
         if self.is_empty:
             logger.debug(
-                f"Directory {self._root_dir} has no 'components' directory\n"
-                f"Processing ComponentStorage items is skipped")
+                f"В директории {self._root_dir} нет папки 'components'\n"
+                f"Обработка ComponentStorage пропущена")
             return []
 
         else:
             return [item.name for item in self._components_path.iterdir() if item.is_dir()]
 
     def _set_component_storages(self):
+        """Specifies ComponentStorage items."""
         for _name in self._component_storage_names:
             component_storage: ComponentStorage = ComponentStorage(self._root_dir, _name)
             component_storage.prepare()

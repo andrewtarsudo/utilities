@@ -8,7 +8,7 @@ from loguru import logger
 
 from utilities.common.errors import TableColsTableBorderNotClosedError
 from utilities.common.functions import file_writer
-from utilities.table_cols import TableAnalyser
+from utilities.table_cols.analyser import TableAnalyser
 from utilities.table_cols.column import TableColumn
 from utilities.table_cols.table import Table
 
@@ -16,8 +16,7 @@ from utilities.table_cols.table import Table
 class AsciiDocFile:
     def __init__(
             self,
-            path: str | Path,
-            *,
+            path: str | Path, *,
             content: Iterable[str] = None):
         self._path: Path = Path(path)
 
@@ -86,7 +85,8 @@ class AsciiDocFile:
             line_indexes: str = ", ".join(map(str, table_marks))
             logger.error(
                 f"В файле {self._path} пропущен символ завершения таблицы '|==='\n"
-                f"Найдено {len(table_marks)}: в строках {line_indexes}", tech_writers=True)
+                f"Найдено {len(table_marks)}: в строках {line_indexes}",
+                tech_writers=True)
             raise TableColsTableBorderNotClosedError
 
         for i in range(len(table_marks) // 2):

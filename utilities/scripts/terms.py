@@ -9,9 +9,9 @@ from click.types import BOOL
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import HELP, PRESS_ENTER_KEY, pretty_print
+from utilities.common.shared import HELP, PRESS_ENTER_KEY, pretty_print
 from utilities.common.functions import file_reader, ReaderMode
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface, MutuallyExclusiveOption
+from utilities.scripts.cli import APIGroup, clear_logs, cli, MutuallyExclusiveOption
 from utilities.terms.ascii_doc_table_terms import AsciiDocTableTerms
 from utilities.terms.git_manager import git_manager
 from utilities.terms.table import Term
@@ -40,7 +40,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     ctx.exit(0)
 
 
-@command_line_interface.command(
+@cli.command(
     "terms",
     cls=APIGroup,
     help="Команда для вывода расшифровки аббревиатур")

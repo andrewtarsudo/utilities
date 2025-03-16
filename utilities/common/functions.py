@@ -2,16 +2,12 @@
 from enum import Enum
 from io import UnsupportedOperation
 from pathlib import Path
-from shutil import rmtree
-from typing import Callable, Iterable
+from typing import Any, Callable, Iterable
 
-from click.core import Context
-from click.decorators import pass_context
-from click.termui import pause
-from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import __version__, DEBUG, NORMAL, PRESS_ENTER_KEY, StrPath
+from utilities.common.errors import FileReaderError
+from utilities.common.shared import StrPath
 
 
 class ReaderMode(Enum):
@@ -20,6 +16,19 @@ class ReaderMode(Enum):
 
     def __str__(self):
         return self._value_
+
+
+class FileType(Enum):
+    JSON = "json"
+    YAML = "yaml"
+    NONE = ""
+
+    def initiate(self):
+        if self._value_ == "json":
+            from json import load as load_file
+
+        elif self._value_ == "yaml":
+            from yaml import safe_load as load_file
 
 
 def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str = "utf-8"):
@@ -36,27 +45,27 @@ def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str =
 
         return _
 
-    except FileNotFoundError:
-        logger.error(f"Файл {path} не найден")
+    except FileNotFoundError as e:
+        logger.error(f"{e.__class__.__name__}: файл {path} не найден")
         raise
 
-    except PermissionError:
+    except PermissionError as e:
         from os import stat
 
-        logger.error(f"Недостаточно прав для чтения файла {path}")
+        logger.error(f"{e.__class__.__name__}: недостаточно прав для чтения файла {path}")
         logger.error(f"Доступ: {stat(path).st_mode}")
         raise
 
-    except RuntimeError:
-        logger.error(f"Произошла ошибка обработки во время записи файла {path}")
+    except RuntimeError as e:
+        logger.error(f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}")
         raise
 
     except UnsupportedOperation as e:
-        logger.error(f"Не поддерживаемая операция с файлом {path}: {e.strerror}")
+        logger.error(f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}")
         raise
 
     except OSError as e:
-        logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+        logger.error(f"{e.__class__.__name__}: {e.strerror}")
         raise
 
 
@@ -71,51 +80,65 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
         with open(path, mode=mode, encoding=encoding, errors="ignore") as f:
             f.write(content)
 
-    except PermissionError:
+    except PermissionError as e:
         from os import stat
 
-        logger.error(f"Недостаточно прав для записи в файл {path}")
+        logger.error(f"{e.__class__.__name__}: недостаточно прав для записи в файл {path}")
         logger.error(f"Доступ: {stat(path).st_mode}")
         raise
 
-    except RuntimeError:
-        logger.error(f"Произошла ошибка обработки во время записи файла {path}")
+    except RuntimeError as e:
+        logger.error(f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}")
         raise
 
     except UnsupportedOperation as e:
-        logger.error(f"Не поддерживаемая операция с файлом {path}: {e.strerror}")
+        logger.error(f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}")
         raise
 
     except OSError as e:
-        logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+        logger.error(f"{e.__class__.__name__}: {e.strerror}")
         raise
 
 
-@pass_context
-def clear_logs(ctx: Context):
-    keep_logs: bool = ctx.obj.get("keep_logs", False)
-    debug: bool = ctx.obj.get("debug", False)
-    no_result: bool = ctx.obj.get("no_result", False)
-    result_file: Path = ctx.obj.get("result_file", None)
+def file_reader_type(path: StrPath, file_type: str | FileType, *, encoding: str = "utf-8"):
+    if isinstance(file_type, str):
+        file_type: ReaderMode = ReaderMode[file_type]
 
-    logger.debug(
-        f"Версия: {__version__}\n"
-        f"Команда: {ctx.command_path}\n"
-        f"Параметры: {ctx.params}")
+    if file_type is FileType.JSON:
+        from json import load as load_file
 
-    logger.remove()
-
-    if no_result and result_file is not None:
-        result_file.unlink(missing_ok=True)
-
-    if not keep_logs:
-        rmtree(NORMAL.parent, ignore_errors=True)
-
-    elif not debug:
-        echo(f"Папка с логами: {NORMAL.parent}")
+    elif file_type is FileType.YAML:
+        from yaml import safe_load as load_file
 
     else:
-        echo(f"Папка с логами: {DEBUG.parent}")
+        logger.error("Тип должен быть json или yaml")
+        raise FileReaderError
 
-    pause(PRESS_ENTER_KEY)
-    ctx.exit(0)
+    try:
+        with open(path, "r", encoding=encoding, errors="ignore") as f:
+            content: dict[str, Any] = load_file(f)
+
+        return content
+
+    except FileNotFoundError as e:
+        logger.error(f"{e.__class__.__name__}: файл {path} не найден")
+        raise
+
+    except PermissionError as e:
+        from os import stat
+
+        logger.error(f"{e.__class__.__name__}: недостаточно прав для чтения файла {path}")
+        logger.error(f"Доступ: {stat(path).st_mode}")
+        raise
+
+    except RuntimeError as e:
+        logger.error(f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}")
+        raise
+
+    except UnsupportedOperation as e:
+        logger.error(f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}")
+        raise
+
+    except OSError as e:
+        logger.error(f"{e.__class__.__name__}: {e.strerror}")
+        raise

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from utilities.common.constants import ADOC_EXTENSION, MD_EXTENSION, StrPath
+from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION, StrPath
 from utilities.link_repair.file_dict import FileDict, TextFile, DirFile
 from utilities.link_repair.link import Link
 from utilities.link_repair.internal_link_inspector import internal_inspector, InternalLinkInspector
@@ -13,18 +13,12 @@ from utilities.link_repair.general_storage import GeneralStorage, ComponentStora
 
 
 def _prepare_link(link: str) -> str:
-    """
-    The generation of the link to the file without index/_index and extension.
+    """Generates the link to the file without index/_index and extension.
 
-    Parameters
-    ----------
-    link : str
-        The link to the file.
-
-    Returns
-    -------
-    str
-        The modified link according to the rules.
+    :param link: The link to the file.
+    :type link: str
+    :return: The modified link according to the rules.
+    :rtype: str
     """
     _: str = link.removesuffix("/")
 
@@ -41,18 +35,11 @@ def _prepare_link(link: str) -> str:
 
 
 def _update_prefix(*lines: str) -> tuple[str, ...]:
-    """
-    The generation of the links having two more or less level ups.
+    """Generates the links having two more or less level ups.
 
-    Parameters
-    ----------
-    lines : str
-        The links to modify.
-
-    Returns
-    -------
-    tuple[str, ...]
-
+    :param lines: The links to modify.
+    :type lines: Iterable[str]
+    :rtype: tuple[str, ...]
     """
     return tuple(
         chain.from_iterable(
@@ -61,23 +48,15 @@ def _update_prefix(*lines: str) -> tuple[str, ...]:
                 f"../{_}",
                 _,
                 _.removeprefix("../"),
-                _.removeprefix("../../")
-            ) for _ in lines))
+                _.removeprefix("../../")) for _ in lines))
 
 
 def _update_suffix(*lines: str) -> tuple[str, ...]:
-    """
-    The generation of the full path to the file.
+    """Generates the full path to the file.
 
-    Parameters
-    ----------
-    lines : str
-        The links to modify.
-
-    Returns
-    -------
-    tuple[str, ...]
-
+    :param lines: The links to modify.
+    :type lines: Iterable[str]
+    :rtype: tuple[str, ...]
     """
     return tuple(
         chain.from_iterable(
@@ -92,69 +71,52 @@ def _update_suffix(*lines: str) -> tuple[str, ...]:
                 f"{_}/index{ADOC_EXTENSION}",
                 f"{_}/_index{ADOC_EXTENSION}",
                 f"{_}/index.en{ADOC_EXTENSION}",
-                f"{_}/_index.en{ADOC_EXTENSION}",
-            ) for _ in lines))
+                f"{_}/_index.en{ADOC_EXTENSION}") for _ in lines))
 
 
 def get_options(path: StrPath) -> tuple[str, ...]:
-    """
-    The generation of the all trivial links that are possible to be valid based on the given one.
+    """Generates all trivial links that are possible to be valid based on the given one.
 
-    Parameters
-    ----------
-    path : str or Path
-        The link to the file.
-
-    Returns
-    -------
-    tuple[str, ...]
-        The full set of links to inspect.
-
+    :param path: The link to the file.
+    :type path: str or Path
+    :return: The full set of links to inspect.
+    :rtype: tuple[str, ...]
     """
     _: str = f"{path}".removeprefix('./')
     return _update_suffix(*_update_prefix(f"{path}"))
 
 
 def validate_file_path(path: StrPath) -> bool:
-    """
-    The validation of the file path.
+    """Validates the file path.
 
-    Parameters
-    ----------
-    path : str or Path
-        The path to inspect.
-
-    Returns
-    -------
-    bool
-        The result of the check.
-
+    :param path: The path to inspect.
+    :type path: str or Path
+    :rtype: bool
+    :return: The result of the check.
     """
     _: Path = Path(path).resolve()
     return _.exists() and _.is_file()
 
 
 class LinkInspector:
-    """
-    Class to represent the entity to inspect the link.
+    """Class to represent the entity to inspect the link.
 
-    Attributes
-    ----------
-    _storage : Storage
-        The entity to store the information about the directory content.
-    _link : Link
-        The link to validate.
-    _destination : Path
-        The path to the file pointed in the link.
-    _proper_link : str or None
-        The proper link that must be in the file.
-    _proper_anchor : str or None
-        The proper anchor that must be in the file.
-    _file_dict : FileDict
-        The entity to store the processed files.
-    _internal_inspector : InternalLinkInspector
-        The entity to inspect anchors.
-
+    :param _storage: The entity to store the information about the directory content.
+    :type _storage: Storage
+    :param _link: The link to validate.
+    :type _link: Link
+    :param _destination: The path to the file pointed in the link.
+    :type _destination: Path
+    :param _proper_link: The proper link that must be in the file.
+    :type _proper_link: str or None
+    :param _proper_anchor: The proper anchor that must be in the file.
+    :type _proper_anchor: str or None
+    :param _file_dict: The entity to store the processed files.
+    :type _file_dict: FileDict
+    :param _internal_inspector: The entity to inspect anchors.
+    :type _internal_inspector: InternalLinkInspector
+    :param updated_anchors: The modified anchors.
+    :type updated_anchors: set[str]
     """
     updated_anchors: set[str] = set()
 
@@ -177,13 +139,11 @@ class LinkInspector:
         return f"<{self.__class__.__name__}>"
 
     def __bool__(self):
-        """
-        The validation if the destination file has already been found.
-
-        """
+        """Validates if the destination file has already been found."""
         return self._destination is not None
 
     def preprocess_link(self):
+        """Handles the link before start."""
         _: str | None = self._link.anchor
         _updated_anchor: str = Path(self._link.link_to_file).stem.removeprefix('_').replace('_', '-')
 
@@ -192,80 +152,69 @@ class LinkInspector:
             self.source_file().update_line(_indexes, _, f"{_}-{_updated_anchor}", is_boundary=True)
 
     def base_dir(self) -> Path:
-        """
-        The base path to get relative links.
-
-        """
+        """Specifies the base path to get relative links."""
         return self._storage.root_dir.parent.parent
 
     def source_link(self) -> Path:
-        """
-        The path to the file containing the link.
-
-        """
+        """Specifies the path to the file containing the link."""
         return Path(self._link.from_file)
 
     def source_file(self) -> TextFile:
+        """Specifies the source text file."""
         return self._file_dict.get(self.source_link())
 
     def destination_file(self) -> DirFile | TextFile:
-        """
-        The file given in the link if found.
-
-        """
+        """Specifies the file given in the link if found."""
         if not self._link.is_component:
             return self._file_dict.get(self._destination) if bool(self) else None
 
     def inspect_original_link(self):
-        """
-        The validation of the original link.
-
-        """
+        """Validates the original link."""
         _options: list[str] = [*_update_suffix(f"{self._link.origin_destination_path()}")]
 
         for index, _option in enumerate(_options):
             if validate_file_path(_option):
-                logger.debug(f"Success, link = {_option}")
+                logger.debug(f"Успех, вариант {_option}")
                 self._destination = Path(_option)
                 self._proper_link = self._link.link_to
                 return
 
         else:
-            logger.debug("Fail, link is invalid")
-            return
+            logger.debug("Неудача, ссылка некорректна")
 
     def inspect_trivial_options(self):
-        """
-        The validation if the link has an invalid number of level ups.
-
-        """
+        """Validates the link having an invalid number of level ups."""
         if bool(self):
-            logger.debug("File path has already been found")
+            logger.debug("Путь до файла уже определен")
             return
 
         for index, _option in enumerate(get_options(self._link.link_to_file)):
             _: Path = self._link.from_file.joinpath(_option).resolve()
 
             if validate_file_path(_):
-                logger.debug(f"Success, option = {_}")
+                logger.debug(f"Успех, вариант {_}")
                 self._destination = _
                 return
 
         else:
-            logger.debug("None of the most possible paths leads to the file")
+            logger.debug(f"Ни один из наиболее вероятных путей не ведет по ссылке {self._link.link_to_file}")
             return
 
     def find_in_storage(self, storage: GeneralStorage):
+        """Searches for the file in the storage by its name or parent/name or grandparent/parent/name.
+
+        :param storage: The storage to look for the file.
+        :type storage: GeneralStorage
+        """
         if bool(self):
-            logger.debug("File path has already been found")
+            logger.debug("Путь до файла уже определен")
             return
 
         _storage_dict_items: tuple[dict[str, Path], ...] = (
             storage.dir_indexes,
             storage.dirindexes,
             storage.non_text_files,
-            storage.text_files
-        )
+            storage.text_files)
 
         for _storage_dict in _storage_dict_items:
             for _name in self._names():
@@ -274,14 +223,10 @@ class LinkInspector:
                     return
 
         else:
-            logger.debug(f"missing file = {self._link.link_to}")
-            return
+            logger.debug(f"Отсутствует файл {self._link.link_to}")
 
     def find_file(self):
-        """
-        The file given in the link by its name from the file name storage.
-
-        """
+        """Searches for the file given in the link by its name from the file name storage."""
         self.find_in_storage(self._storage)
 
         if self._link.component_name is not None:
@@ -308,26 +253,20 @@ class LinkInspector:
             return
 
     def error_file(self, path: StrPath) -> str:
-        """
-        The file name to provide in the error.
+        """Specifies the file name to show in the error.
 
-        Attributes
-        ----------
-        path : str or Path
-            The path to the file.
-
+        :param path: The path to the file.
+        :type path: str or Path
+        :rtype: str
         """
         return Path(relpath(path, self.base_dir())).as_posix()
 
     def inspect_anchor(self):
-        """
-        Setting the anchor from the link if any.
-
-        """
+        """Sets the anchor from the link if any."""
         if not bool(self) or self.destination_file() is None:
             return
 
-        if not isinstance(self.destination_file(), TextFile):
+        elif not isinstance(self.destination_file(), TextFile):
             logger.debug("Anchor cannot be in image")
             self._proper_anchor = ""
 
@@ -343,10 +282,7 @@ class LinkInspector:
             self._proper_anchor = None
 
     def find_proper_anchor(self):
-        """
-        The attempt to find the valid anchor.
-
-        """
+        """Tries to find the valid anchor."""
         if self._proper_anchor is not None:
             return
 
@@ -355,8 +291,9 @@ class LinkInspector:
 
         if _proper_anchor is not None:
             logger.warning(
-                f"В файле {self.destination_file().rel_path} найден якорь\n"
-                f"{_proper_anchor} вместо {self._link.anchor}", result=True)
+                f"В файле {self.destination_file().rel_path} найден якорь"
+                f"\n{_proper_anchor} вместо {self._link.anchor}",
+                result=True)
             self._proper_anchor = _proper_anchor
 
         else:
@@ -366,14 +303,8 @@ class LinkInspector:
             self._proper_anchor = "/#_valid_anchor_"
 
     def set_proper_link(self):
-        """
-        The preparation of the proper link.
-
-        """
-        if not bool(self):
-            return
-
-        if self._proper_link is not None:
+        """Specifies the proper link."""
+        if not bool(self) or self._proper_link is not None:
             return
 
         _path: str = Path(relpath(self._destination, self.source_link())).as_posix()
@@ -391,22 +322,15 @@ class LinkInspector:
         self._proper_link: str = proper_link
 
     def compare_links(self) -> bool:
-        """
-        The comparison of the original link and the proper one.
-
-        Returns
-        -------
-        bool
-            The result of the comparison.
-
-        """
+        """Compares the original link and the proper one."""
         if self._proper_link is None:
             logger.error(
-                f"Файл {self.error_file(self._link.from_file)} по ссылке {self._link.link_to} не найден", result=True)
+                f"Файл {self.error_file(self._link.from_file)} по ссылке {self._link.link_to} не найден",
+                result=True)
             return True
 
         elif self._proper_link == self._link.link_to:
-            logger.debug("Links are equal")
+            logger.debug("Ссылки эквивалентны")
             return True
 
         elif self._proper_anchor == "/#_valid_anchor_":
@@ -422,10 +346,7 @@ class LinkInspector:
             return False
 
     def clear(self):
-        """
-        Setting the values to None.
-
-        """
+        """Sets the values to None."""
         self._link: Link | None = None
         self._destination: Path | None = None
         self._proper_link: str | None = None
@@ -438,15 +359,13 @@ class LinkInspector:
     @file_dict.setter
     def file_dict(self, value):
         if self._file_dict is not None:
-            logger.debug("FileDict has already been set up")
+            logger.debug("FileDict уже инициирован")
 
         elif not isinstance(value, FileDict):
-            logger.debug(f"Value must be of FileDict type, but {type(value)} received")
+            logger.debug(f"Присваиваемое значение должно быть типа FileDict, но получено {type(value)}")
 
         else:
             self._file_dict = value
-
-        return
 
     @property
     def link(self) -> Link:
@@ -458,23 +377,17 @@ class LinkInspector:
             self._link: Link | None = value
 
         else:
-            logger.debug(f"Value must be of Link type or None, but {type(value)} received")
-
-        return
+            logger.debug(f"Присваиваемое значение должно быть типа Link или None, но получено {type(value)}")
 
     @property
     def proper_link(self) -> str | None:
         return self._proper_link
 
     def _names(self) -> tuple[str, ...]:
-        """
-        The possible names of the destination file in the storage.
+        """Specifies the possible names of the destination file in the storage.
 
-        Returns
-        -------
-        tuple[str, ...]
-            The names of the file having different number of parents.
-
+        :return: The names of the file having different number of parents.
+        :rtype: tuple[str, ...]
         """
         _destination_name: str = self._link.stem
         _ext_destination_name: str = f"{self._link.parent_stem}/{self._link.stem}"

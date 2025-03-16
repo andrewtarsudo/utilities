@@ -10,7 +10,7 @@ from urllib.request import Request, urlopen
 
 from loguru import logger
 
-from utilities.common.constants import StrPath
+from utilities.common.shared import StrPath
 from utilities.common.errors import TermsRequiredAttributeMissingError
 from utilities.terms.const import CustomPort, CustomScheme
 
@@ -51,10 +51,11 @@ class CustomHTTPRequest:
     def __str__(self):
         return (
             f"{self.__class__.__name__}: "
-            f"scheme = {self._scheme}, web hook = {self._web_hook}, "
-            f"host = {self._host}, "
-            f"post = {self._port}, "
-            f"params = {self._params})")
+            f"\nscheme = {self._scheme},"
+            f"\nweb hook = {self._web_hook},"
+            f"\nhost = {self._host},"
+            f"\npost = {self._port},"
+            f"\nparams = {self._params})")
 
     def __repr__(self):
         return (

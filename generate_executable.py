@@ -16,7 +16,7 @@ if __name__ == "__main__":
         exe_file: str = r"./bin/tw_utilities"
 
     install: list[str] = [
-        "poetry",
+        "uv",
         "run",
         "pyinstaller",
         "--noconfirm",

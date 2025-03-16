@@ -8,7 +8,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 from loguru import logger
 
-from utilities.common.constants import StrPath
+from utilities.common.shared import StrPath
 from utilities.common.functions import file_writer
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.qualified_name import _ns, fqdn

@@ -10,8 +10,8 @@ from click.types import BOOL, Path as ClickPath
 from loguru import logger
 from PIL import Image
 
-from utilities.common.constants import HELP, separator, StrPath
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.common.shared import HELP, separator, StrPath
+from utilities.scripts.cli import APIGroup, clear_logs, cli
 from utilities.scripts.list_files import get_files
 
 
@@ -48,7 +48,7 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
     return destination
 
 
-@command_line_interface.command(
+@cli.command(
     "reduce-image",
     cls=APIGroup,
     help="Команда для уменьшения размера изображений JPG, PNG")

@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "title": "YAML Validation",
+  "description": "Validation for YAML file generating PDF",
+  "properties": {
+    "settings": {
+      "type": {
+        "$ref": "#/$defs/settingsType"
+      }
+    }
+  },
+  "Rights": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "object",
+        "properties": {
+          "title-files": {
+            "type": "bool",
+            "const": true
+          },
+          "value": {
+            "type": "string",
+            "const": "Юридическая информация"
+          },
+          "required": [
+            "title-files",
+            "value"
+          ]
+        }
+      },
+      "index": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "minItems": 1,
+        "maxItems": 1,
+        "enum": [
+          [
+            "content/common/_index.md"
+          ],
+          [
+            "content/common/_index.adoc"
+          ]
+        ]
+      },
+      "required": [
+        "title",
+        "index"
+      ]
+    }
+  },
+  "patternProperties": {
+    "^.*$": {
+      "type": {
+        "$ref": "#/$defs/sectionType"
+      }
+    }
+  },
+  "$defs": {
+    "levelType": {
+      "type": "number",
+      "minimum": 2,
+      "maximum": 9
+    },
+    "titleType": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "level": {
+          "type": {
+            "$ref": "#/$defs/levelType"
+          }
+        },
+        "title-files": {
+          "type": "boolean"
+        },
+        "break-files": {
+          "type": "boolean"
+        },
+        "break-chapters": {
+          "type": "boolean"
+        }
+      }
+    },
+    "settingsType": {
+      "type": "object",
+      "properties": {
+        "doctype": {
+          "type": "string",
+          "enum": [
+            "article",
+            "book",
+            "inline",
+            "manpage"
+          ]
+        },
+        "figure-caption": {
+          "type": "string",
+          "const": "Рисунок"
+        },
+        "outlinelevels": {
+          "type": {
+            "$ref": "#/$defs/levelType"
+          }
+        },
+        "sectnumlevels": {
+          "type": {
+            "$ref": "#/$defs/levelType"
+          }
+        },
+        "title-logo-image": {
+          "type": "string",
+          "const": "images/logo.svg[top=4%,align=right,pdfwidth=3cm]"
+        },
+        "chapter-signifier": {
+          "type": "boolean",
+          "const": false
+        },
+        "table-caption": {
+          "type": "string",
+          "const": "Таблица"
+        },
+        "title-page": {
+          "type": "string"
+        },
+        "toc": {
+          "type": "boolean",
+          "const": true
+        },
+        "toc-title": {
+          "type": "string",
+          "const": "Содержание"
+        },
+        "version": {
+          "type": "string"
+        },
+        "required": [
+          "title-page",
+          "version"
+        ]
+      }
+    },
+    "sectionType": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": {
+            "$ref": "#/$defs/titleType"
+          }
+        },
+        "index": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "required": [
+    "settings",
+    "Rights"
+  ]
+}

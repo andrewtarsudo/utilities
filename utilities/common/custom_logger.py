@@ -10,7 +10,7 @@ from warnings import simplefilter
 
 from loguru import logger
 
-from utilities.common.constants import DEBUG, NORMAL
+from utilities.common.shared import DEBUG, NORMAL
 from utilities.common.errors import BaseError
 
 HandlerType: Type[str] = Literal["stream", "file_rotating", "result_file"]

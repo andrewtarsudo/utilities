@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from auxiliary.timer import Timer
 
 if __name__ == '__main__':
     from sys import hexversion
@@ -34,9 +34,9 @@ if __name__ == '__main__':
     else:
         stdout.reconfigure(encoding="utf-8")
 
-    from utilities.scripts.cli import command_line_interface
+    from utilities.scripts.cli import cli
 
-    command_line_interface()
+    cli()
 
     if faulthandler.is_enabled():
         faulthandler.disable()

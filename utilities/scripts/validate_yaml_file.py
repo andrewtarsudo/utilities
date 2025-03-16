@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from io import UnsupportedOperation
+from json import load
 from os import system
 from pathlib import Path
 from sys import platform
@@ -9,32 +9,28 @@ from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 from click.utils import echo
+from jsonschema.exceptions import FormatError, UndefinedTypeCheck, ValidationError
+from jsonschema.validators import Draft202012Validator
 from loguru import logger
-from yaml import safe_load
 
-from utilities.common.constants import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
-from utilities.common.functions import file_reader, ReaderMode
-from utilities.scripts.cli import clear_logs, command_line_interface, SwitchArgsAPIGroup
+from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
+from utilities.common.functions import file_reader, file_reader_type, FileType, ReaderMode
+from utilities.scripts.cli import clear_logs, cli, SwitchArgsAPIGroup
 
 _ALLOWED_KEYS: tuple[str, ...] = ("title", "index", "files")
 
 _SETTINGS_NAMES: tuple[str, ...] = (
-    "settings", "Settings"
-)
+    "settings", "Settings")
 _RIGHTS_NAMES: tuple[str, ...] = (
-    "rights", "Rights"
-)
+    "rights", "Rights")
 
 _DICT_RESULTS: dict[bool, dict[str, str]] = {
     True: {
         "status": "OK",
-        "color": PASS_COLOR
-    },
+        "color": PASS_COLOR},
     False: {
         "status": "NOT OK",
-        "color": FAIL_COLOR
-    }
-}
+        "color": FAIL_COLOR}}
 
 
 def determine_key(item: Mapping, keys: Iterable[str]):
@@ -339,7 +335,7 @@ def inspect_sections(
     return warnings, messages
 
 
-def validate(
+def validate_file(
         root: StrPath,
         lines: Iterable[str],
         out: str | None = None,
@@ -349,8 +345,7 @@ def validate(
     paths: dict[int, Path] = {
         index: Path(root).joinpath(line.strip().removeprefix("- "))
         for index, line in enumerate(lines)
-        if line.strip().startswith("- ") and ".." not in line
-    }
+        if line.strip().startswith("- ") and ".." not in line}
 
     _lines: list[str] = []
 
@@ -380,7 +375,39 @@ def validate(
                 replace(NORMAL_COLOR, ""))
 
 
-@command_line_interface.command(
+def validate_json_scheme(instance: Mapping[str, Any], yaml_file: StrPath):
+    if len(Path(yaml_file).suffixes) == 1:
+        file: str = "sources/validation.json"
+
+    else:
+        file: str = "sources/validation.en.json"
+
+    with open(file, "r", encoding="utf-8", errors="ignore") as f:
+        schema: dict[str, Any] = load(f)
+
+    try:
+        validator: Draft202012Validator = Draft202012Validator(schema)
+        validator.validate(instance)
+
+    except ValidationError as e:
+        logger.error(
+            f"{e.__class__.__name__}: указанный YAML-файл не соответствует схеме"
+            f"\n{e.context}"
+            f"\n{e.message}"
+            f"\n{e.cause}")
+
+    except FormatError as e:
+        logger.error(
+            f"{e.__class__.__name__}: ошибка формата"
+            f"\n{e.message}"
+            f"\n{e.cause}")
+
+    except UndefinedTypeCheck as e:
+        logger.error(
+            f"{e.__class__.__name__}: тип {e.type} не определен")
+
+
+@cli.command(
     "validate-yaml",
     cls=SwitchArgsAPIGroup,
     help="Команда для валидации YAML-файла, используемого при генерации PDF")
@@ -439,52 +466,32 @@ def validate_yaml_command(
 
     yaml_file: Path = Path(yaml_file).expanduser().resolve()
 
-    try:
-        with open(yaml_file, "r", encoding="utf-8", errors="ignore") as f:
-            content: dict[str, Any] = safe_load(f)
+    content: dict[str, Any] = file_reader_type(yaml_file, FileType.YAML)
 
-    except FileNotFoundError:
-        logger.error(f"Файл {yaml_file} не найден")
+    warnings: list[str] = []
+    messages: list[str] = []
 
-    except PermissionError:
-        logger.error(f"Недостаточно прав для чтения файла {yaml_file}")
+    warnings, messages = inspect_settings(content, verbose, warnings, messages)
+    warnings, messages = inspect_legal(content, verbose, warnings, messages)
+    warnings, messages = inspect_sections(content, verbose, warnings, messages)
 
-    except RuntimeError:
-        logger.error(f"Истекло время чтения файла {yaml_file}")
+    if warnings:
+        logger.warning("Предупреждения:")
+        logger.warning(pretty_print(warnings))
 
-    except UnsupportedOperation:
-        logger.error(f"Не поддерживаемая операция с файлом {yaml_file}")
+    elif messages:
+        logger.warning(pretty_print(messages))
 
-    except UnboundLocalError as e:
-        logger.error(f"Ошибка присваивания {e.name}")
+    elif not verbose:
+        echo("Проблемы с парамерами разделов не обнаружены\n")
 
-    except OSError as e:
-        logger.error(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+    lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
+    validate_file(yaml_file.parent, lines, output, verbose)
 
-    else:
-        warnings: list[str] = []
-        messages: list[str] = []
+    validate_json_scheme(content, yaml_file)
 
-        warnings, messages = inspect_settings(content, verbose, warnings, messages)
-        warnings, messages = inspect_legal(content, verbose, warnings, messages)
-        warnings, messages = inspect_sections(content, verbose, warnings, messages)
+    if output is not None:
+        echo(f"Файл с результатами: {output.resolve()}")
 
-        if warnings:
-            logger.warning("Предупреждения:")
-            logger.warning(pretty_print(warnings))
-
-        elif messages:
-            logger.warning(pretty_print(messages))
-
-        elif not verbose:
-            echo("Проблемы с парамерами разделов не обнаружены\n")
-
-        lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
-        validate(yaml_file.parent, lines, output, verbose)
-
-        if output is not None:
-            echo(f"Файл с результатами: {output.resolve()}")
-
-    finally:
-        ctx.obj["keep_logs"] = keep_logs
-        ctx.invoke(clear_logs)
+    ctx.obj["keep_logs"] = keep_logs
+    ctx.invoke(clear_logs)

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from collections.abc import Iterable
-from glob import iglob
+from os import scandir, sep
 from pathlib import Path
+from sys import platform
 
 from click import pause
 from click.core import Context
@@ -10,8 +11,8 @@ from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import HELP, PRESS_ENTER_KEY, pretty_print, StrPath
-from utilities.scripts.cli import clear_logs, command_line_interface, MutuallyExclusiveOption, SwitchArgsAPIGroup
+from utilities.common.shared import HELP, PRESS_ENTER_KEY, pretty_print, StrPath
+from utilities.scripts.cli import clear_logs, cli, MutuallyExclusiveOption, SwitchArgsAPIGroup
 
 
 def check_content_common(path: Path):
@@ -26,21 +27,30 @@ def check_content_common(path: Path):
 
 
 def generate_base_root(path: Path, content_common_index: int):
-    parts: tuple[str, ...] = path.parts
+    parts: list[str] = [*path.parts]
+    echo(f"{parts=}")
+    # return Path(sep.join(parts[:content_common_index])).relative_to(path).as_posix()
 
     if content_common_index == -1:
         return path
 
     else:
+        if not platform.startswith("win"):
+            parts[0] = ""
+
+        # return Path(sep.join(parts[:content_common_index])).relative_to(path).as_posix()
+        # path.root.joinpath("/".join(parts[1:content_common_index])).relative_to(path)
         return path.relative_to(Path().joinpath("/".join(parts[:content_common_index]))).as_posix()
 
 
 def check_path(
-        path: Path,
+        path: StrPath,
         ignored_dirs: Iterable[str],
         ignored_files: Iterable[str],
         extensions: Iterable[str],
         language: str | None):
+    path: Path = Path(path)
+
     is_dir: bool = path.is_dir()
     is_in_ignored_dirs: bool = any(part in ignored_dirs for part in path.parts)
     has_ignored_name: bool = path.name in ignored_dirs
@@ -57,8 +67,7 @@ def check_path(
         has_ignored_language: bool = f".{language}" not in path.suffixes
 
     conditions: list[bool] = [
-        is_dir, is_in_ignored_dirs, has_ignored_name, is_in_ignored_files, has_ignored_extension, has_ignored_language
-    ]
+        is_dir, is_in_ignored_dirs, has_ignored_name, is_in_ignored_files, has_ignored_extension, has_ignored_language]
 
     logger.debug(
         f"Проверка пути {path}:"
@@ -67,12 +76,37 @@ def check_path(
         f"\nhas_ignored_name = {has_ignored_name}"
         f"\nis_in_ignored_files = {is_in_ignored_files}"
         f"\nhas_ignored_extension = {has_ignored_extension}"
-        f"\nhas_ignored_language = {has_ignored_language}")
+        f"\nhas_ignored_language = {has_ignored_language}\n")
 
     return not any(conditions)
 
 
-@command_line_interface.command(
+def walk_full(
+        path: StrPath,
+        ignored_dirs: Iterable[str],
+        ignored_files: Iterable[str],
+        extensions: Iterable[str],
+        language: str | None,
+        results: list[Path] = None):
+    if results is None:
+        results: list[Path] = []
+
+    for element in scandir(path):
+        item: Path = Path(element.path)
+
+        if element.is_dir(follow_symlinks=True):
+            walk_full(item, ignored_dirs, ignored_files, extensions, language, results)
+
+        elif check_path(item, ignored_dirs, ignored_files, extensions, language):
+            results.append(item.relative_to(path))
+
+        else:
+            continue
+
+    return results
+
+
+@cli.command(
     "list-files",
     cls=SwitchArgsAPIGroup,
     help="Команда для вывода файлов в директории")
@@ -344,22 +378,10 @@ def list_files_command(
         f"\nauxiliary = {auxiliary}"
         f"\nkeep_logs = {keep_logs}")
 
-    results: list[str] = []
-
-    for item in iglob(
-            "**/*",
-            root_dir=root_dir,
-            recursive=recursive,
-            include_hidden=hidden):
-        _: Path = root_dir.joinpath(item)
-
-        logger.debug(f"Файл {item}")
-
-        if check_path(_, ignored_dirs, ignored_files, extensions, language):
-            results.append(f"{prefix}{Path(item).as_posix()}")
+    results: list[Path] = walk_full(root_dir, ignored_dirs, ignored_files, extensions, language)
 
     if not auxiliary:
-        echo("\n".join(results))
+        echo(pretty_print(results))
         ctx.obj["keep_logs"] = keep_logs
         ctx.invoke(clear_logs)
 

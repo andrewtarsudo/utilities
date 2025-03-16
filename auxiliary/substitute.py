@@ -8,9 +8,9 @@ from click.decorators import help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
-from utilities.common.constants import HELP, StrPath
+from utilities.common.shared import HELP, StrPath
 from utilities.common.functions import file_reader, file_writer, ReaderMode
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.scripts.cli import APIGroup, clear_logs, cli
 from utilities.scripts.list_files import get_files
 
 
@@ -64,7 +64,7 @@ def substitute(file: StrPath, dry_run: bool = False):
         logger.info(f"Все замены в файле {file} выполнены\n")
 
 
-@command_line_interface.command(
+@cli.command(
     "sub-var",
     cls=APIGroup,
     help="Команда для замены переменных на их значения")

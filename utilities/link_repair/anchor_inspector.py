@@ -5,7 +5,7 @@ from typing import Iterable
 
 from loguru import logger
 
-from utilities.common.constants import separator
+from utilities.common.shared import pretty_print, separator
 from utilities.common.errors import LinkRepairFileInvalidTypeError, LinkRepairMissingFileError
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.link_repair.file_dict import TextFile
@@ -13,18 +13,14 @@ from utilities.link_repair.const import FileLanguage, prepare_logging
 
 
 class AnchorInspector:
-    """
-    The inspector for anchors in the files.
+    """Class to represent the inspector for anchors in the files.
 
-    Attributes
-    ----------
-    _dict_anchors : dict[str, list[str]]
-        The dictionary of the files and anchors inside.
-    _dict_files : dict[str, list[TextFile]]
-        The dictionary of the anchors and the files containing these links.
-    _dict_changes : dict[TextFile, list[str]]
-        The dictionary of the files and anchors to fix.
-
+    :param _dict_anchors: The dictionary of the files and anchors inside.
+    :type _dict_anchors: dict[str, list[str]]
+    :param _dict_files: The dictionary of the anchors and the files containing these links.
+    :type _dict_files: dict[str, list[TextFile]]
+    :param _dict_changes: The dictionary of the files and anchors to fix.
+    :type _dict_changes: dict[TextFile, list[str]]
     """
 
     def __init__(self):
@@ -136,7 +132,6 @@ class AnchorInspector:
                 logger.debug(f"В файле {file} якори корректны")
 
             else:
-                _str_anchors: str = ", ".join(_invalid_anchors)
                 logger.error(
                     f"Внутри файла {file} найдены дублирующиеся якори:\n{prepare_logging(_invalid_anchors)}",
                     result=True)
@@ -161,7 +156,7 @@ class AnchorInspector:
         _invalid_anchors: list[str] = [k for k, v in counter.items() if v > 1]
 
         if not _invalid_anchors:
-            logger.debug(f"Повторяющихся якорей во всех файлах не найдено\n")
+            logger.debug("Повторяющихся якорей во всех файлах не найдено\n")
             return
 
         else:
@@ -181,10 +176,10 @@ class AnchorInspector:
 
                     _files.append(file.rel_path)
 
-                _str_files: str = "\n".join(_files)
+                _str_files: str = pretty_print(_files)
                 log_messages.append(f"Якорь {_invalid_anchor} повторяется в файлах:\n{_str_files}")
 
-            _str_anchors: str = "\n".join(_invalid_anchors)
+            _str_anchors: str = pretty_print(_invalid_anchors)
             _str_log_messages = f"\n{separator}\n".join(log_messages)
 
             logger.error(

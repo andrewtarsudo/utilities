@@ -9,12 +9,12 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.constants import HELP, StrPath
-from utilities.scripts.cli import APIGroup, clear_logs, command_line_interface
+from utilities.common.shared import HELP, StrPath
+from utilities.scripts.cli import APIGroup, clear_logs, cli
 from utilities.scripts.list_files import get_files
 
 
-@command_line_interface.command(
+@cli.command(
     "repair-svg",
     cls=APIGroup,
     help="Команда для исправления файлов SVG")

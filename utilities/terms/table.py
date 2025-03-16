@@ -3,10 +3,10 @@ from typing import NamedTuple
 
 
 class Term(NamedTuple):
-    short: str = None
-    full: str = None
-    rus: str = None
-    commentary: str = None
+    short: str | None = None
+    full: str | None = None
+    rus: str | None = None
+    commentary: str | None = None
 
     def __repr__(self):
         return f"<{self.__class__.__name__}(short={self.short}, full={self.full}, rus={self.rus}, " \
@@ -28,8 +28,7 @@ class Term(NamedTuple):
         _: dict[str, int] = {
             "full": 1,
             "rus": 2,
-            "commentary": 4
-        }
+            "commentary": 4}
 
         return sum(map(lambda x: _multiplier(x) * _.get(x), _.keys()))
 
@@ -41,8 +40,7 @@ class Term(NamedTuple):
             4: f"{self.commentary}",
             5: f"{self.full} — {self.commentary}",
             6: f"{self.rus} — {self.commentary}",
-            7: f"{self.full}, {self.rus} — {self.commentary}"
-        }
+            7: f"{self.full}, {self.rus} — {self.commentary}"}
 
         return _.get(self._formatting_type(), "")
 

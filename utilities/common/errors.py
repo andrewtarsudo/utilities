@@ -141,3 +141,7 @@ class TableColsTableColumnInvalidIdentifierError(TableColsError):
 
 class NoArgumentsOptionsError(BaseError):
     """No argument or option is specified."""
+
+
+class FileReaderError(BaseError):
+    """Specified file reader mode has an invalid type."""

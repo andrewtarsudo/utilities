@@ -58,8 +58,7 @@ class TableCell:
             r"\[\.?[\[#].*?]": r"",
             r"link:[^\[]*": r"",
             r"[&\{][lg]t[;}]": r"_",
-            r"[\<\>\[\]\{\}]": r"",
-        }
+            r"[\<\>\[\]\{\}]": r""}
 
         _: str = self._text
 
@@ -77,8 +76,7 @@ class TableCell:
             ("RFC ", "RFC"),
             ("ITU-T ", "ITU-T_"),
             ("Recommendation ", "Recommendation_"),
-            ("GSM ", "GSM_")
-        )
+            ("GSM ", "GSM_"))
 
         if self.is_spaced():
             separator: str = " "

@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "utilities"
+version = "2.0.0"
+description = "Command line interface commands for technical writers"
+authors = ["Andrew Tarasov <tarasov-a@protei.ru>"]
+license = "MIT"
+readme = "README.adoc"
+repository = "https://gitlab.com/tech_writers_protei/utilities/"
+packages = [
+  { include = "utilities" }
+]
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+loguru = ">=0.7"
+more-itertools = ">=10.5"
+pyyaml = ">=6.0"
+pillow = ">=11.1"
+python-slugify = ">=8.0"
+certifi = { version = ">=2025.1", markers = "sys_platform != 'win32'" }
+pip-system-certs = { version = ">=4.0", markers = "sys_platform == 'win32'" }
+typer = ">=0.15"
+shellingham = ">=1.5"
+rich = ">=13.9"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=8.3"
+flake8 = ">=7.1"
+vulture = ">=2.13"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+my-script = "__main__.py"
