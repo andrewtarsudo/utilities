@@ -32,7 +32,8 @@ include::partials/run.adoc[]
 ----
 Использование:
 {name} {script-name}
--d/--dir DIR | -f/--file FILE ... FILE | -l/--length LEN | --recursive | --keep-logs | --h/--help
+-d/--dir DIR | -f/--file FILE ... FILE | -l/--length LEN | -r/--recursive | -k/--keep-logs |
+--h/--help
 
   Команда для форматирования блоков кода
 

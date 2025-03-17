@@ -30,15 +30,15 @@ include::partials/run.adoc[]
 ----
 Использование:
 {name} {script-name} <PROJECT_DIR>
--d/--dry-run | -o/--output FILE | --recursive | --keep-logs | --h/--help
+-d/--dry-run | -o/--output FILE | -r/--recursive | -k/--keep-logs | --h/--help
 
   Команда для удаления неиспользуемых изображений
 
 Аргументы:
-  project_dir                            Путь до директории проекта
+  project_dir (*)                        Путь до директории проекта
 
 Опции:
-  -d, --dry-run                          Флаг вывода некорректных ссылок на экран без изменения
+  -d, --dry-run / -D, --no-dry-run       Флаг вывода некорректных ссылок на экран без изменения
                                          файлов.
                                          По умолчанию: False, файлы удаляются
   -o, --output FILE                      Файл для записи вывода. По умолчанию: вывод в консоль

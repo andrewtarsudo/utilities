@@ -10,7 +10,6 @@ requires-python = ">=3.9"
 dependencies = [
   "certifi>=2025.1",
   "click>=8.1",
-  "jsonschema>=4.23",
   "loguru>=0.7",
   "more-itertools>=10.6",
   "pillow>=11.1",
@@ -21,12 +20,12 @@ dependencies = [
 ]
 
 [project.scripts]
-my-script = "__main__.py"
+utilities = "__main__.py"
 
 [dependency-groups]
 dev = [
   "flake8>=7.1",
-  "mypy>=1.15.0",
+  "mypy>=1.15",
   "pyinstaller>=6.12",
   "pytest>=8.3",
   "vulture>=2.14",

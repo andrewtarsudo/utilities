@@ -92,7 +92,7 @@ def repair_svg_command(
 
             logger.debug(f"Файл {file}")
 
-            if not file.exists(follow_symlinks=True):
+            if not file.exists():
                 echo(f"Указан не существующий файл {file}")
                 continue
 

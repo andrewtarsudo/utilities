@@ -122,7 +122,7 @@ def file_inspection(path: str, is_color: bool = True):
     metavar="FILE ... FILE",
     default=None)
 @option(
-    "--verbose/--quiet", "-v/-q",
+    "-v/-q", "--verbose/--quiet",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг подробного вывода."

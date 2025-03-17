@@ -44,6 +44,7 @@ def _iter_internal_options(line: str) -> Iterator[str]:
     return iter((to_underline, to_dash, to_camel_case))
 
 
+# noinspection PyUnresolvedReferences
 class InternalLinkInspector:
     """Class to represent the inspector for internal links having only anchors.
 

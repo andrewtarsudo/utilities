@@ -26,7 +26,7 @@ include::partials/run.adoc[]
 Использование:
 {name} {script-name}
 -f/--file FILE ... FILE | -d/--dir DIR | -s/--max-symbols WIDTH | -c/--min-column WIDTH |
---recursive | --keep-logs | --h/--help
+-r/--recursive | -o/--add-options | -k/--keep-logs | --h/--help
 
   Команда для задания ширины столбцам таблиц
 
@@ -39,6 +39,10 @@ include::partials/run.adoc[]
   -c, --min-column WIDTH                 Минимальная ширина столбца в символах.
                                          По умолчанию: 4.
                                          Примечание. Должно быть целым положительным числом
+  -o, --add-options / -O, --no-options   Флаг добавления опций таблицы.
+                                         По умолчанию: True, добавляются:
+                                         * options="header";
+                                         * width="100%"
   {recursive}
                                          {recursive-note}
   {keep-logs}

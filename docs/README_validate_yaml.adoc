@@ -37,16 +37,16 @@ include::partials/run.adoc[]
 ----
 Использование:
 {name} {script-name} <YAML_FILE>
--o/--output FILE | --verbose | --keep-logs | --h/--help
+-o/--output FILE | -v/--verbose | -k/--keep-logs | --h/--help
 
   Команда для валидации YAML-файла, используемого при генерации PDF
 
 Аргументы:
-  yaml_file                              Путь до файла PDF_*.yml
+  yaml_file (*)                          Путь до файла PDF_*.yml
 
 Опции:
   -o, --output FILE                      Файл для записи вывода. По умолчанию: вывод в консоль
-  --verbose / --no-verbose               Флаг подробного вывода.
+  -v, --verbose / -q, --quiet            Флаг подробного вывода.
                                          По умолчанию: False, выводятся только ошибки
   {keep-logs}
                                          {keep-logs-cont}

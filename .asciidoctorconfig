@@ -7,9 +7,9 @@
 :toc-title: Содержание
 :sectnums:
 :name: tw_utilities.exe
-:recursive: --recursive / --no-recursive           Флаг рекурсивного поиска файлов.
+:recursive: -r, --recursive / -R, --no-recursive   Флаг рекурсивного поиска файлов.
 :recursive-note: По умолчанию: True, вложенные файлы учитываются
-:keep-logs: --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
+:keep-logs: -k, --keep-logs / -K, --remove-logs    Флаг сохранения директории с лог-файлом по завершении
 :keep-logs-cont: работы в штатном режиме.
 :keep-logs-default: По умолчанию: False, лог-файл и директория удаляются
 :help: -h, --help                             Вывести справочную информацию на экран и завершить

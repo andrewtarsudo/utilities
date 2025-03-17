@@ -98,6 +98,7 @@ def validate_file_path(path: StrPath) -> bool:
     return _.exists() and _.is_file()
 
 
+# noinspection PyUnresolvedReferences
 class LinkInspector:
     """Class to represent the entity to inspect the link.
 

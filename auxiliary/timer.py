@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from time import perf_counter_ns
 from types import TracebackType
-from typing import Any, ContextManager
+from typing import ContextManager
 
 from click.termui import echo
 

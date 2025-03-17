@@ -26,7 +26,7 @@ def unique(values: Iterable[Any] = None) -> list[Any]:
 
 
 def with_parent(path: StrPath) -> str:
-    """Getting the file name with the parent.
+    """Gets the file name with the parent.
 
     :param path: The file path.
     :type path: str or Path
@@ -38,7 +38,7 @@ def with_parent(path: StrPath) -> str:
 
 
 def with_grandparent(path: StrPath) -> str:
-    """Getting the file name with the parent and the grandparent.
+    """Gets the file name with the parent and the grandparent.
 
     :param path: The file path.
     :type path: str or Path
@@ -49,6 +49,7 @@ def with_grandparent(path: StrPath) -> str:
     return f"{_.parent.parent.name}/{_.parent.name}/{_.name}"
 
 
+# noinspection PyUnresolvedReferences
 class GeneralStorage:
     """Class to represent the storage of the file names.
 

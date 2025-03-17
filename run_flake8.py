@@ -16,8 +16,7 @@ if __name__ == "__main__":
         "--benchmark",
         "--exit-zero",
         "__main__.py",
-        "utilities/**/*.py"
-    ]
+        "utilities/**/*.py"]
 
     try:
         _: CompletedProcess = run(

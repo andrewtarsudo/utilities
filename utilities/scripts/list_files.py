@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from collections.abc import Iterable
-from os import scandir, sep
+from os import scandir
 from pathlib import Path
 from sys import platform
 
-from click import pause
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
+from click.termui import pause
 from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 from loguru import logger
@@ -28,8 +28,6 @@ def check_content_common(path: Path):
 
 def generate_base_root(path: Path, content_common_index: int):
     parts: list[str] = [*path.parts]
-    echo(f"{parts=}")
-    # return Path(sep.join(parts[:content_common_index])).relative_to(path).as_posix()
 
     if content_common_index == -1:
         return path
@@ -38,8 +36,6 @@ def generate_base_root(path: Path, content_common_index: int):
         if not platform.startswith("win"):
             parts[0] = ""
 
-        # return Path(sep.join(parts[:content_common_index])).relative_to(path).as_posix()
-        # path.root.joinpath("/".join(parts[1:content_common_index])).relative_to(path)
         return path.relative_to(Path().joinpath("/".join(parts[:content_common_index]))).as_posix()
 
 
@@ -81,13 +77,25 @@ def check_path(
     return not any(conditions)
 
 
+def add_prefix(prefix: str, values: Iterable[StrPath] = None):
+    if values is None:
+        return list()
+
+    else:
+        return [f"{prefix}{value}" for value in values]
+
+
 def walk_full(
         path: StrPath,
         ignored_dirs: Iterable[str],
         ignored_files: Iterable[str],
         extensions: Iterable[str],
         language: str | None,
+        root: Path = None,
         results: list[Path] = None):
+    if root is None:
+        root: Path = Path(path)
+
     if results is None:
         results: list[Path] = []
 
@@ -95,10 +103,10 @@ def walk_full(
         item: Path = Path(element.path)
 
         if element.is_dir(follow_symlinks=True):
-            walk_full(item, ignored_dirs, ignored_files, extensions, language, results)
+            walk_full(item, ignored_dirs, ignored_files, extensions, language, root, results)
 
         elif check_path(item, ignored_dirs, ignored_files, extensions, language):
-            results.append(item.relative_to(path))
+            results.append(item.relative_to(root))
 
         else:
             continue
@@ -378,15 +386,28 @@ def list_files_command(
         f"\nauxiliary = {auxiliary}"
         f"\nkeep_logs = {keep_logs}")
 
-    results: list[Path] = walk_full(root_dir, ignored_dirs, ignored_files, extensions, language)
+    values: list[Path] | None = walk_full(root_dir, ignored_dirs, ignored_files, extensions, language)
 
-    if not auxiliary:
-        echo(pretty_print(results))
-        ctx.obj["keep_logs"] = keep_logs
-        ctx.invoke(clear_logs)
+    if values is None or not values:
+        echo(f"Подходящих файлов в директории {root_dir} не найдено")
+
+        if auxiliary:
+            return None
+
+        else:
+            ctx.obj["keep_logs"] = keep_logs
+            ctx.invoke(clear_logs)
 
     else:
-        return results
+        results: list[Path] = add_prefix(prefix, sorted(values))
+
+        if auxiliary:
+            return results
+
+        else:
+            echo(pretty_print(results))
+            ctx.obj["keep_logs"] = keep_logs
+            ctx.invoke(clear_logs)
 
 
 def get_files(
@@ -427,8 +448,11 @@ def get_files(
             recursive=recursive,
             auxiliary=True)
 
-        files.extend(map(directory.joinpath, listed_files))
+        if listed_files:
+            files.extend(map(directory.joinpath, listed_files))
+            logger.debug(f"Обрабатываемые файлы:\n{pretty_print(files)}")
 
-    logger.debug(f"Обрабатываемые файлы:\n{pretty_print(files)}")
+        else:
+            logger.debug("Нет дополнительных файлов для обработки")
 
     return files

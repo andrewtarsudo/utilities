@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from json import load
 from os import system
 from pathlib import Path
 from sys import platform
@@ -9,12 +8,10 @@ from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 from click.utils import echo
-from jsonschema.exceptions import FormatError, UndefinedTypeCheck, ValidationError
-from jsonschema.validators import Draft202012Validator
 from loguru import logger
 
-from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
 from utilities.common.functions import file_reader, file_reader_type, FileType, ReaderMode
+from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
 from utilities.scripts.cli import clear_logs, cli, SwitchArgsAPIGroup
 
 _ALLOWED_KEYS: tuple[str, ...] = ("title", "index", "files")
@@ -279,9 +276,9 @@ def inspect_sections(
                                     f"но получено {level}")
                                 __is_ok: bool = False
 
-                            elif level > 5:
+                            elif level > 9:
                                 messages.append(
-                                    f"Значение ключа '{name}::title::level' должно быть целым числом, диапазон: [0-5], "
+                                    f"Значение ключа '{name}::title::level' должно быть целым числом, диапазон: [0-9], "
                                     f"но получено {level}")
                                 __is_ok: bool = False
 
@@ -375,38 +372,6 @@ def validate_file(
                 replace(NORMAL_COLOR, ""))
 
 
-def validate_json_scheme(instance: Mapping[str, Any], yaml_file: StrPath):
-    if len(Path(yaml_file).suffixes) == 1:
-        file: str = "sources/validation.json"
-
-    else:
-        file: str = "sources/validation.en.json"
-
-    with open(file, "r", encoding="utf-8", errors="ignore") as f:
-        schema: dict[str, Any] = load(f)
-
-    try:
-        validator: Draft202012Validator = Draft202012Validator(schema)
-        validator.validate(instance)
-
-    except ValidationError as e:
-        logger.error(
-            f"{e.__class__.__name__}: указанный YAML-файл не соответствует схеме"
-            f"\n{e.context}"
-            f"\n{e.message}"
-            f"\n{e.cause}")
-
-    except FormatError as e:
-        logger.error(
-            f"{e.__class__.__name__}: ошибка формата"
-            f"\n{e.message}"
-            f"\n{e.cause}")
-
-    except UndefinedTypeCheck as e:
-        logger.error(
-            f"{e.__class__.__name__}: тип {e.type} не определен")
-
-
 @cli.command(
     "validate-yaml",
     cls=SwitchArgsAPIGroup,
@@ -433,7 +398,7 @@ def validate_json_scheme(instance: Mapping[str, Any], yaml_file: StrPath):
     metavar="FILE",
     default=None)
 @option(
-    "-v/-V", "--verbose/--no-verbose",
+    "-v/-q", "--verbose/--quiet",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг подробного вывода.\nПо умолчанию: False, выводятся только ошибки",
@@ -487,8 +452,6 @@ def validate_yaml_command(
 
     lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
     validate_file(yaml_file.parent, lines, output, verbose)
-
-    validate_json_scheme(content, yaml_file)
 
     if output is not None:
         echo(f"Файл с результатами: {output.resolve()}")

@@ -7,10 +7,10 @@ binaries += collect_dynamic_libs('.')
 
 a = Analysis(
     ['__main__.py'],
-    pathex=['./utilities', 'venv/lib/python3.12/site-packages'],
+    pathex=['./utilities', '.venv/lib/python3.12/site-packages'],
     binaries=binaries,
     datas=[('LICENSE', '.'), ('MANIFEST.in', '.'), ('pyproject.toml', '.'), ('sources/', './sources/'), ('utilities/', './utilities/')],
-    hiddenimports=['loguru', 'yaml', 'more_itertools', 'click', 'slugify', 'PIL', 'certifi'],
+    hiddenimports=['loguru', 'yaml', 'more_itertools', 'click', 'slugify', 'PIL', 'certifi', 'shellingham'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

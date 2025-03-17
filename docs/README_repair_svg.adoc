@@ -27,7 +27,7 @@ include::partials/run.adoc[]
 ----
 Использование:
 {name} {script-name}
--f/--file FILE ... FILE | -d/--dir DIR | --recursive | --keep-logs | --h/--help
+-f/--file FILE ... FILE | -d/--dir DIR | -r/--recursive | -k/--keep-logs | --h/--help
 
   Команда для исправления файлов SVG
 

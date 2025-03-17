@@ -12,6 +12,7 @@ from utilities.link_repair.file_dict import TextFile
 from utilities.link_repair.const import FileLanguage, prepare_logging
 
 
+# noinspection PyUnresolvedReferences
 class AnchorInspector:
     """Class to represent the inspector for anchors in the files.
 

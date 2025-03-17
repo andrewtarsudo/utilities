@@ -25,14 +25,15 @@ include::partials/run.adoc[]
 ----
 Использование:
 {name} {script-name}
--f/--file FILE ... FILE | -d/--dir DIR | --recursive | --dry-run | --keep-logs | --h/--help
+-f/--file FILE ... FILE | -d/--dir DIR | --dry-run | -r/--recursive | -k/--keep-logs |
+--h/--help
 
   Команда для уменьшения размера изображений JPG, PNG
 
 Опции:
   -f, --file FILE ... FILE               Файл для обработки. Может использоваться несколько раз
   -d, --dir DIR                          Директория для обработки
-  --dry-run                              Флаг вывода изменений размеров файлов без их изменения.
+  --dry-run / --no-dry-run               Флаг вывода изменений размеров файлов без их изменения.
                                          По умолчанию: False, файлы перезаписываются
   {recursive}
                                          {recursive-note}

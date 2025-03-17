@@ -101,6 +101,7 @@ class FileLinkItem(NamedTuple):
         return f"<{self.__class__.__name__}({self._asdict()})>"
 
 
+# noinspection PyUnresolvedReferences
 class DirFile:
     """Class to represent the file in the directory.
 
@@ -133,6 +134,7 @@ class DirFile:
         return self._full_path
 
 
+# noinspection PyUnresolvedReferences
 class TextFile(DirFile):
     """Class to represent the text file in the directory.
 

@@ -4,6 +4,7 @@ from utilities.scripts.cli import APIGroup, clear_logs, cli, MutuallyExclusiveOp
 from utilities.scripts.convert_tables import convert_tables_command
 from utilities.scripts.filter_images import filter_images_command
 from utilities.scripts.format_code import format_code_command
+from utilities.scripts.help import help_command
 from utilities.scripts.link_repair import link_repair_command
 from utilities.scripts.list_files import list_files_command
 from utilities.scripts.reduce_image import reduce_image_command

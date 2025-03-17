@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from auxiliary.timer import Timer
 
 if __name__ == '__main__':
     from sys import hexversion

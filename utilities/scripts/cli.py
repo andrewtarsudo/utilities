@@ -20,7 +20,7 @@ from utilities.common.custom_logger import custom_logging
 from utilities.common.errors import BaseError, NoArgumentsOptionsError
 from utilities.common.shared import __version__, args_help_dict, DEBUG, HELP, NORMAL, PRESS_ENTER_KEY, pretty_print
 
-COL_MAX: int = 51
+COL_MAX: int = 52
 MAX_CONTENT_WIDTH: int = 96
 TERMINAL_WIDTH: int = 96
 
@@ -85,7 +85,9 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
 
     args_str: str = " ".join(args) if args else ""
     opts_str: str = " | ".join(opts) if opts else ""
-    opts_str: str = f"{opts_str} | --h/--help"
+
+    if cmd.name != "help":
+        opts_str: str = f"{opts_str} | --h/--help"
 
     commands: dict[str, Command] = getattr(cmd, "commands", None)
     suffix: str = "" if not platform.startswith("win") else ".exe"
@@ -100,11 +102,16 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
             f"\n{wrap_line(opts_str)}"
             f"\n{wrap_line(args_str)}\n")
 
-    else:
+    elif cmd.name != "help":
         formatter.write(
             f"{style('Использование', fg='bright_cyan', bold=True)}:"
             f"\n{name} {args_str}"
             f"\n{wrap_line(opts_str)}\n")
+
+    else:
+        formatter.write(
+            f"{style('Использование', fg='bright_cyan', bold=True)}:"
+            f"\n{name}\n")
 
 
 def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
@@ -186,6 +193,23 @@ def format_help(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     format_epilog(cmd, ctx, formatter)
 
 
+def format_full_help(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
+    format_usage(cmd, ctx, formatter)
+    cmd.format_help_text(ctx, formatter)
+    format_args(cmd, ctx, formatter)
+    format_options(cmd, ctx, formatter)
+    format_epilog(cmd, ctx, formatter)
+
+    if hasattr(cmd, "commands") and hasattr(ctx, "obj"):
+        formatter.write(f"{SEPARATOR}\n\n")
+
+        for command_name in sorted(cmd.commands):
+            command: Command = cmd.commands.get(command_name)
+
+            if not command.hidden:
+                formatter.write(recursive_help(command, ctx))
+
+
 # noinspection PyTypeChecker
 def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
     args: list[Argument] = [
@@ -218,6 +242,15 @@ def get_help(cmd: Command, ctx: Context) -> str:
 
     formatter: HelpFormatter = ctx.make_formatter()
     format_help(cmd, ctx, formatter)
+    return formatter.getvalue().rstrip("\n")
+
+
+def get_full_help(cmd: Command, ctx: Context) -> str:
+    ctx.max_content_width = MAX_CONTENT_WIDTH
+    ctx.terminal_width = TERMINAL_WIDTH
+
+    formatter: HelpFormatter = ctx.make_formatter()
+    format_full_help(cmd, ctx, formatter)
     return formatter.getvalue().rstrip("\n")
 
 
@@ -263,20 +296,7 @@ class APIGroup(Group):
         super().__init__(**attrs)
 
     def format_help(self, ctx: Context, formatter: HelpFormatter) -> None:
-        self.format_usage(ctx, formatter)
-        self.format_help_text(ctx, formatter)
-        self.format_args(ctx, formatter)
-        self.format_options(ctx, formatter)
-        self.format_epilog(ctx, formatter)
-
-        if hasattr(self, "commands"):
-            formatter.write(f"{SEPARATOR}\n\n")
-
-            for command_name in sorted(self.commands):
-                command: Command = self.commands.get(command_name)
-
-                if not command.hidden:
-                    formatter.write(recursive_help(command, ctx))
+        format_help(self, ctx, formatter)
 
     def format_usage(self, ctx: Context, formatter: HelpFormatter) -> None:
         format_usage(self, ctx, formatter)
@@ -339,6 +359,14 @@ class TermsAPIGroup(APIGroup):
         return super().parse_args(ctx, args)
 
 
+class HelpAPIGroup(APIGroup):
+    def parse_args(self, ctx: Context, args: list[str]) -> list[str]:
+        if args is None:
+            args: list[str] = []
+
+        return super().parse_args(ctx, args)
+
+
 class MutuallyExclusiveOption(Option):
     def __init__(self, *args, **kwargs):
         self.mutually_exclusive: tuple[str, ...] = tuple(kwargs.pop("mutually_exclusive", tuple()))
@@ -381,7 +409,7 @@ class MutuallyExclusiveOption(Option):
     cls=APIGroup,
     help="Набор скриптов для технических писателей")
 @option(
-    "-v", "--version",
+    "--version",
     is_flag=True,
     expose_value=False,
     is_eager=True,
@@ -418,7 +446,13 @@ def cli(debug: bool = False):
             pause(PRESS_ENTER_KEY)
             ctx.exit(0)
 
-        if ctx.invoked_subcommand == "link-repair":
+        elif ctx.invoked_subcommand == "help":
+            ctx.obj["full_help"] = True
+            text: str = ctx.invoke(get_full_help, cmd=ctx.command, ctx=ctx)
+            echo(text)
+            ctx.exit(0)
+
+        elif ctx.invoked_subcommand == "link-repair":
             result_file: bool = True
 
         custom_logging("cli", is_debug=debug, result_file=result_file)

@@ -37,23 +37,24 @@ include::partials/run.adoc[]
 [source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name}
--d/--dir DIR | -f/--file FILE ... FILE | --verbose | --recursive | --keep-logs | --h/--help
+tw_utilities check-russian
+-d/--dir DIR | -f/--file FILE ... FILE | -v/--verbose | -r/--recursive | -k/--keep-logs |
+--h/--help
 
   Команда для проверки наличия непереведенных слов
 
 Опции:
   -d, --dir DIR                          Директория для обработки
   -f, --file FILE ... FILE               Файл для обработки. Может использоваться несколько раз
-  --verbose / --no-verbose               Флаг подробного вывода.
+  -v, --verbose / -q, --quiet            Флаг подробного вывода.
                                          По умолчанию: False, выводятся только ошибки
-  --recursive / --no-recursive           Флаг рекурсивного поиска файлов.
+  -r, --recursive / -R, --no-recursive   Флаг рекурсивного поиска файлов.
                                          По умолчанию: True, вложенные файлы учитываются
-  --keep-logs                            Флаг сохранения директории с лог-файлом по завершении
-                                         работы в штатном режиме.
-                                         По умолчанию: False, лог-файл и директория удаляются
-  -h, --help                             Вывести справочную информацию на экран и завершить
-                                         работу
+  {keep-logs}
+                                         {keep-logs-cont}
+                                         {keep-logs-default}
+  {help}
+                                         {help-cont}
 ------------------------------------------------------------------------------------------------
 ----
 

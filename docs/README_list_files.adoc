@@ -29,13 +29,13 @@ include::partials/run.adoc[]
 {name} {script-name} <ROOT_DIR>
 -d/--ignored-dirs DIR ... DIR | --all-dirs | -f/--ignored-files FILE ... FILE | --all-files |
 -e/--extensions "EXT ... EXT" | --all-ext | -l/--language LANG | --all-langs |
--i/--ignore-index | -p/--prefix PFX | -n/--no-prefix | --hidden | --recursive | --keep-logs |
---h/--help
+-i/--ignore-index | -p/--prefix PFX | -n/--no-prefix | -H/--hidden | -r/--recursive |
+-k/--keep-logs | --h/--help
 
   Команда для вывода файлов в директории
 
 Аргументы:
-  root_dir                               Путь до директории
+  root_dir (*)                           Путь до директории
 
 Опции:
   -d, --ignored-dirs DIR ... DIR         Перечень игнорируемых директорий. Может использоваться
@@ -73,18 +73,18 @@ include::partials/run.adoc[]
                                          По умолчанию: True, выводятся файлы на всех языках.
                                          Примечание. Не может использоваться одновременно с
                                          --language
-  -i, --ignore-index                     Флаг игнорирования файлов _index любого расширения.
+  -i, --ignore-index / -I, --keep-index  Флаг игнорирования файлов _index любого расширения.
                                          По умолчанию: False, файл включается в список
   -p, --prefix PFX                       Префикс, добавляемый к названиям файлов.
                                          По умолчанию: если в пути есть 'content' и 'common',
                                          то путь, пригодный для добавления в YAML-файл для PDF;
                                          иначе -- ''.
                                          Примечание. Если задано --no-prefix, то игнорируется
-  -n, --no-prefix                        Флаг вывода исключительно относительных путей до файлов
+  -n, --no-prefix / -N, --with-prefix    Флаг вывода исключительно относительных путей до файлов
                                          без префиксов.
                                          По умолчанию: False, префикс задается опцией --prefix.
                                          Примечание. Имеет приоритет над опцией --prefix
-  --hidden                               Флаг поиска скрытых файлов.
+  -H, --hidden                           Флаг поиска скрытых файлов.
                                          По умолчанию: False, скрытые файлы игнорируются
   {recursive}
                                          {recursive-note}

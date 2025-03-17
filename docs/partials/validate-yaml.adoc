@@ -8,13 +8,6 @@
 Раздел 'settings' задан корректно
 Раздел 'Rights' задан корректно
 Секция Basics задана корректно
-Секция component_Message_Sender задана корректно
-Секция component_Message_Sender/config задана корректно
-Секция component_Message_Sender/logging задана корректно
-Секция component_Message_Sender/logging/cdr задана корректно
-Секция config задана корректно
-Секция logging задана корректно
-Секция logging/cdr задана корректно
 Секция oam задана корректно
 Секция oam/api задана корректно
 Секция oam/api/Access_Point задана корректно
@@ -26,17 +19,6 @@
 Секция oam/api/Package_Volume_Service задана корректно
 Секция oam/api/Qosp задана корректно
 Секция oam/api/Shared_Volume_Service задана корректно
-Секция oam/api/Statistic_Data задана корректно
-Секция oam/api/Subscriber_Service задана корректно
-Секция oam/api/Traffic_Service задана корректно
-Секция web задана корректно
-Секция web/sections задана корректно
-Секция web/sections/acc_files задана корректно
-Секция web/sections/find_sim_card задана корректно
-Секция web/sections/dictionary задана корректно
-Секция web/sections/tariffication задана корректно
-Секция web/sections/management задана корректно
-Секция web/sections/setting задана корректно
 
  20  content/common/_index.md.................................................................OK
  27  content/common/basics/_index.md..........................................................OK

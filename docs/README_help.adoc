@@ -1,0 +1,35 @@
+[[help]]
+= Руководство для help
+:imagesdir: images
+:stylesdir: ../css
+:stylesheet: default.css
+:pdf-themesdir: themes
+:pdf-theme: base-theme.yml
+:script-name: help
+:asciidoctorconfigdir: ..
+
+== Описание
+
+Скрипт выводит полную справочную информацию по каждой доступной команде.
+
+== Для чего нужно?
+
+Не все команды запоминаются, а со временем забываются, тем более, их аргументы и опции.
+Подобным образом можно быстро вспомнить.
+
+include::partials/run.adoc[]
+
+=== Опции скрипта
+
+[source,console,subs="attributes+"]
+----
+Использование:
+{name} {script-name}
+
+  Команда для вызова полной справки
+-------------------------------------------------------------------------------------------------
+----
+
+=== Примеры
+
+include::partials/help.adoc[]
