@@ -20,13 +20,11 @@ dependencies = [
   "shellingham>=1.5",
 ]
 
-
 [project.scripts]
 utilities = "__main__.py"
 
 [dependency-groups]
 dev = [
-  "click-completion>=0.5.2",
   "flake8>=7.1",
   "mypy>=1.15",
   "pyinstaller>=6.12",
@@ -36,7 +34,7 @@ dev = [
 
 [tool.uv]
 managed = true
-package = true
+package = false
 compile-bytecode = true
 python-downloads = "never"
 python-preference = "managed"
