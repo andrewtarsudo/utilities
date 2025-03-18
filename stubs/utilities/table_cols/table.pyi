@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 from typing import Iterable, Iterator, Mapping
-from utilities.common.errors import TableColsTableColumnIndexError as TableColsTableColumnIndexError, \
-    TableColsTableColumnInvalidIdentifierError as TableColsTableColumnInvalidIdentifierError, \
-    TableColsTableColumnInvalidNameError as TableColsTableColumnInvalidNameError
-from utilities.table_cols.cell import TableCell as TableCell
 from utilities.table_cols.column import TableColumn as TableColumn
-from utilities.table_cols.coordinate import TableCoordinate as TableCoordinate
 
 
 class Table:

@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 from click.core import Context as Context
 from typing import Iterable
-from utilities.common.shared import FAIL_COLOR as FAIL_COLOR, HELP as HELP, NORMAL_COLOR as NORMAL_COLOR, \
-    PASS_COLOR as PASS_COLOR, StrPath as StrPath, pretty_print as pretty_print, separator as separator
-from utilities.common.functions import ReaderMode as ReaderMode, file_reader as file_reader
-from utilities.scripts.cli import APIGroup as APIGroup, clear_logs as clear_logs, \
-    cli as command_line_interface
-from utilities.scripts.list_files import get_files as get_files
+from utilities.common.shared import StrPath as StrPath
 
 RUSSIAN_CHARS: str
 

@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
-from click import secho as secho
 from click.core import Command as Command, Context, Group, Option, Parameter as Parameter
 from click.formatting import HelpFormatter as HelpFormatter
 from typing import Any, Iterable, Mapping
-from utilities.common.shared import DEBUG as DEBUG, HELP as HELP, NORMAL as NORMAL, \
-    PRESS_ENTER_KEY as PRESS_ENTER_KEY, __version__ as __version__, args_help_dict as args_help_dict
-from utilities.common.custom_logger import custom_logging as custom_logging
-from utilities.common.errors import BaseError as BaseError, NoArgumentsOptionsError as NoArgumentsOptionsError
 
 COL_MAX: int
 MAX_CONTENT_WIDTH: int
@@ -87,7 +82,7 @@ class MutuallyExclusiveOption(Option):
         Any, list[str]]: ...
 
 
-def command_line_interface(debug: bool = False): ...
+def cli(debug: bool = False): ...
 
 
 def clear_logs(ctx: Context): ...

@@ -4,8 +4,6 @@ from collections.abc import Iterable
 from pathlib import Path
 from utilities.common.shared import HELP as HELP, PRESS_ENTER_KEY as PRESS_ENTER_KEY, StrPath as StrPath, \
     pretty_print as pretty_print
-from utilities.scripts.cli import MutuallyExclusiveOption as MutuallyExclusiveOption, \
-    SwitchArgsAPIGroup as SwitchArgsAPIGroup, clear_logs as clear_logs, cli as command_line_interface
 
 
 def check_content_common(path: Path): ...

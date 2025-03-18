@@ -195,7 +195,9 @@ class AsciiDocFile:
                             table.options[k] = v
 
                         else:
-                            logger.debug(f"Опции {k} уже задано значение {table.options.get(k)} в таблице {table.name} файла {self._path}")
+                            logger.debug(
+                                f"Опции {k} уже задано значение {table.options.get(k)} "
+                                f"в таблице {table.name} файла {self._path}")
 
                 table_column: TableColumn
                 table_analyser._column_parameters = [

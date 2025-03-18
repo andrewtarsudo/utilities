@@ -7,7 +7,7 @@ from utilities.common.errors import FormatCodeNonIntegerLineLengthError as Forma
     FormatCodeNonPositiveLineLengthError as FormatCodeNonPositiveLineLengthError
 from utilities.common.functions import ReaderMode as ReaderMode, file_reader as file_reader, file_writer as file_writer
 from utilities.scripts.cli import APIGroup as APIGroup, clear_logs as clear_logs, \
-    cli as command_line_interface
+    cli as cli
 from utilities.scripts.list_files import get_files as get_files
 
 MAX_LENGTH: int

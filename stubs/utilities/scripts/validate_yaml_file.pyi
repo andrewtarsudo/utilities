@@ -5,7 +5,7 @@ from utilities.common.shared import FAIL_COLOR as FAIL_COLOR, HELP as HELP, NORM
     PASS_COLOR as PASS_COLOR, StrPath as StrPath, pretty_print as pretty_print
 from utilities.common.functions import ReaderMode as ReaderMode, file_reader as file_reader
 from utilities.scripts.cli import SwitchArgsAPIGroup as SwitchArgsAPIGroup, clear_logs as clear_logs, \
-    cli as command_line_interface
+    cli as cli
 
 
 def determine_key(item: Mapping, keys: Iterable[str]): ...
