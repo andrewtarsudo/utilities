@@ -6,3 +6,4 @@ graft docs/*.adoc
 graft sources
 include LICENSE
 include MANIFEST.in
+graft stubs
