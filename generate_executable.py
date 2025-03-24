@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from os import environ
 from pathlib import Path
 from subprocess import CalledProcessError, CompletedProcess, run
 from sys import platform
@@ -15,9 +16,12 @@ if __name__ == "__main__":
         spec_file: str = "utilities.spec"
         exe_file: str = r"./bin/tw_utilities"
 
+    environ["VIRTUAL_ENV"] = "venv"
+
     install: list[str] = [
         "uv",
         "run",
+        "--active",
         "pyinstaller",
         "--noconfirm",
         "--distpath",
@@ -38,7 +42,7 @@ if __name__ == "__main__":
         raise
 
     except PermissionError as e:
-        from os import stat
+        from os import environ, stat
 
         print(f"Недостаточно прав доступа к файлу {log_file}.\nМаска: {stat(log_file).st_mode}")
         raise

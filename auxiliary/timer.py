@@ -3,8 +3,6 @@ from time import perf_counter_ns
 from types import TracebackType
 from typing import ContextManager
 
-from click.termui import echo
-
 from utilities.common.errors import TimerRunningError, TimerStoppedError
 
 
@@ -39,44 +37,62 @@ class Timer(ContextManager):
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance._start_time = None
-            cls._instance._end_time = None
-            cls._instance._elapsed_time = 0
+            cls._instance.start_time = None
+            cls._instance.end_time = None
+            cls._instance.elapsed_times = []
+            cls._instance._active = True
+            cls._instance._round_number = 0
 
             for k, v in kwargs.items():
                 setattr(cls._instance, f"_{k}", v)
 
         return cls._instance
 
+    def __call__(self, *args, **kwargs):
+        if not self._active:
+            print("Таймер остановлен")
+            print(self.get_result())
+
+        else:
+            if self.start_time is None:
+                self.start()
+
+            else:
+                self.pause()
+
+    def __bool__(self):
+        return self._active
+
     def start(self) -> None:
         """Start a new timer"""
-        if self._start_time is not None:
+        if not bool(self):
             raise TimerRunningError
 
-        self._start_time = perf_counter_ns()
-        self._end_time = None
+        self.start_time = perf_counter_ns()
+        print(f"{self.start_time=}")
 
     def pause(self):
-        if self._start_time is None:
+        if self.start_time is None:
             raise TimerStoppedError
 
-        self._end_time = perf_counter_ns()
-        self._elapsed_time += self._end_time - self._start_time
-        self._start_time = None
+        self.end_time = perf_counter_ns()
+        self.elapsed_times.append(self.end_time - self.start_time)
+        self._round_number += 1
+
+    def __getitem__(self, item):
+        if isinstance(item, (int, slice)):
+            return self.elapsed_times[item]
+
+        else:
+            raise TypeError
 
     def stop(self):
         """Stop the timer, and report the elapsed time"""
-        if self._start_time is None:
-            raise TimerStoppedError
-
-        # Calculate elapsed time
         self.pause()
+        self._active = False
 
-        # Report elapsed time
-        echo(process_timing(self._elapsed_time))
-        self._start_time = None
-        self._end_time = None
-        self._elapsed_time = 0
+    def get_results(self):
+        return ", ".join(map(process_timing, self.elapsed_times))
 
     def __enter__(self):
         """Start a new timer as a context manager"""
@@ -89,8 +105,24 @@ class Timer(ContextManager):
             exc_value: BaseException | None,
             traceback: TracebackType | None, /) -> None:
         """Stop the context manager timer"""
-        echo(
-            f"{exc_type.__class__.__name__}, {str(exc_value)}"
-            f"\n{traceback.tb_lineno}{traceback.tb_lasti}"
-            f"\n{traceback.tb_frame}")
         self.pause()
+
+    def safe_close(self):
+        if not bool(self):
+            pass
+
+        else:
+            if self.start_time is None:
+                self.stop()
+
+
+
+def dummy_function():
+    print("dummy")
+
+
+if __name__ == '__main__':
+    with Timer() as timer:
+        dummy_function()
+    timer()
+    print(timer.get_result())

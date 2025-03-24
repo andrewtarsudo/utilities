@@ -175,6 +175,7 @@ class AsciiDocFile:
 
             # skip table_cols if it already has cols option
             elif "cols" in table.options and any(digit in table.options.get("cols") for digit in digits):
+                logger.debug(f"Для таблицы {table.index}, {table.name} уже заданы ширины столбцов")
                 continue
 
             # skip tables if some text has been accidentally processed as table_cols
@@ -203,6 +204,7 @@ class AsciiDocFile:
                 table_analyser._column_parameters = [
                     table_column.column_parameters() for table_column in table.iter_column_items()]
                 table_analyser._table_id = f"{self._path.name}, {table.name}"
+                table_analyser.adjust()
                 table_analyser.inspect_valid()
                 table_analyser.set_base_column_widths()
                 table_analyser.distribute_rest()

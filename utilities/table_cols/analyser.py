@@ -20,7 +20,7 @@ The general steps:
 
 from loguru import logger
 
-from utilities.common.shared import MAX_SYMBOLS, MIN_COLUMN
+from utilities.common.shared import COEFFICIENT, MAX_SYMBOLS, MIN_COLUMN
 from utilities.table_cols.column import TableColumnParameters
 
 
@@ -41,12 +41,18 @@ class TableAnalyser:
         self._is_valid: bool | None = None
         self._table_id: str | None = None
 
+    def adjust(self):
+        self._max_symbols -= int(len(self) * COEFFICIENT)
+
     def nullify(self):
         """Deallocates the used resources."""
         self._columns.clear()
         self._column_parameters.clear()
         self._is_valid = None
         self._table_id = None
+
+    def __len__(self):
+        return len(self._column_parameters)
 
     def __iter__(self):
         return iter(self._column_parameters)
@@ -57,6 +63,9 @@ class TableAnalyser:
         If the sum of minimum lengths < max table_cols width = Basic_config::analyser::max_symbols,
         then there is no way to fit the table_cols properly.
         """
+        for _ in iter(self):
+            print(f"{_=}")
+
         minimum_lengths: int = sum(column_parameters.minimum_length for column_parameters in iter(self))
 
         if minimum_lengths > self._max_symbols:

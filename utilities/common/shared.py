@@ -31,8 +31,9 @@ HELP: str = """Вывести справочную информацию на э�
 MD_EXTENSION: str = ".md"
 ADOC_EXTENSION: str = ".adoc"
 
-MAX_SYMBOLS: int = 68
-MIN_COLUMN = 4
+MAX_SYMBOLS: int = 98
+MIN_COLUMN: int = 5
+COEFFICIENT: float = 1.0
 
 __version__: str = "2.0.0"
 
