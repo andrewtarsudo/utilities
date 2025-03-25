@@ -354,7 +354,7 @@ def validate_file(
 
         _path: str = path.relative_to(root).as_posix()
 
-        _line = f"{_color}{line_no + 1:>4}  {_path: <{max_length}}{_status:.>6}{NORMAL_COLOR}"
+        _line = f"{_color}{line_no + 1:>4}  {_path: <{max_length}}{_status: >6}{NORMAL_COLOR}"
         _lines.append(_line)
 
         if verbose or _status == "NOT OK":
