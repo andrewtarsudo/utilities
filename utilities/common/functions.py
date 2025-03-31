@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Callable, Iterable
 
 from loguru import logger
+from yaml.scanner import ScannerError
 
 from utilities.common.errors import FileReaderError
 from utilities.common.shared import StrPath
@@ -137,6 +138,12 @@ def file_reader_type(path: StrPath, file_type: str | FileType, *, encoding: str 
 
     except UnsupportedOperation as e:
         logger.error(f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}")
+        raise
+
+    except ScannerError as e:
+        logger.error(
+            f"{e.__class__.__name__}: ошибка обработки файла {e.context_mark.name}"
+            f"\nв символе {e.context_mark.line + 1}:{e.context_mark.column + 1}")
         raise
 
     except OSError as e:
