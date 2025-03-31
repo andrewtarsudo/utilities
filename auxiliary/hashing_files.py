@@ -85,12 +85,14 @@ def generate_test_files(n_files, file_size):
     for i in range(n_files):
         filename = f"test_{i}.txt"
         with open(filename, "w") as f:
-            f.write(''.join(random.choice(string.ascii_letters) for _ in range(file_size)))
+            f.write(
+                "".join(random.choice(string.ascii_letters) for _ in range(file_size))
+            )
 
 
 def hash_concatenated_files(files):
     """Хеширование объединенного буфера"""
-    buffer = b''.join(open(file, 'rb').read() for file in files)
+    buffer = b"".join(open(file, "rb").read() for file in files)
     return hashlib.md5(buffer).hexdigest()
 
 
@@ -99,12 +101,12 @@ def hash_separate_files_parallel(files):
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
         futures = [executor.submit(hash_file, file) for file in files]
         hashes = [future.result() for future in futures]
-    return hashlib.md5(' '.join(hashes).encode()).hexdigest()
+    return hashlib.md5(" ".join(hashes).encode()).hexdigest()
 
 
 def hash_file(file):
     """Хеширование одного файла"""
-    return hashlib.md5(open(file, 'rb').read()).hexdigest()
+    return hashlib.md5(open(file, "rb").read()).hexdigest()
 
 
 def measure_time(func, files):
@@ -119,7 +121,9 @@ def run_experiment(n_files, file_size):
     """Запуск эксперимента"""
     filenames = [f"test_{i}.txt" for i in range(n_files)]
     concat_time, concat_result = measure_time(hash_concatenated_files, filenames)
-    parallel_time, parallel_result = measure_time(hash_separate_files_parallel, filenames)
+    parallel_time, parallel_result = measure_time(
+        hash_separate_files_parallel, filenames
+    )
     return concat_time, parallel_time, concat_result, parallel_result
 
 
