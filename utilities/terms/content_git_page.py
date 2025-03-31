@@ -8,7 +8,11 @@ from utilities.common.shared import StrPath
 from utilities.common.errors import TermsInvalidProjectIdError
 from utilities.common.functions import file_writer
 from utilities.terms.const import CustomPort, CustomScheme
-from utilities.terms.http_request import CustomHTTPRequest, CustomHTTPResponseChunked, CustomPreparedRequest
+from utilities.terms.http_request import (
+    CustomHTTPRequest,
+    CustomHTTPResponseChunked,
+    CustomPreparedRequest,
+)
 
 
 class ContentGitPage(NamedTuple):
@@ -35,29 +39,31 @@ class ContentGitPage(NamedTuple):
         else:
             logger.error(
                 f"Идентификатор проекта {self.project_id} должен быть int или str, "
-                f"но получено {type(self.project_id)}")
+                f"но получено {type(self.project_id)}"
+            )
             raise TermsInvalidProjectIdError
 
     @property
     def _custom_http_request(self):
         scheme: str = CustomScheme.HTTPS.value
-        web_hook: str = f"api/v4/projects/{self.project_id}/repository/files/{self.file_name}"
+        web_hook: str = (
+            f"api/v4/projects/{self.project_id}/repository/files/{self.file_name}"
+        )
         host: str = "gitlab.com"
         port: int = CustomPort.HTTPS.value
         params: tuple[tuple[str, str], ...] = (("ref", "main"),)
 
         return CustomHTTPRequest(
-            scheme=scheme,
-            web_hook=web_hook,
-            host=host,
-            port=port,
-            params=params)
+            scheme=scheme, web_hook=web_hook, host=host, port=port, params=params
+        )
 
     def set_content(self):
         logger.debug(f"URL = {self._custom_http_request.url()}")
 
         _prepared_request: CustomPreparedRequest
-        _prepared_request = CustomPreparedRequest.from_custom_request(self._custom_http_request)
+        _prepared_request = CustomPreparedRequest.from_custom_request(
+            self._custom_http_request
+        )
 
         _http_response: HTTPResponse = _prepared_request.http_response()
         _chunked: CustomHTTPResponseChunked

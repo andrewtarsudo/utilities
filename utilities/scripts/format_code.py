@@ -7,8 +7,17 @@ from click.decorators import help_option, option, pass_context
 from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
-from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatCodeNonPositiveLineLengthError
-from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, pretty_print, StrPath
+from utilities.common.errors import (
+    FormatCodeNonIntegerLineLengthError,
+    FormatCodeNonPositiveLineLengthError,
+)
+from utilities.common.shared import (
+    ADOC_EXTENSION,
+    HELP,
+    MD_EXTENSION,
+    pretty_print,
+    StrPath,
+)
 from utilities.common.functions import file_reader, file_writer, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, cli
 from utilities.scripts.list_files import get_files
@@ -16,93 +25,99 @@ from utilities.scripts.list_files import get_files
 MAX_LENGTH: int = 84
 
 
-@cli.command(
-    "format-code",
-    cls=APIGroup,
-    help="Команда для форматирования блоков кода")
+@cli.command("format-code", cls=APIGroup, help="Команда для форматирования блоков кода")
 @option(
-    "-d", "--dir", "directory",
-    type=ClickPath(
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
+    "-d",
+    "--dir",
+    "directory",
+    type=ClickPath(file_okay=False, resolve_path=True, allow_dash=False, dir_okay=True),
     help="Директория для обработки",
     multiple=False,
     required=False,
     metavar="DIR",
-    default=None)
+    default=None,
+)
 @option(
-    "-f", "--file", "files",
+    "-f",
+    "--file",
+    "files",
     type=ClickPath(
         file_okay=True,
         readable=True,
         resolve_path=True,
         allow_dash=False,
-        dir_okay=False),
+        dir_okay=False,
+    ),
     help="\b\nФайлы для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
-    default=None)
+    default=None,
+)
 @option(
-    "-l", "--length",
+    "-l",
+    "--length",
     type=INT,
     help=f"\b\nМаксимальная длина строки. По умолчанию: {MAX_LENGTH}"
-         f"\nПримечание. Должно быть целым положительным числом",
+    f"\nПримечание. Должно быть целым положительным числом",
     multiple=False,
     required=False,
     metavar="LEN",
-    default=MAX_LENGTH)
+    default=MAX_LENGTH,
+)
 @option(
-    "-r/-R", "--recursive/--no-recursive",
+    "-r/-R",
+    "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
-         "\nПо умолчанию: True, вложенные файлы учитываются",
+    "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
-    default=True)
+    default=True,
+)
 @option(
-    "-k/-K", "--keep-logs/--remove-logs",
+    "-k/-K",
+    "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
+    "\nработы в штатном режиме."
+    "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
+    default=False,
+)
+@help_option("-h", "--help", help=HELP, is_eager=True)
 @pass_context
 def format_code_command(
-        ctx: Context,
-        directory: StrPath = None,
-        files: Iterable[StrPath] = None,
-        recursive: bool = True,
-        length: int = MAX_LENGTH,
-        keep_logs: bool = False):
+    ctx: Context,
+    directory: StrPath = None,
+    files: Iterable[StrPath] = None,
+    recursive: bool = True,
+    length: int = MAX_LENGTH,
+    keep_logs: bool = False,
+):
     if length < 0:
-        logger.error(f"Максимальная длина не может быть неположительным числом, однако получено {length}")
+        logger.error(
+            f"Максимальная длина не может быть неположительным числом, однако получено {length}"
+        )
         raise FormatCodeNonPositiveLineLengthError
 
     elif not isinstance(length, int):
-        logger.error(f"Максимальная длина должна быть целым числом, однако получено {type(length)}")
+        logger.error(
+            f"Максимальная длина должна быть целым числом, однако получено {type(length)}"
+        )
         raise FormatCodeNonIntegerLineLengthError
 
     files: list[StrPath] | None = get_files(
-        ctx,
-        files=files,
-        directory=directory,
-        recursive=recursive,
-        language=None)
+        ctx, files=files, directory=directory, recursive=recursive, language=None
+    )
 
     patterns: dict[str, str] = {
         MD_EXTENSION: r"```\S*\n(.*?)\n```",
-        ADOC_EXTENSION: r"(?:-{4}|={4}|\.{4})([\s\S]+)(?:-{4}|={4}|\.{4})"}
+        ADOC_EXTENSION: r"(?:-{4}|={4}|\.{4})([\s\S]+)(?:-{4}|={4}|\.{4})",
+    }
 
     if files is not None and files:
         for file in files:
@@ -141,10 +156,11 @@ def format_code_command(
 
 
 def split(
-        line: str,
-        start: int = 0,
-        length: int = MAX_LENGTH,
-        split_lines: Iterable[str] = None) -> list[str] | None:
+    line: str,
+    start: int = 0,
+    length: int = MAX_LENGTH,
+    split_lines: Iterable[str] = None,
+) -> list[str] | None:
     if split_lines is None:
         split_lines: list[str] = []
 
@@ -184,7 +200,7 @@ def split(
         else:
             stop: int = len(line) - start
 
-        split_line: str = line[start:start + stop]
+        split_line: str = line[start : start + stop]
         split_lines.append(split_line)
 
         start += stop

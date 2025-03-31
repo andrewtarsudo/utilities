@@ -16,7 +16,9 @@ class SystemInfo(NamedTuple):
 
         elif platform.startswith("darwin"):
             prog: str = f"{Path(__file__).parent.name}"
-            folder: Path = Path.home().joinpath("Library/Application Support/TechWritersUtilities")
+            folder: Path = Path.home().joinpath(
+                "Library/Application Support/TechWritersUtilities"
+            )
 
         else:
             prog: str = f"{Path(__file__).parent.name}"

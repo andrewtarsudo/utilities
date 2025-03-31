@@ -7,8 +7,11 @@ from typing import Iterable, Iterator, Mapping, Pattern
 
 from loguru import logger
 
-from utilities.common.errors import TableColsTableColumnIndexError, TableColsTableColumnInvalidIdentifierError, \
-    TableColsTableColumnInvalidNameError
+from utilities.common.errors import (
+    TableColsTableColumnIndexError,
+    TableColsTableColumnInvalidIdentifierError,
+    TableColsTableColumnInvalidNameError,
+)
 from utilities.table_cols.cell import TableCell
 from utilities.table_cols.column import TableColumn
 from utilities.table_cols.coordinate import TableCoordinate
@@ -18,16 +21,21 @@ class Table:
     """Class to represent the AsciiDoc table_cols."""
 
     def __init__(
-            self,
-            name: str | None = None,
-            index: int | None = None,
-            lines: Iterable[str] = None,
-            options: Mapping[str, str | None] = None):
+        self,
+        name: str | None = None,
+        index: int | None = None,
+        lines: Iterable[str] = None,
+        options: Mapping[str, str | None] = None,
+    ):
         if lines is None:
             self._lines: list[str] = []
 
         else:
-            self._lines = [_.removesuffix("\n").strip() for _ in lines if _.removesuffix("\n").strip()]
+            self._lines = [
+                _.removesuffix("\n").strip()
+                for _ in lines
+                if _.removesuffix("\n").strip()
+            ]
 
         if options is None:
             options: dict[str, str | None] = dict()
@@ -42,9 +50,7 @@ class Table:
 
         At the time such tables are skipped since they require separate algorithm to determine the rows.
         """
-        return any(
-            line.strip().startswith(digits)
-            for line in iter(self))
+        return any(line.strip().startswith(digits) for line in iter(self))
 
     def __iter__(self) -> Iterator[str]:
         return iter(self._lines)
@@ -85,7 +91,9 @@ class Table:
             return self._lines[item]
 
         else:
-            logger.error(f"Ключ {item} должен быть типа int или slice, но получен {type(item)}")
+            logger.error(
+                f"Ключ {item} должен быть типа int или slice, но получен {type(item)}"
+            )
             logger.debug(f"Таблица:\n{str(self)}")
             raise TypeError
 
@@ -107,7 +115,9 @@ class Table:
             logger.error(f"{str(self)}")
             return
 
-        CELL_PATTERN: Pattern = compile(r"(\d*)\.?(\d*)[<^>]?\.?[<^>]?\+?\|([^|]*)", MULTILINE | DOTALL)
+        CELL_PATTERN: Pattern = compile(
+            r"(\d*)\.?(\d*)[<^>]?\.?[<^>]?\+?\|([^|]*)", MULTILINE | DOTALL
+        )
 
         _occupied: set[TableCoordinate] = set()
 
@@ -118,7 +128,9 @@ class Table:
             shift: int = 0
 
             while shift < self.num_columns:
-                table_coordinate: TableCoordinate = TableCoordinate.as_element(number + shift, self.num_columns)
+                table_coordinate: TableCoordinate = TableCoordinate.as_element(
+                    number + shift, self.num_columns
+                )
 
                 if table_coordinate not in _occupied:
                     _occupied.add(table_coordinate)
@@ -137,8 +149,12 @@ class Table:
             row_modifier: int = int(match.group(2)) if match.group(1) else 1
 
             if (row_modifier, column_modifier) != (1, 1):
-                for row_offset, column_offset in product(range(row_modifier), range(column_modifier)):
-                    _table_coord: TableCoordinate = table_coordinate.shift(row_offset, column_offset)
+                for row_offset, column_offset in product(
+                    range(row_modifier), range(column_modifier)
+                ):
+                    _table_coord: TableCoordinate = table_coordinate.shift(
+                        row_offset, column_offset
+                    )
                     _occupied.add(_table_coord)
 
             table_cell: TableCell = TableCell(table_coordinate, text)
@@ -188,12 +204,14 @@ class Table:
         if isinstance(column, int):
             if 0 <= column < self.num_columns:
                 table_cells: list[TableCell] = [
-                    v for k, v in self._table_cells.items()
-                    if k.column == column]
+                    v for k, v in self._table_cells.items() if k.column == column
+                ]
                 return TableColumn(table_cells, column)
 
             else:
-                logger.error(f"Индекс строки должен быть в диапазоне 0-{self.num_columns}, но получен {column}")
+                logger.error(
+                    f"Индекс строки должен быть в диапазоне 0-{self.num_columns}, но получен {column}"
+                )
                 raise TableColsTableColumnIndexError
 
         elif isinstance(column, str):
@@ -204,15 +222,18 @@ class Table:
 
             else:
                 column_names: str = ", ".join(self.column_names)
-                logger.error(f"Столбец с именем {column} не найден. Доступные названия:\n{column_names}")
+                logger.error(
+                    f"Столбец с именем {column} не найден. Доступные названия:\n{column_names}"
+                )
                 raise TableColsTableColumnInvalidNameError
 
         else:
             logger.error(
-                f"Столбец задается индексом типа int или именем типа str, но получено {column} типа {type(column)}")
+                f"Столбец задается индексом типа int или именем типа str, но получено {column} типа {type(column)}"
+            )
             raise TableColsTableColumnInvalidIdentifierError
 
-    def iter_column_items(self) -> Iterator['TableColumn']:
+    def iter_column_items(self) -> Iterator["TableColumn"]:
         """Iterates over the table_cols columns.
 
         Used for specifying the column widths if activated.

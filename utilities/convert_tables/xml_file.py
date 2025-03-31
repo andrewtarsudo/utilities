@@ -2,6 +2,7 @@
 from pathlib import Path
 from shutil import rmtree
 from typing import Iterator
+
 # noinspection PyProtectedMember
 from xml.etree.ElementTree import Element, parse, register_namespace
 from zipfile import ZIP_DEFLATED, ZipFile
@@ -49,8 +50,10 @@ class UnzippedFile:
         self._core_document: CoreDocument = core_document
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}({self._name}, {repr(self._core_document)})>," \
-               f" {self._core_document.file}"
+        return (
+            f"<{self.__class__.__name__}({self._name}, {repr(self._core_document)})>,"
+            f" {self._core_document.file}"
+        )
 
     def __str__(self):
         return f"{self.__class__.__name__}: {self._name}, {str(self._core_document)}, {self._core_document.file}"
@@ -116,7 +119,7 @@ class XmlDocument(XmlFile):
     def __len__(self):
         return len(list(self.content.iter(fqdn("w:tbl"))))
 
-    def __iter__(self) -> Iterator['XmlTable']:
+    def __iter__(self) -> Iterator["XmlTable"]:
         return iter(XmlTable(self, table_index) for table_index in range(len(self)))
 
     def parse_document(self, line_formatter: LineFormatter):
@@ -125,7 +128,9 @@ class XmlDocument(XmlFile):
             xml_table.set_lines(line_formatter)
             xml_table.write_to_file()
 
-        logger.info(f"В директорию {self.tables_dir} записано {len(self)} обработанных таблиц")
+        logger.info(
+            f"В директорию {self.tables_dir} записано {len(self)} обработанных таблиц"
+        )
 
 
 class XmlTable(XmlFilePart):
@@ -147,7 +152,7 @@ class XmlTable(XmlFilePart):
         return iter(XmlTableRow(self, row_index) for row_index in range(self._num_rows))
 
     @property
-    def xml_rows(self) -> list['XmlTableRow']:
+    def xml_rows(self) -> list["XmlTableRow"]:
         return list(iter(self))
 
     def __len__(self):
@@ -167,11 +172,15 @@ class XmlTable(XmlFilePart):
 
     @property
     def md_table_path(self):
-        return self._xml_document.tables_dir.joinpath(f"table_{self._table_index + 1}.md")
+        return self._xml_document.tables_dir.joinpath(
+            f"table_{self._table_index + 1}.md"
+        )
 
     def write_to_file(self):
         file_writer(self.md_table_path, str(self))
-        file_path: Path = self._xml_document.tables_dir.joinpath(f"table_{self._table_index + 1}.md")
+        file_path: Path = self._xml_document.tables_dir.joinpath(
+            f"table_{self._table_index + 1}.md"
+        )
 
         if not file_path.exists():
             file_path.touch(exist_ok=True)

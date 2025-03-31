@@ -15,115 +15,123 @@ from utilities.table_cols.file import AsciiDocFile
 
 
 @cli.command(
-    "table-cols",
-    cls=APIGroup,
-    help="Команда для задания ширины столбцам таблиц")
+    "table-cols", cls=APIGroup, help="Команда для задания ширины столбцам таблиц"
+)
 @option(
-    "-f", "--file", "files",
+    "-f",
+    "--file",
+    "files",
     type=ClickPath(
         file_okay=True,
         readable=True,
         resolve_path=True,
         allow_dash=False,
-        dir_okay=False),
+        dir_okay=False,
+    ),
     help="\b\nФайл для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
-    default=None)
+    default=None,
+)
 @option(
-    "-d", "--dir", "directory",
-    type=ClickPath(
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
+    "-d",
+    "--dir",
+    "directory",
+    type=ClickPath(file_okay=False, resolve_path=True, allow_dash=False, dir_okay=True),
     help="Директория для обработки",
     multiple=False,
     required=False,
     metavar="DIR",
-    default=None)
+    default=None,
+)
 @option(
-    "-s", "--max-symbols",
+    "-s",
+    "--max-symbols",
     type=INT,
     help=f"\b\nМаксимальная ширина столбца в символах."
-         f"\nПо умолчанию: {MAX_SYMBOLS}."
-         f"\nПримечание. Должно быть целым положительным числом",
+    f"\nПо умолчанию: {MAX_SYMBOLS}."
+    f"\nПримечание. Должно быть целым положительным числом",
     multiple=False,
     required=False,
     metavar="WIDTH",
-    default=MAX_SYMBOLS)
+    default=MAX_SYMBOLS,
+)
 @option(
-    "-c", "--min-column",
+    "-c",
+    "--min-column",
     type=INT,
     help=f"\b\nМинимальная ширина столбца в символах."
-         f"\nПо умолчанию: {MIN_COLUMN}."
-         f"\nПримечание. Должно быть целым положительным числом",
+    f"\nПо умолчанию: {MIN_COLUMN}."
+    f"\nПримечание. Должно быть целым положительным числом",
     multiple=False,
     required=False,
     metavar="WIDTH",
-    default=MIN_COLUMN)
+    default=MIN_COLUMN,
+)
 @option(
-    "-r/-R", "--recursive/--no-recursive",
+    "-r/-R",
+    "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
-         "\nПо умолчанию: True, вложенные файлы учитываются",
+    "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
-    default=True)
+    default=True,
+)
 @option(
-    "-o/-O", "--add-options/--no-options", "add_options",
+    "-o/-O",
+    "--add-options/--no-options",
+    "add_options",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг добавления опций таблицы."
-         "\nПо умолчанию: True, добавляются:"
-         "\n* options=\"header\";"
-         "\n* width=\"100%\"",
+    "\nПо умолчанию: True, добавляются:"
+    '\n* options="header";'
+    '\n* width="100%"',
     show_default=True,
     required=False,
-    default=True)
+    default=True,
+)
 @option(
-    "-k/-K", "--keep-logs/--remove-logs",
+    "-k/-K",
+    "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
+    "\nработы в штатном режиме."
+    "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
+    default=False,
+)
+@help_option("-h", "--help", help=HELP, is_eager=True)
 @pass_context
 def table_cols_command(
-        ctx: Context,
-        files: Iterable[StrPath] = None,
-        directory: StrPath = None,
-        recursive: bool = True,
-        max_symbols: int = MAX_SYMBOLS,
-        min_column: int = MIN_COLUMN,
-        add_options: bool = True,
-        keep_logs: bool = False):
+    ctx: Context,
+    files: Iterable[StrPath] = None,
+    directory: StrPath = None,
+    recursive: bool = True,
+    max_symbols: int = MAX_SYMBOLS,
+    min_column: int = MIN_COLUMN,
+    add_options: bool = True,
+    keep_logs: bool = False,
+):
     if add_options:
-        options: dict[str, str] | None = {
-            "width": "100%",
-            "options": "header"}
+        options: dict[str, str] | None = {"width": "100%", "options": "header"}
 
     else:
         options: dict[str, str] | None = None
 
     files: list[StrPath] | None = get_files(
-        ctx,
-        files=files,
-        directory=directory,
-        recursive=recursive,
-        extensions="adoc")
+        ctx, files=files, directory=directory, recursive=recursive, extensions="adoc"
+    )
 
     if files is not None and files:
-        table_analyser: TableAnalyser = TableAnalyser(max_symbols=max_symbols, min_column=min_column)
+        table_analyser: TableAnalyser = TableAnalyser(
+            max_symbols=max_symbols, min_column=min_column
+        )
 
         for file in files:
             logger.debug(f"Файл {file}")

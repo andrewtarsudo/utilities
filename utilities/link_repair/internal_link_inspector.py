@@ -4,7 +4,10 @@ from typing import Iterator
 
 from loguru import logger
 
-from utilities.common.errors import LinkRepairFileInvalidTypeError, LinkRepairInvalidMatchError
+from utilities.common.errors import (
+    LinkRepairFileInvalidTypeError,
+    LinkRepairInvalidMatchError,
+)
 from utilities.link_repair.file_dict import TextFile
 
 __all__ = ["InternalLinkInspector", "internal_inspector"]
@@ -120,22 +123,32 @@ class InternalLinkInspector:
             if _modified_anchor is not None:
                 logger.warning(
                     f"В файле {self._text_file.rel_path} найден якорь\n"
-                    f"{_modified_anchor} вместо {_anchor}", result=True)
+                    f"{_modified_anchor} вместо {_anchor}",
+                    result=True,
+                )
 
                 for _i_link in self._text_file.get_internal_links(_anchor):
-                    self._text_file.update_line(_i_link.index, _i_link.anchor, _modified_anchor)
+                    self._text_file.update_line(
+                        _i_link.index, _i_link.anchor, _modified_anchor
+                    )
 
                 logger.success(
                     f"Файл {self._text_file.rel_path}:\n"
-                    f"{_anchor} -> {_modified_anchor}\n", result=True)
+                    f"{_anchor} -> {_modified_anchor}\n",
+                    result=True,
+                )
 
             else:
                 _indexes: str = ", ".join(
-                    str(_internal_link.index) for _internal_link in self._text_file.get_internal_links(_anchor))
+                    str(_internal_link.index)
+                    for _internal_link in self._text_file.get_internal_links(_anchor)
+                )
 
                 logger.error(
                     f"Не найден якорь {_anchor} в файле {self._text_file.rel_path}.\n"
-                    f"Строки: {_indexes}", result=True)
+                    f"Строки: {_indexes}",
+                    result=True,
+                )
 
 
 internal_inspector: InternalLinkInspector = InternalLinkInspector()

@@ -30,7 +30,8 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     command_files: dict[str, Path] = {
         "info_flag": INFO_FILE,
         "readme_flag": README_FILE,
-        "samples_flag": SAMPLES_FILE}
+        "samples_flag": SAMPLES_FILE,
+    }
 
     path: Path = command_files.get(param.name)
 
@@ -40,18 +41,12 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     ctx.exit(0)
 
 
-@cli.command(
-    "terms",
-    cls=APIGroup,
-    help="Команда для вывода расшифровки аббревиатур")
-@argument(
-    "terms",
-    required=False,
-    metavar="TERMS",
-    nargs=-1,
-    default=None)
+@cli.command("terms", cls=APIGroup, help="Команда для вывода расшифровки аббревиатур")
+@argument("terms", required=False, metavar="TERMS", nargs=-1, default=None)
 @option(
-    "-a", "--all", "all_flag",
+    "-a",
+    "--all",
+    "all_flag",
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["full_flag", "readme_flag", "samples_flag"],
@@ -59,9 +54,12 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     show_default=True,
     required=False,
     is_eager=True,
-    default=False)
+    default=False,
+)
 @option(
-    "-f", "--full", "full_flag",
+    "-f",
+    "--full",
+    "full_flag",
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_flag", "readme_flag", "samples_flag"],
@@ -69,9 +67,12 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     show_default=True,
     required=False,
     is_eager=True,
-    default=False)
+    default=False,
+)
 @option(
-    "-i", "--info", "info_flag",
+    "-i",
+    "--info",
+    "info_flag",
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["full_flag", "all_flag", "samples_flag", "readme_flag"],
@@ -80,9 +81,12 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     required=False,
     is_eager=True,
     callback=print_file,
-    default=False)
+    default=False,
+)
 @option(
-    "-r", "--readme", "readme_flag",
+    "-r",
+    "--readme",
+    "readme_flag",
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["full_flag", "all_flag", "samples_flag", "info_flag"],
@@ -91,9 +95,12 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     required=False,
     is_eager=True,
     callback=print_file,
-    default=False)
+    default=False,
+)
 @option(
-    "-s", "--samples", "samples_flag",
+    "-s",
+    "--samples",
+    "samples_flag",
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["full_flag", "readme_flag", "all_flag", "info_flag"],
@@ -102,61 +109,69 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     required=False,
     is_eager=True,
     callback=print_file,
-    default=False)
+    default=False,
+)
 @option(
-    "--abbr", "abbr_flag",
+    "--abbr",
+    "abbr_flag",
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["ascii_flag", "common_flag"],
-    help="\b\nФлаг вывода сокращения для добавления в файл Markdown.\nФормат: <abbr title=\"\"></abbr>",
+    help='\b\nФлаг вывода сокращения для добавления в файл Markdown.\nФормат: <abbr title=""></abbr>',
     show_default=True,
     required=False,
-    default=False)
+    default=False,
+)
 @option(
-    "--ascii", "ascii_flag",
+    "--ascii",
+    "ascii_flag",
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["abbr_flag", "common_flag"],
-    help="\b\nФлаг вывода сокращения для добавления в файл AsciiDoc.\nФормат: pass:q[<abbr title=\"\"></abbr>]",
+    help='\b\nФлаг вывода сокращения для добавления в файл AsciiDoc.\nФормат: pass:q[<abbr title=""></abbr>]',
     show_default=True,
     required=False,
-    default=False)
+    default=False,
+)
 @option(
-    "--common", "common_flag",
+    "--common",
+    "common_flag",
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["abbr_flag", "ascii_flag"],
     help="\b\nФлаг вывода сокращения в свободном виде",
     show_default=True,
     required=False,
-    default=True)
+    default=True,
+)
 @option(
-    "-k/-K", "--keep-logs/--remove-logs",
+    "-k/-K",
+    "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
+    "\nработы в штатном режиме."
+    "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
+    default=False,
+)
+@help_option("-h", "--help", help=HELP, is_eager=True)
 @pass_context
 def terms_command(
-        ctx: Context,
-        terms: Iterable[str] = None, *,
-        all_flag: bool = False,
-        full_flag: bool = False,
-        info_flag: bool = False,
-        readme_flag: bool = False,
-        samples_flag: bool = False,
-        abbr_flag: bool = False,
-        ascii_flag: bool = False,
-        keep_logs: bool = False,
-        common_flag: bool = False):
+    ctx: Context,
+    terms: Iterable[str] = None,
+    *,
+    all_flag: bool = False,
+    full_flag: bool = False,
+    info_flag: bool = False,
+    readme_flag: bool = False,
+    samples_flag: bool = False,
+    abbr_flag: bool = False,
+    ascii_flag: bool = False,
+    keep_logs: bool = False,
+    common_flag: bool = False,
+):
     git_manager.set_content_git_pages()
     git_manager.compare()
     git_manager.set_terms()
@@ -171,7 +186,9 @@ def terms_command(
         result: str = file_reader(INFO_FILE, ReaderMode.STRING)
 
     elif full_flag:
-        terms_full: list[Term] = [v for values in iter(ascii_doc_table.dict_terms.values()) for v in values]
+        terms_full: list[Term] = [
+            v for values in iter(ascii_doc_table.dict_terms.values()) for v in values
+        ]
         result: str = "\n".join(map(lambda x: x.formatted(), terms_full))
 
     elif info_flag:

@@ -6,7 +6,10 @@ from typing import Iterable, Iterator, NamedTuple
 from loguru import logger
 
 from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION, StrPath
-from utilities.common.errors import LinkRepairInternalLinkAnchorError, LinkRepairLineInvalidTypeError
+from utilities.common.errors import (
+    LinkRepairInternalLinkAnchorError,
+    LinkRepairLineInvalidTypeError,
+)
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.link_repair.const import FileLanguage, prepare_logging
 from utilities.link_repair.link import Link
@@ -26,6 +29,7 @@ class FilePattern(NamedTuple):
     :param pattern_internal_link: The pattern to get the internal link.
     :type pattern_internal_link: str
     """
+
     pattern_anchor: str
     pattern_link: str
     pattern_internal_link: str
@@ -34,7 +38,8 @@ class FilePattern(NamedTuple):
         return (
             f"ANCHOR: {self.pattern_anchor}\n"
             f"LINK: {self.pattern_link}\n"
-            f"INTERNAL_LINK: {self.pattern_internal_link}")
+            f"INTERNAL_LINK: {self.pattern_internal_link}"
+        )
 
     __repr__ = __str__
 
@@ -42,12 +47,14 @@ class FilePattern(NamedTuple):
 md_file_pattern: FilePattern = FilePattern(
     rf"{_MD_ANCHOR_HEADING}|{_MD_ANCHOR_A_NAME}|{_MD_ANCHOR_A_ID}",
     r"\[[^]]+]\(([^)]+)\)",
-    r"\[[^]]+]\(#([^)]+)\)")
+    r"\[[^]]+]\(#([^)]+)\)",
+)
 
 ascii_doc_file_pattern: FilePattern = FilePattern(
     r"(?<=\[[\[#])[^]]+(?=])",
     r"(?<=xref:)[^\[]+(?=\[)|(?<=link:)[^\[]+(?=\[)|(?<=image::)[^\[]+(?=\[)|(?<=image:)[^\[]+(?=\[)",
-    r"(?<=<<)([^,>]+)[^>]*(?=>>)")
+    r"(?<=<<)([^,>]+)[^>]*(?=>>)",
+)
 
 
 class Boundary(NamedTuple):
@@ -58,6 +65,7 @@ class Boundary(NamedTuple):
     :param after: The suffix.
     :type after: str
     """
+
     before: str = ""
     after: str = ""
 
@@ -73,11 +81,14 @@ class _InternalLink(NamedTuple):
     :param anchor: The anchor in the link.
     :type anchor: str
     """
+
     index: int
     anchor: str
 
     def __str__(self):
-        return f"{self.__class__.__name__}:\nline number {self.index}\nlink {self.anchor}"
+        return (
+            f"{self.__class__.__name__}:\nline number {self.index}\nlink {self.anchor}"
+        )
 
     def __repr__(self):
         return f"<{self.__class__.__name__}({self._asdict()})>"
@@ -91,6 +102,7 @@ class FileLinkItem(NamedTuple):
     :param link: The link from the file.
     :type link: Link
     """
+
     index: int
     link: Link
 
@@ -151,10 +163,13 @@ class TextFile(DirFile):
     :param _patterns: The patterns that used for the file.
     :type _patterns: FilePattern or None
     """
+
     _pattern_anchor: list[Boundary] = []
     IGNORED_LINKS: tuple[str, ...] = ("http", "mailto", "/", "#")
 
-    def __init__(self, root_dir: StrPath, full_path: StrPath, patterns: FilePattern | None = None):
+    def __init__(
+        self, root_dir: StrPath, full_path: StrPath, patterns: FilePattern | None = None
+    ):
         super().__init__(root_dir, full_path)
         self._content: list[str] = []
         self._links: list[FileLinkItem] = []
@@ -168,7 +183,9 @@ class TextFile(DirFile):
             return self._content[item]
 
         else:
-            raise LinkRepairLineInvalidTypeError(f"Тип должен быть int, но получен {type(item)}")
+            raise LinkRepairLineInvalidTypeError(
+                f"Тип должен быть int, но получен {type(item)}"
+            )
 
     def __setitem__(self, key, value):
         if isinstance(key, int) and isinstance(value, str):
@@ -176,7 +193,8 @@ class TextFile(DirFile):
 
         else:
             raise LinkRepairLineInvalidTypeError(
-                f"Тип ключа должен быть int, а value - str, но получены {type(key)} и {type(value)}")
+                f"Тип ключа должен быть int, а value - str, но получены {type(key)} и {type(value)}"
+            )
 
     def __contains__(self, item):
         if not isinstance(item, str):
@@ -220,7 +238,9 @@ class TextFile(DirFile):
         """
         return iter(_.anchor for _ in self._iter_internal_links())
 
-    def get_internal_links(self, anchor: str | None) -> tuple[_InternalLink, ...] | None:
+    def get_internal_links(
+        self, anchor: str | None
+    ) -> tuple[_InternalLink, ...] | None:
         """Gets the internal links having the specified anchor.
 
         :param anchor: The anchor to find.
@@ -233,11 +253,15 @@ class TextFile(DirFile):
             return
 
         elif anchor not in self.iter_internal_link_anchors():
-            logger.error(f"В файле {self.rel_path} не обнаружен ни якорь, ни ссылка {anchor}")
+            logger.error(
+                f"В файле {self.rel_path} не обнаружен ни якорь, ни ссылка {anchor}"
+            )
             raise LinkRepairInternalLinkAnchorError
 
         else:
-            return tuple(filter(lambda x: x.anchor == anchor, self._iter_internal_links()))
+            return tuple(
+                filter(lambda x: x.anchor == anchor, self._iter_internal_links())
+            )
 
     @property
     def is_changed(self):
@@ -249,11 +273,13 @@ class TextFile(DirFile):
             self._is_changed = value
 
     def update_line(
-            self,
-            line_number: int | Iterable[int],
-            old_line: str,
-            new_line: str, *,
-            is_boundary: bool = False):
+        self,
+        line_number: int | Iterable[int],
+        old_line: str,
+        new_line: str,
+        *,
+        is_boundary: bool = False,
+    ):
         """Modifies the line in the text file.
 
         :param line_number: The line index or indexes in the text file.
@@ -279,7 +305,9 @@ class TextFile(DirFile):
                 _boundaries: list[Boundary] = [Boundary()]
 
             for boundary in _boundaries:
-                self[_index] = self[_index].replace(boundary.bound(old_line), boundary.bound(new_line))
+                self[_index] = self[_index].replace(
+                    boundary.bound(old_line), boundary.bound(new_line)
+                )
 
         if isinstance(line_number, int):
             single_number(line_number, boundaries)
@@ -288,7 +316,9 @@ class TextFile(DirFile):
             for index in line_number:
                 single_number(index, boundaries)
 
-        logger.success(f"{old_line} -> {new_line}, в файле {self.rel_path} в строках: {line_number}\n")
+        logger.success(
+            f"{old_line} -> {new_line}, в файле {self.rel_path} в строках: {line_number}\n"
+        )
 
     def find_anchor(self, anchor: str) -> list[int]:
         """Searches for the indexes of the anchor.
@@ -299,8 +329,10 @@ class TextFile(DirFile):
         :rtype: list[int]
         """
         return [
-            index for index, line in enumerate(iter(self))
-            if any(boundary.bound(anchor) in line for boundary in self._pattern_anchor)]
+            index
+            for index, line in enumerate(iter(self))
+            if any(boundary.bound(anchor) in line for boundary in self._pattern_anchor)
+        ]
 
     @property
     def language(self) -> FileLanguage:
@@ -349,10 +381,12 @@ class MdFile(TextFile):
     :param _is_changed: The flag of changes in the file.
     :type _is_changed: bool
     """
+
     _pattern_anchor: list[Boundary] = [
         Boundary("{#", "}"),
-        Boundary("<a name=\"", "\">"),
-        Boundary("#")]
+        Boundary('<a name="', '">'),
+        Boundary("#"),
+    ]
 
     def __init__(self, root_dir: StrPath, full_path: StrPath):
         super().__init__(root_dir, full_path, md_file_pattern)
@@ -360,12 +394,16 @@ class MdFile(TextFile):
     def set_anchors(self):
         """Specifies the anchors in the Markdown file."""
         for line in iter(self):
-            _m: list[str] = findall(self._patterns.pattern_anchor, line.removesuffix("\n"))
+            _m: list[str] = findall(
+                self._patterns.pattern_anchor, line.removesuffix("\n")
+            )
 
             if _m:
                 self._anchors.update(_m)
 
-        logger.debug(f"File {self.rel_path}, anchors:\n{prepare_logging(self._anchors)}")
+        logger.debug(
+            f"File {self.rel_path}, anchors:\n{prepare_logging(self._anchors)}"
+        )
 
     def set_links(self):
         """Specifies the links in the Markdown file."""
@@ -378,24 +416,30 @@ class MdFile(TextFile):
                     continue
 
                 else:
-                    _: FileLinkItem = FileLinkItem(index, Link(self._full_path, _link_to))
+                    _: FileLinkItem = FileLinkItem(
+                        index, Link(self._full_path, _link_to)
+                    )
                     self._links.append(_)
 
         logger.debug(
             f"File {self.rel_path}, "
-            f"links:\n{prepare_logging(_.link.link_to for _ in self.iter_links())}")
+            f"links:\n{prepare_logging(_.link.link_to for _ in self.iter_links())}"
+        )
 
     def set_internal_links(self):
         """Specifies the internal links in the Markdown file."""
         for index, line in enumerate(iter(self)):
-            for _m in finditer(self._patterns.pattern_internal_link, line.removesuffix("\n")):
+            for _m in finditer(
+                self._patterns.pattern_internal_link, line.removesuffix("\n")
+            ):
                 _anchor: str = _m.group(1)
                 _: _InternalLink = _InternalLink(index, _anchor)
                 self._internal_links.add(_)
 
         logger.debug(
             f"File {self.rel_path}, "
-            f"internal links:\n{prepare_logging(_.anchor for _ in self._iter_internal_links())}")
+            f"internal links:\n{prepare_logging(_.anchor for _ in self._iter_internal_links())}"
+        )
 
 
 # noinspection PyUnresolvedReferences
@@ -415,11 +459,13 @@ class AsciiDocFile(TextFile):
     :param _is_changed: The flag of changes in the file.
     :type _is_changed: bool
     """
+
     _pattern_anchor: list[Boundary] = [
         Boundary("[#", "]"),
         Boundary("[[", "]]"),
         Boundary("#"),
-        Boundary("<<", ",")]
+        Boundary("<<", ","),
+    ]
 
     def __init__(self, root_dir: StrPath, full_path: StrPath):
         super().__init__(root_dir, full_path, ascii_doc_file_pattern)
@@ -434,26 +480,33 @@ class AsciiDocFile(TextFile):
             else:
                 _pattern: Pattern = compile(r"(?<=:imagesdir:)[^]]+")
                 _m: Match = search(_pattern, line)
-                self._imagesdir = f"{_m.string[_m.start():_m.end()]}".strip().removesuffix("/")
+                self._imagesdir = (
+                    f"{_m.string[_m.start():_m.end()]}".strip().removesuffix("/")
+                )
                 break
 
     def set_anchors(self):
         """Specifies the anchors in the AsciiDoc file."""
         for line in iter(self):
-            _m: list[str] = findall(self._patterns.pattern_anchor, line.removesuffix("\n"))
+            _m: list[str] = findall(
+                self._patterns.pattern_anchor, line.removesuffix("\n")
+            )
 
             if _m:
                 self._anchors.update(_m)
 
         logger.debug(
-            f"File {self.rel_path}, anchors:\n{prepare_logging(self._anchors)}")
+            f"File {self.rel_path}, anchors:\n{prepare_logging(self._anchors)}"
+        )
 
     def set_links(self):
         """Specifies the links in the AsciiDoc file."""
         for index, line in enumerate(iter(self)):
             for _m in finditer(self._patterns.pattern_link, line.removesuffix("\n")):
                 if "image" in f"{_m.string}":
-                    _base_link_to: str = f"{_m.string[_m.start():_m.end()]}".removeprefix(":")
+                    _base_link_to: str = (
+                        f"{_m.string[_m.start():_m.end()]}".removeprefix(":")
+                    )
                     _link_to: str = f"{self._imagesdir}/{_base_link_to}"
 
                 else:
@@ -464,24 +517,30 @@ class AsciiDocFile(TextFile):
                     continue
 
                 else:
-                    _: FileLinkItem = FileLinkItem(index, Link(self._full_path, _link_to))
+                    _: FileLinkItem = FileLinkItem(
+                        index, Link(self._full_path, _link_to)
+                    )
                     self._links.append(_)
 
         logger.debug(
             f"File {self.rel_path}, "
-            f"links:\n{prepare_logging(_.link.link_to for _ in self.iter_links())}")
+            f"links:\n{prepare_logging(_.link.link_to for _ in self.iter_links())}"
+        )
 
     def set_internal_links(self):
         """Specifies the internal links in the AsciiDoc file."""
         for index, line in enumerate(iter(self)):
-            for _m in finditer(self._patterns.pattern_internal_link, line.removesuffix("\n")):
+            for _m in finditer(
+                self._patterns.pattern_internal_link, line.removesuffix("\n")
+            ):
                 _anchor: str = _m.group(1)
                 _: _InternalLink = _InternalLink(index, _anchor)
                 self._internal_links.add(_)
 
         logger.debug(
             f"File {self.rel_path}, "
-            f"internal links:\n{prepare_logging(_.anchor for _ in self._iter_internal_links())}")
+            f"internal links:\n{prepare_logging(_.anchor for _ in self._iter_internal_links())}"
+        )
 
 
 def get_file(root_dir: StrPath, full_path: StrPath) -> MdFile | AsciiDocFile:
@@ -561,7 +620,9 @@ class FileDict:
             if file_path.suffix in (MD_EXTENSION, ADOC_EXTENSION):
                 text_file: TextFile = get_file(self._root_dir, file_path)
 
-                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, encoding="utf-8")
+                text_file._content = file_reader(
+                    text_file.full_path, ReaderMode.LINES, encoding="utf-8"
+                )
                 text_file.set_imagesdir()
                 text_file.set_links()
                 text_file.set_anchors()
@@ -580,17 +641,24 @@ class FileDict:
                 _add_file(item)
 
         else:
-            logger.debug(f"Элемент {other} должен быть типа str или Path, но получено {type(other)}")
+            logger.debug(
+                f"Элемент {other} должен быть типа str или Path, но получено {type(other)}"
+            )
 
     __radd__ = __add__
     __iadd__ = __add__
 
     def __iter__(self) -> Iterator[DirFile]:
-        return iter(filter(lambda x: isinstance(x, TextFile), self._dict_files.values()))
+        return iter(
+            filter(lambda x: isinstance(x, TextFile), self._dict_files.values())
+        )
 
     def __getitem__(self, item):
         if not isinstance(item, (str, Path)):
-            logger.exception(f"Элемент {item} должен быть типа str или Path, но получено {type(item)}", result=True)
+            logger.exception(
+                f"Элемент {item} должен быть типа str или Path, но получено {type(item)}",
+                result=True,
+            )
             return
 
         else:
@@ -606,4 +674,5 @@ class FileDict:
         else:
             logger.debug(
                 f"Ключ {key} должен быть типа str или Path, а значение {value} типа TextFile, "
-                f"но получены {type(key)} и {type(value)}")
+                f"но получены {type(key)} и {type(value)}"
+            )

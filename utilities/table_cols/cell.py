@@ -24,11 +24,12 @@ class TableCell:
     """Class to represent the table_cols cell."""
 
     def __init__(
-            self,
-            table_coordinate: TableCoordinate,
-            text: str = None,
-            row_modifier: int = 1,
-            column_modifier: int = 1):
+        self,
+        table_coordinate: TableCoordinate,
+        text: str = None,
+        row_modifier: int = 1,
+        column_modifier: int = 1,
+    ):
         self._table_coordinate: TableCoordinate = table_coordinate
         self._text: str = text
         self._row_modifier: int = row_modifier
@@ -58,7 +59,8 @@ class TableCell:
             r"\[\.?[\[#].*?]": r"",
             r"link:[^\[]*": r"",
             r"[&\{][lg]t[;}]": r"_",
-            r"[\<\>\[\]\{\}]": r""}
+            r"[\<\>\[\]\{\}]": r"",
+        }
 
         _: str = self._text
 
@@ -76,7 +78,8 @@ class TableCell:
             ("RFC ", "RFC"),
             ("ITU-T ", "ITU-T_"),
             ("Recommendation ", "Recommendation_"),
-            ("GSM ", "GSM_"))
+            ("GSM ", "GSM_"),
+        )
 
         if self.is_spaced():
             separator: str = " "
@@ -90,7 +93,8 @@ class TableCell:
             separator=separator,
             lowercase=False,
             allow_unicode=True,
-            stopwords=["br"])
+            stopwords=["br"],
+        )
 
         if not _:
             return ""
@@ -140,7 +144,8 @@ class TableCell:
     def __repr__(self):
         return (
             f"{self.__class__.__name__}"
-            f"{self._table_coordinate.__class__.__name__}({self._table_coordinate})\n{self._text}")
+            f"{self._table_coordinate.__class__.__name__}({self._table_coordinate})\n{self._text}"
+        )
 
     def __str__(self) -> str:
         if not bool(self):

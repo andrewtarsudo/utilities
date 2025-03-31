@@ -13,9 +13,9 @@ from yaml import safe_load
 
 from utilities.common.errors import FileReaderError
 
-FAIL_COLOR: str = '\033[41m'
-PASS_COLOR: str = '\033[42m'
-NORMAL_COLOR: str = '\033[0m'
+FAIL_COLOR: str = "\033[41m"
+PASS_COLOR: str = "\033[42m"
+NORMAL_COLOR: str = "\033[0m"
 
 separator: str = "-" * 80
 
@@ -48,7 +48,9 @@ class ArgsHelpDict(dict):
         super().__init__()
         self.update(**_content)
 
-    def get_multiple_keys(self, *, dictionary: Mapping[str, Any] = None, keys: Sequence[str] = None):
+    def get_multiple_keys(
+        self, *, dictionary: Mapping[str, Any] = None, keys: Sequence[str] = None
+    ):
         if dictionary is None:
             dictionary: Mapping[str, Any] = self
 
@@ -56,11 +58,15 @@ class ArgsHelpDict(dict):
             return dictionary
 
         else:
-            return self.get_multiple_keys(dictionary=dictionary.get(keys[0]), keys=keys[1:])
+            return self.get_multiple_keys(
+                dictionary=dictionary.get(keys[0]), keys=keys[1:]
+            )
 
     @property
     def max_key(self) -> int:
-        return max(len(k) for _, values in self.items() for k, _ in values.items()) + 2 + 4
+        return (
+            max(len(k) for _, values in self.items() for k, _ in values.items()) + 2 + 4
+        )
 
 
 args_help_dict: ArgsHelpDict = ArgsHelpDict()
@@ -80,7 +86,9 @@ class FileType(Enum):
     NONE = ""
 
 
-def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str = "utf-8"):
+def file_reader(
+    path: StrPath, reader_mode: str | ReaderMode, *, encoding: str = "utf-8"
+):
     """Reads the text file content.
 
     :param path: The path to the file.
@@ -94,10 +102,13 @@ def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str =
         reader_mode: ReaderMode = ReaderMode[reader_mode]
 
     try:
-        with open(Path(path).expanduser().resolve(), "r", encoding=encoding, errors="ignore") as f:
+        with open(
+            Path(path).expanduser().resolve(), "r", encoding=encoding, errors="ignore"
+        ) as f:
             functions: dict[ReaderMode, Callable] = {
                 ReaderMode.STRING: f.read,
-                ReaderMode.LINES: f.readlines}
+                ReaderMode.LINES: f.readlines,
+            }
 
             _: str | list[str] = functions.get(reader_mode)()
 
@@ -110,16 +121,22 @@ def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str =
     except PermissionError as e:
         from os import stat
 
-        logger.error(f"{e.__class__.__name__}: недостаточно прав для чтения файла {path}")
+        logger.error(
+            f"{e.__class__.__name__}: недостаточно прав для чтения файла {path}"
+        )
         logger.error(f"Доступ: {stat(path).st_mode}")
         raise
 
     except RuntimeError as e:
-        logger.error(f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}")
+        logger.error(
+            f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}"
+        )
         raise
 
     except UnsupportedOperation as e:
-        logger.error(f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}")
+        logger.error(
+            f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}"
+        )
         raise
 
     except OSError as e:
@@ -127,7 +144,9 @@ def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str =
         raise
 
 
-def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = "utf-8"):
+def file_writer(
+    path: StrPath, content: str | Iterable[str], *, encoding: str = "utf-8"
+):
     """Writes the text to the file.
 
     :param path: The path to the file.
@@ -150,16 +169,22 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
     except PermissionError as e:
         from os import stat
 
-        logger.error(f"{e.__class__.__name__}: недостаточно прав для записи в файл {path}")
+        logger.error(
+            f"{e.__class__.__name__}: недостаточно прав для записи в файл {path}"
+        )
         logger.error(f"Доступ: {stat(path).st_mode}")
         raise
 
     except RuntimeError as e:
-        logger.error(f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}")
+        logger.error(
+            f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}"
+        )
         raise
 
     except UnsupportedOperation as e:
-        logger.error(f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}")
+        logger.error(
+            f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}"
+        )
         raise
 
     except OSError as e:
@@ -167,7 +192,9 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
         raise
 
 
-def file_reader_type(path: StrPath, file_type: str | FileType, *, encoding: str = "utf-8"):
+def file_reader_type(
+    path: StrPath, file_type: str | FileType, *, encoding: str = "utf-8"
+):
     """Reads the config text file.
 
     :param path: The path to the file.
@@ -203,16 +230,22 @@ def file_reader_type(path: StrPath, file_type: str | FileType, *, encoding: str 
     except PermissionError as e:
         from os import stat
 
-        logger.error(f"{e.__class__.__name__}: недостаточно прав для чтения файла {path}")
+        logger.error(
+            f"{e.__class__.__name__}: недостаточно прав для чтения файла {path}"
+        )
         logger.error(f"Доступ: {stat(path).st_mode}")
         raise
 
     except RuntimeError as e:
-        logger.error(f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}")
+        logger.error(
+            f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}"
+        )
         raise
 
     except UnsupportedOperation as e:
-        logger.error(f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}")
+        logger.error(
+            f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}"
+        )
         raise
 
     except OSError as e:
@@ -230,7 +263,8 @@ def clear_logs(ctx: Context):
     logger.debug(
         f"Версия: {__version__}"
         f"\nКоманда: {ctx.command_path}"
-        f"\nПараметры: {ctx.params}")
+        f"\nПараметры: {ctx.params}"
+    )
 
     logger.remove()
 

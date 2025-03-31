@@ -10,7 +10,8 @@ from utilities.scripts.cli import cli, format_full_help, HelpAPIGroup
     "help",
     cls=HelpAPIGroup,
     help="Команда для вызова полной справки",
-    add_help_option=False)
+    add_help_option=False,
+)
 @pass_context
 def help_command(ctx: Context):
     ctx.obj["full_help"] = True

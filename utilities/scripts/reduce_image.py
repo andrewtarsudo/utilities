@@ -51,72 +51,79 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
 @cli.command(
     "reduce-image",
     cls=APIGroup,
-    help="Команда для уменьшения размера изображений JPG, PNG")
+    help="Команда для уменьшения размера изображений JPG, PNG",
+)
 @option(
-    "-f", "--file", "files",
+    "-f",
+    "--file",
+    "files",
     type=ClickPath(
         file_okay=True,
         readable=True,
         resolve_path=True,
         allow_dash=False,
-        dir_okay=False),
+        dir_okay=False,
+    ),
     help="\b\nФайл для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
-    default=None)
+    default=None,
+)
 @option(
-    "-d", "--dir", "directory",
-    type=ClickPath(
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
+    "-d",
+    "--dir",
+    "directory",
+    type=ClickPath(file_okay=False, resolve_path=True, allow_dash=False, dir_okay=True),
     help="Директория для обработки",
     multiple=False,
     required=False,
     metavar="DIR",
-    default=None)
+    default=None,
+)
 @option(
     "--dry-run/--no-dry-run",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг вывода изменений размеров файлов без их изменения.\n"
-         "По умолчанию: False, файлы перезаписываются",
+    "По умолчанию: False, файлы перезаписываются",
     show_default=True,
     required=False,
-    default=False)
+    default=False,
+)
 @option(
-    "-r/-R", "--recursive/--no-recursive",
+    "-r/-R",
+    "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
-         "\nПо умолчанию: True, вложенные файлы учитываются",
+    "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
-    default=True)
+    default=True,
+)
 @option(
-    "-k/-K", "--keep-logs/--remove-logs",
+    "-k/-K",
+    "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
+    "\nработы в штатном режиме."
+    "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
+    default=False,
+)
+@help_option("-h", "--help", help=HELP, is_eager=True)
 @pass_context
 def reduce_image_command(
-        ctx: Context,
-        files: Iterable[StrPath] = None,
-        directory: StrPath = None,
-        recursive: bool = True,
-        dry_run: bool = False,
-        keep_logs: bool = False):
+    ctx: Context,
+    files: Iterable[StrPath] = None,
+    directory: StrPath = None,
+    recursive: bool = True,
+    dry_run: bool = False,
+    keep_logs: bool = False,
+):
     extensions: str = "png jpg jpeg bmp"
 
     files: list[StrPath] | None = get_files(
@@ -124,7 +131,8 @@ def reduce_image_command(
         files=files,
         directory=directory,
         recursive=recursive,
-        extensions=extensions)
+        extensions=extensions,
+    )
 
     if files is not None and files:
         before: int = 0
@@ -142,7 +150,9 @@ def reduce_image_command(
             new_size: int = getsize(result)
 
             after += new_size
-            logger.info(f"Файл {file.name}: {file_size(current_size)} -> {file_size(new_size)}")
+            logger.info(
+                f"Файл {file.name}: {file_size(current_size)} -> {file_size(new_size)}"
+            )
 
             if result.stem.startswith("temp_file"):
                 result.unlink(missing_ok=True)

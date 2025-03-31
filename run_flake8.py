@@ -16,15 +16,13 @@ if __name__ == "__main__":
         "--benchmark",
         "--exit-zero",
         "__main__.py",
-        "utilities/**/*.py"]
+        "utilities/**/*.py",
+    ]
 
     try:
         _: CompletedProcess = run(
-            flake8,
-            encoding="utf-8",
-            shell=True,
-            capture_output=True,
-            check=True)
+            flake8, encoding="utf-8", shell=True, capture_output=True, check=True
+        )
 
         _.check_returncode()
 
@@ -33,7 +31,9 @@ if __name__ == "__main__":
         raise
 
     except PermissionError as e:
-        print(f"{e.__class__.__name__}, недостаточно прав доступа к файлу. {e.strerror}.")
+        print(
+            f"{e.__class__.__name__}, недостаточно прав доступа к файлу. {e.strerror}."
+        )
         raise
 
     except RuntimeError as e:

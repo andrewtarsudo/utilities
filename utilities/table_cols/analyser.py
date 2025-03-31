@@ -66,13 +66,16 @@ class TableAnalyser:
         for _ in iter(self):
             print(f"{_=}")
 
-        minimum_lengths: int = sum(column_parameters.minimum_length for column_parameters in iter(self))
+        minimum_lengths: int = sum(
+            column_parameters.minimum_length for column_parameters in iter(self)
+        )
 
         if minimum_lengths > self._max_symbols:
             logger.error(
                 f"Минимальная допустимая ширина для таблицы, {minimum_lengths}, "
                 f"превышает максимально допустимую, {self._max_symbols}\n"
-                f"Таблица {self._table_id}")
+                f"Таблица {self._table_id}"
+            )
             self._is_valid = False
 
         else:
@@ -117,7 +120,9 @@ class TableAnalyser:
                 for column_parameters in iter(self):
                     if column_parameters.is_spaced:
                         index: int = column_parameters.index
-                        ratio: int = column_parameters.preferred_length - self._columns[index]
+                        ratio: int = (
+                            column_parameters.preferred_length - self._columns[index]
+                        )
 
                         if ratio:
                             ratios[index] = ratio
@@ -139,7 +144,9 @@ class TableAnalyser:
         sum_values: int = sum(self._columns.values())
 
         # get percentages
-        percents: list[int] = [round(value * 100 / sum_values) for value in self._columns.values()]
+        percents: list[int] = [
+            round(value * 100 / sum_values) for value in self._columns.values()
+        ]
         sum_percents: int = sum(percents)
 
         # if rounding is not good enough
