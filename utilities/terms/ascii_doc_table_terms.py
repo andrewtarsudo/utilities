@@ -7,7 +7,11 @@ from loguru import logger
 from more_itertools import pairwise
 
 from utilities.common.shared import StrPath
-from utilities.common.errors import TermsAsciiDocFileTableRowIndexError, TermsEmptyFileError, TermsInvalidTermIndexError
+from utilities.common.errors import (
+    TermsAsciiDocFileTableRowIndexError,
+    TermsEmptyFileError,
+    TermsInvalidTermIndexError,
+)
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.terms.table import TableCellCoordinate, TableItem, Term
 
@@ -20,7 +24,9 @@ class AsciiDocTableTerms:
 
     @classmethod
     def from_file(cls, file_path: StrPath):
-        _content: list[str] = file_reader(file_path, ReaderMode.LINES, encoding="cp1251")
+        _content: list[str] = file_reader(
+            file_path, ReaderMode.LINES, encoding="cp1251"
+        )
 
         if not _content or len(_content) < 6:
             logger.error(f"Файл {file_path} пуст")
@@ -37,7 +43,9 @@ class AsciiDocTableTerms:
         return f"<{self.__class__.__name__}>({self._items.items()})"
 
     def set_terms(self):
-        _: list[Term] = [Term(*self._get_row_item(row_index)) for row_index in range(self.max_row)]
+        _: list[Term] = [
+            Term(*self._get_row_item(row_index)) for row_index in range(self.max_row)
+        ]
         _dict_proxy: dict[str, list[Term]] = {}
 
         for term in _:
@@ -48,7 +56,9 @@ class AsciiDocTableTerms:
 
             _dict_proxy[term_short].append(term)
 
-        _dict_terms: dict[str, tuple[Term, ...]] = {k.upper(): (*v,) for k, v in _dict_proxy.items()}
+        _dict_terms: dict[str, tuple[Term, ...]] = {
+            k.upper(): (*v,) for k, v in _dict_proxy.items()
+        }
         self._dict_terms.update(**_dict_terms)
 
         logger.debug("Файл обработан успешно")
@@ -69,7 +79,7 @@ class AsciiDocTableTerms:
 
         else:
             logger.debug(f"Термин {item} не найден")
-            return Term(),
+            return (Term(),)
 
     def get(self, item):
         return self.__getitem__(item)
@@ -98,10 +108,8 @@ class AsciiDocTableTerms:
         return tuple(map(lambda x: x.upper(), iter(self)))
 
     def _binary_search(
-            self,
-            search_value: str,
-            min_index: int = 0,
-            max_index: int = None) -> tuple[Term, ...]:
+        self, search_value: str, min_index: int = 0, max_index: int = None
+    ) -> tuple[Term, ...]:
         """
         Specifies the binary search to accelerate the common one.
 
@@ -128,7 +136,9 @@ class AsciiDocTableTerms:
 
     def _get_row(self, row_index: int) -> list[TableItem]:
         if row_index > self.max_row:
-            logger.error(f"Индекс строки {row_index} превышает максимально возможное значение")
+            logger.error(
+                f"Индекс строки {row_index} превышает максимально возможное значение"
+            )
             raise TermsAsciiDocFileTableRowIndexError
 
         else:
@@ -152,10 +162,14 @@ class AsciiDocTableTerms:
         header_line: str = self._content[self._find_header()]
         _: list[str] = header_line.split("|")
 
-        _empty: list[int] = [index for index, line in enumerate(self._content) if line == "\n"]
+        _empty: list[int] = [
+            index for index, line in enumerate(self._content) if line == "\n"
+        ]
 
         for row_index, (_from, _to) in enumerate(pairwise(_empty[1:-1])):
-            lines: list[str] = [content.strip("\n") for content in self._content[_from + 1:_to]]
+            lines: list[str] = [
+                content.strip("\n") for content in self._content[_from + 1 : _to]
+            ]
             _: list[str] = "".join(lines).split("|")
 
             for column_index, text in enumerate(_[1:]):

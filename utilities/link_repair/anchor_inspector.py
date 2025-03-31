@@ -6,7 +6,10 @@ from typing import Iterable
 from loguru import logger
 
 from utilities.common.shared import pretty_print, separator
-from utilities.common.errors import LinkRepairFileInvalidTypeError, LinkRepairMissingFileError
+from utilities.common.errors import (
+    LinkRepairFileInvalidTypeError,
+    LinkRepairMissingFileError,
+)
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.link_repair.file_dict import TextFile
 from utilities.link_repair.const import FileLanguage, prepare_logging
@@ -53,18 +56,24 @@ class AnchorInspector:
 
     def __add__(self, other):
         if isinstance(other, TextFile):
-            other._content = file_reader(other.full_path, ReaderMode.LINES, encoding="utf-8")
+            other._content = file_reader(
+                other.full_path, ReaderMode.LINES, encoding="utf-8"
+            )
             self._dict_anchors[other] = list(other.iter_anchors())
 
         elif isinstance(other, Iterable):
             text_files: list[TextFile] = [_ for _ in other if isinstance(_, TextFile)]
 
             for text_file in text_files:
-                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, encoding="utf-8")
+                text_file._content = file_reader(
+                    text_file.full_path, ReaderMode.LINES, encoding="utf-8"
+                )
                 self._dict_anchors[text_file] = list(text_file.iter_anchors())
 
         else:
-            logger.error(f"Элемент {other} должен быть типа TextFile, но получен {type(other)}")
+            logger.error(
+                f"Элемент {other} должен быть типа TextFile, но получен {type(other)}"
+            )
 
     @property
     def dict_anchors(self):
@@ -81,7 +90,9 @@ class AnchorInspector:
         :return: The dictionary of Russian files and their anchors.
         :rtype: dict[TextFile, list[str]]
         """
-        return {k: v for k, v in self._dict_anchors.items() if k.language == FileLanguage.RU}
+        return {
+            k: v for k, v in self._dict_anchors.items() if k.language == FileLanguage.RU
+        }
 
     @property
     def dict_en_files(self) -> dict[TextFile, list[str]]:
@@ -90,7 +101,9 @@ class AnchorInspector:
         :return: The dictionary of English files and their anchors.
         :rtype: dict[TextFile, list[str]]
         """
-        return {k: v for k, v in self._dict_anchors.items() if k.language == FileLanguage.EN}
+        return {
+            k: v for k, v in self._dict_anchors.items() if k.language == FileLanguage.EN
+        }
 
     def _get_files(self, language: FileLanguage) -> dict[TextFile, list[str]]:
         """Gets only necessary files.
@@ -135,7 +148,8 @@ class AnchorInspector:
             else:
                 logger.error(
                     f"Внутри файла {file} найдены дублирующиеся якори:\n{prepare_logging(_invalid_anchors)}",
-                    result=True)
+                    result=True,
+                )
 
     def all_anchors(self, language: FileLanguage) -> list[str]:
         """Gets all anchors.
@@ -178,14 +192,18 @@ class AnchorInspector:
                     _files.append(file.rel_path)
 
                 _str_files: str = pretty_print(_files)
-                log_messages.append(f"Якорь {_invalid_anchor} повторяется в файлах:\n{_str_files}")
+                log_messages.append(
+                    f"Якорь {_invalid_anchor} повторяется в файлах:\n{_str_files}"
+                )
 
             _str_anchors: str = pretty_print(_invalid_anchors)
             _str_log_messages = f"\n{separator}\n".join(log_messages)
 
             logger.error(
                 f"Найдены повторяющиеся якори:\n{_str_anchors}\n\n"
-                f"{_str_log_messages}", result=True)
+                f"{_str_log_messages}",
+                result=True,
+            )
 
     @property
     def dict_changes(self):

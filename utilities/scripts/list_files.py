@@ -12,7 +12,12 @@ from click.utils import echo
 from loguru import logger
 
 from utilities.common.shared import HELP, PRESS_ENTER_KEY, pretty_print, StrPath
-from utilities.scripts.cli import clear_logs, cli, MutuallyExclusiveOption, SwitchArgsAPIGroup
+from utilities.scripts.cli import (
+    clear_logs,
+    cli,
+    MutuallyExclusiveOption,
+    SwitchArgsAPIGroup,
+)
 
 
 def check_content_common(path: Path):
@@ -36,15 +41,18 @@ def generate_base_root(path: Path, content_common_index: int):
         if not platform.startswith("win"):
             parts[0] = ""
 
-        return path.relative_to(Path().joinpath("/".join(parts[:content_common_index]))).as_posix()
+        return path.relative_to(
+            Path().joinpath("/".join(parts[:content_common_index]))
+        ).as_posix()
 
 
 def check_path(
-        path: StrPath,
-        ignored_dirs: Iterable[str],
-        ignored_files: Iterable[str],
-        extensions: Iterable[str],
-        language: str | None):
+    path: StrPath,
+    ignored_dirs: Iterable[str],
+    ignored_files: Iterable[str],
+    extensions: Iterable[str],
+    language: str | None,
+):
     path: Path = Path(path)
 
     is_dir: bool = path.is_dir()
@@ -63,7 +71,13 @@ def check_path(
         has_ignored_language: bool = f".{language}" not in path.suffixes
 
     conditions: list[bool] = [
-        is_dir, is_in_ignored_dirs, has_ignored_name, is_in_ignored_files, has_ignored_extension, has_ignored_language]
+        is_dir,
+        is_in_ignored_dirs,
+        has_ignored_name,
+        is_in_ignored_files,
+        has_ignored_extension,
+        has_ignored_language,
+    ]
 
     logger.debug(
         f"Проверка пути {path}:"
@@ -72,7 +86,8 @@ def check_path(
         f"\nhas_ignored_name = {has_ignored_name}"
         f"\nis_in_ignored_files = {is_in_ignored_files}"
         f"\nhas_ignored_extension = {has_ignored_extension}"
-        f"\nhas_ignored_language = {has_ignored_language}\n")
+        f"\nhas_ignored_language = {has_ignored_language}\n"
+    )
 
     return not any(conditions)
 
@@ -86,13 +101,14 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
 
 
 def walk_full(
-        path: StrPath,
-        ignored_dirs: Iterable[str],
-        ignored_files: Iterable[str],
-        extensions: Iterable[str],
-        language: str | None,
-        root: Path = None,
-        results: list[Path] = None):
+    path: StrPath,
+    ignored_dirs: Iterable[str],
+    ignored_files: Iterable[str],
+    extensions: Iterable[str],
+    language: str | None,
+    root: Path = None,
+    results: list[Path] = None,
+):
     if root is None:
         root: Path = Path(path)
 
@@ -103,7 +119,9 @@ def walk_full(
         item: Path = Path(element.path)
 
         if element.is_dir(follow_symlinks=True):
-            walk_full(item, ignored_dirs, ignored_files, extensions, language, root, results)
+            walk_full(
+                item, ignored_dirs, ignored_files, extensions, language, root, results
+            )
 
         elif check_path(item, ignored_dirs, ignored_files, extensions, language):
             results.append(item.relative_to(root))
@@ -115,32 +133,32 @@ def walk_full(
 
 
 @cli.command(
-    "list-files",
-    cls=SwitchArgsAPIGroup,
-    help="Команда для вывода файлов в директории")
+    "list-files", cls=SwitchArgsAPIGroup, help="Команда для вывода файлов в директории"
+)
 @argument(
     "root_dir",
-    type=ClickPath(
-        file_okay=False,
-        resolve_path=True,
-        path_type=Path,
-        dir_okay=True),
+    type=ClickPath(file_okay=False, resolve_path=True, path_type=Path, dir_okay=True),
     required=True,
-    metavar="ROOT_DIR")
+    metavar="ROOT_DIR",
+)
 @option(
-    "-d", "--ignored-dirs", "ignored_dirs",
+    "-d",
+    "--ignored-dirs",
+    "ignored_dirs",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_dirs"],
     type=STRING,
     help="\b\nПеречень игнорируемых директорий. Может использоваться \nнесколько раз."
-         "\nПо умолчанию: _temp_folder, _temp_storage, private",
+    "\nПо умолчанию: _temp_folder, _temp_storage, private",
     multiple=True,
     required=False,
     metavar="DIR ... DIR",
     show_default=True,
-    default=["_temp_folder", "_temp_storage", "private"])
+    default=["_temp_folder", "_temp_storage", "private"],
+)
 @option(
-    "--all-dirs", "all_dirs",
+    "--all-dirs",
+    "all_dirs",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["ignored_dirs"],
     type=BOOL,
@@ -148,162 +166,191 @@ def walk_full(
     multiple=False,
     required=False,
     show_default=True,
-    default=False)
+    default=False,
+)
 @option(
-    "-f", "--ignored-files", "ignored_files",
+    "-f",
+    "--ignored-files",
+    "ignored_files",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_files"],
     type=STRING,
     help="\b\nПеречень игнорируемых файлов. Может использоваться"
-         "\nнесколько раз."
-         "\nПо умолчанию: README, _check_list",
+    "\nнесколько раз."
+    "\nПо умолчанию: README, _check_list",
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
     show_default=True,
-    default=["README", "_check_list"])
+    default=["README", "_check_list"],
+)
 @option(
-    "--all-files", "all_files",
+    "--all-files",
+    "all_files",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["ignored_files"],
     type=BOOL,
     help="\b\nФлаг обработки всех файлов."
-         "\nПо умолчанию: False, выводятся файлы только"
-         "\nс определенными именами",
+    "\nПо умолчанию: False, выводятся файлы только"
+    "\nс определенными именами",
     multiple=False,
     required=False,
     show_default=True,
-    default=False)
+    default=False,
+)
 @option(
-    "-e", "--extensions", "extensions",
+    "-e",
+    "--extensions",
+    "extensions",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_extensions"],
     type=STRING,
     help="\b\nОбрабатываемые типы файлов, разделяемые пробелом."
-         "\nПо умолчанию: md adoc",
+    "\nПо умолчанию: md adoc",
     multiple=False,
     required=False,
-    metavar="\"EXT ... EXT\"",
+    metavar='"EXT ... EXT"',
     show_default=True,
-    default="md adoc")
+    default="md adoc",
+)
 @option(
-    "--all-ext", "all_extensions",
+    "--all-ext",
+    "all_extensions",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["extensions"],
     type=BOOL,
     help="\b\nФлаг обработки файлов всех расширений."
-         "\nПо умолчанию: False, выводятся файлы только"
-         "\nс определенными расширениями",
+    "\nПо умолчанию: False, выводятся файлы только"
+    "\nс определенными расширениями",
     multiple=False,
     required=False,
     show_default=True,
-    default=False)
+    default=False,
+)
 @option(
-    "-l", "--language", "language",
+    "-l",
+    "--language",
+    "language",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_languages"],
     type=STRING,
-    help="\b\nЯзык файлов.\nПо умолчанию: \"\", выводятся файлы на всех языках",
+    help='\b\nЯзык файлов.\nПо умолчанию: "", выводятся файлы на всех языках',
     multiple=False,
     required=False,
     metavar="LANG",
     show_default=True,
-    default=None)
+    default=None,
+)
 @option(
-    "--all-langs", "all_languages",
+    "--all-langs",
+    "all_languages",
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["language"],
     type=BOOL,
     help="\b\nФлаг обработки файлов всех языков."
-         "\nПо умолчанию: True, выводятся файлы на всех языках",
+    "\nПо умолчанию: True, выводятся файлы на всех языках",
     multiple=False,
     required=False,
     show_default=True,
-    default=True)
+    default=True,
+)
 @option(
-    "-i/-I", "--ignore-index/--keep-index", "ignore_index",
+    "-i/-I",
+    "--ignore-index/--keep-index",
+    "ignore_index",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг игнорирования файлов _index любого расширения."
-         "\nПо умолчанию: False, файл включается в список",
+    "\nПо умолчанию: False, файл включается в список",
     show_default=True,
     required=False,
-    default=False)
+    default=False,
+)
 @option(
-    "-p", "--prefix", "prefix",
+    "-p",
+    "--prefix",
+    "prefix",
     type=STRING,
     help="\b\nПрефикс, добавляемый к названиям файлов."
-         "\nПо умолчанию: если в пути есть 'content' и 'common',"
-         "\nто путь, пригодный для добавления в YAML-файл для PDF;"
-         "\nиначе -- ''."
-         "\nПримечание. Если задано --no-prefix, то игнорируется",
+    "\nПо умолчанию: если в пути есть 'content' и 'common',"
+    "\nто путь, пригодный для добавления в YAML-файл для PDF;"
+    "\nиначе -- ''."
+    "\nПримечание. Если задано --no-prefix, то игнорируется",
     multiple=False,
     required=False,
     metavar="PFX",
     show_default=True,
-    default=None)
+    default=None,
+)
 @option(
-    "-n/-N", "--no-prefix/--with-prefix", "no_prefix",
+    "-n/-N",
+    "--no-prefix/--with-prefix",
+    "no_prefix",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг вывода исключительно относительных путей до файлов"
-         "\nбез префиксов."
-         "\nПо умолчанию: False, префикс задается опцией --prefix."
-         "\nПримечание. Имеет приоритет над опцией --prefix",
+    "\nбез префиксов."
+    "\nПо умолчанию: False, префикс задается опцией --prefix."
+    "\nПримечание. Имеет приоритет над опцией --prefix",
     show_default=True,
     required=False,
-    default=False)
+    default=False,
+)
 @option(
-    "-H", "--hidden",
+    "-H",
+    "--hidden",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг поиска скрытых файлов."
-         "\nПо умолчанию: False, скрытые файлы игнорируются",
+    "\nПо умолчанию: False, скрытые файлы игнорируются",
     show_default=True,
     required=False,
-    default=False)
+    default=False,
+)
 @option(
-    "-r/-R", "--recursive/--no-recursive",
+    "-r/-R",
+    "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
-         "\nПо умолчанию: True, вложенные файлы учитываются",
+    "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
-    default=True)
+    default=True,
+)
 @option(
-    "-k/-K", "--keep-logs/--remove-logs",
+    "-k/-K",
+    "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
+    "\nработы в штатном режиме."
+    "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
+    default=False,
+)
+@help_option("-h", "--help", help=HELP, is_eager=True)
 @pass_context
 def list_files_command(
-        ctx: Context,
-        root_dir: StrPath,
-        ignored_dirs: Iterable[str] = None,
-        all_dirs: bool = False,
-        ignored_files: Iterable[str] = None,
-        all_files: bool = False,
-        extensions: str = None,
-        all_extensions: bool = False,
-        language: str = None,
-        all_languages: bool = True,
-        prefix: str = None,
-        no_prefix: bool = False,
-        hidden: bool = False,
-        ignore_index: bool = False,
-        recursive: bool = True,
-        auxiliary: bool = False,
-        keep_logs: bool = False):
+    ctx: Context,
+    root_dir: StrPath,
+    ignored_dirs: Iterable[str] = None,
+    all_dirs: bool = False,
+    ignored_files: Iterable[str] = None,
+    all_files: bool = False,
+    extensions: str = None,
+    all_extensions: bool = False,
+    language: str = None,
+    all_languages: bool = True,
+    prefix: str = None,
+    no_prefix: bool = False,
+    hidden: bool = False,
+    ignore_index: bool = False,
+    recursive: bool = True,
+    auxiliary: bool = False,
+    keep_logs: bool = False,
+):
     root_dir: Path = root_dir.expanduser()
 
     if extensions is None and not all_extensions:
@@ -315,7 +362,8 @@ def list_files_command(
     elif not all_extensions:
         extensions: set[str] = {
             f".{extension.removeprefix('.')}"
-            for extension in extensions.strip().split(" ")}
+            for extension in extensions.strip().split(" ")
+        }
 
     else:
         extensions: set[str] = set()
@@ -328,7 +376,8 @@ def list_files_command(
 
     elif all_files is None and all_files is False:
         ignored_files: set[str] = {
-            ignored_file.split(".")[-1] for ignored_file in ignored_files}
+            ignored_file.split(".")[-1] for ignored_file in ignored_files
+        }
 
     else:
         ignored_files: set[str] = set()
@@ -384,9 +433,12 @@ def list_files_command(
         f"\nignore_index = {ignore_index}"
         f"\nrecursive = {recursive}"
         f"\nauxiliary = {auxiliary}"
-        f"\nkeep_logs = {keep_logs}")
+        f"\nkeep_logs = {keep_logs}"
+    )
 
-    values: list[Path] | None = walk_full(root_dir, ignored_dirs, ignored_files, extensions, language)
+    values: list[Path] | None = walk_full(
+        root_dir, ignored_dirs, ignored_files, extensions, language
+    )
 
     if values is None or not values:
         echo(f"Подходящих файлов в директории {root_dir} не найдено")
@@ -411,12 +463,14 @@ def list_files_command(
 
 
 def get_files(
-        ctx: Context, *,
-        files: Iterable[StrPath] = None,
-        directory: StrPath = None,
-        recursive: bool = True,
-        language: str | None = None,
-        extensions: str = "md adoc"):
+    ctx: Context,
+    *,
+    files: Iterable[StrPath] = None,
+    directory: StrPath = None,
+    recursive: bool = True,
+    language: str | None = None,
+    extensions: str = "md adoc",
+):
     if files is None and directory is None:
         logger.error("Хотя бы один из параметров --file, --dir должен быть задан")
         pause(PRESS_ENTER_KEY)
@@ -446,7 +500,8 @@ def get_files(
             prefix="",
             hidden=False,
             recursive=recursive,
-            auxiliary=True)
+            auxiliary=True,
+        )
 
         if listed_files:
             files.extend(map(directory.joinpath, listed_files))

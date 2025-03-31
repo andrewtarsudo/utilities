@@ -8,8 +8,15 @@ from loguru import logger
 from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION, StrPath
 from utilities.link_repair.file_dict import FileDict, TextFile, DirFile
 from utilities.link_repair.link import Link
-from utilities.link_repair.internal_link_inspector import internal_inspector, InternalLinkInspector
-from utilities.link_repair.general_storage import GeneralStorage, ComponentStorage, Storage
+from utilities.link_repair.internal_link_inspector import (
+    internal_inspector,
+    InternalLinkInspector,
+)
+from utilities.link_repair.general_storage import (
+    GeneralStorage,
+    ComponentStorage,
+    Storage,
+)
 
 
 def _prepare_link(link: str) -> str:
@@ -48,7 +55,11 @@ def _update_prefix(*lines: str) -> tuple[str, ...]:
                 f"../{_}",
                 _,
                 _.removeprefix("../"),
-                _.removeprefix("../../")) for _ in lines))
+                _.removeprefix("../../"),
+            )
+            for _ in lines
+        )
+    )
 
 
 def _update_suffix(*lines: str) -> tuple[str, ...]:
@@ -71,7 +82,11 @@ def _update_suffix(*lines: str) -> tuple[str, ...]:
                 f"{_}/index{ADOC_EXTENSION}",
                 f"{_}/_index{ADOC_EXTENSION}",
                 f"{_}/index.en{ADOC_EXTENSION}",
-                f"{_}/_index.en{ADOC_EXTENSION}") for _ in lines))
+                f"{_}/_index.en{ADOC_EXTENSION}",
+            )
+            for _ in lines
+        )
+    )
 
 
 def get_options(path: StrPath) -> tuple[str, ...]:
@@ -82,7 +97,7 @@ def get_options(path: StrPath) -> tuple[str, ...]:
     :return: The full set of links to inspect.
     :rtype: tuple[str, ...]
     """
-    _: str = f"{path}".removeprefix('./')
+    _: str = f"{path}".removeprefix("./")
     return _update_suffix(*_update_prefix(f"{path}"))
 
 
@@ -119,12 +134,12 @@ class LinkInspector:
     :param updated_anchors: The modified anchors.
     :type updated_anchors: set[str]
     """
+
     updated_anchors: set[str] = set()
 
     def __init__(
-            self,
-            storage: Storage | None = None,
-            file_dict: FileDict | None = None):
+        self, storage: Storage | None = None, file_dict: FileDict | None = None
+    ):
         self._storage: Storage | None = storage
         self._file_dict: FileDict | None = file_dict
         self._link: Link | None = None
@@ -146,11 +161,15 @@ class LinkInspector:
     def preprocess_link(self):
         """Handles the link before start."""
         _: str | None = self._link.anchor
-        _updated_anchor: str = Path(self._link.link_to_file).stem.removeprefix('_').replace('_', '-')
+        _updated_anchor: str = (
+            Path(self._link.link_to_file).stem.removeprefix("_").replace("_", "-")
+        )
 
         if _ is not None and _ in self.updated_anchors:
             _indexes: list[int] = self.source_file().find_anchor(_)
-            self.source_file().update_line(_indexes, _, f"{_}-{_updated_anchor}", is_boundary=True)
+            self.source_file().update_line(
+                _indexes, _, f"{_}-{_updated_anchor}", is_boundary=True
+            )
 
     def base_dir(self) -> Path:
         """Specifies the base path to get relative links."""
@@ -171,7 +190,9 @@ class LinkInspector:
 
     def inspect_original_link(self):
         """Validates the original link."""
-        _options: list[str] = [*_update_suffix(f"{self._link.origin_destination_path()}")]
+        _options: list[str] = [
+            *_update_suffix(f"{self._link.origin_destination_path()}")
+        ]
 
         for option in _options:
             if validate_file_path(option):
@@ -198,7 +219,9 @@ class LinkInspector:
                 return
 
         else:
-            logger.debug(f"Ни один из наиболее вероятных путей не ведет по ссылке {self._link.link_to_file}")
+            logger.debug(
+                f"Ни один из наиболее вероятных путей не ведет по ссылке {self._link.link_to_file}"
+            )
             return
 
     def find_in_storage(self, storage: GeneralStorage):
@@ -215,7 +238,8 @@ class LinkInspector:
             storage.dir_indexes,
             storage.dirindexes,
             storage.non_text_files,
-            storage.text_files)
+            storage.text_files,
+        )
 
         for _storage_dict in _storage_dict_items:
             for _name in self._names():
@@ -231,7 +255,9 @@ class LinkInspector:
         self.find_in_storage(self._storage)
 
         if self._link.component_name is not None:
-            _component_storage: ComponentStorage = self._storage.get_component_storage(self._link.component_name)
+            _component_storage: ComponentStorage = self._storage.get_component_storage(
+                self._link.component_name
+            )
             logger.debug(f"_component_storage = {_component_storage}")
             self.find_in_storage(_component_storage)
 
@@ -288,19 +314,23 @@ class LinkInspector:
             return
 
         self._internal_inspector._text_file = self.destination_file()
-        _proper_anchor: str | None = self._internal_inspector.modified_anchor(self._link.anchor)
+        _proper_anchor: str | None = self._internal_inspector.modified_anchor(
+            self._link.anchor
+        )
 
         if _proper_anchor is not None:
             logger.warning(
                 f"В файле {self.destination_file().rel_path} найден якорь"
                 f"\n{_proper_anchor} вместо {self._link.anchor}",
-                result=True)
+                result=True,
+            )
             self._proper_anchor = _proper_anchor
 
         else:
             logger.error(
                 f"Не найден якорь {self._link.anchor} в файле {self.error_file(self.destination_file().full_path)}\n"
-                f"Ссылка {self._link.link_to} в файле {self.source_link().relative_to(self.base_dir())}")
+                f"Ссылка {self._link.link_to} в файле {self.source_link().relative_to(self.base_dir())}"
+            )
             self._proper_anchor = "/#_valid_anchor_"
 
     def set_proper_link(self):
@@ -327,7 +357,8 @@ class LinkInspector:
         if self._proper_link is None:
             logger.error(
                 f"Файл {self.error_file(self._link.from_file)} по ссылке {self._link.link_to} не найден",
-                result=True)
+                result=True,
+            )
             return True
 
         elif self._proper_link == self._link.link_to:
@@ -337,13 +368,17 @@ class LinkInspector:
         elif self._proper_anchor == "/#_valid_anchor_":
             logger.error(
                 f"В файле {self.error_file(self._link.from_file)} ссылка должна быть:\n"
-                f"{self._proper_link}, но получено\n{self._link.link_to}", result=True)
+                f"{self._proper_link}, но получено\n{self._link.link_to}",
+                result=True,
+            )
             return True
 
         else:
             logger.warning(
                 f"В файле {self.error_file(self._link.from_file)} ссылка должна быть:\n"
-                f"{self._proper_link}, но получено\n{self._link.link_to}", result=True)
+                f"{self._proper_link}, но получено\n{self._link.link_to}",
+                result=True,
+            )
             return False
 
     def clear(self):
@@ -363,7 +398,9 @@ class LinkInspector:
             logger.debug("FileDict уже инициирован")
 
         elif not isinstance(value, FileDict):
-            logger.debug(f"Присваиваемое значение должно быть типа FileDict, но получено {type(value)}")
+            logger.debug(
+                f"Присваиваемое значение должно быть типа FileDict, но получено {type(value)}"
+            )
 
         else:
             self._file_dict = value
@@ -378,7 +415,9 @@ class LinkInspector:
             self._link: Link | None = value
 
         else:
-            logger.debug(f"Присваиваемое значение должно быть типа Link или None, но получено {type(value)}")
+            logger.debug(
+                f"Присваиваемое значение должно быть типа Link или None, но получено {type(value)}"
+            )
 
     @property
     def proper_link(self) -> str | None:
@@ -392,7 +431,9 @@ class LinkInspector:
         """
         _destination_name: str = self._link.stem
         _ext_destination_name: str = f"{self._link.parent_stem}/{self._link.stem}"
-        _ext_ext_destination_name: str = f"{self._link.grandparent_stem}/{self._link.parent_stem}/{self._link.stem}"
+        _ext_ext_destination_name: str = (
+            f"{self._link.grandparent_stem}/{self._link.parent_stem}/{self._link.stem}"
+        )
 
         return _destination_name, _ext_destination_name, _ext_ext_destination_name
 

@@ -34,7 +34,7 @@ _ns: dict[str, str] = {
     "v": "urn:schemas-microsoft-com:vml",
     "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
     "w10": "urn:schemas-microsoft-com:office:word",
-    'w14': "http://schemas.microsoft.com/office/word/2010/wordml",
+    "w14": "http://schemas.microsoft.com/office/word/2010/wordml",
     "w15": "http://schemas.microsoft.com/office/word/2012/wordml",
     "w16": "http://schemas.microsoft.com/office/word/2018/wordml",
     "w16cid": "http://schemas.microsoft.com/office/word/2016/wordml/cid",
@@ -51,7 +51,8 @@ _ns: dict[str, str] = {
     "xsi": "http://www.w3.org/2001/XMLSchema-instance",
     "xmlns": "http://schemas.openxmlformats.org/package/2006/content-types",
     "ve": "http://schemas.openxmlformats.org/markup-compatibility/2006",
-    "vt": "http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"}
+    "vt": "http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes",
+}
 
 
 def prefix_tagroot(tag: str) -> list[str]:

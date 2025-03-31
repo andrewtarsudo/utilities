@@ -18,7 +18,15 @@ from loguru import logger
 
 from utilities.common.custom_logger import custom_logging
 from utilities.common.errors import BaseError, NoArgumentsOptionsError
-from utilities.common.shared import __version__, args_help_dict, DEBUG, HELP, NORMAL, PRESS_ENTER_KEY, pretty_print
+from utilities.common.shared import (
+    __version__,
+    args_help_dict,
+    DEBUG,
+    HELP,
+    NORMAL,
+    PRESS_ENTER_KEY,
+    pretty_print,
+)
 
 COL_MAX: int = 52
 MAX_CONTENT_WIDTH: int = 96
@@ -31,7 +39,9 @@ def up(value: str):
     return value.upper() if not value.startswith("--") else value
 
 
-def prepare_option(value: str, *, prefix: bool = True, remove_suffix: str | None = "-flag"):
+def prepare_option(
+    value: str, *, prefix: bool = True, remove_suffix: str | None = "-flag"
+):
     value: str = value.replace("_", "-")
 
     if remove_suffix is not None:
@@ -42,7 +52,9 @@ def prepare_option(value: str, *, prefix: bool = True, remove_suffix: str | None
 
 def wrap_line(line: str):
     if len(line) >= MAX_CONTENT_WIDTH:
-        pipe_indexes: list[int] = [index for index, char in enumerate(line) if char == "|"]
+        pipe_indexes: list[int] = [
+            index for index, char in enumerate(line) if char == "|"
+        ]
         index: int = max(filter(lambda x: x <= MAX_CONTENT_WIDTH, pipe_indexes))
         line: str = f"{line[:index + 1]}\n{wrap_line(line[index + 2:])}"
 
@@ -100,18 +112,20 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
             f"\n{name}"
             f"\n{commands_str}"
             f"\n{wrap_line(opts_str)}"
-            f"\n{wrap_line(args_str)}\n")
+            f"\n{wrap_line(args_str)}\n"
+        )
 
     elif cmd.name != "help":
         formatter.write(
             f"{style('Использование', fg='bright_cyan', bold=True)}:"
             f"\n{name} {args_str}"
-            f"\n{wrap_line(opts_str)}\n")
+            f"\n{wrap_line(opts_str)}\n"
+        )
 
     else:
         formatter.write(
-            f"{style('Использование', fg='bright_cyan', bold=True)}:"
-            f"\n{name}\n")
+            f"{style('Использование', fg='bright_cyan', bold=True)}:" f"\n{name}\n"
+        )
 
 
 def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
@@ -160,7 +174,9 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
             formatter.write_dl(rows, col_max, col_spacing)
 
 
-def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter = None) -> None:
+def format_epilog(
+    cmd: Command, parent: Context = None, formatter: HelpFormatter = None
+) -> None:
     if parent is None:
         parent: Context = get_current_context()
 
@@ -174,11 +190,17 @@ def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter
     if commands:
         with formatter.section(style("Подкоманды", fg="green", bold=True)):
             rows: list[tuple[str, str]] = [
-                (style(sub.name, fg="green", bold=True), style(sub.help, fg="green", bold=True))
+                (
+                    style(sub.name, fg="green", bold=True),
+                    style(sub.help, fg="green", bold=True),
+                )
                 for sub in sorted(commands.values(), key=attrgetter("name"))
-                if not sub.hidden]
+                if not sub.hidden
+            ]
 
-            sub_names: list[str] = [sub.name for sub in commands.values() if not sub.hidden]
+            sub_names: list[str] = [
+                sub.name for sub in commands.values() if not sub.hidden
+            ]
             col_spacing: int = COL_MAX - 2 * max(map(len, sub_names)) + 1
             col_max: int = MAX_CONTENT_WIDTH
 
@@ -213,19 +235,23 @@ def format_full_help(cmd: Command, ctx: Context, formatter: HelpFormatter) -> No
 # noinspection PyTypeChecker
 def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
     args: list[Argument] = [
-        param for param in cmd.get_params(ctx)
-        if isinstance(param, Argument)]
+        param for param in cmd.get_params(ctx) if isinstance(param, Argument)
+    ]
 
     if args:
         formatter.width = MAX_CONTENT_WIDTH
         asterisk: str = style("(*)", fg="red", bold=True)
 
-        keys: list[str] = [item.removesuffix(".exe") for item in ctx.command_path.split(" ")]
+        keys: list[str] = [
+            item.removesuffix(".exe") for item in ctx.command_path.split(" ")
+        ]
         rows: list[tuple[str, str]] = [
             (
                 f"{style(arg.name, fg='cyan', bold=True)} {asterisk}",
-                args_help_dict.get_multiple_keys(keys=keys).get(arg.name))
-            for arg in args]
+                args_help_dict.get_multiple_keys(keys=keys).get(arg.name),
+            )
+            for arg in args
+        ]
 
         args_names: list[str] = [arg.name for arg in args]
 
@@ -267,7 +293,8 @@ def recursive_help(cmd: Command, parent: Context = None, lines: Iterable[str] = 
         parent=parent,
         color=True,
         terminal_width=TERMINAL_WIDTH,
-        max_content_width=MAX_CONTENT_WIDTH)
+        max_content_width=MAX_CONTENT_WIDTH,
+    )
 
     lines.append(f"{get_help(cmd, ctx)}\n{SEPARATOR}")
     commands: dict[str, Command] = getattr(cmd, "commands", {})
@@ -319,7 +346,9 @@ class APIGroup(Group):
 
     def parse_args(self, ctx: Context, args: list[str]) -> list[str]:
         if args is None or not args:
-            logger.error(f"Для команды {ctx.command_path} не задано ни одного аргумента или опции")
+            logger.error(
+                f"Для команды {ctx.command_path} не задано ни одного аргумента или опции"
+            )
             logger.error(f"Для вызова справки используется\n{ctx.command_path} --help")
             raise NoArgumentsOptionsError
 
@@ -354,7 +383,7 @@ class TermsAPIGroup(APIGroup):
             args: list[str] = list(map(up, args))
 
             if all(not x.startswith("-") for x in args):
-                args.insert(0, '--common')
+                args.insert(0, "--common")
 
         return super().parse_args(ctx, args)
 
@@ -369,33 +398,40 @@ class HelpAPIGroup(APIGroup):
 
 class MutuallyExclusiveOption(Option):
     def __init__(self, *args, **kwargs):
-        self.mutually_exclusive: tuple[str, ...] = tuple(kwargs.pop("mutually_exclusive", tuple()))
+        self.mutually_exclusive: tuple[str, ...] = tuple(
+            kwargs.pop("mutually_exclusive", tuple())
+        )
 
         _help: str = kwargs.get("help", "")
 
         if self.mutually_exclusive:
-            exclusive_options: str = ", ".join(map(prepare_option, self.mutually_exclusive))
+            exclusive_options: str = ", ".join(
+                map(prepare_option, self.mutually_exclusive)
+            )
 
             _: dict[str, str] = {
                 "help": (
                     f"{_help}.\n"
                     f"Примечание. Не может использоваться одновременно с \n"
-                    f"{exclusive_options}")}
+                    f"{exclusive_options}"
+                )
+            }
             kwargs.update(_)
 
         super().__init__(*args, **kwargs)
 
     def handle_parse_result(
-            self,
-            ctx: Context,
-            opts: Mapping[str, Any],
-            args: Iterable[str]) -> tuple[Any, list[str]]:
+        self, ctx: Context, opts: Mapping[str, Any], args: Iterable[str]
+    ) -> tuple[Any, list[str]]:
         if set(self.mutually_exclusive).intersection(opts) and self.name in opts:
-            exclusive_options: str = ", ".join(map(prepare_option, self.mutually_exclusive))
+            exclusive_options: str = ", ".join(
+                map(prepare_option, self.mutually_exclusive)
+            )
 
             raise UsageError(
                 f"Ошибка в задании команды: `{self.name}` не может использоваться одновременно с "
-                f"`{exclusive_options}`.")
+                f"`{exclusive_options}`."
+            )
 
         else:
             args: list[str] = [*args]
@@ -405,30 +441,26 @@ class MutuallyExclusiveOption(Option):
             return super().handle_parse_result(ctx, opts, args)
 
 
-@group(
-    cls=APIGroup,
-    help="Набор скриптов для технических писателей")
+@group(cls=APIGroup, help="Набор скриптов для технических писателей")
 @option(
     "--version",
     is_flag=True,
     expose_value=False,
     is_eager=True,
     help="Вывести версию скрипта на экран и завершить работу",
-    callback=print_version)
+    callback=print_version,
+)
 @option(
     "--debug",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг активации режима отладки."
-         "\nПо умолчанию: False, режим отключен",
+    help="\b\nФлаг активации режима отладки." "\nПо умолчанию: False, режим отключен",
     show_default=True,
     required=False,
     default=False,
-    hidden=True)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
+    hidden=True,
+)
+@help_option("-h", "--help", help=HELP, is_eager=True)
 def cli(debug: bool = False):
     ctx: Context = get_current_context()
 
@@ -441,7 +473,9 @@ def cli(debug: bool = False):
         result_file: bool = False
 
         if ctx.invoked_subcommand is None:
-            echo("Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help")
+            echo(
+                "Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help"
+            )
             pause(PRESS_ENTER_KEY)
             ctx.exit(0)
 
@@ -472,7 +506,8 @@ def clear_logs(ctx: Context):
     logger.debug(
         f"Версия: {__version__}\n"
         f"Команда: {ctx.command_path}\n"
-        f"Параметры: {ctx.params}")
+        f"Параметры: {ctx.params}"
+    )
 
     logger.remove()
 

@@ -12,26 +12,24 @@ class LineFormatter:
         self._remove_spaces: bool = remove_spaces
         self._escape_chars: bool = escape_chars
         self._patterns: dict[str, dict[str, str]] = {
-            "remove_spaces": {
-                r"\s+": " ",
-                r"\s\.": "."},
+            "remove_spaces": {r"\s+": " ", r"\s\.": "."},
             "escape_chars": {
                 r"([*-_])": r"\\\1",
-                r"<(?!/?br>|/?sub>|/?sup>)([^<>]*)(?<!<br)>": r"\\<\1\\>"}}
+                r"<(?!/?br>|/?sub>|/?sup>)([^<>]*)(?<!<br)>": r"\\<\1\\>",
+            },
+        }
 
     def __str__(self):
-        _convert_bool: dict[bool, str] = {
-            True: "да",
-            False: "нет"}
+        _convert_bool: dict[bool, str] = {True: "да", False: "нет"}
 
         return (
             f"Параметры форматирования текста\n"
             f"удаление лишних пробелов: {_convert_bool.get(self._remove_spaces)}\n"
-            f"экранирование символов '<', '>': {_convert_bool.get(self._escape_chars)}")
+            f"экранирование символов '<', '>': {_convert_bool.get(self._escape_chars)}"
+        )
 
     def __repr__(self):
-        return (
-            f"<{self.__class__.__name__}(remove_spaces = {self._remove_spaces}, escape_chars = {self._escape_chars})>")
+        return f"<{self.__class__.__name__}(remove_spaces = {self._remove_spaces}, escape_chars = {self._escape_chars})>"
 
     def format_lines(self, lines: MutableSequence[str] = None):
         if lines is None:
