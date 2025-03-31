@@ -25,9 +25,9 @@ class AnchorInspector:
     """
 
     def __init__(self):
-        self._dict_anchors: dict[TextFile, list[str]] = dict()
-        self._dict_files: dict[str, list[TextFile]] = dict()
-        self._dict_changes: dict[TextFile, list[str]] = dict()
+        self._dict_anchors: dict[TextFile, list[str]] = {}
+        self._dict_files: dict[str, list[TextFile]] = {}
+        self._dict_changes: dict[TextFile, list[str]] = {}
 
     def __str__(self):
         return f"<{self.__class__.__name__}>"

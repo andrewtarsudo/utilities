@@ -82,7 +82,7 @@ def fqdn(tag: str | None) -> QName | str | None:
     if tag is None:
         return None
 
-    elif all([item not in tag for item in (":", "{")]):
+    elif all(item not in tag for item in (":", "{")):
         return tag
 
     else:

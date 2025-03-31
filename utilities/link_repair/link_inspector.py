@@ -173,10 +173,10 @@ class LinkInspector:
         """Validates the original link."""
         _options: list[str] = [*_update_suffix(f"{self._link.origin_destination_path()}")]
 
-        for index, _option in enumerate(_options):
-            if validate_file_path(_option):
-                logger.debug(f"Успех, вариант {_option}")
-                self._destination = Path(_option)
+        for option in _options:
+            if validate_file_path(option):
+                logger.debug(f"Успех, вариант {option}")
+                self._destination = Path(option)
                 self._proper_link = self._link.link_to
                 return
 
@@ -189,8 +189,8 @@ class LinkInspector:
             logger.debug("Путь до файла уже определен")
             return
 
-        for index, _option in enumerate(get_options(self._link.link_to_file)):
-            _: Path = self._link.from_file.joinpath(_option).resolve()
+        for option in get_options(self._link.link_to_file):
+            _: Path = self._link.from_file.joinpath(option).resolve()
 
             if validate_file_path(_):
                 logger.debug(f"Успех, вариант {_}")

@@ -79,7 +79,7 @@ def check_path(
 
 def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     if values is None:
-        return list()
+        return []
 
     else:
         return [f"{prefix}{value}" for value in values]

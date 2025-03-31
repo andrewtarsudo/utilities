@@ -73,9 +73,6 @@ class ContentGitPage(NamedTuple):
 
         logger.debug(f"Response: {self.content is not None}")
 
-    # def __getitem__(self, item):
-    #     return self.content[item]
-
     def __len__(self):
         return len(self.content)
 

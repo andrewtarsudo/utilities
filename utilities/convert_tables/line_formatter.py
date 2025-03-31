@@ -38,7 +38,7 @@ class LineFormatter:
             logger.error("Нет строк для модификации")
             raise ConvertTablesEmptyLinesError
 
-        patterns: dict[str, str] = dict()
+        patterns: dict[str, str] = {}
 
         if self._remove_spaces:
             patterns.update(self._patterns.get("remove_spaces"))

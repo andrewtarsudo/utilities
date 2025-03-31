@@ -30,12 +30,12 @@ class Table:
             self._lines = [_.removesuffix("\n").strip() for _ in lines if _.removesuffix("\n").strip()]
 
         if options is None:
-            options: dict[str, str | None] = dict()
+            options: dict[str, str | None] = {}
 
         self._name: str | None = name
         self._index: int | None = index
         self._options: dict[str, str | None] = {**options}
-        self._table_cells: dict[TableCoordinate, TableCell] = dict()
+        self._table_cells: dict[TableCoordinate, TableCell] = {}
 
     def has_horizontal_span(self):
         """Detects if the table_cols has span cells.
@@ -53,6 +53,7 @@ class Table:
         if isinstance(other, self.__class__):
             if self._name is None or other._name is None:
                 return False
+
             else:
                 return self._name == other._name
 
@@ -63,6 +64,7 @@ class Table:
         if isinstance(other, self.__class__):
             if self._name is None or other._name is None:
                 return True
+
             else:
                 return self._name != other._name
 
@@ -146,7 +148,7 @@ class Table:
 
     def options_str(self) -> str:
         """Gets the string of table_cols options."""
-        if self._options == dict():
+        if not self._options:
             return ""
 
         else:

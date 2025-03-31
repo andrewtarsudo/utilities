@@ -154,7 +154,7 @@ class LoggerConfiguration:
             handlers: dict[HandlerType, LoggingLevel] = None, *,
             is_debug: bool = False):
         if handlers is None:
-            handlers = dict()
+            handlers = {}
 
         self._file_name: str = file_name
         self._handlers: dict[str, str] = handlers

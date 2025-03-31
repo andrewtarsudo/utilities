@@ -513,7 +513,7 @@ class FileDict:
 
     def __init__(self, root_dir: StrPath):
         self._root_dir: Path = Path(root_dir).resolve()
-        self._dict_files: dict[Path, DirFile] = dict()
+        self._dict_files: dict[Path, DirFile] = {}
 
     def __repr__(self):
         _paths: str = "\n".join([f"{_path}" for _path in self._dict_files])

@@ -69,11 +69,11 @@ class GeneralStorage:
 
     def __init__(self, root_dir: StrPath):
         self._root_dir: Path = Path(root_dir).resolve()
-        self._dirindexes: dict[str, Path] = dict()
-        self._dir_indexes: dict[str, Path] = dict()
-        self._non_text_files: dict[str, Path] = dict()
-        self._text_files: dict[str, Path] = dict()
-        self._component_storages: dict[str, Any] = dict()
+        self._dirindexes: dict[str, Path] = {}
+        self._dir_indexes: dict[str, Path] = {}
+        self._non_text_files: dict[str, Path] = {}
+        self._text_files: dict[str, Path] = {}
+        self._component_storages: dict[str, Any] = {}
 
     def __str__(self):
         return f"{self.__class__.__name__}: {self._root_dir}"

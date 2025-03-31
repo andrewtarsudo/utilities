@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
         shell, _ = detect_shell()
 
-    except RuntimeError or ShellDetectionFailure:
+    except (RuntimeError, ShellDetectionFailure):
         shell = None
 
     if shell in ("powershell", "pwsh") or shell is None:

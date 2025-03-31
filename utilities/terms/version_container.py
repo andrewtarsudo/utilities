@@ -103,6 +103,7 @@ class VersionContainer:
                 version: Version = Version.from_string(value)
 
             except TermsInvalidVersionError:
+                logger.error("Некорректная структура файла версии")
                 raise
 
             else:
@@ -126,6 +127,7 @@ class VersionContainer:
                 version: Version = Version.from_string(value)
 
             except TermsInvalidVersionError:
+                logger.error("Некорректная структура файла версии")
                 raise
 
             else:

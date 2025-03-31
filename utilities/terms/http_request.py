@@ -128,7 +128,7 @@ class CustomPreparedRequest(NamedTuple):
         return (
             f"<{self.__class__.__name__}: "
             f"Connection #{self.index} ({self.url}, {self.data}, "
-            f"{[header for header in self.headers]}, "
+            f"{list(self.headers.keys())}, "
             f"{self.host}, {self.unverifiable}, {self.method})>")
 
     def __hash__(self):
@@ -156,7 +156,7 @@ class CustomPreparedRequest(NamedTuple):
             data: bytes = None,
             headers: dict[str, str] = None):
         if headers is None:
-            headers = dict()
+            headers = {}
 
         if data is None:
             data = b''
@@ -175,7 +175,7 @@ class CustomPreparedRequest(NamedTuple):
 
     def request(self) -> Request:
         if self.headers is None:
-            self.headers = dict()
+            self.headers = {}
 
         self.headers["User-Agent"] = "My User Agent 1.0"
 
@@ -205,7 +205,7 @@ class CustomHTTPResponseChunked:
         self._path: Path = Path(path).resolve()
         self._http_response: HTTPResponse = http_response
         self._chunk: int = chunk
-        self._response_dict: dict[str, Any] = dict()
+        self._response_dict: dict[str, Any] = {}
         self.get_response()
 
     def __str__(self):

@@ -131,7 +131,7 @@ class TableAnalyser:
 
                     for index, length in ratios.items():
                         # ratios[index] / sum_ratios is a part that each column with 'spaced' text gets additionally
-                        self._columns[index] += int(rest * (ratios[index] / sum_ratios))
+                        self._columns[index] += int(rest * (length / sum_ratios))
 
     @property
     def percentages(self):

@@ -93,7 +93,7 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     suffix: str = "" if not platform.startswith("win") else ".exe"
     name: str = ctx.command_path.replace("__main__.py", f"tw_utilities{suffix}")
 
-    if commands is not None and commands != dict():
+    if commands is not None and commands:
         commands_str: str = wrap_line(" | ".join(map(add_brackets, commands)))
         formatter.write(
             f"{style('Использование', fg='bright_cyan', bold=True)}:"
@@ -171,7 +171,7 @@ def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter
 
     commands: dict[str, Command] = getattr(cmd, "commands", dict())
 
-    if commands != dict():
+    if commands:
         with formatter.section(style("Подкоманды", fg="green", bold=True)):
             rows: list[tuple[str, str]] = [
                 (style(sub.name, fg="green", bold=True), style(sub.help, fg="green", bold=True))
@@ -270,7 +270,7 @@ def recursive_help(cmd: Command, parent: Context = None, lines: Iterable[str] = 
         max_content_width=MAX_CONTENT_WIDTH)
 
     lines.append(f"{get_help(cmd, ctx)}\n{SEPARATOR}")
-    commands: dict[str, Command] = getattr(cmd, "commands", dict())
+    commands: dict[str, Command] = getattr(cmd, "commands", {})
 
     for sub in commands.values():
         if not sub.hidden:
@@ -434,8 +434,7 @@ def cli(debug: bool = False):
 
     try:
         ctx.ensure_object(dict)
-        ctx.obj = dict()
-        ctx.obj["debug"] = debug
+        ctx.obj = {"debug": debug}
 
         custom_logging("cli", is_debug=debug)
 

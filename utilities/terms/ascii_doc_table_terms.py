@@ -15,8 +15,8 @@ from utilities.terms.table import TableCellCoordinate, TableItem, Term
 class AsciiDocTableTerms:
     def __init__(self, lines: Iterable[str] = None):
         self._content: list[str] = [*lines]
-        self._items: dict[TableCellCoordinate, TableItem] = dict()
-        self._dict_terms: dict[str, tuple[Term, ...]] = dict()
+        self._items: dict[TableCellCoordinate, TableItem] = {}
+        self._dict_terms: dict[str, tuple[Term, ...]] = {}
 
     @classmethod
     def from_file(cls, file_path: StrPath):
@@ -38,7 +38,7 @@ class AsciiDocTableTerms:
 
     def set_terms(self):
         _: list[Term] = [Term(*self._get_row_item(row_index)) for row_index in range(self.max_row)]
-        _dict_proxy: dict[str, list[Term]] = dict()
+        _dict_proxy: dict[str, list[Term]] = {}
 
         for term in _:
             term_short: str = term.short
