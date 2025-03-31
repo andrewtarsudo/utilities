@@ -9,8 +9,10 @@ class Term(NamedTuple):
     commentary: str | None = None
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}(short={self.short}, full={self.full}, rus={self.rus}, " \
-               f"commentary={self.commentary})>"
+        return (
+            f"<{self.__class__.__name__}(short={self.short}, full={self.full}, rus={self.rus}, "
+            f"commentary={self.commentary})>"
+        )
 
     def __str__(self):
         return f"{self.short}\n{self.full}, {self.rus} -- {self.commentary}"
@@ -25,10 +27,7 @@ class Term(NamedTuple):
             value: str = getattr(self, attr)
             return int(value is not None and not (not value))
 
-        _: dict[str, int] = {
-            "full": 1,
-            "rus": 2,
-            "commentary": 4}
+        _: dict[str, int] = {"full": 1, "rus": 2, "commentary": 4}
 
         return sum(map(lambda x: _multiplier(x) * _.get(x), _.keys()))
 
@@ -40,7 +39,8 @@ class Term(NamedTuple):
             4: f"{self.commentary}",
             5: f"{self.full} — {self.commentary}",
             6: f"{self.rus} — {self.commentary}",
-            7: f"{self.full}, {self.rus} — {self.commentary}"}
+            7: f"{self.full}, {self.rus} — {self.commentary}",
+        }
 
         return _.get(self._formatting_type(), "")
 
@@ -56,8 +56,10 @@ class Term(NamedTuple):
             return "Не найдено"
 
         else:
-            return f':{self.short.lower()}: {self.short}\n' \
-                   f':{self.short.lower()}: pass:[<abbr title="{self.full}">{self.short}</abbr>]'
+            return (
+                f":{self.short.lower()}: {self.short}\n"
+                f':{self.short.lower()}: pass:[<abbr title="{self.full}">{self.short}</abbr>]'
+            )
 
     def formatted(self) -> str:
         if bool(self):
@@ -79,14 +81,20 @@ class TableCellCoordinate(NamedTuple):
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return (self.row_index, self.column_index) == (other.row_index, other.column_index)
+            return (self.row_index, self.column_index) == (
+                other.row_index,
+                other.column_index,
+            )
 
         else:
             return False
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
-            return (self.row_index, self.column_index) != (other.row_index, other.column_index)
+            return (self.row_index, self.column_index) != (
+                other.row_index,
+                other.column_index,
+            )
 
         else:
             return False

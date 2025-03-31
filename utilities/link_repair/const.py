@@ -7,6 +7,7 @@ from utilities.common.shared import separator
 
 class FileLanguage(Enum):
     """Class to represent the file language."""
+
     RU = "russian"
     EN = "english"
     RU_EN = "russian+english"

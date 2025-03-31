@@ -12,6 +12,7 @@ class TableCoordinate(NamedTuple):
     At the time a bit over-complicated since there is no need to compare or order cells,
     but may be used in other scripts.
     """
+
     row: int
     column: int
 
@@ -53,7 +54,8 @@ class TableCoordinate(NamedTuple):
 
         else:
             logger.error(
-                f"Индекс {number} и количество столбцов {num_columns} должны быть положительными")
+                f"Индекс {number} и количество столбцов {num_columns} должны быть положительными"
+            )
             raise TableColsTableCoordinateInitError
 
     def shift(self, row_offset: int = 0, column_offset: int = 0):

@@ -6,7 +6,10 @@ from typing import NamedTuple
 from loguru import logger
 
 from utilities.common.shared import StrPath
-from utilities.common.errors import TermsInvalidTypeVersionError, TermsInvalidVersionError
+from utilities.common.errors import (
+    TermsInvalidTypeVersionError,
+    TermsInvalidVersionError,
+)
 from utilities.common.functions import file_reader, ReaderMode
 
 
@@ -109,7 +112,9 @@ class VersionContainer:
                 self._version = version
 
         else:
-            logger.error(f"Значение {value} должно быть типа Version или str, но получено {type(value)}")
+            logger.error(
+                f"Значение {value} должно быть типа Version или str, но получено {type(value)}"
+            )
             raise TypeError
 
     @property
@@ -132,7 +137,9 @@ class VersionContainer:
                 self._version_basic = version
 
         else:
-            logger.error(f"Значение {value} должно быть типа Version или str, но получено {type(value)}")
+            logger.error(
+                f"Значение {value} должно быть типа Version или str, но получено {type(value)}"
+            )
             raise TermsInvalidTypeVersionError
 
     def __bool__(self):

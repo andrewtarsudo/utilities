@@ -27,13 +27,11 @@ if __name__ == "__main__":
         "--distpath",
         "./bin",
         f"{spec_file}",
-        f"2> {log_file}"]
+        f"2> {log_file}",
+    ]
 
     try:
-        _: CompletedProcess = run(
-            install,
-            encoding="utf-8",
-            check=True)
+        _: CompletedProcess = run(install, encoding="utf-8", check=True)
 
         _.check_returncode()
 
@@ -44,7 +42,9 @@ if __name__ == "__main__":
     except PermissionError as e:
         from os import environ, stat
 
-        print(f"Недостаточно прав доступа к файлу {log_file}.\nМаска: {stat(log_file).st_mode}")
+        print(
+            f"Недостаточно прав доступа к файлу {log_file}.\nМаска: {stat(log_file).st_mode}"
+        )
         raise
 
     except RuntimeError as e:

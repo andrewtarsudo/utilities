@@ -9,18 +9,25 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, separator, StrPath
+from utilities.common.shared import (
+    FAIL_COLOR,
+    HELP,
+    NORMAL_COLOR,
+    PASS_COLOR,
+    pretty_print,
+    separator,
+    StrPath,
+)
 from utilities.common.functions import file_reader, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, cli
 from utilities.scripts.list_files import get_files
 
-RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+RUSSIAN_CHARS: str = (
+    "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+)
 
 
-def wrap_text(
-        value: str, *,
-        is_color: bool = True,
-        is_success: bool = False):
+def wrap_text(value: str, *, is_color: bool = True, is_success: bool = False):
     if is_color and is_success:
         prefix: str = PASS_COLOR
         postfix: str = NORMAL_COLOR
@@ -37,10 +44,11 @@ def wrap_text(
 
 
 def wrap_iterable(
-        values: Iterable[str], *,
-        is_color: bool = True,
-        is_success: bool = False):
-    lines: list[str] = [wrap_text(value, is_color=is_color, is_success=is_success) for value in values]
+    values: Iterable[str], *, is_color: bool = True, is_success: bool = False
+):
+    lines: list[str] = [
+        wrap_text(value, is_color=is_color, is_success=is_success) for value in values
+    ]
     return pretty_print(lines)
 
 
@@ -66,14 +74,16 @@ def file_inspection(path: str, is_color: bool = True):
             record: str = wrap_text(
                 f"Строка {line_no + 1}, символ {index + 1}: {char}",
                 is_color=is_color,
-                is_success=False)
+                is_success=False,
+            )
             results.append(record)
 
     if not results and is_color:
         return wrap_text(
             f"В файле {path} не найдены кириллические буквы",
             is_color=is_color,
-            is_success=True)
+            is_success=True,
+        )
 
     elif not results and not is_color:
         return None
@@ -83,84 +93,96 @@ def file_inspection(path: str, is_color: bool = True):
 
     elif results and is_color:
         return pretty_print(
-            (wrap_text(f"В файле {path} найдены кириллические буквы:", is_color=is_color, is_success=False),
-             wrap_iterable(
-                 results,
-                 is_color=is_color,
-                 is_success=False)))
+            (
+                wrap_text(
+                    f"В файле {path} найдены кириллические буквы:",
+                    is_color=is_color,
+                    is_success=False,
+                ),
+                wrap_iterable(results, is_color=is_color, is_success=False),
+            )
+        )
 
 
 @cli.command(
     "check-russian",
     cls=APIGroup,
-    help="Команда для проверки наличия непереведенных слов")
+    help="Команда для проверки наличия непереведенных слов",
+)
 @option(
-    "-d", "--dir", "directory",
+    "-d",
+    "--dir",
+    "directory",
     type=ClickPath(
-        exists=True,
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
+        exists=True, file_okay=False, resolve_path=True, allow_dash=False, dir_okay=True
+    ),
     help="Директория для обработки",
     multiple=False,
     required=False,
     metavar="DIR",
-    default=None)
+    default=None,
+)
 @option(
-    "-f", "--file", "files",
+    "-f",
+    "--file",
+    "files",
     type=ClickPath(
         exists=True,
         file_okay=True,
         readable=True,
         resolve_path=True,
         allow_dash=False,
-        dir_okay=False),
+        dir_okay=False,
+    ),
     help="\b\nФайл для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
-    default=None)
+    default=None,
+)
 @option(
-    "-v/-q", "--verbose/--quiet",
+    "-v/-q",
+    "--verbose/--quiet",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг подробного вывода."
-         "\nПо умолчанию: False, выводятся только ошибки",
+    help="\b\nФлаг подробного вывода." "\nПо умолчанию: False, выводятся только ошибки",
     show_default=True,
     required=False,
-    default=False)
+    default=False,
+)
 @option(
-    "-r/-R", "--recursive/--no-recursive",
+    "-r/-R",
+    "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
-         "\nПо умолчанию: True, вложенные файлы учитываются",
+    "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
-    default=True)
+    default=True,
+)
 @option(
-    "-k/-K", "--keep-logs/--remove-logs",
+    "-k/-K",
+    "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
+    "\nработы в штатном режиме."
+    "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
+    default=False,
+)
+@help_option("-h", "--help", help=HELP, is_eager=True)
 @pass_context
 def check_russian_command(
-        ctx: Context,
-        files: Iterable[StrPath] = None,
-        directory: StrPath = None,
-        recursive: bool = True,
-        verbose: bool = False,
-        keep_logs: bool = False):
+    ctx: Context,
+    files: Iterable[StrPath] = None,
+    directory: StrPath = None,
+    recursive: bool = True,
+    verbose: bool = False,
+    keep_logs: bool = False,
+):
     if platform.startswith("win"):
         system("color")
 
@@ -170,7 +192,8 @@ def check_russian_command(
         directory=directory,
         recursive=recursive,
         language="en",
-        extensions="md adoc")
+        extensions="md adoc",
+    )
 
     if files is not None and files:
         is_color: bool = verbose
@@ -189,7 +212,8 @@ def check_russian_command(
             final: str = wrap_text(
                 "Ни в одном файле не обнаружены кириллические буквы",
                 is_color=is_color,
-                is_success=True)
+                is_success=True,
+            )
 
         else:
             final: str = pretty_print(result)

@@ -20,7 +20,9 @@ class GitManager:
 
     def __init__(self):
         self._lines: list[str] = []
-        self._version_validator: VersionContainer = VersionContainer(self.TEMP_VERSION, self.TEMP_TERMS_VERSION)
+        self._version_validator: VersionContainer = VersionContainer(
+            self.TEMP_VERSION, self.TEMP_TERMS_VERSION
+        )
         self._content_git_terms: ContentGitPage | None = None
         self._content_git_version: ContentGitPage | None = None
 
@@ -54,22 +56,22 @@ class GitManager:
 
     def set_content_git_pages(self):
         content_git_terms: ContentGitPage = ContentGitPage(
-            file_name="terms.adoc",
-            path=self.TEMP_TERMS,
-            content=[])
+            file_name="terms.adoc", path=self.TEMP_TERMS, content=[]
+        )
         content_git_terms.download()
         self._content_git_terms = content_git_terms
 
         content_git_version: ContentGitPage = ContentGitPage(
-            file_name="__version__.txt",
-            path=self.TEMP_VERSION,
-            content=[])
+            file_name="__version__.txt", path=self.TEMP_VERSION, content=[]
+        )
         content_git_version.download()
         self._content_git_version = content_git_version
 
     def set_versions(self):
         self._version_validator.set_version_basic()
-        self._version_validator.version = Version.from_string("".join(self._content_git_version.content))
+        self._version_validator.version = Version.from_string(
+            "".join(self._content_git_version.content)
+        )
 
     def output_if_different(self, message: str):
         logger.info(message)
@@ -93,7 +95,9 @@ class GitManager:
 
     def set_terms(self):
         file_writer(self.TEMP_TERMS_BASIC, self._content_git_terms.content)
-        lines: list[str] = file_reader(self.TEMP_TERMS_BASIC, ReaderMode.LINES, encoding="cp1251")
+        lines: list[str] = file_reader(
+            self.TEMP_TERMS_BASIC, ReaderMode.LINES, encoding="cp1251"
+        )
         self._lines = lines[6:-1]
 
     def __iter__(self):

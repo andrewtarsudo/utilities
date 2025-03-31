@@ -7,7 +7,7 @@ from utilities.common.errors import TimerRunningError, TimerStoppedError
 
 
 def process_timing(value: int):
-    ms: int = value // 10 ** 6
+    ms: int = value // 10**6
     ms_str: str = f"{ms} мс"
 
     if ms <= 1000:
@@ -15,7 +15,7 @@ def process_timing(value: int):
         m_str: str = ""
 
     else:
-        s, ms = divmod(ms, 10 ** 3)
+        s, ms = divmod(ms, 10**3)
 
         if s > 60:
             m, s = divmod(s, 60)
@@ -32,6 +32,7 @@ def process_timing(value: int):
 
 class Timer(ContextManager):
     """Time your code using a class, context manager, or decorator"""
+
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -100,10 +101,12 @@ class Timer(ContextManager):
         return self
 
     def __exit__(
-            self,
-            exc_type: type[BaseException] | None,
-            exc_value: BaseException | None,
-            traceback: TracebackType | None, /) -> None:
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+        /,
+    ) -> None:
         """Stop the context manager timer"""
         self.pause()
 
@@ -116,12 +119,11 @@ class Timer(ContextManager):
                 self.stop()
 
 
-
 def dummy_function():
     print("dummy")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     with Timer() as timer:
         dummy_function()
     timer()

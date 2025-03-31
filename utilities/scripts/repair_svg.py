@@ -14,77 +14,77 @@ from utilities.scripts.cli import APIGroup, clear_logs, cli
 from utilities.scripts.list_files import get_files
 
 
-@cli.command(
-    "repair-svg",
-    cls=APIGroup,
-    help="Команда для исправления файлов SVG")
+@cli.command("repair-svg", cls=APIGroup, help="Команда для исправления файлов SVG")
 @option(
-    "-f", "--file", "files",
+    "-f",
+    "--file",
+    "files",
     type=ClickPath(
         file_okay=True,
         readable=True,
         resolve_path=True,
         allow_dash=False,
-        dir_okay=False),
+        dir_okay=False,
+    ),
     help="\b\nФайл для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
-    default=None)
+    default=None,
+)
 @option(
-    "-d", "--dir", "directory",
-    type=ClickPath(
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
+    "-d",
+    "--dir",
+    "directory",
+    type=ClickPath(file_okay=False, resolve_path=True, allow_dash=False, dir_okay=True),
     help="Директория для обработки",
     multiple=False,
     required=False,
     metavar="DIR",
-    default=None)
+    default=None,
+)
 @option(
-    "-r/-R", "--recursive/--no-recursive",
+    "-r/-R",
+    "--recursive/--no-recursive",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг рекурсивного поиска файлов."
-         "\nПо умолчанию: True, вложенные файлы учитываются",
+    "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
-    default=True)
+    default=True,
+)
 @option(
-    "-k/-K", "--keep-logs/--remove-logs",
+    "-k/-K",
+    "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
+    "\nработы в штатном режиме."
+    "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
+    default=False,
+)
+@help_option("-h", "--help", help=HELP, is_eager=True)
 @pass_context
 def repair_svg_command(
-        ctx: Context,
-        files: Iterable[StrPath] = None,
-        directory: StrPath = None,
-        recursive: bool = True,
-        keep_logs: bool = False):
+    ctx: Context,
+    files: Iterable[StrPath] = None,
+    directory: StrPath = None,
+    recursive: bool = True,
+    keep_logs: bool = False,
+):
     files: list[StrPath] | None = get_files(
-        ctx,
-        files=files,
-        directory=directory,
-        recursive=recursive,
-        extensions="svg")
+        ctx, files=files, directory=directory, recursive=recursive, extensions="svg"
+    )
 
     if files is not None and files:
         FOREIGN_OBJECT: str = "<foreignObject.*?</foreignObject>"
         TEXT: str = (
             r"<a\s?transform=\"translate(0,-5)\"\s?xlink:href=\"https://www.drawio.com/doc/faq/svg-export-text-problems"
-            "\".*?</a>")
+            '".*?</a>'
+        )
         FEATURES: str = r"<g>\s?<g\s?requiredFeatures=\"http://www.w3.org/TR/SVG11/feature#Extensibility\"/>\s?</g>"
 
         for file in files:
@@ -120,7 +120,9 @@ def repair_svg_command(
                     logger.info(f"Файл {file.name} успешно обработан")
 
                 except PermissionError:
-                    logger.error(f"Недостаточно прав для чтения/записи в файл {file.name}")
+                    logger.error(
+                        f"Недостаточно прав для чтения/записи в файл {file.name}"
+                    )
                     continue
 
                 except RuntimeError:

@@ -15,7 +15,8 @@ def folder_result():
         "README_terms.adoc"
         "\nREADME_list_files.adoc"
         "\nREADME_check_russian.adoc"
-        "\nREADME_validate_yaml.adoc\nREADME_format_code.adoc\nREADME_convert_tables.adoc\nREADME_link_repair.adoc\nREADME_repair_svg.adoc\nВременные журналы скрипта удалены\n")
+        "\nREADME_validate_yaml.adoc\nREADME_format_code.adoc\nREADME_convert_tables.adoc\nREADME_link_repair.adoc\nREADME_repair_svg.adoc\nВременные журналы скрипта удалены\n"
+    )
 
 
 @fixture(scope="module")

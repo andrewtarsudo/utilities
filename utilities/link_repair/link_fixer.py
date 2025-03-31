@@ -3,12 +3,16 @@ from re import finditer, Match, sub
 
 from loguru import logger
 
-from utilities.common.errors import LinkRepairFixerNoLinkError, LinkRepairInvalidHashCharIndexError
+from utilities.common.errors import (
+    LinkRepairFixerNoLinkError,
+    LinkRepairInvalidHashCharIndexError,
+)
 from utilities.link_repair.file_dict import TextFile
 
 
 class LinkFixer:
     """Class to represent the instance to fix links."""
+
     PATTERN: str = r"(\.\.)(\w)"
 
     def __init__(self):
@@ -55,7 +59,9 @@ class LinkFixer:
                 logger.warning(
                     f"В файле {self.text_file.rel_path} некорректная ссылка:\n"
                     f"{_}\n"
-                    f"Строка: {link.index}", result=True)
+                    f"Строка: {link.index}",
+                    result=True,
+                )
 
         if self.text_file.is_changed is False:
             logger.debug(f"file {self.text_file.rel_path}, no whitespaces to fix")
@@ -71,12 +77,16 @@ class LinkFixer:
 
             for _m in finditer(self.__class__.PATTERN, _):
                 if _m:
-                    self.text_file.update_line(link.index, _, sub(self.__class__.PATTERN, add_slash, _))
+                    self.text_file.update_line(
+                        link.index, _, sub(self.__class__.PATTERN, add_slash, _)
+                    )
                     self.text_file.is_changed = True
                     logger.warning(
                         f"В файле {self.text_file.rel_path} некорректная ссылка:\n"
                         f"{_}\n"
-                        f"Строка: {link.index}", result=True)
+                        f"Строка: {link.index}",
+                        result=True,
+                    )
 
         if self.text_file.is_changed is False:
             logger.debug(f"В файле {self.text_file.rel_path} нет недостающих '/'")
@@ -92,7 +102,8 @@ class LinkFixer:
                 if index < -1:
                     logger.error(
                         f"Позиция # в файле {self.text_file.rel_path} в ссылке {_} определена как {index}, "
-                        f"что некорректно")
+                        f"что некорректно"
+                    )
                     raise LinkRepairInvalidHashCharIndexError
 
                 elif index == -1:
@@ -105,7 +116,9 @@ class LinkFixer:
                     logger.warning(
                         f"В файле {self.text_file.rel_path} некорректная ссылка:\n"
                         f"{_}\n"
-                        f"Строка: {link.index}", result=True)
+                        f"Строка: {link.index}",
+                        result=True,
+                    )
 
                 else:
                     continue

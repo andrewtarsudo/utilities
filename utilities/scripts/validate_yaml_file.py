@@ -10,24 +10,31 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.functions import file_reader, file_reader_type, FileType, ReaderMode
-from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
+from utilities.common.functions import (
+    file_reader,
+    file_reader_type,
+    FileType,
+    ReaderMode,
+)
+from utilities.common.shared import (
+    FAIL_COLOR,
+    HELP,
+    NORMAL_COLOR,
+    PASS_COLOR,
+    pretty_print,
+    StrPath,
+)
 from utilities.scripts.cli import clear_logs, cli, SwitchArgsAPIGroup
 
 _ALLOWED_KEYS: tuple[str, ...] = ("title", "index", "files")
 
-_SETTINGS_NAMES: tuple[str, ...] = (
-    "settings", "Settings")
-_RIGHTS_NAMES: tuple[str, ...] = (
-    "rights", "Rights")
+_SETTINGS_NAMES: tuple[str, ...] = ("settings", "Settings")
+_RIGHTS_NAMES: tuple[str, ...] = ("rights", "Rights")
 
 _DICT_RESULTS: dict[bool, dict[str, str]] = {
-    True: {
-        "status": "OK",
-        "color": PASS_COLOR},
-    False: {
-        "status": "NOT OK",
-        "color": FAIL_COLOR}}
+    True: {"status": "OK", "color": PASS_COLOR},
+    False: {"status": "NOT OK", "color": FAIL_COLOR},
+}
 
 
 def determine_key(item: Mapping, keys: Iterable[str]):
@@ -49,10 +56,11 @@ def detect_extra_keys(item: Mapping[str, Any]):
 
 
 def inspect_settings(
-        content: Mapping[str, Any],
-        verbose: bool,
-        warnings: Iterable[str] = None,
-        messages: Iterable[str] = None):
+    content: Mapping[str, Any],
+    verbose: bool,
+    warnings: Iterable[str] = None,
+    messages: Iterable[str] = None,
+):
     if warnings is None:
         warnings: list[str] = []
 
@@ -77,7 +85,8 @@ def inspect_settings(
         for key in ("title-page", "version"):
             if key not in settings:
                 messages.append(
-                    f"В разделе 'settings' отсутствует обязательный ключ '{key}'")
+                    f"В разделе 'settings' отсутствует обязательный ключ '{key}'"
+                )
                 __is_ok: bool = False
 
             else:
@@ -86,7 +95,8 @@ def inspect_settings(
                 if not (isinstance(value, str) or hasattr(value, "__str__")):
                     messages.append(
                         f"Значение {value} ключа {key} должно быть типа string, "
-                        f"но получен {type(value)}")
+                        f"но получен {type(value)}"
+                    )
                     __is_ok: bool = False
 
         if __is_ok and verbose:
@@ -96,10 +106,11 @@ def inspect_settings(
 
 
 def inspect_legal(
-        content: Mapping[str, Any],
-        verbose: bool,
-        warnings: Iterable[str] = None,
-        messages: Iterable[str] = None):
+    content: Mapping[str, Any],
+    verbose: bool,
+    warnings: Iterable[str] = None,
+    messages: Iterable[str] = None,
+):
     if warnings is None:
         warnings: list[str] = []
 
@@ -122,7 +133,9 @@ def inspect_legal(
         rights: dict[str, dict[str, str | bool] | list[str]] = content.get(_)
 
         if not isinstance(rights, Mapping):
-            warnings.append(f"Раздел 'Rights' должен быть типа object, но получено {type(rights)}")
+            warnings.append(
+                f"Раздел 'Rights' должен быть типа object, но получено {type(rights)}"
+            )
             __is_ok: bool = False
 
         if "title" not in rights:
@@ -133,7 +146,9 @@ def inspect_legal(
             title: dict[str, str | bool] = rights.get("title")
 
             if "title-files" not in title:
-                warnings.append("В секции 'Rights::title' отсутствует ключ 'title-files'")
+                warnings.append(
+                    "В секции 'Rights::title' отсутствует ключ 'title-files'"
+                )
                 __is_ok: bool = False
 
             else:
@@ -142,7 +157,8 @@ def inspect_legal(
                 if not isinstance(title_files, bool) or title_files is not False:
                     warnings.append(
                         f"Значение ключа 'Rights::title::title-files' должно быть false, "
-                        f"но получено {title_files}")
+                        f"но получено {title_files}"
+                    )
                     __is_ok: bool = False
 
             if "value" not in title:
@@ -152,11 +168,15 @@ def inspect_legal(
             else:
                 value = title.get("value")
 
-                if not isinstance(value, str) or value not in ("Юридическая информация", "Legal Information"):
+                if not isinstance(value, str) or value not in (
+                    "Юридическая информация",
+                    "Legal Information",
+                ):
                     warnings.append(
                         "Значение ключа 'Rights::title::value' должно быть "
                         "'Юридическая информация' или 'Legal Information', "
-                        f"но получено {value}")
+                        f"но получено {value}"
+                    )
                     __is_ok: bool = False
 
         if "index" not in rights:
@@ -169,31 +189,36 @@ def inspect_legal(
             if not isinstance(index, list):
                 warnings.append(
                     f"Значение ключа 'Rights::index' должно быть типа list, "
-                    f"но получено {get_origin(index)}")
+                    f"но получено {get_origin(index)}"
+                )
                 __is_ok: bool = False
 
             elif not isinstance(index[0], str):
                 warnings.append(
                     f"Все значения ключа 'Rights::index' должны быть типа str, "
-                    f"но получено {get_args(index)}")
+                    f"но получено {get_args(index)}"
+                )
                 __is_ok: bool = False
 
             elif len(index) != 1:
                 warnings.append(
                     f"Количество значений 'Rights::index' должно быть 1, "
-                    f"но получено {len(index)}")
+                    f"но получено {len(index)}"
+                )
                 __is_ok: bool = False
 
             elif not index[0].startswith("content/common/_index"):
                 warnings.append(
                     f"Значение ключа 'Rights::index' должно быть 'content/common/_index.md' "
                     f"или 'content/common/_index.adoc', "
-                    f"но получено {index[0]}")
+                    f"но получено {index[0]}"
+                )
                 __is_ok: bool = False
 
         if (extra_keys := detect_extra_keys({**rights})) is not None:
             warnings.append(
-                f"В разделе Rights обнаружены посторонние ключи:\n{pretty_print(extra_keys)}")
+                f"В разделе Rights обнаружены посторонние ключи:\n{pretty_print(extra_keys)}"
+            )
 
         if __is_ok and verbose:
             messages.append("Раздел 'Rights' задан корректно")
@@ -202,10 +227,11 @@ def inspect_legal(
 
 
 def inspect_sections(
-        content: Mapping[str, Any],
-        verbose: bool,
-        warnings: Iterable[str] = None,
-        messages: Iterable[str] = None):
+    content: Mapping[str, Any],
+    verbose: bool,
+    warnings: Iterable[str] = None,
+    messages: Iterable[str] = None,
+):
     if warnings is None:
         warnings: list[str] = []
 
@@ -225,12 +251,15 @@ def inspect_sections(
         elif name.endswith("cross_docs"):
             warnings.append(
                 f"Обнаружен раздел {name}, в котором ссылки ведут в другой проект.\n"
-                "На данный момент такие секции пропускаются при проверке")
+                "На данный момент такие секции пропускаются при проверке"
+            )
             continue
 
         else:
             if not isinstance(section, Mapping):
-                messages.append(f"Раздел '{name}' должна быть типа object, но получено {type(section)}")
+                messages.append(
+                    f"Раздел '{name}' должна быть типа object, но получено {type(section)}"
+                )
 
             else:
                 __is_ok: bool = True
@@ -239,7 +268,9 @@ def inspect_sections(
                     title: dict[str, str | bool] = section.get("title", dict())
 
                     if title is None:
-                        warnings.append(f"В разделе {name} объявлена секция title, хотя она пуста")
+                        warnings.append(
+                            f"В разделе {name} объявлена секция title, хотя она пуста"
+                        )
                         __is_ok: bool = False
 
                     else:
@@ -249,7 +280,8 @@ def inspect_sections(
                             if not isinstance(title_files, bool):
                                 warnings.append(
                                     f"Значение ключа '{name}::title::title-files' должно быть типа bool, "
-                                    f"но получено {type(title_files)}")
+                                    f"но получено {type(title_files)}"
+                                )
                                 __is_ok: bool = False
 
                         if "value" in title.keys():
@@ -258,7 +290,8 @@ def inspect_sections(
                             if not isinstance(value, str):
                                 warnings.append(
                                     f"Значение ключа '{name}::title::value' должно быть типа str, "
-                                    f"но получено {type(value)}")
+                                    f"но получено {type(value)}"
+                                )
                                 __is_ok: bool = False
 
                         if "level" in title.keys():
@@ -267,44 +300,52 @@ def inspect_sections(
                             if not isinstance(level, int):
                                 warnings.append(
                                     f"Значение ключа '{name}::title::level' должно быть типа int, "
-                                    f"но получено {type(level)}")
+                                    f"но получено {type(level)}"
+                                )
                                 __is_ok: bool = False
 
                             elif level < 0:
                                 messages.append(
                                     f"Значение ключа '{name}::title::level' должно быть неотрицательным, "
-                                    f"но получено {level}")
+                                    f"но получено {level}"
+                                )
                                 __is_ok: bool = False
 
                             elif level > 9:
                                 messages.append(
                                     f"Значение ключа '{name}::title::level' должно быть целым числом, диапазон: [0-9], "
-                                    f"но получено {level}")
+                                    f"но получено {level}"
+                                )
                                 __is_ok: bool = False
 
                 if "index" in section.keys():
                     index = section.get("index")
 
                     if index is None:
-                        warnings.append(f"В разделе {name} объявлена секция index, хотя она пуста")
+                        warnings.append(
+                            f"В разделе {name} объявлена секция index, хотя она пуста"
+                        )
                         __is_ok: bool = False
 
                     elif not isinstance(index, list):
                         warnings.append(
                             f"Значение ключа '{name}::index' должно быть типа list, "
-                            f"но получено {get_origin(index)}")
+                            f"но получено {get_origin(index)}"
+                        )
                         __is_ok: bool = False
 
                     elif not all(isinstance(item, str) for item in index):
                         warnings.append(
                             f"Все значения ключа '{name}::index' должны быть типа str, "
-                            f"но получено {get_args(index)}")
+                            f"но получено {get_args(index)}"
+                        )
                         __is_ok: bool = False
 
                     elif len(index) != 1:
                         warnings.append(
                             f"Количество значений '{name}::index' должно быть 1, "
-                            f"но получено {len(index)}")
+                            f"но получено {len(index)}"
+                        )
                         __is_ok: bool = False
 
                 if "files" in section.keys():
@@ -313,18 +354,21 @@ def inspect_sections(
                     if not isinstance(files, list):
                         warnings.append(
                             f"Значение ключа '{name}::files' должно быть типа list, "
-                            f"но получено {get_origin(files)}")
+                            f"но получено {get_origin(files)}"
+                        )
                         __is_ok: bool = False
 
                     elif not all(isinstance(file, str) for file in files):
                         warnings.append(
                             f"Все значения ключа '{name}::files' должны быть типа str, "
-                            f"но получено {get_args(files)}")
+                            f"но получено {get_args(files)}"
+                        )
                         __is_ok: bool = False
 
                 if (extra_keys := detect_extra_keys({**section})) is not None:
                     warnings.append(
-                        f"В разделе {name} обнаружены посторонние ключи:\n{pretty_print(extra_keys)}")
+                        f"В разделе {name} обнаружены посторонние ключи:\n{pretty_print(extra_keys)}"
+                    )
 
                 if __is_ok and verbose:
                     messages.append(f"Раздел {name} задан корректно")
@@ -333,16 +377,15 @@ def inspect_sections(
 
 
 def validate_file(
-        root: StrPath,
-        lines: Iterable[str],
-        out: str | None = None,
-        verbose: bool = False):
+    root: StrPath, lines: Iterable[str], out: str | None = None, verbose: bool = False
+):
     max_length: int = max(map(len, lines)) + 5
 
     paths: dict[int, Path] = {
         index: Path(root).joinpath(line.strip().removeprefix("- "))
         for index, line in enumerate(lines)
-        if line.strip().startswith("- ") and ".." not in line}
+        if line.strip().startswith("- ") and ".." not in line
+    }
 
     _lines: list[str] = []
 
@@ -366,66 +409,71 @@ def validate_file(
 
         with open(out, mode) as f:
             f.write(
-                pretty_print(_lines).
-                replace(PASS_COLOR, "").
-                replace(FAIL_COLOR, "").
-                replace(NORMAL_COLOR, ""))
+                pretty_print(_lines)
+                .replace(PASS_COLOR, "")
+                .replace(FAIL_COLOR, "")
+                .replace(NORMAL_COLOR, "")
+            )
 
 
 @cli.command(
     "validate-yaml",
     cls=SwitchArgsAPIGroup,
-    help="Команда для валидации YAML-файла, используемого при генерации PDF")
+    help="Команда для валидации YAML-файла, используемого при генерации PDF",
+)
 @argument(
     "yaml_file",
-    type=ClickPath(
-        file_okay=True,
-        readable=True,
-        allow_dash=False,
-        dir_okay=False),
-    required=True)
+    type=ClickPath(file_okay=True, readable=True, allow_dash=False, dir_okay=False),
+    required=True,
+)
 @option(
-    "-o", "--output", "output",
+    "-o",
+    "--output",
+    "output",
     type=ClickPath(
         file_okay=True,
         readable=True,
         resolve_path=True,
         allow_dash=True,
-        dir_okay=False),
+        dir_okay=False,
+    ),
     help="\b\nФайл для записи вывода. По умолчанию: вывод в консоль",
     multiple=False,
     required=False,
     metavar="FILE",
-    default=None)
+    default=None,
+)
 @option(
-    "-v/-q", "--verbose/--quiet",
+    "-v/-q",
+    "--verbose/--quiet",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг подробного вывода.\nПо умолчанию: False, выводятся только ошибки",
     show_default=True,
     required=False,
-    default=False)
+    default=False,
+)
 @option(
-    "-k/-K", "--keep-logs/--remove-logs",
+    "-k/-K",
+    "--keep-logs/--remove-logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"
-         "\nработы в штатном режиме."
-         "\nПо умолчанию: False, лог-файл и директория удаляются",
+    "\nработы в штатном режиме."
+    "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
-@help_option(
-    "-h", "--help",
-    help=HELP,
-    is_eager=True)
+    default=False,
+)
+@help_option("-h", "--help", help=HELP, is_eager=True)
 @pass_context
 def validate_yaml_command(
-        ctx: Context,
-        yaml_file: StrPath,
-        output: StrPath = None,
-        verbose: bool = False,
-        keep_logs: bool = False):
+    ctx: Context,
+    yaml_file: StrPath,
+    output: StrPath = None,
+    verbose: bool = False,
+    keep_logs: bool = False,
+):
     if platform.startswith("win"):
         system("color")
 

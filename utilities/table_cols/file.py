@@ -14,10 +14,7 @@ from utilities.table_cols.table import Table
 
 
 class AsciiDocFile:
-    def __init__(
-            self,
-            path: str | Path, *,
-            content: Iterable[str] = None):
+    def __init__(self, path: str | Path, *, content: Iterable[str] = None):
         self._path: Path = Path(path)
 
         if content is None:
@@ -60,7 +57,8 @@ class AsciiDocFile:
         else:
             logger.error(
                 f"Ключ {item} для файла {self._path} должен быть типа int или slice,"
-                f"но получен {type(item)}")
+                f"но получен {type(item)}"
+            )
             raise TypeError
 
     def __setitem__(self, key, value):
@@ -70,14 +68,15 @@ class AsciiDocFile:
         else:
             logger.error(
                 f"Ключ {key} должен быть типа int, а значение {value} должно быть типа str, "
-                f"но получены {type(key)} и {type(value)}")
+                f"но получены {type(key)} и {type(value)}"
+            )
             raise TypeError
 
     def table_borders(self) -> Iterator[tuple[int, int]]:
         """Iterates over the table_cols borders signs, '|==='."""
         table_marks: list[int] = [
-            index for index, line in enumerate(iter(self))
-            if line.startswith("|===")]
+            index for index, line in enumerate(iter(self)) if line.startswith("|===")
+        ]
 
         # check if all tables are opened and closed
         # if not, the IndexError is raised
@@ -86,7 +85,8 @@ class AsciiDocFile:
             logger.error(
                 f"В файле {self._path} пропущен символ завершения таблицы '|==='\n"
                 f"Найдено {len(table_marks)}: в строках {line_indexes}",
-                tech_writers=True)
+                tech_writers=True,
+            )
             raise TableColsTableBorderNotClosedError
 
         for i in range(len(table_marks) // 2):
@@ -98,7 +98,7 @@ class AsciiDocFile:
 
         # get the limits by the '|===' lines
         for index, (start, stop) in enumerate(self.table_borders()):
-            lines: list[str] = self[start + 1:stop]
+            lines: list[str] = self[start + 1 : stop]
 
             options: dict[str, str | None] = dict()
 
@@ -144,19 +144,26 @@ class AsciiDocFile:
                 _: str = "\n".join(iter(table))
 
                 logger.debug(
-                    f"Таблица {table.name} не может быть обработана\n"
-                    f"Строки:\n{_}")
+                    f"Таблица {table.name} не может быть обработана\n" f"Строки:\n{_}"
+                )
 
     def replace_tables(self):
         """Replaces tables with the modified ones."""
         lines: list[str] = self[:]
 
         for table, start, stop in reversed(self._tables):
-            lines: list[str] = [*lines[:start - 1], "\n", str(table), *lines[stop + 1:]]
+            lines: list[str] = [
+                *lines[: start - 1],
+                "\n",
+                str(table),
+                *lines[stop + 1 :],
+            ]
 
         self._content = lines
 
-    def fix_tables(self, table_analyser: TableAnalyser, options: Mapping[str, str] = None):
+    def fix_tables(
+        self, table_analyser: TableAnalyser, options: Mapping[str, str] = None
+    ):
         """Adds the 'cols' option if not specified."""
         table: Table
         for table, *_ in self._tables:
@@ -170,20 +177,24 @@ class AsciiDocFile:
                 logger.warning(
                     "В таблице есть объединенные горизонтальные ячейки.\n"
                     "На данный момент такие таблицы оставляются как есть.\n"
-                    f"Таблица {table.index}, {table.name}")
+                    f"Таблица {table.index}, {table.name}"
+                )
                 continue
 
             # skip table_cols if it already has cols option
-            elif "cols" in table.options and any(digit in table.options.get("cols") for digit in digits):
-                logger.debug(f"Для таблицы {table.index}, {table.name} уже заданы ширины столбцов")
+            elif "cols" in table.options and any(
+                digit in table.options.get("cols") for digit in digits
+            ):
+                logger.debug(
+                    f"Для таблицы {table.index}, {table.name} уже заданы ширины столбцов"
+                )
                 continue
 
             # skip tables if some text has been accidentally processed as table_cols
             elif not bool(table):
                 _: str = "\n".join(iter(table))
 
-                logger.warning(
-                    f"Не удалось корректно обработать текст:\n{_}")
+                logger.warning(f"Не удалось корректно обработать текст:\n{_}")
                 continue
 
             else:
@@ -198,11 +209,14 @@ class AsciiDocFile:
                         else:
                             logger.debug(
                                 f"Опции {k} уже задано значение {table.options.get(k)} "
-                                f"в таблице {table.name} файла {self._path}")
+                                f"в таблице {table.name} файла {self._path}"
+                            )
 
                 table_column: TableColumn
                 table_analyser._column_parameters = [
-                    table_column.column_parameters() for table_column in table.iter_column_items()]
+                    table_column.column_parameters()
+                    for table_column in table.iter_column_items()
+                ]
                 table_analyser._table_id = f"{self._path.name}, {table.name}"
                 table_analyser.adjust()
                 table_analyser.inspect_valid()

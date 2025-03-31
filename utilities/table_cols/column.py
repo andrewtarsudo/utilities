@@ -19,6 +19,7 @@ class TableColumnParameters(NamedTuple):
     :param is_spaced: The flag if the cell texts have any spaces.
     :type is_spaced: bool
     """
+
     index: int
     minimum_length: int
     preferred_length: int
@@ -29,7 +30,8 @@ class TableColumnParameters(NamedTuple):
             f"Столбец {self.index}\n"
             f"Минимальная ширина: {self.minimum_length}\n"
             f"Предпочтительная ширина: {self.preferred_length}\n"
-            f"Содержит только неразрывный текст: {not self.is_spaced}")
+            f"Содержит только неразрывный текст: {not self.is_spaced}"
+        )
 
     def __repr__(self):
         return f"<{self.__class__.__name__}({self._asdict()})>"
@@ -68,6 +70,7 @@ class TableColumnParameters(NamedTuple):
 
 class TableColumn(NamedTuple):
     """Class to represent the row in the table_cols."""
+
     table_cells: list[TableCell]
     column: int
 
@@ -92,10 +95,12 @@ class TableColumn(NamedTuple):
             return self.table_cells[item]
 
         elif isinstance(item, slice):
-            return self.table_cells[item.start:item.stop:item.step]
+            return self.table_cells[item.start : item.stop : item.step]
 
         else:
-            logger.error(f"Ключ должен быть типа int или slice, но получено {type(item)}")
+            logger.error(
+                f"Ключ должен быть типа int или slice, но получено {type(item)}"
+            )
             raise TableColsTableColumnTypeError
 
     def is_spaced(self):
@@ -163,4 +168,9 @@ class TableColumn(NamedTuple):
             return NotImplemented
 
     def column_parameters(self):
-        return TableColumnParameters(self.column, self.minimum_length(), self.preferred_length(), self.is_spaced())
+        return TableColumnParameters(
+            self.column,
+            self.minimum_length(),
+            self.preferred_length(),
+            self.is_spaced(),
+        )
