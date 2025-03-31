@@ -32,15 +32,20 @@ class FileType(Enum):
             from yaml import safe_load as load_file
 
 
-def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str = "utf-8"):
+def file_reader(
+    path: StrPath, reader_mode: str | ReaderMode, *, encoding: str = "utf-8"
+):
     if isinstance(reader_mode, str):
         reader_mode: ReaderMode = ReaderMode[reader_mode]
 
     try:
-        with open(Path(path).expanduser().resolve(), "r", encoding=encoding, errors="ignore") as f:
+        with open(
+            Path(path).expanduser().resolve(), "r", encoding=encoding, errors="ignore"
+        ) as f:
             functions: dict[ReaderMode, Callable] = {
                 ReaderMode.STRING: f.read,
-                ReaderMode.LINES: f.readlines}
+                ReaderMode.LINES: f.readlines,
+            }
 
             _: str | list[str] = functions.get(reader_mode)()
 
@@ -53,16 +58,22 @@ def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str =
     except PermissionError as e:
         from os import stat
 
-        logger.error(f"{e.__class__.__name__}: недостаточно прав для чтения файла {path}")
+        logger.error(
+            f"{e.__class__.__name__}: недостаточно прав для чтения файла {path}"
+        )
         logger.error(f"Доступ: {stat(path).st_mode}")
         raise
 
     except RuntimeError as e:
-        logger.error(f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}")
+        logger.error(
+            f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}"
+        )
         raise
 
     except UnsupportedOperation as e:
-        logger.error(f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}")
+        logger.error(
+            f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}"
+        )
         raise
 
     except OSError as e:
@@ -70,7 +81,9 @@ def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str =
         raise
 
 
-def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = "utf-8"):
+def file_writer(
+    path: StrPath, content: str | Iterable[str], *, encoding: str = "utf-8"
+):
     path: Path = Path(path).expanduser().resolve()
     mode: str = "w" if path.exists() else "x"
 
@@ -84,16 +97,22 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
     except PermissionError as e:
         from os import stat
 
-        logger.error(f"{e.__class__.__name__}: недостаточно прав для записи в файл {path}")
+        logger.error(
+            f"{e.__class__.__name__}: недостаточно прав для записи в файл {path}"
+        )
         logger.error(f"Доступ: {stat(path).st_mode}")
         raise
 
     except RuntimeError as e:
-        logger.error(f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}")
+        logger.error(
+            f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}"
+        )
         raise
 
     except UnsupportedOperation as e:
-        logger.error(f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}")
+        logger.error(
+            f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}"
+        )
         raise
 
     except OSError as e:
@@ -101,7 +120,9 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
         raise
 
 
-def file_reader_type(path: StrPath, file_type: str | FileType, *, encoding: str = "utf-8"):
+def file_reader_type(
+    path: StrPath, file_type: str | FileType, *, encoding: str = "utf-8"
+):
     if isinstance(file_type, str):
         file_type: ReaderMode = ReaderMode[file_type]
 
@@ -128,22 +149,29 @@ def file_reader_type(path: StrPath, file_type: str | FileType, *, encoding: str 
     except PermissionError as e:
         from os import stat
 
-        logger.error(f"{e.__class__.__name__}: недостаточно прав для чтения файла {path}")
+        logger.error(
+            f"{e.__class__.__name__}: недостаточно прав для чтения файла {path}"
+        )
         logger.error(f"Доступ: {stat(path).st_mode}")
         raise
 
     except RuntimeError as e:
-        logger.error(f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}")
+        logger.error(
+            f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}"
+        )
         raise
 
     except UnsupportedOperation as e:
-        logger.error(f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}")
+        logger.error(
+            f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}"
+        )
         raise
 
     except ScannerError as e:
         logger.error(
             f"{e.__class__.__name__}: ошибка обработки файла {e.context_mark.name}"
-            f"\nв символе {e.context_mark.line + 1}:{e.context_mark.column + 1}")
+            f"\nв символе {e.context_mark.line + 1}:{e.context_mark.column + 1}"
+        )
         raise
 
     except OSError as e:
