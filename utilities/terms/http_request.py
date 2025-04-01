@@ -15,8 +15,8 @@ from utilities.common.errors import TermsRequiredAttributeMissingError
 from utilities.terms.const import CustomPort, CustomScheme
 
 try:
-    PROTOCOL: str = environ['PROTOCOL']
-    CHUNK_SIZE: int = int(environ['CHUNK_SIZE'])
+    PROTOCOL: str = environ["PROTOCOL"]
+    CHUNK_SIZE: int = int(environ["CHUNK_SIZE"])
 
 except KeyError:
     PROTOCOL = "HTTPS"
@@ -27,12 +27,14 @@ class CustomHTTPRequest:
     identifier = 0
 
     def __init__(
-            self, *,
-            scheme: str | None = None,
-            web_hook: str | None = None,
-            host: str | None = None,
-            port: int | None = None,
-            params: tuple[tuple[str, str], ...] | None = None):
+        self,
+        *,
+        scheme: str | None = None,
+        web_hook: str | None = None,
+        host: str | None = None,
+        port: int | None = None,
+        params: tuple[tuple[str, str], ...] | None = None,
+    ):
         if scheme is None:
             scheme: str = CustomScheme[PROTOCOL].value
 
@@ -55,13 +57,15 @@ class CustomHTTPRequest:
             f"\nweb hook = {self._web_hook},"
             f"\nhost = {self._host},"
             f"\npost = {self._port},"
-            f"\nparams = {self._params})")
+            f"\nparams = {self._params})"
+        )
 
     def __repr__(self):
         return (
             f"<{self.__class__.__name__}"
             f"({self._scheme}, {self._web_hook}, {self._host}, {self._port},"
-            f" {self._params})>")
+            f" {self._params})>"
+        )
 
     def __hash__(self):
         return hash(self.url())
@@ -129,7 +133,8 @@ class CustomPreparedRequest(NamedTuple):
             f"<{self.__class__.__name__}: "
             f"Connection #{self.index} ({self.url}, {self.data}, "
             f"{list(self.headers.keys())}, "
-            f"{self.host}, {self.unverifiable}, {self.method})>")
+            f"{self.host}, {self.unverifiable}, {self.method})>"
+        )
 
     def __hash__(self):
         return hash((self.host, self.headers, self.data))
@@ -150,16 +155,18 @@ class CustomPreparedRequest(NamedTuple):
 
     @classmethod
     def from_custom_request(
-            cls,
-            custom_http_request: CustomHTTPRequest, *,
-            method: str = None,
-            data: bytes = None,
-            headers: dict[str, str] = None):
+        cls,
+        custom_http_request: CustomHTTPRequest,
+        *,
+        method: str = None,
+        data: bytes = None,
+        headers: dict[str, str] = None,
+    ):
         if headers is None:
             headers = {}
 
         if data is None:
-            data = b''
+            data = b""
 
         if method is None:
             method: str = "GET"
@@ -171,7 +178,8 @@ class CustomPreparedRequest(NamedTuple):
             custom_http_request.host,
             False,
             method,
-            custom_http_request.index)
+            custom_http_request.index,
+        )
 
     def request(self) -> Request:
         if self.headers is None:
@@ -180,12 +188,8 @@ class CustomPreparedRequest(NamedTuple):
         self.headers["User-Agent"] = "My User Agent 1.0"
 
         return Request(
-            self.url,
-            self.data,
-            self.headers,
-            self.host,
-            self.unverifiable,
-            self.method)
+            self.url, self.data, self.headers, self.host, self.unverifiable, self.method
+        )
 
     def http_response(self) -> HTTPResponse:
         try:
@@ -198,10 +202,8 @@ class CustomPreparedRequest(NamedTuple):
 
 class CustomHTTPResponseChunked:
     def __init__(
-            self,
-            path: StrPath,
-            http_response: HTTPResponse, *,
-            chunk: int = CHUNK_SIZE):
+        self, path: StrPath, http_response: HTTPResponse, *, chunk: int = CHUNK_SIZE
+    ):
         self._path: Path = Path(path).resolve()
         self._http_response: HTTPResponse = http_response
         self._chunk: int = chunk

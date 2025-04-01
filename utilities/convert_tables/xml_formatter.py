@@ -25,7 +25,8 @@ class Formatting(Enum):
             fqdn("w:b"): "bold",
             fqdn("w:i"): "italic",
             fqdn("superscript"): "superscript",
-            fqdn("subscript"): "subscript"}
+            fqdn("subscript"): "subscript",
+        }
         return cls(_conversion_dict.get(tag))
 
 
@@ -35,7 +36,8 @@ def frame_line(line: str, formatting: Iterable[Formatting]) -> str:
         Formatting.ITALIC: ("_", "_"),
         Formatting.SUPERSCRIPT: ("<sup>", "</sup>"),
         Formatting.SUBSCRIPT: ("<sub>", "</sub>"),
-        Formatting.NONE: ("", "")}
+        Formatting.NONE: ("", ""),
+    }
 
     for _format in formatting:
         prefix, suffix = formatting_dict.get(_format)
@@ -85,12 +87,11 @@ def get_paragraph_text(p: Element) -> str:
     lines: list[str] = [
         frame_line(k, v)
         for r in p.findall(fqdn("w:r"), _ns)
-        for k, v in get_run_text(r).items()]
+        for k, v in get_run_text(r).items()
+    ]
 
     return "".join(lines)
 
 
 def get_all_text(element: Element) -> str:
-    return "<br>".join(
-        get_paragraph_text(p)
-        for p in element.findall(fqdn("w:p"), _ns))
+    return "<br>".join(get_paragraph_text(p) for p in element.findall(fqdn("w:p"), _ns))
