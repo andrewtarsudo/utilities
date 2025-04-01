@@ -4,11 +4,11 @@ from typing import NamedTuple
 
 from loguru import logger
 
-from utilities.common.shared import StrPath
 from utilities.common.errors import TermsInvalidProjectIdError
 from utilities.common.functions import file_writer
-from utilities.terms.const import CustomPort, CustomScheme
 from utilities.terms.http_request import CustomHTTPRequest, CustomHTTPResponseChunked, CustomPreparedRequest
+from utilities.common.shared import StrPath
+from utilities.terms.const import CustomPort, CustomScheme
 
 
 class ContentGitPage(NamedTuple):

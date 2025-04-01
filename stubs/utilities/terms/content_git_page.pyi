@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 from typing import NamedTuple
 from utilities.common.shared import StrPath as StrPath
-from utilities.common.errors import TermsInvalidProjectIdError as TermsInvalidProjectIdError
-from utilities.common.functions import file_writer as file_writer
-from utilities.terms.const import CustomPort as CustomPort, CustomScheme as CustomScheme
-from utilities.terms.http_request import CustomHTTPRequest as CustomHTTPRequest, \
-    CustomHTTPResponseChunked as CustomHTTPResponseChunked, CustomPreparedRequest as CustomPreparedRequest
 
 
 class ContentGitPage(NamedTuple):

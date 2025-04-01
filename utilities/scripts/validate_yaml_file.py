@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import Counter
 from os import system
 from pathlib import Path
 from sys import platform
@@ -26,7 +27,7 @@ _DICT_RESULTS: dict[bool, dict[str, str]] = {
         "status": "OK",
         "color": PASS_COLOR},
     False: {
-        "status": "NOT OK",
+        "status": "FAIL",
         "color": FAIL_COLOR}}
 
 
@@ -35,8 +36,7 @@ def determine_key(item: Mapping, keys: Iterable[str]):
         if key in item:
             return key
 
-    else:
-        return None
+    return None
 
 
 def detect_extra_keys(item: Mapping[str, Any]):
@@ -54,38 +54,11 @@ class GeneralInfo(NamedTuple):
     names: set[str] = set()
     non_unique_names: set[str] = set()
 
-    def find_non_unique_name_indexes(self, lines: list[str]):
-        non_unique: dict[str, list[int]] = {non_unique_name: [] for non_unique_name in self.non_unique_names}
-
-        for index, line in enumerate(iter(lines)):
-            for name in self.non_unique_names:
-                if line.startswith(f"{name}:"):
-                    non_unique[name].append(index)
-
-        self.warnings.extend(f"Ключ {k} не уникален: повторяется в строках: {''.join(map(str, v))}" for k, v in non_unique.items())
-
 
 general_info: GeneralInfo = GeneralInfo()
 
 
-def inspect_settings(
-        content: Mapping[str, Any],
-        verbose: bool,
-        # warnings: Iterable[str] = None,
-        # messages: Iterable[str] = None
-):
-    # if warnings is None:
-    #     warnings: list[str] = []
-    #
-    # else:
-    #     warnings: list[str] = [*warnings]
-    #
-    # if messages is None:
-    #     messages: list[str] = []
-    #
-    # else:
-    #     messages: list[str] = [*messages]
-
+def inspect_settings(content: Mapping[str, Any], verbose: bool):
     if all(key not in content for key in iter(_SETTINGS_NAMES)):
         general_info.messages.append("Отсутствует раздел с параметрами 'Settings'")
 
@@ -113,27 +86,8 @@ def inspect_settings(
         if __is_ok and verbose:
             general_info.messages.append("Раздел 'settings' задан корректно")
 
-    # return warnings, messages
 
-
-def inspect_legal(
-        content: Mapping[str, Any],
-        verbose: bool,
-        # warnings: Iterable[str] = None,
-        # messages: Iterable[str] = None
-):
-    # if warnings is None:
-    #     warnings: list[str] = []
-    #
-    # else:
-    #     warnings: list[str] = [*warnings]
-    #
-    # if messages is None:
-    #     messages: list[str] = []
-    #
-    # else:
-    #     messages: list[str] = [*messages]
-
+def inspect_legal(content: Mapping[str, Any], verbose: bool):
     if all(key not in content for key in iter(_RIGHTS_NAMES)):
         general_info.warnings.append("Отсутствует раздел с юридической информацией 'Rights'")
 
@@ -220,29 +174,9 @@ def inspect_legal(
         if __is_ok and verbose:
             general_info.messages.append("Раздел 'Rights' задан корректно")
 
-    # return warnings, messages
 
-
-def inspect_sections(
-        content: Mapping[str, Any],
-        verbose: bool,
-        # warnings: Iterable[str] = None,
-        # messages: Iterable[str] = None
-):
-    # if warnings is None:
-    #     warnings: list[str] = []
-    #
-    # else:
-    #     warnings: list[str] = [*warnings]
-    #
-    # if messages is None:
-    #     messages: list[str] = []
-    #
-    # else:
-    #     messages: list[str] = [*messages]
-
+def inspect_sections(content: Mapping[str, Any], verbose: bool):
     for name, section in content.items():
-        print(f"{name=}")
         if name in general_info.names:
             general_info.non_unique_names.add(name)
 
@@ -266,7 +200,7 @@ def inspect_sections(
                 __is_ok: bool = True
 
                 if "title" in section.keys():
-                    title: dict[str, str | bool] = section.get("title", dict())
+                    title: dict[str, str | bool] = section.get("title", {})
 
                     if title is None:
                         general_info.warnings.append(f"В разделе {name} объявлена секция title, хотя она пуста")
@@ -311,6 +245,12 @@ def inspect_sections(
                                     f"Значение ключа '{name}::title::level' должно быть целым числом, диапазон: [0-9], "
                                     f"но получено {level}")
                                 __is_ok: bool = False
+
+                        for key in title.keys():
+                            if key not in ("title-files", "value", "level"):
+                                print(f"{key=}")
+                                general_info.warnings.append(
+                                    f"Ключ {key} не должен находиться в секции title раздела {name}")
 
                 if "index" in section.keys():
                     index = section.get("index")
@@ -359,7 +299,25 @@ def inspect_sections(
                 if __is_ok and verbose:
                     general_info.messages.append(f"Раздел {name} задан корректно")
 
-    # return warnings, messages
+
+def find_non_unique(lines: list[str]):
+    keys: dict[int, str] = {
+        index: line.strip("\n")
+        for index, line in enumerate(iter(lines))
+        if not line.startswith(" ") and line.strip("\n")}
+
+    counter: Counter = Counter(keys.values())
+    repeating: list[str] = [key for key, value in counter.items() if value > 1]
+    non_unique: dict[str, list[int]] = {_: [] for _ in repeating}
+
+    for k, v in keys.items():
+        if v in repeating:
+            non_unique[v].append(k)
+
+    general_info.warnings.extend(
+        f"Ключ {_non_unique_key} не уникален: повторяется в строках: "
+        f"{','.join(map(str, _non_unique_value))}"
+        for _non_unique_key, _non_unique_value in non_unique.items())
 
 
 def validate_file(
@@ -367,7 +325,7 @@ def validate_file(
         lines: Iterable[str],
         out: str | None = None,
         verbose: bool = False):
-    max_length: int = max(map(len, lines)) + 5
+    max_length: int = max(map(len, lines)) + 3
 
     paths: dict[int, Path] = {
         index: Path(root).joinpath(line.strip().removeprefix("- "))
@@ -384,7 +342,7 @@ def validate_file(
 
         _path: str = path.relative_to(root).as_posix()
 
-        _line = f"{_color}{line_no + 1:>4}  {_path: <{max_length}}{_status: >6}{NORMAL_COLOR}"
+        _line = f"{_color}{line_no + 1:>4}  {_path: <{max_length}}{_status: >5}{NORMAL_COLOR}"
         _lines.append(_line)
 
         if verbose or _status == "NOT OK":
@@ -463,16 +421,14 @@ def validate_yaml_command(
 
     content: dict[str, Any] = file_reader_type(yaml_file, FileType.YAML)
 
-    # warnings: list[str] = []
-    # messages: list[str] = []
-
-    # warnings, messages = inspect_settings(content, verbose, warnings, messages)
-    # warnings, messages = inspect_legal(content, verbose, warnings, messages)
-    # warnings, messages = inspect_sections(content, verbose, warnings, messages)
-
     inspect_settings(content, verbose)
     inspect_legal(content, verbose)
     inspect_sections(content, verbose)
+
+    lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
+
+    find_non_unique(lines)
+    validate_file(yaml_file.parent, lines, output, verbose)
 
     if general_info.warnings:
         logger.warning("Предупреждения:")
@@ -483,13 +439,6 @@ def validate_yaml_command(
 
     elif not verbose:
         echo("Проблемы с парамерами разделов не обнаружены\n")
-
-    lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
-    general_info.find_non_unique_name_indexes(lines)
-
-    print(general_info.non_unique_names)
-
-    validate_file(yaml_file.parent, lines, output, verbose)
 
     if output is not None:
         echo(f"Файл с результатами: {output.resolve()}")
