@@ -248,7 +248,6 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
 
                         for key in title.keys():
                             if key not in ("title-files", "value", "level"):
-                                print(f"{key=}")
                                 general_info.warnings.append(
                                     f"Ключ {key} не должен находиться в секции title раздела {name}")
 
