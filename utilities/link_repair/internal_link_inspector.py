@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from re import sub, Match
+from re import Match, sub
 from typing import Iterator
 
 from loguru import logger
+from slugify.slugify import slugify
 
 from utilities.common.errors import LinkRepairFileInvalidTypeError, LinkRepairInvalidMatchError
 from utilities.link_repair.file_dict import TextFile
@@ -10,7 +11,7 @@ from utilities.link_repair.file_dict import TextFile
 __all__ = ["InternalLinkInspector", "internal_inspector"]
 
 
-def _replace_dash_underline(match: Match) -> str:
+def format_camel_case(match: Match) -> str:
     """Replaces snake_case and kebab-case with camelCase.
 
     :param match: The substring matching the pattern.
@@ -39,7 +40,7 @@ def _iter_internal_options(line: str) -> Iterator[str]:
     """
     to_underline: str = line.replace("-", "_")
     to_dash: str = line.replace("_", "-")
-    to_camel_case: str = sub("([-_])(\\w)", _replace_dash_underline, line)
+    to_camel_case: str = sub("([-_])(\\w)", format_camel_case, line)
 
     return iter((to_underline, to_dash, to_camel_case))
 
@@ -85,6 +86,11 @@ class InternalLinkInspector:
         for _modified_anchor in _iter_internal_options(anchor):
             if _modified_anchor in self._text_file.iter_anchors():
                 return _modified_anchor
+
+        _updated_anchor: str = f"{anchor}-{slugify(self._text_file.full_path.stem)}"
+
+        if _updated_anchor in self._text_file.iter_anchors():
+            return _updated_anchor
 
         else:
             return

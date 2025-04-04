@@ -146,7 +146,7 @@ class LoggerConfiguration:
          "<cyan>{module}</cyan>::<cyan>{function}</cyan>",
          "<cyan>{file.name}</cyan>::<cyan>{name}</cyan>::<cyan>{line}</cyan>",
          "\n<level>{message}</level>"))
-    _USER_FORMAT: str = "{message}\n"
+    _USER_FORMAT: str = "<level>{message}</level>\n"
 
     def __init__(
             self,

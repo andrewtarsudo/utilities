@@ -103,11 +103,11 @@ class GeneralStorage:
 
     def __iter__(self) -> Iterator[Path]:
         return iter(
-            [
+            (
                 *self._dir_indexes.values(),
                 *self._dirindexes.values(),
                 *self._text_files.values(),
-                *self._non_text_files.values()])
+                *self._non_text_files.values()))
 
     def join_path(self, path: StrPath) -> Path:
         """Specifies the path basing on the root_dir.

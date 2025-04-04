@@ -288,7 +288,7 @@ class TextFile(DirFile):
             for index in line_number:
                 single_number(index, boundaries)
 
-        logger.success(f"{old_line} -> {new_line}, в файле {self.rel_path} в строках: {line_number}\n")
+        logger.success(f"{old_line} -> {new_line}, в файле {self.rel_path} в строках: {line_number}")
 
     def find_anchor(self, anchor: str) -> list[int]:
         """Searches for the indexes of the anchor.

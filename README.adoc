@@ -24,7 +24,7 @@
 :mme: ../MME/content/common/
 :pcrf: ../PCRF/content/common/
 ifdef::backend-html5[:toc: right]
-ifdef::env-idea[toc:auto]
+ifdef::env-idea[:toc: auto]
 
 == Общая информация
 

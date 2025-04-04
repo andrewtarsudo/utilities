@@ -100,7 +100,7 @@ class AsciiDocFile:
         for index, (start, stop) in enumerate(self.table_borders()):
             lines: list[str] = self[start + 1:stop]
 
-            options: dict[str, str | None] = dict()
+            options: dict[str, str | None] = {}
 
             # gets the options if specified
             # sign '=' is used for options like 'key="value"'

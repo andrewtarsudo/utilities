@@ -36,7 +36,7 @@ class TableAnalyser:
 
         self._max_symbols: int = max_symbols
         self._min_column: int = min_column
-        self._columns: dict[int, int] = dict()
+        self._columns: dict[int, int] = {}
         self._column_parameters: list[TableColumnParameters] = []
         self._is_valid: bool | None = None
         self._table_id: str | None = None
@@ -112,7 +112,7 @@ class TableAnalyser:
             if rest:
                 # the ratios to divide the rest
                 # according to their preferred lengths minus the corresponding current ones
-                ratios: dict[int, int] = dict()
+                ratios: dict[int, int] = {}
 
                 for column_parameters in iter(self):
                     if column_parameters.is_spaced:

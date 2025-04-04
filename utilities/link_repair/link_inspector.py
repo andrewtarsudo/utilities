@@ -336,14 +336,17 @@ class LinkInspector:
 
         elif self._proper_anchor == "/#_valid_anchor_":
             logger.error(
-                f"В файле {self.error_file(self._link.from_file)} ссылка должна быть:\n"
-                f"{self._proper_link}, но получено\n{self._link.link_to}", result=True)
-            return True
+                f"В файле {self.error_file(self._link.from_file)} ссылка должна быть:"
+                f"\n{self._proper_link}, но получено"
+                f"\n{self._link.link_to}")
+            self._proper_anchor = "/"
+            return False
 
         else:
             logger.warning(
-                f"В файле {self.error_file(self._link.from_file)} ссылка должна быть:\n"
-                f"{self._proper_link}, но получено\n{self._link.link_to}", result=True)
+                f"В файле {self.error_file(self._link.from_file)} ссылка должна быть:"
+                f"\n{self._proper_link}, но получено"
+                f"\n{self._link.link_to}")
             return False
 
     def clear(self):
