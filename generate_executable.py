@@ -16,7 +16,7 @@ if __name__ == "__main__":
         spec_file: str = "utilities.spec"
         exe_file: str = r"./bin/tw_utilities"
 
-    environ["VIRTUAL_ENV"] = "venv"
+    environ["VIRTUAL_ENV"] = ".venv"
 
     install: list[str] = [
         "uv",
