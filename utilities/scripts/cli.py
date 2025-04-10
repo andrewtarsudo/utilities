@@ -11,6 +11,7 @@ from click.decorators import group, help_option, option, pass_context
 from click.exceptions import UsageError
 from click.formatting import HelpFormatter
 from click.globals import get_current_context
+from click.shell_completion import CompletionItem
 from click.termui import pause, style
 from click.types import BOOL
 from click.utils import echo
@@ -289,6 +290,30 @@ def print_version(ctx: Context, param: Parameter, value: Any):
     ctx.exit(0)
 
 
+def build_command_tree(cmd):
+    tree = {}
+    if isinstance(cmd, Group):
+        for name, subcmd in cmd.commands.items():
+            tree[name] = build_command_tree(subcmd)
+    else:
+        tree = None
+
+    return tree
+
+
+def get_completions(tokens, tree=None):
+    if tree is None:
+        tree = build_command_tree(cli)
+    for token in tokens:
+        if token.startswith("-"):
+            continue
+        if tree and token in tree:
+            tree = tree[token]
+        else:
+            return []
+    return list(tree.keys()) if tree else []
+
+
 class APIGroup(Group):
     def __init__(self, **attrs: Any):
         kwargs: dict[str, bool] = {"invoke_without_command": True, "chain": False}
@@ -312,8 +337,6 @@ class APIGroup(Group):
         format_options(self, ctx, formatter)
 
     def format_epilog(self, ctx: Context, formatter: HelpFormatter) -> None:
-        # format_epilog(self, ctx, formatter)
-
         if self.epilog:
             super().format_epilog(ctx, formatter)
 
@@ -338,6 +361,19 @@ class APIGroup(Group):
             logger.error(f"Ошибка {e.__class__.__name__}")
             pause(PRESS_ENTER_KEY)
             ctx.exit(1)
+
+    def shell_complete(self, ctx: Context, incomplete: str) -> list[CompletionItem]:
+        commands: list[CompletionItem] = [
+            CompletionItem(cmd_name)
+            for cmd_name in self.list_commands(ctx)
+            if cmd_name.startswith(incomplete)]
+
+        params: list[CompletionItem] = [
+            CompletionItem(param)
+            for param in self.params
+            if param.opts[0].startswith(incomplete) or param.opts[0].startswith(incomplete)]
+
+        return [*commands, *params]
 
 
 class SwitchArgsAPIGroup(APIGroup):

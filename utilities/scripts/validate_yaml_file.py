@@ -297,7 +297,7 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
                             if not isinstance(level, int):
                                 general_info.warnings.append(
                                     f"Значение ключа '{name}::title::level' должно быть типа int, "
-                                    f"но получено {type(level)}")
+                                    f"но получено {type(level).__name__}")
                                 __is_ok: bool = False
 
                             elif level < 0 or level > 9:
