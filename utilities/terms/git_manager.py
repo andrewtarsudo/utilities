@@ -93,7 +93,7 @@ class GitManager:
 
     def set_terms(self):
         file_writer(self.TEMP_TERMS_BASIC, self._content_git_terms.content)
-        lines: list[str] = file_reader(self.TEMP_TERMS_BASIC, ReaderMode.LINES, encoding="cp1251")
+        lines: list[str] = file_reader(self.TEMP_TERMS_BASIC, "lines", encoding="cp1251")
         self._lines = lines[6:-1]
 
     def __iter__(self):

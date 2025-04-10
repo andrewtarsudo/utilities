@@ -6,8 +6,8 @@ from click.decorators import help_option, option, pass_context
 from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
+from utilities.common.functions import file_reader
 from utilities.common.shared import HELP, MAX_SYMBOLS, MIN_COLUMN, StrPath
-from utilities.common.functions import file_reader, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, cli
 from utilities.scripts.list_files import get_files
 from utilities.table_cols.analyser import TableAnalyser
@@ -127,7 +127,7 @@ def table_cols_command(
 
         for file in files:
             logger.debug(f"Файл {file}")
-            content: list[str] = file_reader(file, ReaderMode.LINES, encoding="utf-8")
+            content: list[str] = file_reader(file, "lines", encoding="utf-8")
             ascii_doc_file: AsciiDocFile = AsciiDocFile(file, content=content)
             ascii_doc_file.set_tables()
             ascii_doc_file.fix_tables(table_analyser, options)

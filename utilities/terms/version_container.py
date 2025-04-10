@@ -145,5 +145,5 @@ class VersionContainer:
             self._version_basic = Version(0, 0, 0)
 
         else:
-            line: str = file_reader(self._basic_version_file, ReaderMode.STRING)
+            line: str = file_reader(self._basic_version_file, "string")
             self._version_basic = Version.from_string(line)

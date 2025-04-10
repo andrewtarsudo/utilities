@@ -297,6 +297,7 @@ class APIGroup(Group):
 
     def format_help(self, ctx: Context, formatter: HelpFormatter) -> None:
         format_help(self, ctx, formatter)
+        self.format_epilog(ctx, formatter)
 
     def format_usage(self, ctx: Context, formatter: HelpFormatter) -> None:
         format_usage(self, ctx, formatter)
@@ -311,7 +312,10 @@ class APIGroup(Group):
         format_options(self, ctx, formatter)
 
     def format_epilog(self, ctx: Context, formatter: HelpFormatter) -> None:
-        format_epilog(self, ctx, formatter)
+        # format_epilog(self, ctx, formatter)
+
+        if self.epilog:
+            super().format_epilog(ctx, formatter)
 
     # noinspection PyTypeChecker
     def format_args(self, ctx: Context, formatter: HelpFormatter):

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 from io import UnsupportedOperation
+from os import scandir
 from pathlib import Path
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Literal, TypeAlias
 
 from loguru import logger
 from yaml.scanner import ScannerError
@@ -10,13 +11,7 @@ from yaml.scanner import ScannerError
 from utilities.common.errors import FileReaderError
 from utilities.common.shared import StrPath
 
-
-class ReaderMode(Enum):
-    STRING = "string"
-    LINES = "lines"
-
-    def __str__(self):
-        return self._value_
+ReaderMode: TypeAlias = Literal["string", "lines"]
 
 
 class FileType(Enum):
@@ -32,15 +27,12 @@ class FileType(Enum):
             from yaml import safe_load as load_file
 
 
-def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str = "utf-8"):
-    if isinstance(reader_mode, str):
-        reader_mode: ReaderMode = ReaderMode[reader_mode]
-
+def file_reader(path: StrPath, reader_mode: ReaderMode, *, encoding: str = "utf-8"):
     try:
         with open(Path(path).expanduser().resolve(), "r", encoding=encoding, errors="ignore") as f:
             functions: dict[ReaderMode, Callable] = {
-                ReaderMode.STRING: f.read,
-                ReaderMode.LINES: f.readlines}
+                "string": f.read,
+                "lines": f.readlines}
 
             _: str | list[str] = functions.get(reader_mode)()
 
@@ -149,3 +141,83 @@ def file_reader_type(path: StrPath, file_type: str | FileType, *, encoding: str 
     except OSError as e:
         logger.error(f"{e.__class__.__name__}: {e.strerror}")
         raise
+
+
+def check_path(
+        path: StrPath,
+        ignored_dirs: Iterable[str] = None,
+        ignored_files: Iterable[str] = None,
+        extensions: Iterable[str] = None,
+        language: str | None = None):
+    if ignored_dirs is None:
+        ignored_dirs: set[str] = set()
+
+    if ignored_files is None:
+        ignored_files: set[str] = set()
+
+    path: Path = Path(path)
+
+    is_dir: bool = path.is_dir()
+    is_in_ignored_dirs: bool = any(part in ignored_dirs for part in path.parts)
+    has_ignored_name: bool = path.name in ignored_dirs
+    is_in_ignored_files: bool = path.stem in ignored_files
+    has_ignored_extension: bool = path.suffix not in extensions if extensions else False
+
+    if language is None:
+        has_ignored_language: bool = False
+
+    elif not language:
+        has_ignored_language: bool = len(path.suffixes) == 1
+
+    else:
+        has_ignored_language: bool = f".{language}" not in path.suffixes
+
+    conditions: list[bool] = [
+        is_dir, is_in_ignored_dirs, has_ignored_name, is_in_ignored_files, has_ignored_extension, has_ignored_language]
+
+    logger.debug(
+        f"Проверка пути {path}:"
+        f"\nis_dir = {is_dir}"
+        f"\nis_in_ignored_dirs = {is_in_ignored_dirs}"
+        f"\nhas_ignored_name = {has_ignored_name}"
+        f"\nis_in_ignored_files = {is_in_ignored_files}"
+        f"\nhas_ignored_extension = {has_ignored_extension}"
+        f"\nhas_ignored_language = {has_ignored_language}\n")
+
+    return not any(conditions)
+
+
+def walk_full(
+        path: StrPath, *,
+        ignored_dirs: Iterable[str] = None,
+        ignored_files: Iterable[str] = None,
+        extensions: Iterable[str] = None,
+        language: str | None = None,
+        root: Path = None,
+        results: list[Path] = None):
+    if root is None:
+        root: Path = Path(path)
+
+    if results is None:
+        results: list[Path] = []
+
+    for element in scandir(path):
+        item: Path = Path(element.path)
+
+        if element.is_dir(follow_symlinks=True):
+            walk_full(
+                item,
+                ignored_dirs=ignored_dirs,
+                ignored_files=ignored_files,
+                extensions=extensions,
+                language=language,
+                root=root,
+                results=results)
+
+        elif check_path(item, ignored_dirs, ignored_files, extensions, language):
+            results.append(item.relative_to(root))
+
+        else:
+            continue
+
+    return results

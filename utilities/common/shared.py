@@ -80,24 +80,21 @@ class FileType(Enum):
     NONE = ""
 
 
-def file_reader(path: StrPath, reader_mode: str | ReaderMode, *, encoding: str = "utf-8"):
+def file_reader(path: StrPath, reader_mode: ReaderMode, *, encoding: str = "utf-8"):
     """Reads the text file content.
 
     :param path: The path to the file.
     :type path: str | Path
     :param reader_mode: The type of the result to get.
-    :type reader_mode: str | ReaderMode
+    :type reader_mode: ReaderMode
     :param encoding: The file encoding.
     :type encoding: str
     """
-    if isinstance(reader_mode, str):
-        reader_mode: ReaderMode = ReaderMode[reader_mode]
-
     try:
         with open(Path(path).expanduser().resolve(), "r", encoding=encoding, errors="ignore") as f:
-            functions: dict[ReaderMode, Callable] = {
-                ReaderMode.STRING: f.read,
-                ReaderMode.LINES: f.readlines}
+            functions: dict[ReaderMode | str, Callable] = {
+                "string": f.read,
+                "lines": f.readlines}
 
             _: str | list[str] = functions.get(reader_mode)()
 
@@ -257,6 +254,9 @@ def _prettify(value: Any):
 def pretty_print(values: Iterable[StrPath] = None):
     if values is None or not values:
         return ""
+
+    elif isinstance(values, str):
+        return f"{values}"
 
     else:
         return "\n".join(map(_prettify, values))

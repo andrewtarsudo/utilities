@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from collections.abc import Iterable
-from os import scandir
 from pathlib import Path
 from sys import platform
 
@@ -11,6 +10,7 @@ from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 from loguru import logger
 
+from utilities.common.functions import walk_full
 from utilities.common.shared import HELP, PRESS_ENTER_KEY, pretty_print, StrPath
 from utilities.scripts.cli import clear_logs, cli, MutuallyExclusiveOption, SwitchArgsAPIGroup
 
@@ -39,79 +39,12 @@ def generate_base_root(path: Path, content_common_index: int):
         return path.relative_to(Path().joinpath("/".join(parts[:content_common_index]))).as_posix()
 
 
-def check_path(
-        path: StrPath,
-        ignored_dirs: Iterable[str],
-        ignored_files: Iterable[str],
-        extensions: Iterable[str],
-        language: str | None):
-    path: Path = Path(path)
-
-    is_dir: bool = path.is_dir()
-    is_in_ignored_dirs: bool = any(part in ignored_dirs for part in path.parts)
-    has_ignored_name: bool = path.name in ignored_dirs
-    is_in_ignored_files: bool = path.stem in ignored_files
-    has_ignored_extension: bool = path.suffix not in extensions if extensions else False
-
-    if language is None:
-        has_ignored_language: bool = False
-
-    elif not language:
-        has_ignored_language: bool = len(path.suffixes) == 1
-
-    else:
-        has_ignored_language: bool = f".{language}" not in path.suffixes
-
-    conditions: list[bool] = [
-        is_dir, is_in_ignored_dirs, has_ignored_name, is_in_ignored_files, has_ignored_extension, has_ignored_language]
-
-    logger.debug(
-        f"Проверка пути {path}:"
-        f"\nis_dir = {is_dir}"
-        f"\nis_in_ignored_dirs = {is_in_ignored_dirs}"
-        f"\nhas_ignored_name = {has_ignored_name}"
-        f"\nis_in_ignored_files = {is_in_ignored_files}"
-        f"\nhas_ignored_extension = {has_ignored_extension}"
-        f"\nhas_ignored_language = {has_ignored_language}\n")
-
-    return not any(conditions)
-
-
 def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     if values is None:
         return []
 
     else:
         return [f"{prefix}{value}" for value in values]
-
-
-def walk_full(
-        path: StrPath,
-        ignored_dirs: Iterable[str],
-        ignored_files: Iterable[str],
-        extensions: Iterable[str],
-        language: str | None,
-        root: Path = None,
-        results: list[Path] = None):
-    if root is None:
-        root: Path = Path(path)
-
-    if results is None:
-        results: list[Path] = []
-
-    for element in scandir(path):
-        item: Path = Path(element.path)
-
-        if element.is_dir(follow_symlinks=True):
-            walk_full(item, ignored_dirs, ignored_files, extensions, language, root, results)
-
-        elif check_path(item, ignored_dirs, ignored_files, extensions, language):
-            results.append(item.relative_to(root))
-
-        else:
-            continue
-
-    return results
 
 
 @cli.command(
@@ -386,7 +319,12 @@ def list_files_command(
         f"\nauxiliary = {auxiliary}"
         f"\nkeep_logs = {keep_logs}")
 
-    values: list[Path] | None = walk_full(root_dir, ignored_dirs, ignored_files, extensions, language)
+    values: list[Path] | None = walk_full(
+        root_dir,
+        ignored_dirs=ignored_dirs,
+        ignored_files=ignored_files,
+        extensions=extensions,
+        language=language)
 
     if values is None or not values:
         echo(f"Подходящих файлов в директории {root_dir} не найдено")

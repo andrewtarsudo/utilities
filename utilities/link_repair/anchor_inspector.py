@@ -5,11 +5,11 @@ from typing import Iterable
 
 from loguru import logger
 
-from utilities.common.shared import pretty_print, separator
 from utilities.common.errors import LinkRepairFileInvalidTypeError, LinkRepairMissingFileError
-from utilities.common.functions import file_reader, ReaderMode
-from utilities.link_repair.file_dict import TextFile
+from utilities.common.functions import file_reader
+from utilities.common.shared import pretty_print, separator
 from utilities.link_repair.const import FileLanguage, prepare_logging
+from utilities.link_repair.file_dict import TextFile
 
 
 # noinspection PyUnresolvedReferences
@@ -53,14 +53,14 @@ class AnchorInspector:
 
     def __add__(self, other):
         if isinstance(other, TextFile):
-            other._content = file_reader(other.full_path, ReaderMode.LINES, encoding="utf-8")
+            other._content = file_reader(other.full_path, "lines", encoding="utf-8")
             self._dict_anchors[other] = list(other.iter_anchors())
 
         elif isinstance(other, Iterable):
             text_files: list[TextFile] = [_ for _ in other if isinstance(_, TextFile)]
 
             for text_file in text_files:
-                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, encoding="utf-8")
+                text_file._content = file_reader(text_file.full_path, "lines", encoding="utf-8")
                 self._dict_anchors[text_file] = list(text_file.iter_anchors())
 
         else:

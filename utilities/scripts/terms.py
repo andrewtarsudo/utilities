@@ -9,8 +9,8 @@ from click.types import BOOL
 from click.utils import echo
 from loguru import logger
 
+from utilities.common.functions import file_reader
 from utilities.common.shared import HELP, PRESS_ENTER_KEY, pretty_print
-from utilities.common.functions import file_reader, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, cli, MutuallyExclusiveOption
 from utilities.terms.ascii_doc_table_terms import AsciiDocTableTerms
 from utilities.terms.git_manager import git_manager
@@ -34,7 +34,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
 
     path: Path = command_files.get(param.name)
 
-    result: str = file_reader(path, ReaderMode.STRING)
+    result: str = file_reader(path, "string")
     echo(result)
     pause(PRESS_ENTER_KEY)
     ctx.exit(0)
@@ -168,20 +168,20 @@ def terms_command(
     ascii_doc_table.set_terms()
 
     if all_flag:
-        result: str = file_reader(INFO_FILE, ReaderMode.STRING)
+        result: str = file_reader(INFO_FILE, "string")
 
     elif full_flag:
         terms_full: list[Term] = [v for values in iter(ascii_doc_table.dict_terms.values()) for v in values]
         result: str = "\n".join(map(lambda x: x.formatted(), terms_full))
 
     elif info_flag:
-        result: str = file_reader(INFO_FILE, ReaderMode.STRING)
+        result: str = file_reader(INFO_FILE, "string")
 
     elif readme_flag:
-        result: str = file_reader(README_FILE, ReaderMode.STRING)
+        result: str = file_reader(README_FILE, "string")
 
     elif samples_flag:
-        result: str = file_reader(SAMPLES_FILE, ReaderMode.STRING)
+        result: str = file_reader(SAMPLES_FILE, "string")
 
     elif terms is None or not terms:
         echo("Не задана ни одна аббревиатура")

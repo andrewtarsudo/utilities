@@ -9,8 +9,8 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
+from utilities.common.functions import file_reader
 from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, separator, StrPath
-from utilities.common.functions import file_reader, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, cli
 from utilities.scripts.list_files import get_files
 
@@ -54,7 +54,7 @@ def find_first_russian_char(line: str):
 
 
 def file_inspection(path: str, is_color: bool = True):
-    lines: list[str] = file_reader(path, ReaderMode.LINES, encoding="utf-8")
+    lines: list[str] = file_reader(path, "lines", encoding="utf-8")
 
     results: list[str] = []
 

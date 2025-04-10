@@ -2,33 +2,107 @@
 
 [source,console,subs="attributes+"]
 ----
-{name} validate-yaml ../PCRF/PDF_Protei_PCRF.yml --verbose
-Предупреждения:
+{name} validate-yaml ../MME/PDF_Protei_MME.yml --verbose --guess
+  17  content/common/_index.adoc                                                 FAIL
+  21  content/common/general.md                                                  FAIL
+  23  content/common/basics/functionalities.md                                     OK
+  24  content/common/basics/network_architecture.md                                OK
+  25  content/common/basics/internal_architecture.md                               OK
+  26  content/common/basics/vnf_arch.md                                            OK
+  27  content/common/basics/requirements_hw_sw.md                                  OK
+  28  content/common/basics/lifecycle.md                                           OK
+  29  content/common/basics/specifications.md                                      OK
+  36  content/common/oam/system_management.md                                      OK
+  37  content/common/oam/api.md                                                    OK
+  38  content/common/oam/cli.md                                                    OK
+  39  content/common/oam/add_imsi.md                                               OK
+  40  content/common/oam/update.md                                                 OK
+  41  content/common/oam/backup_recovery.md                                        OK
+  42  content/common/oam/performance_kpi.md                                        OK
+  46  content/common/config/_index.md                                              OK
+  48  content/common/config/ap.md                                                  OK
+  49  content/common/config/diameter.md                                            OK
+  50  content/common/config/dns.md                                                 OK
+  51  content/common/config/gtp_c.md                                               OK
+  52  content/common/config/http.md                                                OK
+  53  content/common/config/keydb_ranges.md                                        OK
+  54  content/common/config/long_mnc.md                                            OK
+  55  content/common/config/metrics.md                                             OK
+  56  content/common/config/mme.md                                                 OK
+  57  content/common/config/pcap.md                                                OK
+  58  content/common/config/plmn.md                                                OK
+  59  content/common/config/protei.md                                              OK
+  60  content/common/config/redis.md                                               OK
+  61  content/common/config/s1ap.md                                                OK
+  62  content/common/config/sgd.md                                                 OK
+  63  content/common/config/sgsap.md                                               OK
+  64  content/common/config/trace.md                                               OK
+  65  content/common/config/ue_trace.md                                            OK
+  66  content/common/config/watchdog.md                                            OK
+  67  content/common/config/rules/apn_rules.md                                     OK
+  68  content/common/config/rules/code_mapping_rules.md                            OK
+  69  content/common/config/rules/emergency_numbers.md                             OK
+  70  content/common/config/rules/emergency_pdn.md                                 OK
+  71  content/common/config/rules/forbidden_imei_rules.md                          OK
+  72  content/common/config/rules/imsi_rules.md                                    OK
+  73  content/common/config/rules/qos_rules.md                                     OK
+  74  content/common/config/rules/rac_rules.md                                     OK
+  75  content/common/config/rules/tac_rules.md                                     OK
+  76  content/common/config/rules/zc_rules.md                                      OK
+  83  content/common/config/component/diameter.md                                  OK
+  84  content/common/config/component/sgsap.md                                     OK
+  88  content/common/logging/_index.md                                             OK
+  95  content/common/logging/edr/connect.md                                        OK
+  96  content/common/logging/edr/dedicated_bearer.md                               OK
+  97  content/common/logging/edr/diam.md                                           OK
+  98  content/common/logging/edr/enodeb.md                                         OK
+  99  content/common/logging/edr/error_code.md                                     OK
+ 100  content/common/logging/edr/gtp_c.md                                          OK
+ 101  content/common/logging/edr/gtp_c_overload.md                                 OK
+ 102  content/common/logging/edr/http.md                                           OK
+ 103  content/common/logging/edr/internal_resource_manager.md                      OK
+ 104  content/common/logging/edr/irat_handover.md                                  OK
+ 105  content/common/logging/edr/lte_handover.md                                   OK
+ 106  content/common/logging/edr/paging.md                                         OK
+ 107  content/common/logging/edr/reject.md                                         OK
+ 108  content/common/logging/edr/s1ap.md                                           OK
+ 109  content/common/logging/edr/s1ap_context.md                                   OK
+ 110  content/common/logging/edr/s1ap_overload.md                                  OK
+ 111  content/common/logging/edr/sgsap.md                                          OK
+ 112  content/common/logging/edr/tau.md                                            OK
+ 118  content/common/logging/stat/_index.md                                        OK
+ 120  content/common/logging/stat/MME_Diameter.md                                  OK
+ 121  content/common/logging/stat/MME_handover.md                                  OK
+ 122  content/common/logging/stat/MME_paging.md                                    OK
+ 123  content/common/logging/stat/MME_resource.md                                  OK
+ 124  content/common/logging/stat/MME_s1_Attach.md                                 OK
+ 125  content/common/logging/stat/MME_s1_Detach.md                                 OK
+ 126  content/common/logging/stat/MME_s1_Bearer_Activation.md                      OK
+ 127  content/common/logging/stat/MME_s1_Bearer_Deactivation.md                    OK
+ 128  content/common/logging/stat/MME_s1_Bearer_Modification.md                    OK
+ 129  content/common/logging/stat/MME_s1_Interface.md                              OK
+ 130  content/common/logging/stat/MME_s1_Security.md                               OK
+ 131  content/common/logging/stat/MME_s1_Service.md                                OK
+ 132  content/common/logging/stat/MME_s11_Interface.md                             OK
+ 133  content/common/logging/stat/MME_S6a_interface.md                             OK
+ 134  content/common/logging/stat/MME_sgs_Interface.md                             OK
+ 135  content/common/logging/stat/MME_sv_Interface.md                              OK
+ 136  content/common/logging/stat/MME_tau.md                                       OK
+ 137  content/common/logging/stat/MME_users.md                                     OK
 
+Замены:
+17  content/common/_index.adoc -> content/common/_index.md
+21  content/common/general.md -> Возможные варианты:
+content/common/basics/general.md
+
+Сообщения:
 Раздел 'settings' задан корректно
 Раздел 'Rights' задан корректно
-Секция Basics задана корректно
-Секция oam задана корректно
-Секция oam/api задана корректно
-Секция oam/api/Access_Point задана корректно
-Секция oam/api/App задана корректно
-Секция oam/api/Apx_Package задана корректно
-Секция oam/api/Location_Zone задана корректно
-Секция oam/api/Node_Manage задана корректно
-Секция oam/api/Order_Service задана корректно
-Секция oam/api/Package_Volume_Service задана корректно
-Секция oam/api/Qosp задана корректно
-Секция oam/api/Shared_Volume_Service задана корректно
-
- 20  content/common/_index.md.................................................................OK
- 27  content/common/basics/_index.md..........................................................OK
- 29  content/common/basics/general.md.........................................................OK
- 30  content/common/basics/functionalities.md.................................................OK
- 31  content/common/basics/lifecycle.md.......................................................OK
- 32  content/common/basics/licensing.md.......................................................OK
- 33  content/common/basics/network_architecture.adoc..........................................OK
- 34  content/common/basics/internal_architecture.adoc.........................................OK
- 35  content/common/basics/high_availability.adoc.............................................OK
- 36  content/common/basics/specifications.md..............................................NOT OK
- 43  content/common/description/_index.md.....................................................OK
+Раздел Basics задан корректно
+Раздел OAM задан корректно
+Раздел Config задан корректно
+Раздел Config/Component задан корректно
+Раздел Logging задан корректно
+Раздел Logging/EDR задан корректно
+Раздел Logging/stat задан корректно
 ----

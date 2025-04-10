@@ -5,15 +5,17 @@ from pathlib import Path
 from sys import platform
 from typing import Any, get_args, get_origin, Iterable, Mapping, NamedTuple
 
+from click import style
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.functions import file_reader, file_reader_type, FileType, ReaderMode
+from utilities.common.functions import file_reader, file_reader_type, FileType
 from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
 from utilities.scripts.cli import clear_logs, cli, SwitchArgsAPIGroup
+from utilities.scripts.list_files import get_files
 
 _ALLOWED_KEYS: tuple[str, ...] = ("title", "index", "files")
 
@@ -29,6 +31,23 @@ _DICT_RESULTS: dict[bool, dict[str, str]] = {
     False: {
         "status": "FAIL",
         "color": FAIL_COLOR}}
+
+EPILOG: str = (
+    "\b\nОпция -g/--guess пытается найти следующие файлы:"
+    "\n- файлы с тем же именем, но с расширением *.md и *.adoc;"
+    "\n- файлы с теми же именем и расширением, но в дочерних папках "
+    "относительно той директории, "
+    "\nгде должен был лежать файл."
+    "\n"
+    "\b\nНапример, для файла content/common/directory/file.md выполняется поиск:"
+    "\n- content/common/directory/file.adoc"
+    "\n- content/common/directory/first_subfolder/file.md"
+    "\n- content/common/directory/first_subfolder/first_child/file.md"
+    "\n- content/common/directory/first_subfolder/nth_child/file.md"
+    "\n- content/common/directory/second_subfolder/file.md"
+    "\n"
+    "\b\nПримечание. Поиск по дочерним папкам не осуществляется для файлов index.* и _index.*, "
+    "\nпоскольку в этом случае будет слишком много нерелевантных предложений.")
 
 
 def determine_key(item: Mapping, keys: Iterable[str]):
@@ -48,9 +67,56 @@ def detect_extra_keys(item: Mapping[str, Any]):
     return extra_keys
 
 
+def rel(path: Path, root: Path):
+    return path.relative_to(root).as_posix()
+
+
+@pass_context
+def fix_path(ctx: Context, line_no: int, path: Path, root: Path):
+    rel_path: str = rel(path, root)
+
+    md_file: Path = path.with_suffix(".md")
+    adoc_file: Path = path.with_suffix(".adoc")
+
+    common_part: str = f"{line_no:>4}  {style(rel_path, strikethrough=True)}"
+
+    if md_file.exists(follow_symlinks=True):
+        return f"{common_part} -> {style(rel(md_file, root), fg="red")}"
+
+    elif adoc_file.exists(follow_symlinks=True):
+        return f"{common_part} -> {style(rel(adoc_file, root), fg="red")}"
+
+    elif path.stem.removeprefix("_") == "index":
+        return f"{common_part} Поиск файлов index.* и _index.* не осуществляется"
+
+    else:
+        name: str = path.name
+
+        options: list[Path] = list(
+            filter(
+                lambda x: x.name == name,
+                get_files(
+                    ctx,
+                    directory=path.parent,
+                    extensions="md adoc")))
+
+        if options:
+            valid_paths: str = style(
+                pretty_print(
+                    map(
+                        lambda x: x.relative_to(root), options)
+                ), fg="red")
+            return f"{common_part} -> Возможные варианты:\n{valid_paths}"
+
+        else:
+            comment: str = style(f"# {rel_path}", fg="red")
+            return f"{common_part} -> {comment}"
+
+
 class GeneralInfo(NamedTuple):
     messages: list[str] = []
     warnings: list[str] = []
+    options: list[str] = []
     names: set[str] = set()
     non_unique_names: set[str] = set()
 
@@ -202,7 +268,7 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
                 if "title" in section.keys():
                     title: dict[str, str | bool] = section.get("title", {})
 
-                    if title is None:
+                    if title is None or not title:
                         general_info.warnings.append(f"В разделе {name} объявлена секция title, хотя она пуста")
                         __is_ok: bool = False
 
@@ -234,27 +300,22 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
                                     f"но получено {type(level)}")
                                 __is_ok: bool = False
 
-                            elif level < 0:
+                            elif level < 0 or level > 9:
                                 general_info.messages.append(
-                                    f"Значение ключа '{name}::title::level' должно быть неотрицательным, "
-                                    f"но получено {level}")
-                                __is_ok: bool = False
-
-                            elif level > 9:
-                                general_info.messages.append(
-                                    f"Значение ключа '{name}::title::level' должно быть целым числом, диапазон: [0-9], "
+                                    f"Значение ключа '{name}::title::level' должно быть "
+                                    f"целым неотрицательным числом в диапазоне [0-9], "
                                     f"но получено {level}")
                                 __is_ok: bool = False
 
                         for key in title.keys():
                             if key not in ("title-files", "value", "level"):
                                 general_info.warnings.append(
-                                    f"Ключ {key} не должен находиться в секции title раздела {name}")
+                                    f"Ключ {key} не ожидается в секции title раздела {name}")
 
                 if "index" in section.keys():
                     index = section.get("index")
 
-                    if index is None:
+                    if index is None or not index:
                         general_info.warnings.append(f"В разделе {name} объявлена секция index, хотя она пуста")
                         __is_ok: bool = False
 
@@ -279,7 +340,10 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
                 if "files" in section.keys():
                     files = section.get("files")
 
-                    if not isinstance(files, list):
+                    if files is None or not files:
+                        general_info.warnings.append(f"В разделе {name} объявлена секция files, хотя она пуста")
+
+                    elif not isinstance(files, list):
                         general_info.warnings.append(
                             f"Значение ключа '{name}::files' должно быть типа list, "
                             f"но получено {get_origin(files)}")
@@ -303,7 +367,7 @@ def find_non_unique(lines: list[str]):
     keys: dict[int, str] = {
         index: line.strip("\n")
         for index, line in enumerate(iter(lines))
-        if not line.startswith(" ") and line.strip("\n")}
+        if not line.startswith(" ") and not line.strip().startswith("#") and line.strip("\n")}
 
     counter: Counter = Counter(keys.values())
     repeating: list[str] = [key for key, value in counter.items() if value > 1]
@@ -315,14 +379,15 @@ def find_non_unique(lines: list[str]):
 
     general_info.warnings.extend(
         f"Ключ {_non_unique_key} не уникален: повторяется в строках: "
-        f"{','.join(map(str, _non_unique_value))}"
+        f"{', '.join(map(str, _non_unique_value))}"
         for _non_unique_key, _non_unique_value in non_unique.items())
 
 
 def validate_file(
         root: StrPath,
-        lines: Iterable[str],
-        out: str | None = None,
+        lines: Iterable[str], *,
+        output: str | None = None,
+        guess: bool = True,
         verbose: bool = False):
     max_length: int = max(map(len, lines)) + 3
 
@@ -336,22 +401,25 @@ def validate_file(
     for line_no, path in paths.items():
         _result: bool = path.exists() and path.as_posix().endswith(("md", "adoc"))
 
-        _status: str = _DICT_RESULTS.get(_result).get("status")
-        _color: str = _DICT_RESULTS.get(_result).get("color")
+        _status: str = _DICT_RESULTS[_result]["status"]
+        _color: str = _DICT_RESULTS[_result]["color"]
 
         _path: str = path.relative_to(root).as_posix()
 
         _line = f"{_color}{line_no + 1:>4}  {_path: <{max_length}}{_status: >5}{NORMAL_COLOR}"
         _lines.append(_line)
 
-        if verbose or _status == "NOT OK":
+        if verbose or _status == "FAIL":
             echo(_line)
 
-    if out is not None and out:
-        out: Path = Path(out).expanduser()
-        mode: str = "w" if out.exists() else "x"
+        if _status == "FAIL" and guess is True:
+            general_info.options.append(fix_path(line_no + 1, path, root))
 
-        with open(out, mode) as f:
+    if output is not None and output:
+        output: Path = Path(output).expanduser()
+        mode: str = "w" if output.exists() else "x"
+
+        with open(output, mode) as f:
             f.write(
                 pretty_print(_lines).
                 replace(PASS_COLOR, "").
@@ -362,7 +430,8 @@ def validate_file(
 @cli.command(
     "validate-yaml",
     cls=SwitchArgsAPIGroup,
-    help="Команда для валидации YAML-файла, используемого при генерации PDF")
+    help="Команда для валидации YAML-файла, используемого при генерации PDF",
+    epilog=EPILOG)
 @argument(
     "yaml_file",
     type=ClickPath(
@@ -372,7 +441,7 @@ def validate_file(
         dir_okay=False),
     required=True)
 @option(
-    "-o", "--output", "output",
+    "-o", "--output",
     type=ClickPath(
         file_okay=True,
         readable=True,
@@ -384,6 +453,15 @@ def validate_file(
     required=False,
     metavar="FILE",
     default=None)
+@option(
+    "-g/-G", "--guess/--no-guess",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг вывода возможных корректных путей."
+         "\nПо умолчанию: True, отображаются предполагаемые замены",
+    show_default=True,
+    required=False,
+    default=True)
 @option(
     "-v/-q", "--verbose/--quiet",
     type=BOOL,
@@ -411,6 +489,7 @@ def validate_yaml_command(
         ctx: Context,
         yaml_file: StrPath,
         output: StrPath = None,
+        guess: bool = True,
         verbose: bool = False,
         keep_logs: bool = False):
     if platform.startswith("win"):
@@ -424,19 +503,24 @@ def validate_yaml_command(
     inspect_legal(content, verbose)
     inspect_sections(content, verbose)
 
-    lines: list[str] = file_reader(yaml_file, ReaderMode.LINES)
+    lines: list[str] = file_reader(yaml_file, "lines")
 
     find_non_unique(lines)
-    validate_file(yaml_file.parent, lines, output, verbose)
+    validate_file(yaml_file.parent, lines, output=output, guess=guess, verbose=verbose)
 
     if general_info.warnings:
-        logger.warning("Предупреждения:")
+        logger.warning("\nПредупреждения:")
         logger.warning(pretty_print(general_info.warnings))
 
-    elif general_info.messages:
-        logger.warning(pretty_print(general_info.messages))
+    if guess and general_info.options:
+        logger.success("\nЗамены:")
+        logger.success(pretty_print(general_info.options))
 
-    elif not verbose:
+    if verbose and general_info.messages:
+        logger.info("\nСообщения:")
+        logger.info(pretty_print(general_info.messages))
+
+    if not (verbose or general_info.warnings or general_info.messages or general_info.options):
         echo("Проблемы с парамерами разделов не обнаружены\n")
 
     if output is not None:

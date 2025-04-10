@@ -8,8 +8,8 @@ from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
 from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatCodeNonPositiveLineLengthError
+from utilities.common.functions import file_reader, file_writer
 from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, pretty_print, StrPath
-from utilities.common.functions import file_reader, file_writer, ReaderMode
 from utilities.scripts.cli import APIGroup, clear_logs, cli
 from utilities.scripts.list_files import get_files
 
@@ -109,7 +109,7 @@ def format_code_command(
             logger.debug(f"Файл {file}")
 
             try:
-                _content: str = file_reader(file, ReaderMode.STRING)
+                _content: str = file_reader(file, "string")
 
                 _result: list[str] = []
 

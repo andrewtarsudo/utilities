@@ -9,9 +9,9 @@ from click.termui import echo, pause
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
-from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.common.errors import LinkRepairInvalidFileDictAttributeError, LinkRepairInvalidStorageAttributeError
-from utilities.common.functions import file_reader, file_writer, ReaderMode
+from utilities.common.functions import file_reader, file_writer
+from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.link_repair.const import FileLanguage, prepare_logging
 from utilities.link_repair.file_dict import FileDict, FileLinkItem, TextFile
 from utilities.link_repair.general_storage import Storage
@@ -214,7 +214,7 @@ def link_repair_command(
         if not dry_run:
             file_writer(dir_file.full_path, dir_file.content, encoding="utf-8")
 
-        dir_file._content = file_reader(dir_file.full_path, ReaderMode.LINES, encoding="utf-8")
+        dir_file._content = file_reader(dir_file.full_path, "lines", encoding="utf-8")
 
         # validate internal links
         internal_inspector.text_file = dir_file

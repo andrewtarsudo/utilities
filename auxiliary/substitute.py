@@ -41,7 +41,7 @@ def substitute(file: StrPath, dry_run: bool = False):
     logger.debug(f"Таблица замен:\n{dumps(translation_table, ensure_ascii=False, indent=2, sort_keys=False)}")
     logger.info(f"Обработка файла {file}:")
 
-    lines: list[str] = file_reader(file, ReaderMode.LINES)
+    lines: list[str] = file_reader(file, "lines")
 
     def repl(m: Match):
         if m.group(1) in translation_table:

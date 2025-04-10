@@ -7,8 +7,8 @@ from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
+from utilities.common.functions import file_reader, file_writer
 from utilities.common.shared import HELP, pretty_print, StrPath
-from utilities.common.functions import file_reader, file_writer, ReaderMode
 from utilities.scripts.cli import clear_logs, cli, SwitchArgsAPIGroup
 from utilities.scripts.list_files import get_files
 
@@ -18,7 +18,7 @@ class File:
 
     def __init__(self, path: StrPath):
         self._path: Path = Path(path).resolve()
-        self._content: list[str] = file_reader(self._path, ReaderMode.LINES, encoding="utf-8")
+        self._content: list[str] = file_reader(self._path, "lines", encoding="utf-8")
 
     def __iter__(self):
         return iter(self._content)

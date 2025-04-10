@@ -5,15 +5,11 @@ from typing import Iterable, Iterator, NamedTuple
 
 from loguru import logger
 
-from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION, StrPath
 from utilities.common.errors import LinkRepairInternalLinkAnchorError, LinkRepairLineInvalidTypeError
-from utilities.common.functions import file_reader, ReaderMode
+from utilities.common.functions import file_reader
+from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION, StrPath
 from utilities.link_repair.const import FileLanguage, prepare_logging
 from utilities.link_repair.link import Link
-
-_MD_ANCHOR_HEADING: str = r"(?<=\{#)[\w_-]+(?=})"
-_MD_ANCHOR_A_NAME: str = r"(?<=<a\sname=\")[^\"]+(?=\">)"
-_MD_ANCHOR_A_ID: str = r"(?<=<a\sid=\")[^\"]+(?=\">)"
 
 
 class FilePattern(NamedTuple):
@@ -37,17 +33,6 @@ class FilePattern(NamedTuple):
             f"INTERNAL_LINK: {self.pattern_internal_link}")
 
     __repr__ = __str__
-
-
-md_file_pattern: FilePattern = FilePattern(
-    rf"{_MD_ANCHOR_HEADING}|{_MD_ANCHOR_A_NAME}|{_MD_ANCHOR_A_ID}",
-    r"\[[^]]+]\(([^)]+)\)",
-    r"\[[^]]+]\(#([^)]+)\)")
-
-ascii_doc_file_pattern: FilePattern = FilePattern(
-    r"(?<=\[[\[#])[^]]+(?=])",
-    r"(?<=xref:)[^\[]+(?=\[)|(?<=link:)[^\[]+(?=\[)|(?<=image::)[^\[]+(?=\[)|(?<=image:)[^\[]+(?=\[)",
-    r"(?<=<<)([^,>]+)[^>]*(?=>>)")
 
 
 class Boundary(NamedTuple):
@@ -355,6 +340,15 @@ class MdFile(TextFile):
         Boundary("#")]
 
     def __init__(self, root_dir: StrPath, full_path: StrPath):
+        _MD_ANCHOR_HEADING: str = r"(?<=\{#)[\w_-]+(?=})"
+        _MD_ANCHOR_A_NAME: str = r"(?<=<a\sname=\")[^\"]+(?=\">)"
+        _MD_ANCHOR_A_ID: str = r"(?<=<a\sid=\")[^\"]+(?=\">)"
+
+        md_file_pattern: FilePattern = FilePattern(
+            rf"{_MD_ANCHOR_HEADING}|{_MD_ANCHOR_A_NAME}|{_MD_ANCHOR_A_ID}",
+            r"\[[^]]+]\(([^)]+)\)",
+            r"\[[^]]+]\(#([^)]+)\)")
+
         super().__init__(root_dir, full_path, md_file_pattern)
 
     def set_anchors(self):
@@ -422,6 +416,11 @@ class AsciiDocFile(TextFile):
         Boundary("<<", ",")]
 
     def __init__(self, root_dir: StrPath, full_path: StrPath):
+        ascii_doc_file_pattern: FilePattern = FilePattern(
+            r"(?<=\[[\[#])[^]]+(?=])",
+            r"(?<=xref:)[^\[]+(?=\[)|(?<=link:)[^\[]+(?=\[)|(?<=image::)[^\[]+(?=\[)|(?<=image:)[^\[]+(?=\[)",
+            r"(?<=<<)([^,>]+)[^>]*(?=>>)")
+
         super().__init__(root_dir, full_path, ascii_doc_file_pattern)
         self._imagesdir: str | None = "./"
 
@@ -561,7 +560,7 @@ class FileDict:
             if file_path.suffix in (MD_EXTENSION, ADOC_EXTENSION):
                 text_file: TextFile = get_file(self._root_dir, file_path)
 
-                text_file._content = file_reader(text_file.full_path, ReaderMode.LINES, encoding="utf-8")
+                text_file._content = file_reader(text_file.full_path, "lines", encoding="utf-8")
                 text_file.set_imagesdir()
                 text_file.set_links()
                 text_file.set_anchors()
