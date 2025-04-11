@@ -145,3 +145,7 @@ class NoArgumentsOptionsError(BaseError):
 
 class FileReaderError(BaseError):
     """Specified file reader mode has an invalid type."""
+
+
+class FileReaderTypeError(BaseError):
+    """Specified file has an improper extension."""

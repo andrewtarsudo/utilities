@@ -5,9 +5,9 @@ from typing import NamedTuple
 
 from loguru import logger
 
-from utilities.common.shared import StrPath
 from utilities.common.errors import TermsInvalidTypeVersionError, TermsInvalidVersionError
-from utilities.common.functions import file_reader, ReaderMode
+from utilities.common.functions import file_reader
+from utilities.common.shared import StrPath
 
 
 class Version(NamedTuple):

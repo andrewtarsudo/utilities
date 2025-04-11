@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from gc import collect
 from operator import attrgetter
 from pathlib import Path
 from shutil import rmtree
@@ -16,10 +15,11 @@ from click.termui import pause, style
 from click.types import BOOL
 from click.utils import echo
 from loguru import logger
+from click_pwsh import support_pwsh_shell_completion
 
 from utilities.common.custom_logger import custom_logging
 from utilities.common.errors import BaseError, NoArgumentsOptionsError
-from utilities.common.shared import __version__, args_help_dict, DEBUG, HELP, NORMAL, PRESS_ENTER_KEY, pretty_print
+from utilities.common.shared import args_help_dict, BASE_PATH, DEBUG, HELP, NORMAL, PRESS_ENTER_KEY, pretty_print
 
 COL_MAX: int = 52
 MAX_CONTENT_WIDTH: int = 96
@@ -280,38 +280,25 @@ def recursive_help(cmd: Command, parent: Context = None, lines: Iterable[str] = 
     return f"{pretty_print(lines)}\n\n"
 
 
+def get_version():
+    from tomllib import load
+
+    with open(BASE_PATH.joinpath("pyproject.toml"), "rb") as f:
+        content: dict[str, Any] = load(f)
+
+    return content.get("project").get("version")
+
+
 # noinspection PyUnusedLocal
 def print_version(ctx: Context, param: Parameter, value: Any):
     if not value or ctx.resilient_parsing:
         return
 
-    echo(f"Версия {__version__}")
+    version: str = get_version()
+
+    echo(f"Версия {version}")
     pause(PRESS_ENTER_KEY)
     ctx.exit(0)
-
-
-def build_command_tree(cmd):
-    tree = {}
-    if isinstance(cmd, Group):
-        for name, subcmd in cmd.commands.items():
-            tree[name] = build_command_tree(subcmd)
-    else:
-        tree = None
-
-    return tree
-
-
-def get_completions(tokens, tree=None):
-    if tree is None:
-        tree = build_command_tree(cli)
-    for token in tokens:
-        if token.startswith("-"):
-            continue
-        if tree and token in tree:
-            tree = tree[token]
-        else:
-            return []
-    return list(tree.keys()) if tree else []
 
 
 class APIGroup(Group):
@@ -399,7 +386,7 @@ class TermsAPIGroup(APIGroup):
         return super().parse_args(ctx, args)
 
 
-class HelpAPIGroup(APIGroup):
+class NoArgsAPIGroup(APIGroup):
     def parse_args(self, ctx: Context, args: list[str]) -> list[str]:
         if args is None:
             args: list[str] = []
@@ -470,6 +457,7 @@ class MutuallyExclusiveOption(Option):
     help=HELP,
     is_eager=True)
 def cli(debug: bool = False):
+    support_pwsh_shell_completion()
     ctx: Context = get_current_context()
 
     try:
@@ -491,6 +479,11 @@ def cli(debug: bool = False):
             echo(text)
             ctx.exit(0)
 
+        elif ctx.invoked_subcommand == "install-completion":
+            echo(ctx.command.name)
+            echo(ctx.params)
+            echo(ctx.command.get_params(ctx))
+
         elif ctx.invoked_subcommand == "link-repair":
             result_file: bool = True
 
@@ -510,7 +503,7 @@ def clear_logs(ctx: Context):
     result_file: Path = ctx.obj.get("result_file", None)
 
     logger.debug(
-        f"Версия: {__version__}\n"
+        f"Версия: {get_version()}\n"
         f"Команда: {ctx.command_path}\n"
         f"Параметры: {ctx.params}")
 
@@ -529,5 +522,12 @@ def clear_logs(ctx: Context):
         echo(f"Папка с логами: {DEBUG.parent}")
 
     pause(PRESS_ENTER_KEY)
-    collect()
     ctx.exit(0)
+
+
+# noinspection PyUnusedLocal
+def completion_powershell(cmd: Command = None, ctx: Context = None):
+    from click_pwsh.__main__ import install
+
+    install(r"tw_utilities.exe")
+    echo("Success")

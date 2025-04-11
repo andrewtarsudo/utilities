@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 validate-yaml:
-  yaml_file: "Путь до файла PDF_*.yml"
+  file_or_project: "Путь до файла PDF_*.yml или директории с такими файлами"
 
 list-files:
   root_dir: "Путь до директории"

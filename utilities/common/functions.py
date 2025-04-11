@@ -1,30 +1,18 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
 from io import UnsupportedOperation
+from json import JSONDecodeError
 from os import scandir
 from pathlib import Path
-from typing import Any, Callable, Iterable, Literal, TypeAlias
+from typing import Any, Callable, Iterable, Literal, Type
 
 from loguru import logger
 from yaml.scanner import ScannerError
 
-from utilities.common.errors import FileReaderError
+from utilities.common.errors import FileReaderError, FileReaderTypeError
 from utilities.common.shared import StrPath
 
-ReaderMode: TypeAlias = Literal["string", "lines"]
-
-
-class FileType(Enum):
-    JSON = "json"
-    YAML = "yaml"
-    NONE = ""
-
-    def initiate(self):
-        if self._value_ == "json":
-            from json import load as load_file
-
-        elif self._value_ == "yaml":
-            from yaml import safe_load as load_file
+ReaderMode: Type[str] = Literal["string", "lines"]
+FileType: Type[str] = Literal["json", "yaml"]
 
 
 def file_reader(path: StrPath, reader_mode: ReaderMode, *, encoding: str = "utf-8"):
@@ -93,18 +81,23 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
         raise
 
 
-def file_reader_type(path: StrPath, file_type: str | FileType, *, encoding: str = "utf-8"):
-    if isinstance(file_type, str):
-        file_type: ReaderMode = ReaderMode[file_type]
-
-    if file_type is FileType.JSON:
+def file_reader_type(path: StrPath, file_type: FileType, *, encoding: str = "utf-8"):
+    if file_type == "json":
         from json import load as load_file
 
-    elif file_type is FileType.YAML:
+        if path.suffix not in (".json", ".json5"):
+            logger.error(f"Ожидался файл JSON с расширением .json или .json5, но получен {path.suffix}")
+            raise FileReaderTypeError
+
+    elif file_type == "yaml":
         from yaml import safe_load as load_file
 
+        if path.suffix not in (".yml", ".yaml"):
+            logger.error(f"Ожидался файл YAML с расширением .yml или .yaml, но получен {path.suffix}")
+            raise FileReaderTypeError
+
     else:
-        logger.error("Тип должен быть json или yaml")
+        logger.error("Тип должен быть JSON или YAML")
         raise FileReaderError
 
     try:
@@ -136,6 +129,12 @@ def file_reader_type(path: StrPath, file_type: str | FileType, *, encoding: str 
         logger.error(
             f"{e.__class__.__name__}: ошибка обработки файла {e.context_mark.name}"
             f"\nв символе {e.context_mark.line + 1}:{e.context_mark.column + 1}")
+        raise
+
+    except JSONDecodeError as e:
+        logger.error(
+            f"{e.__class__.__name__}: ошибка обработки файла {path.resolve()}"
+            f"\nв символе {e.lineno}:{e.colno}")
         raise
 
     except OSError as e:

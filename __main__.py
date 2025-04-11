@@ -28,13 +28,13 @@ if __name__ == '__main__':
     except (RuntimeError, ShellDetectionFailure):
         shell = None
 
-    if shell in ("powershell", "pwsh"):
+    if shell in ("powershell", "pwsh") or shell is None:
         encoding: str = "cp1251"
 
     else:
         encoding: str = "utf-8"
 
-    stdout.reconfigure(encoding="utf-8")
+    stdout.reconfigure(encoding=encoding)
 
     from utilities.scripts.cli import cli
 

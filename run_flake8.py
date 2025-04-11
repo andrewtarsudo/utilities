@@ -11,12 +11,18 @@ if __name__ == "__main__":
     flake8: list[str] = [
         "flake8",
         "--color=auto",
+        "--config=.flake8",
         f"--output-file={output_file}",
         "--verbose",
         "--benchmark",
         "--exit-zero",
         "__main__.py",
-        "utilities/**/*.py"]
+        "utilities/common/",
+        "utilities/convert_tables/",
+        "utilities/link_repair/",
+        "utilities/scripts/",
+        "utilities/table_cols/",
+        "utilities/terms/"]
 
     try:
         _: CompletedProcess = run(

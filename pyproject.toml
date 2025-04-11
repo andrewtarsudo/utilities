@@ -11,6 +11,7 @@ requires-python = ">=3.9"
 dependencies = [
   "certifi>=2025.1",
   "click>=8.1",
+  "click-pwsh>=0.9.5",
   "loguru>=0.7",
   "more-itertools>=10.6",
   "pillow>=11.1",
@@ -21,7 +22,7 @@ dependencies = [
   "shellingham>=1.5",
 ]
 
-[project.scripts]
+[project.gui-scripts]
 utilities = "__main__.py"
 
 [dependency-groups]
