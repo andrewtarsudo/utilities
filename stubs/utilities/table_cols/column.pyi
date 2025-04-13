@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from typing import Iterator, NamedTuple
-from utilities.common.errors import TableColsTableColumnTypeError as TableColsTableColumnTypeError
-from utilities.table_cols.cell import TableCell as TableCell
+from utilities.table_cols.cell import TableCell
 
 
 class TableColumnParameters(NamedTuple):

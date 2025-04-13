@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 from typing import Iterable
-from utilities.convert_tables.qualified_name import fqdn as fqdn
 from xml.etree.ElementTree import Element
 
 

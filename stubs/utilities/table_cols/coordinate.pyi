@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 from typing import NamedTuple
-from utilities.common.errors import TableColsTableCoordinateInitError as TableColsTableCoordinateInitError
 
 
 class TableCoordinate(NamedTuple):

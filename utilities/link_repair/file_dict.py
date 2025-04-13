@@ -28,9 +28,9 @@ class FilePattern(NamedTuple):
 
     def __str__(self):
         return (
-            f"ANCHOR: {self.pattern_anchor}\n"
-            f"LINK: {self.pattern_link}\n"
-            f"INTERNAL_LINK: {self.pattern_internal_link}")
+            f"ANCHOR: {self.pattern_anchor}"
+            f"\nLINK: {self.pattern_link}"
+            f"\nINTERNAL_LINK: {self.pattern_internal_link}")
 
     __repr__ = __str__
 

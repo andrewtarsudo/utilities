@@ -51,10 +51,7 @@ class Link(NamedTuple):
         else:
             _real_link_to_file: str = self.link_to_file
 
-        return (self
-                .from_file
-                .joinpath(_real_link_to_file)
-                .resolve())
+        return self.from_file.joinpath(_real_link_to_file).resolve()
 
     @property
     def anchor(self) -> str | None:
@@ -77,19 +74,12 @@ class Link(NamedTuple):
     @property
     def parent_stem(self) -> str:
         """Gets the stem of the destination file parent from the link."""
-        return (self
-                .origin_destination_path()
-                .parent
-                .name)
+        return self.origin_destination_path().parent.name
 
     @property
     def grandparent_stem(self) -> str:
         """Gets the stem of the destination file grandparent from the link."""
-        return (self
-                .origin_destination_path()
-                .parent
-                .parent
-                .name)
+        return self.origin_destination_path().parent.parent.name
 
     @property
     def from_type(self) -> _LinkType:
@@ -114,10 +104,7 @@ class Link(NamedTuple):
     def link_to_file(self) -> str:
         """Gets the link to the file with no anchor."""
         if bool(self):
-            return (self
-                    .link_to
-                    .rsplit("#", 1)[0]
-                    .removesuffix("/"))
+            return self.link_to.rsplit("#", 1)[0].removesuffix("/")
 
         else:
             return self.link_to.removesuffix("/")

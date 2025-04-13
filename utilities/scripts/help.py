@@ -3,12 +3,13 @@ from click.core import Context
 from click.decorators import pass_context
 from click.termui import echo
 
-from utilities.scripts.cli import cli, format_full_help, HelpAPIGroup
+from utilities.scripts.api_group import format_full_help, NoArgsAPIGroup
+from utilities.scripts.cli import cli
 
 
 @cli.command(
     "help",
-    cls=HelpAPIGroup,
+    cls=NoArgsAPIGroup,
     help="Команда для вызова полной справки",
     add_help_option=False)
 @pass_context

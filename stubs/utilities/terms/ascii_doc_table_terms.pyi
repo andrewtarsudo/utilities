@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import Iterable
-from utilities.common.shared import StrPath as StrPath
-from utilities.common.errors import TermsAsciiDocFileTableRowIndexError as TermsAsciiDocFileTableRowIndexError, \
-    TermsEmptyFileError as TermsEmptyFileError, TermsInvalidTermIndexError as TermsInvalidTermIndexError
-from utilities.common.functions import ReaderMode as ReaderMode, file_reader as file_reader
-from utilities.terms.table import TableCellCoordinate as TableCellCoordinate, TableItem as TableItem, Term as Term
+
+from utilities.common.shared import StrPath
 
 
 class AsciiDocTableTerms:

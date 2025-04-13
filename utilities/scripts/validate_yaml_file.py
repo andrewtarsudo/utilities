@@ -5,32 +5,23 @@ from pathlib import Path
 from sys import platform
 from typing import Any, get_args, get_origin, Iterable, Mapping, NamedTuple
 
-from click import style
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
+from click.termui import style
 from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.functions import file_reader, file_reader_type, FileType
-from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, StrPath
-from utilities.scripts.cli import clear_logs, cli, SwitchArgsAPIGroup
+from utilities.common.functions import file_reader, file_reader_type, file_writer, pretty_print
+from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, StrPath
+from utilities.scripts.api_group import SwitchArgsAPIGroup
+from utilities.scripts.cli import clear_logs, cli
 from utilities.scripts.list_files import get_files
-
-_ALLOWED_KEYS: tuple[str, ...] = ("title", "index", "files")
 
 _SETTINGS_NAMES: tuple[str, ...] = (
     "settings", "Settings")
 _RIGHTS_NAMES: tuple[str, ...] = (
     "rights", "Rights")
-
-_DICT_RESULTS: dict[bool, dict[str, str]] = {
-    True: {
-        "status": "OK",
-        "color": PASS_COLOR},
-    False: {
-        "status": "FAIL",
-        "color": FAIL_COLOR}}
 
 EPILOG: str = (
     "\b\nОпция -g/--guess пытается найти следующие файлы:"
@@ -59,7 +50,7 @@ def determine_key(item: Mapping, keys: Iterable[str]):
 
 
 def detect_extra_keys(item: Mapping[str, Any]):
-    extra_keys: set[str] | None = set(item.keys()).difference(_ALLOWED_KEYS)
+    extra_keys: set[str] | None = set(item.keys()).difference({"title", "index", "files"})
 
     if not extra_keys:
         extra_keys: set[str] | None = None
@@ -101,11 +92,7 @@ def fix_path(ctx: Context, line_no: int, path: Path, root: Path):
                     extensions="md adoc")))
 
         if options:
-            valid_paths: str = style(
-                pretty_print(
-                    map(
-                        lambda x: x.relative_to(root), options)
-                ), fg="red")
+            valid_paths: str = style(pretty_print(map(lambda x: x.relative_to(root), options)), fg="red")
             return f"{common_part} -> Возможные варианты:\n{valid_paths}"
 
         else:
@@ -119,6 +106,13 @@ class GeneralInfo(NamedTuple):
     options: list[str] = []
     names: set[str] = set()
     non_unique_names: set[str] = set()
+
+    def clear(self):
+        self.messages.clear()
+        self.warnings.clear()
+        self.options.clear()
+        self.names.clear()
+        self.non_unique_names.clear()
 
 
 general_info: GeneralInfo = GeneralInfo()
@@ -398,6 +392,14 @@ def validate_file(
 
     _lines: list[str] = []
 
+    _DICT_RESULTS: dict[bool, dict[str, str]] = {
+        True: {
+            "status": "OK",
+            "color": PASS_COLOR},
+        False: {
+            "status": "FAIL",
+            "color": FAIL_COLOR}}
+
     for line_no, path in paths.items():
         _result: bool = path.exists() and path.as_posix().endswith(("md", "adoc"))
 
@@ -417,14 +419,16 @@ def validate_file(
 
     if output is not None and output:
         output: Path = Path(output).expanduser()
-        mode: str = "w" if output.exists() else "x"
+        output.unlink(missing_ok=True)
+        output.touch(exist_ok=True)
 
-        with open(output, mode) as f:
-            f.write(
-                pretty_print(_lines).
-                replace(PASS_COLOR, "").
-                replace(FAIL_COLOR, "").
-                replace(NORMAL_COLOR, ""))
+        content: str = (
+            pretty_print(_lines).
+            replace(PASS_COLOR, "").
+            replace(FAIL_COLOR, "").
+            replace(NORMAL_COLOR, ""))
+
+        file_writer(output, content)
 
 
 @cli.command(
@@ -433,12 +437,12 @@ def validate_file(
     help="Команда для валидации YAML-файла, используемого при генерации PDF",
     epilog=EPILOG)
 @argument(
-    "yaml_file",
+    "file_or_project",
     type=ClickPath(
+        exists=True,
         file_okay=True,
-        readable=True,
         allow_dash=False,
-        dir_okay=False),
+        dir_okay=True),
     required=True)
 @option(
     "-o", "--output",
@@ -487,7 +491,7 @@ def validate_file(
 @pass_context
 def validate_yaml_command(
         ctx: Context,
-        yaml_file: StrPath,
+        file_or_project: StrPath,
         output: StrPath = None,
         guess: bool = True,
         verbose: bool = False,
@@ -495,33 +499,52 @@ def validate_yaml_command(
     if platform.startswith("win"):
         system("color")
 
-    yaml_file: Path = Path(yaml_file).expanduser().resolve()
+    if file_or_project.is_dir():
+        yaml_files: list[Path] = list(filter(lambda x: x.suffix == ".yml", file_or_project.iterdir()))
 
-    content: dict[str, Any] = file_reader_type(yaml_file, FileType.YAML)
+    elif file_or_project.is_file():
+        yaml_files: list[Path] = [file_or_project]
 
-    inspect_settings(content, verbose)
-    inspect_legal(content, verbose)
-    inspect_sections(content, verbose)
+    else:
+        logger.error(f"Некорректное значение file_or_project: {file_or_project}, {type(file_or_project).__name__}")
+        raise ValueError
 
-    lines: list[str] = file_reader(yaml_file, "lines")
+    if not yaml_files:
+        logger.warning("Не найдены подходящие файлы в указанной директории или указанный файл не является YAML")
 
-    find_non_unique(lines)
-    validate_file(yaml_file.parent, lines, output=output, guess=guess, verbose=verbose)
+    else:
+        for yaml_file in yaml_files:
+            yaml_file: Path = Path(yaml_file).expanduser().resolve()
 
-    if general_info.warnings:
-        logger.warning("\nПредупреждения:")
-        logger.warning(pretty_print(general_info.warnings))
+            echo(f"Файл {yaml_file.name}:")
 
-    if guess and general_info.options:
-        logger.success("\nЗамены:")
-        logger.success(pretty_print(general_info.options))
+            content: dict[str, Any] = file_reader_type(yaml_file, "yaml")
 
-    if verbose and general_info.messages:
-        logger.info("\nСообщения:")
-        logger.info(pretty_print(general_info.messages))
+            inspect_settings(content, verbose)
+            inspect_legal(content, verbose)
+            inspect_sections(content, verbose)
 
-    if not (verbose or general_info.warnings or general_info.messages or general_info.options):
-        echo("Проблемы с парамерами разделов не обнаружены\n")
+            lines: list[str] = file_reader(yaml_file, "lines")
+
+            find_non_unique(lines)
+            validate_file(yaml_file.parent, lines, output=output, guess=guess, verbose=verbose)
+
+            if general_info.warnings:
+                logger.warning("\nПредупреждения:")
+                logger.warning(pretty_print(general_info.warnings))
+
+            if guess and general_info.options:
+                logger.success("\nЗамены:")
+                logger.success(pretty_print(general_info.options))
+
+            if verbose and general_info.messages:
+                logger.info("\nСообщения:")
+                logger.info(pretty_print(general_info.messages))
+
+            if not (verbose or general_info.warnings or general_info.messages or general_info.options):
+                echo("Проблемы с парамерами разделов не обнаружены\n")
+
+            general_info.clear()
 
     if output is not None:
         echo(f"Файл с результатами: {output.resolve()}")

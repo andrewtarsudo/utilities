@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from click.core import Context as Context
 from pathlib import Path
+
+from click.core import Context
+
 from utilities.common.shared import StrPath as StrPath
 
 

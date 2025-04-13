@@ -11,7 +11,9 @@ from loguru import logger
 from PIL import Image
 
 from utilities.common.shared import HELP, separator, StrPath
-from utilities.scripts.cli import APIGroup, clear_logs, cli
+from utilities.scripts.api_group import APIGroup
+from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
 
 
@@ -64,6 +66,7 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
+    shell_complete=file_completion,
     default=None)
 @option(
     "-d", "--dir", "directory",
@@ -76,6 +79,7 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
     multiple=False,
     required=False,
     metavar="DIR",
+    shell_complete=dir_completion,
     default=None)
 @option(
     "--dry-run/--no-dry-run",

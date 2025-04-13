@@ -6,8 +6,8 @@ from typing import Iterable
 from loguru import logger
 
 from utilities.common.errors import LinkRepairFileInvalidTypeError, LinkRepairMissingFileError
-from utilities.common.functions import file_reader
-from utilities.common.shared import pretty_print, separator
+from utilities.common.functions import file_reader, pretty_print
+from utilities.common.shared import separator
 from utilities.link_repair.const import FileLanguage, prepare_logging
 from utilities.link_repair.file_dict import TextFile
 

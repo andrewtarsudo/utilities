@@ -7,9 +7,11 @@ from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
-from utilities.common.functions import file_reader, file_writer
-from utilities.common.shared import HELP, pretty_print, StrPath
-from utilities.scripts.cli import clear_logs, cli, SwitchArgsAPIGroup
+from utilities.common.functions import file_reader, file_writer, pretty_print
+from utilities.common.shared import HELP, StrPath
+from utilities.scripts.api_group import SwitchArgsAPIGroup
+from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.completion import dir_completion
 from utilities.scripts.list_files import get_files
 
 
@@ -79,6 +81,7 @@ class AsciiDocFile(File):
         allow_dash=False,
         dir_okay=True),
     required=True,
+    shell_complete=dir_completion,
     metavar="PROJECT_DIR")
 @option(
     "-d/-D", "--dry-run/--no-dry-run",

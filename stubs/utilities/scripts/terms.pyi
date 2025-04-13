@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-from click.core import Context as Context, Parameter as Parameter
 from pathlib import Path
 from typing import Any, Iterable
+
+from click.core import Context, Parameter
 
 INFO_FILE: Path
 README_FILE: Path

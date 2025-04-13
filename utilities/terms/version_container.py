@@ -7,7 +7,7 @@ from loguru import logger
 
 from utilities.common.shared import StrPath
 from utilities.common.errors import TermsInvalidTypeVersionError, TermsInvalidVersionError
-from utilities.common.functions import file_reader, ReaderMode
+from utilities.common.functions import file_reader
 
 
 class Version(NamedTuple):

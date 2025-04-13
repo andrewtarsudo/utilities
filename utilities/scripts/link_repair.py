@@ -19,7 +19,9 @@ from utilities.link_repair.internal_link_inspector import internal_inspector
 from utilities.link_repair.link import Link
 from utilities.link_repair.link_fixer import link_fixer
 from utilities.link_repair.link_inspector import link_inspector
-from utilities.scripts.cli import clear_logs, cli, SwitchArgsAPIGroup
+from utilities.scripts.api_group import SwitchArgsAPIGroup
+from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.completion import dir_completion
 
 
 def validate_dir_path(path: StrPath | None) -> bool:
@@ -57,6 +59,7 @@ def has_no_required_files(path: StrPath) -> bool:
         allow_dash=False,
         dir_okay=True),
     required=True,
+    shell_complete=dir_completion,
     metavar="PATHDIR")
 @option(
     "-a/-A", "--anchor/--no-anchor", "anchor_validation",
@@ -97,7 +100,7 @@ def has_no_required_files(path: StrPath) -> bool:
     required=False,
     default=True)
 @option(
-    "-e/-E", "--skip-en/--keep-en",
+    "-e/-E", "--skip-en/--with-en",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг обработки файлов только на русском языке."

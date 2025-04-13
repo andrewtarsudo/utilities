@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from utilities.table_cols.coordinate import TableCoordinate as TableCoordinate
+from utilities.table_cols.coordinate import TableCoordinate
 
 
 def fix_length(text: str): ...

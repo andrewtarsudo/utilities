@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
 from subprocess import CalledProcessError, CompletedProcess, run
+from sys import platform
 
 if __name__ == "__main__":
     output_file: str = "flake8.txt"
@@ -11,18 +12,26 @@ if __name__ == "__main__":
     flake8: list[str] = [
         "flake8",
         "--color=auto",
+        "--config=.flake8",
         f"--output-file={output_file}",
         "--verbose",
         "--benchmark",
         "--exit-zero",
         "__main__.py",
-        "utilities/**/*.py"]
+        "utilities/common/",
+        "utilities/convert_tables/",
+        "utilities/link_repair/",
+        "utilities/scripts/",
+        "utilities/table_cols/",
+        "utilities/terms/"]
+
+    shell: bool = platform.startswith("win")
 
     try:
         _: CompletedProcess = run(
             flake8,
             encoding="utf-8",
-            shell=True,
+            shell=shell,
             capture_output=True,
             check=True)
 

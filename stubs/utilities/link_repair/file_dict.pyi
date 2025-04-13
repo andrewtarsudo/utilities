@@ -1,22 +1,15 @@
 # -*- coding: utf-8 -*-
 from typing import Iterable, Iterator, NamedTuple
-from utilities.common.shared import ADOC_EXTENSION as ADOC_EXTENSION, MD_EXTENSION as MD_EXTENSION, \
-    StrPath as StrPath
-from utilities.common.errors import LinkRepairInternalLinkAnchorError as LinkRepairInternalLinkAnchorError, \
-    LinkRepairLineInvalidTypeError as LinkRepairLineInvalidTypeError
-from utilities.common.functions import ReaderMode as ReaderMode, file_reader as file_reader
-from utilities.link_repair.const import FileLanguage as FileLanguage, prepare_logging as prepare_logging
-from utilities.link_repair.link import Link as Link
+
+from utilities.common.shared import StrPath
+from utilities.link_repair.const import FileLanguage
+from utilities.link_repair.link import Link
 
 
 class FilePattern(NamedTuple):
     pattern_anchor: str
     pattern_link: str
     pattern_internal_link: str
-
-
-md_file_pattern: FilePattern
-ascii_doc_file_pattern: FilePattern
 
 
 class Boundary(NamedTuple):
@@ -69,6 +62,9 @@ class TextFile(DirFile):
 
     def get_internal_links(self, anchor: str | None) -> tuple[_InternalLink, ...] | None: ...
 
+    @property
+    def is_changed(self): ...
+
     def update_line(
             self,
             line_number: int | Iterable[int],
@@ -120,6 +116,9 @@ def get_file(root_dir: StrPath, full_path: StrPath) -> MdFile | AsciiDocFile: ..
 
 class FileDict:
     def __init__(self, root_dir: StrPath) -> None: ...
+
+    @property
+    def dict_files(self): ...
 
     def __contains__(self, item) -> bool: ...
 

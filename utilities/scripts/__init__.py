@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from utilities.scripts.check_russian import check_russian_command
-from utilities.scripts.cli import APIGroup, clear_logs, cli, MutuallyExclusiveOption
+from utilities.scripts.cli import APIGroup, clear_logs, cli
 from utilities.scripts.convert_tables import convert_tables_command
 from utilities.scripts.filter_images import filter_images_command
 from utilities.scripts.format_code import format_code_command

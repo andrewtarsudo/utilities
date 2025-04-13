@@ -53,12 +53,12 @@ class LinkFixer:
             if " " in _:
                 self.text_file.update_line(link.index, _, _.replace(" ", ""))
                 logger.warning(
-                    f"В файле {self.text_file.rel_path} некорректная ссылка:\n"
-                    f"{_}\n"
-                    f"Строка: {link.index}", result=True)
+                    f"В файле {self.text_file.rel_path} некорректная ссылка:"
+                    f"\n{_}"
+                    f"\nСтрока: {link.index}", result=True)
 
         if self.text_file.is_changed is False:
-            logger.debug(f"file {self.text_file.rel_path}, no whitespaces to fix")
+            logger.debug(f"В файле {self.text_file.rel_path} нет пробелов для исправления")
 
     def _fix_missing_slashes_after_dots(self):
         """Fixes errors when the link has double dots with no slash followed."""

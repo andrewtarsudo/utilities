@@ -10,9 +10,11 @@ from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.functions import walk_full
-from utilities.common.shared import HELP, PRESS_ENTER_KEY, pretty_print, StrPath
-from utilities.scripts.cli import clear_logs, cli, MutuallyExclusiveOption, SwitchArgsAPIGroup
+from utilities.common.functions import pretty_print, walk_full
+from utilities.common.shared import HELP, PRESS_ENTER_KEY, StrPath
+from utilities.scripts.api_group import MutuallyExclusiveOption, SwitchArgsAPIGroup
+from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.completion import dir_completion, file_completion
 
 
 def check_content_common(path: Path):
@@ -59,6 +61,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
         path_type=Path,
         dir_okay=True),
     required=True,
+    shell_complete=dir_completion,
     metavar="ROOT_DIR")
 @option(
     "-d", "--ignored-dirs", "ignored_dirs",
@@ -71,6 +74,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     required=False,
     metavar="DIR ... DIR",
     show_default=True,
+    shell_complete=dir_completion,
     default=["_temp_folder", "_temp_storage", "private"])
 @option(
     "--all-dirs", "all_dirs",
@@ -94,6 +98,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     required=False,
     metavar="FILE ... FILE",
     show_default=True,
+    shell_complete=file_completion,
     default=["README", "_check_list"])
 @option(
     "--all-files", "all_files",

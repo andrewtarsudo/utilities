@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-from click.core import Context as Context
 from pathlib import Path
-from utilities.common.shared import HELP as HELP, StrPath as StrPath, pretty_print as pretty_print
-from utilities.common.functions import ReaderMode as ReaderMode, file_reader as file_reader, file_writer as file_writer
-from utilities.scripts.cli import SwitchArgsAPIGroup as SwitchArgsAPIGroup, clear_logs as clear_logs, \
-    cli as cli
-from utilities.scripts.list_files import get_files as get_files
+
+from click.core import Context
+
+from utilities.common.shared import StrPath
 
 
 class File:

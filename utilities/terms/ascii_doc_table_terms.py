@@ -6,9 +6,9 @@ from typing import Iterable
 from loguru import logger
 from more_itertools import pairwise
 
-from utilities.common.shared import StrPath
 from utilities.common.errors import TermsAsciiDocFileTableRowIndexError, TermsEmptyFileError, TermsInvalidTermIndexError
-from utilities.common.functions import file_reader, ReaderMode
+from utilities.common.functions import file_reader
+from utilities.common.shared import StrPath
 from utilities.terms.table import TableCellCoordinate, TableItem, Term
 
 

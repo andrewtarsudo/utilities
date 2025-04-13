@@ -4,7 +4,7 @@ from pathlib import Path
 from click.utils import get_app_dir
 from loguru import logger
 
-from utilities.common.functions import file_reader, file_writer, ReaderMode
+from utilities.common.functions import file_reader, file_writer
 from utilities.terms.content_git_page import ContentGitPage
 from utilities.terms.version_container import Version, VersionContainer
 

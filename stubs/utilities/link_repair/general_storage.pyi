@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
 from typing import Any, Iterable, Iterator
-from utilities.common.shared import ADOC_EXTENSION as ADOC_EXTENSION, MD_EXTENSION as MD_EXTENSION, \
-    StrPath as StrPath
+
+from utilities.common.shared import StrPath
 
 
 def unique(values: Iterable[Any] = None) -> list[Any]: ...

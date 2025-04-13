@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from typing import NamedTuple
-from utilities.common.shared import StrPath as StrPath
-from utilities.common.errors import TermsInvalidTypeVersionError as TermsInvalidTypeVersionError, \
-    TermsInvalidVersionError as TermsInvalidVersionError
-from utilities.common.functions import ReaderMode as ReaderMode, file_reader as file_reader
+from utilities.common.shared import StrPath
 
 
 class Version(NamedTuple):
@@ -27,6 +24,12 @@ class VersionContainer:
     def __eq__(self, other): ...
 
     def __ne__(self, other): ...
+
+    @property
+    def version(self): ...
+
+    @property
+    def version_basic(self): ...
 
     def __bool__(self) -> bool: ...
 

@@ -7,7 +7,9 @@ from click.types import BOOL, Path as ClickPath
 from utilities.common.shared import HELP, StrPath
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument
-from utilities.scripts.cli import clear_logs, cli, MutuallyExclusiveOption, SwitchArgsAPIGroup
+from utilities.scripts.api_group import MutuallyExclusiveOption, SwitchArgsAPIGroup
+from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.completion import doc_completion
 
 
 @cli.command(
@@ -23,11 +25,11 @@ from utilities.scripts.cli import clear_logs, cli, MutuallyExclusiveOption, Swit
         allow_dash=False,
         dir_okay=False),
     required=True,
+    shell_complete=doc_completion,
     metavar="DOCX_FILE")
 @option(
     "-p", "--parse", "tables_dir",
     type=ClickPath(
-        exists=False,
         file_okay=False,
         resolve_path=True,
         allow_dash=False,

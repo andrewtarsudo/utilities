@@ -10,7 +10,9 @@ from click.utils import echo
 from loguru import logger
 
 from utilities.common.shared import HELP, StrPath
-from utilities.scripts.cli import APIGroup, clear_logs, cli
+from utilities.scripts.api_group import APIGroup
+from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
 
 
@@ -30,6 +32,7 @@ from utilities.scripts.list_files import get_files
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
+    shell_complete=file_completion,
     default=None)
 @option(
     "-d", "--dir", "directory",
@@ -42,6 +45,7 @@ from utilities.scripts.list_files import get_files
     multiple=False,
     required=False,
     metavar="DIR",
+    shell_complete=dir_completion,
     default=None)
 @option(
     "-r/-R", "--recursive/--no-recursive",

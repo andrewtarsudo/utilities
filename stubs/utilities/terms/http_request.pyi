@@ -2,9 +2,8 @@
 from http.client import HTTPResponse
 from typing import NamedTuple
 from urllib.request import Request
-from utilities.common.shared import StrPath as StrPath
-from utilities.common.errors import TermsRequiredAttributeMissingError as TermsRequiredAttributeMissingError
-from utilities.terms.const import CustomPort as CustomPort, CustomScheme as CustomScheme
+
+from utilities.common.shared import StrPath
 
 PROTOCOL: str
 CHUNK_SIZE: int

@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-from utilities.common.functions import ReaderMode as ReaderMode, file_reader as file_reader, file_writer as file_writer
-from utilities.terms.content_git_page import ContentGitPage as ContentGitPage
-from utilities.terms.version_container import Version as Version, VersionContainer as VersionContainer
 
 
 class GitManager:

@@ -8,9 +8,11 @@ from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
 from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatCodeNonPositiveLineLengthError
-from utilities.common.functions import file_reader, file_writer
-from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, pretty_print, StrPath
-from utilities.scripts.cli import APIGroup, clear_logs, cli
+from utilities.common.functions import file_reader, file_writer, pretty_print
+from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, StrPath
+from utilities.scripts.api_group import APIGroup
+from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
 
 MAX_LENGTH: int = 84
@@ -20,18 +22,6 @@ MAX_LENGTH: int = 84
     "format-code",
     cls=APIGroup,
     help="Команда для форматирования блоков кода")
-@option(
-    "-d", "--dir", "directory",
-    type=ClickPath(
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
-    help="Директория для обработки",
-    multiple=False,
-    required=False,
-    metavar="DIR",
-    default=None)
 @option(
     "-f", "--file", "files",
     type=ClickPath(
@@ -44,6 +34,20 @@ MAX_LENGTH: int = 84
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
+    shell_complete=file_completion,
+    default=None)
+@option(
+    "-d", "--dir", "directory",
+    type=ClickPath(
+        file_okay=False,
+        resolve_path=True,
+        allow_dash=False,
+        dir_okay=True),
+    help="Директория для обработки",
+    multiple=False,
+    required=False,
+    metavar="DIR",
+    shell_complete=dir_completion,
     default=None)
 @option(
     "-l", "--length",

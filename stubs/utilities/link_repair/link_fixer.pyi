@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-from utilities.common.errors import LinkRepairFixerNoLinkError as LinkRepairFixerNoLinkError, \
-    LinkRepairInvalidHashCharIndexError as LinkRepairInvalidHashCharIndexError
-from utilities.link_repair.file_dict import TextFile as TextFile
+from utilities.link_repair.file_dict import TextFile
 
 
 class LinkFixer:

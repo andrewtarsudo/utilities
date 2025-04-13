@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
-from utilities.common.shared import MAX_SYMBOLS as MAX_SYMBOLS, MIN_COLUMN as MIN_COLUMN
-from utilities.table_cols.column import TableColumnParameters as TableColumnParameters
+from utilities.table_cols.column import TableColumnParameters
 
 
 class TableAnalyser:
     def __init__(self, *, max_symbols: int = None, min_column: int = None) -> None: ...
 
+    def adjust(self) -> None: ...
+
     def nullify(self) -> None: ...
+
+    def __len__(self) -> int: ...
 
     def __iter__(self): ...
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from click.core import Context as Context
-from utilities.common.shared import StrPath as StrPath
+from click.core import Context
+
+from utilities.common.shared import StrPath
 
 
 def convert_tables_command(

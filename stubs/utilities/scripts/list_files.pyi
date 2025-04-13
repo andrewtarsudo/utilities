@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from click.core import Context as Context
 from collections.abc import Iterable
 from pathlib import Path
-from utilities.common.shared import HELP as HELP, PRESS_ENTER_KEY as PRESS_ENTER_KEY, StrPath as StrPath, \
-    pretty_print as pretty_print
+
+from click.core import Context
+
+from utilities.common.shared import StrPath
 
 
 def check_content_common(path: Path): ...
@@ -12,21 +13,7 @@ def check_content_common(path: Path): ...
 def generate_base_root(path: Path, content_common_index: int): ...
 
 
-def check_path(
-        path: StrPath,
-        ignored_dirs: Iterable[str],
-        ignored_files: Iterable[str],
-        extensions: Iterable[str],
-        language: str | None): ...
-
-
-def walk_full(
-        path: StrPath,
-        ignored_dirs: Iterable[str],
-        ignored_files: Iterable[str],
-        extensions: Iterable[str],
-        language: str | None,
-        results: list[Path] = None): ...
+def add_prefix(prefix: str, values: Iterable[StrPath] = None): ...
 
 
 def list_files_command(

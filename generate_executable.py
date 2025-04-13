@@ -11,12 +11,14 @@ if __name__ == "__main__":
     if platform.startswith("win"):
         spec_file: str = "utilities.exe.spec"
         exe_file: str = r".\bin\tw_utilities.exe"
+        environ["VIRTUAL_ENV"] = "venv"
+        shell: bool = True
 
     else:
         spec_file: str = "utilities.spec"
         exe_file: str = r"./bin/tw_utilities"
-
-    environ["VIRTUAL_ENV"] = ".venv"
+        environ["VIRTUAL_ENV"] = ".venv"
+        shell: bool = False
 
     install: list[str] = [
         "uv",
@@ -32,6 +34,7 @@ if __name__ == "__main__":
     try:
         _: CompletedProcess = run(
             install,
+            shell=shell,
             encoding="utf-8",
             check=True)
 

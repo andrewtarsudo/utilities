@@ -48,7 +48,6 @@ def find_children(element: Element, tags: Iterable[str] = None) -> set[str] | No
     if tags is None:
         return
 
-    child: Element
     _children_names: set[str] = {child.tag for child in iter(element)}
     return _children_names.intersection(tags)
 
@@ -81,7 +80,6 @@ def get_run_text(r: Element) -> dict[str, list[Formatting]]:
 
 
 def get_paragraph_text(p: Element) -> str:
-    r: Element
     lines: list[str] = [
         frame_line(k, v)
         for r in p.findall(fqdn("w:r"), _ns)

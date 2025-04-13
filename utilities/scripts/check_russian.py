@@ -5,42 +5,23 @@ from typing import Iterable
 
 from click.core import Context
 from click.decorators import help_option, option, pass_context
+from click.termui import style
 from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.functions import file_reader
-from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, pretty_print, separator, StrPath
-from utilities.scripts.cli import APIGroup, clear_logs, cli
+from utilities.common.functions import file_reader, pretty_print
+from utilities.common.shared import HELP, separator, StrPath
+from utilities.scripts import APIGroup
+from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
 
 RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
 
 
-def wrap_text(
-        value: str, *,
-        is_color: bool = True,
-        is_success: bool = False):
-    if is_color and is_success:
-        prefix: str = PASS_COLOR
-        postfix: str = NORMAL_COLOR
-
-    elif is_color and not is_success:
-        prefix: str = FAIL_COLOR
-        postfix: str = NORMAL_COLOR
-
-    else:
-        prefix: str = ""
-        postfix: str = ""
-
-    return f"{prefix}{value.strip()}{postfix}"
-
-
-def wrap_iterable(
-        values: Iterable[str], *,
-        is_color: bool = True,
-        is_success: bool = False):
-    lines: list[str] = [wrap_text(value, is_color=is_color, is_success=is_success) for value in values]
+def style_iterable(values: Iterable[str], fg: str):
+    lines: list[str] = [style(value, fg=fg) for value in values]
     return pretty_print(lines)
 
 
@@ -49,8 +30,7 @@ def find_first_russian_char(line: str):
         if char in RUSSIAN_CHARS:
             return index, char
 
-    else:
-        return None
+    return None
 
 
 def file_inspection(path: str, is_color: bool = True):
@@ -63,17 +43,11 @@ def file_inspection(path: str, is_color: bool = True):
 
         if _ is not None:
             index, char = _
-            record: str = wrap_text(
-                f"Строка {line_no + 1}, символ {index + 1}: {char}",
-                is_color=is_color,
-                is_success=False)
+            record: str = style(f"Строка {line_no + 1}, символ {index + 1}: {char}", fg="red")
             results.append(record)
 
     if not results and is_color:
-        return wrap_text(
-            f"В файле {path} не найдены кириллические буквы",
-            is_color=is_color,
-            is_success=True)
+        return style(f"В файле {path} не найдены кириллические буквы", fg="green")
 
     elif not results and not is_color:
         return None
@@ -83,11 +57,8 @@ def file_inspection(path: str, is_color: bool = True):
 
     elif results and is_color:
         return pretty_print(
-            (wrap_text(f"В файле {path} найдены кириллические буквы:", is_color=is_color, is_success=False),
-             wrap_iterable(
-                 results,
-                 is_color=is_color,
-                 is_success=False)))
+            (style(f"В файле {path} найдены кириллические буквы:", fg="red"),
+             style_iterable(results, fg="red")))
 
 
 @cli.command(
@@ -106,6 +77,7 @@ def file_inspection(path: str, is_color: bool = True):
     multiple=False,
     required=False,
     metavar="DIR",
+    shell_complete=dir_completion,
     default=None)
 @option(
     "-f", "--file", "files",
@@ -120,6 +92,7 @@ def file_inspection(path: str, is_color: bool = True):
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
+    shell_complete=file_completion,
     default=None)
 @option(
     "-v/-q", "--verbose/--quiet",
@@ -173,8 +146,6 @@ def check_russian_command(
         extensions="md adoc")
 
     if files is not None and files:
-        is_color: bool = verbose
-
         result: list[str] = []
 
         for file in files:
@@ -186,10 +157,7 @@ def check_russian_command(
                 logger.debug(file_result)
 
         if not result and not verbose:
-            final: str = wrap_text(
-                "Ни в одном файле не обнаружены кириллические буквы",
-                is_color=is_color,
-                is_success=True)
+            final: str = style("Ни в одном файле не обнаружены кириллические буквы", fg="green")
 
         else:
             final: str = pretty_print(result)

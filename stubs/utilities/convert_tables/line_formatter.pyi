@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from typing import MutableSequence
-from utilities.common.errors import ConvertTablesEmptyLinesError as ConvertTablesEmptyLinesError
 
 
 class LineFormatter:

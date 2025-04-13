@@ -51,7 +51,7 @@ class Timer(ContextManager):
     def __call__(self, *args, **kwargs):
         if not self._active:
             print("Таймер остановлен")
-            print(self.get_result())
+            print(self.get_results())
 
         else:
             if self.start_time is None:
@@ -114,7 +114,6 @@ class Timer(ContextManager):
         else:
             if self.start_time is None:
                 self.stop()
-
 
 
 def dummy_function():

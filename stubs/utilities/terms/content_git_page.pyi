@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import NamedTuple
-from utilities.common.shared import StrPath as StrPath
+
+from utilities.common.shared import StrPath
 
 
 class ContentGitPage(NamedTuple):

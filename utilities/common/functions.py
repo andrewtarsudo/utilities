@@ -1,30 +1,20 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
 from io import UnsupportedOperation
+from json import JSONDecodeError
 from os import scandir
 from pathlib import Path
-from typing import Any, Callable, Iterable, Literal, TypeAlias
+from typing import Any, Callable, Iterable
 
 from loguru import logger
 from yaml.scanner import ScannerError
 
-from utilities.common.errors import FileReaderError
-from utilities.common.shared import StrPath
-
-ReaderMode: TypeAlias = Literal["string", "lines"]
+from utilities.common.errors import FileReaderError, FileReaderTypeError
+from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath
 
 
-class FileType(Enum):
-    JSON = "json"
-    YAML = "yaml"
-    NONE = ""
-
-    def initiate(self):
-        if self._value_ == "json":
-            from json import load as load_file
-
-        elif self._value_ == "yaml":
-            from yaml import safe_load as load_file
+def get_version():
+    content: dict[str, dict[str, str]] = file_reader_type(BASE_PATH.joinpath("pyproject.toml"), "toml")
+    return content["project"]["version"]
 
 
 def file_reader(path: StrPath, reader_mode: ReaderMode, *, encoding: str = "utf-8"):
@@ -93,22 +83,36 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
         raise
 
 
-def file_reader_type(path: StrPath, file_type: str | FileType, *, encoding: str = "utf-8"):
-    if isinstance(file_type, str):
-        file_type: ReaderMode = ReaderMode[file_type]
+def file_reader_type(path: StrPath, file_type: FileType):
+    suffix: str = path.suffix
 
-    if file_type is FileType.JSON:
+    if file_type == "json":
         from json import load as load_file
 
-    elif file_type is FileType.YAML:
+        if suffix not in (".json", ".json5"):
+            logger.error(f"Файл {path.name} должен иметь расширение .json или .json5, но получено {suffix}")
+            raise FileReaderTypeError
+
+    elif file_type == "yaml":
         from yaml import safe_load as load_file
 
+        if suffix not in (".json", ".json5"):
+            logger.error(f"Файл {path.name} должен иметь расширение .json или .json5, но получено {suffix}")
+            raise FileReaderTypeError
+
+    elif file_type == "toml":
+        from tomllib import load as load_file
+
+        if suffix not in (".toml", ".lock"):
+            logger.error(f"Файл {path.name} должен иметь расширение .toml или .lock, но получено {suffix}")
+            raise FileReaderTypeError
+
     else:
-        logger.error("Тип должен быть json или yaml")
+        logger.error(f"Тип файла должен быть json, yaml или toml, но получен {file_type}")
         raise FileReaderError
 
     try:
-        with open(path, "r", encoding=encoding, errors="ignore") as f:
+        with open(path, "rb") as f:
             content: dict[str, Any] = load_file(f)
 
         return content
@@ -136,6 +140,12 @@ def file_reader_type(path: StrPath, file_type: str | FileType, *, encoding: str 
         logger.error(
             f"{e.__class__.__name__}: ошибка обработки файла {e.context_mark.name}"
             f"\nв символе {e.context_mark.line + 1}:{e.context_mark.column + 1}")
+        raise
+
+    except JSONDecodeError as e:
+        logger.error(
+            f"{e.__class__.__name__}: ошибка обработки файла {path.name}"
+            f"\nв символе {e.lineno + 1}:{e.colno + 1}")
         raise
 
     except OSError as e:
@@ -221,3 +231,48 @@ def walk_full(
             continue
 
     return results
+
+
+# @pass_context
+# def clear_logs(ctx: Context):
+#     keep_logs: bool = ctx.obj.get("keep_logs", False)
+#     debug: bool = ctx.obj.get("debug", False)
+#     no_result: bool = ctx.obj.get("no_result", False)
+#     result_file: Path = ctx.obj.get("result_file", None)
+#
+#     logger.debug(
+#         f"Версия: {get_version()}"
+#         f"\nКоманда: {ctx.command_path}"
+#         f"\nПараметры: {ctx.params}")
+#
+#     logger.remove()
+#
+#     if no_result and result_file is not None:
+#         result_file.unlink(missing_ok=True)
+#
+#     if not keep_logs:
+#         rmtree(NORMAL.parent, ignore_errors=True)
+#
+#     elif not debug:
+#         echo(f"Папка с логами: {NORMAL.parent}")
+#
+#     else:
+#         echo(f"Папка с логами: {DEBUG.parent}")
+#
+#     pause(PRESS_ENTER_KEY)
+#     ctx.exit(0)
+
+
+def _prettify(value: Any):
+    return str(value).strip()
+
+
+def pretty_print(values: Iterable[StrPath] = None):
+    if values is None or not values:
+        return ""
+
+    elif isinstance(values, str):
+        return f"{values}"
+
+    else:
+        return "\n".join(map(_prettify, values))

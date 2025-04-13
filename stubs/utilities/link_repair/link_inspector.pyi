@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-from utilities.common.shared import ADOC_EXTENSION as ADOC_EXTENSION, MD_EXTENSION as MD_EXTENSION, \
-    StrPath as StrPath
-from utilities.link_repair.file_dict import DirFile as DirFile, FileDict as FileDict, TextFile as TextFile
-from utilities.link_repair.general_storage import ComponentStorage as ComponentStorage, \
-    GeneralStorage as GeneralStorage, Storage as Storage
-from utilities.link_repair.internal_link_inspector import InternalLinkInspector as InternalLinkInspector, \
-    internal_inspector as internal_inspector
-from utilities.link_repair.link import Link as Link
+
+from utilities.common.shared import StrPath
+from utilities.link_repair.file_dict import DirFile, FileDict, TextFile
+from utilities.link_repair.general_storage import GeneralStorage, Storage
+from utilities.link_repair.link import Link
 
 
 def get_options(path: StrPath) -> tuple[str, ...]: ...
@@ -41,6 +38,9 @@ class LinkInspector:
 
     def find_file(self) -> None: ...
 
+    @property
+    def storage(self) -> Storage: ...
+
     def error_file(self, path: StrPath) -> str: ...
 
     def inspect_anchor(self) -> None: ...
@@ -52,6 +52,12 @@ class LinkInspector:
     def compare_links(self) -> bool: ...
 
     def clear(self) -> None: ...
+
+    @property
+    def file_dict(self) -> FileDict: ...
+
+    @property
+    def link(self) -> Link: ...
 
     @property
     def proper_link(self) -> str | None: ...

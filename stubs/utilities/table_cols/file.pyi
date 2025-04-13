@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-from typing import Iterable, Iterator
-from utilities.common.errors import TableColsTableBorderNotClosedError as TableColsTableBorderNotClosedError
-from utilities.common.functions import file_writer as file_writer
-from utilities.table_cols import TableAnalyser as TableAnalyser
-from utilities.table_cols.column import TableColumn as TableColumn
-from utilities.table_cols.table import Table as Table
+from typing import Iterable, Iterator, Mapping
+
+from utilities.table_cols.analyser import TableAnalyser
 
 
 class AsciiDocFile:
@@ -25,6 +22,6 @@ class AsciiDocFile:
 
     def replace_tables(self) -> None: ...
 
-    def fix_tables(self, table_analyser: TableAnalyser): ...
+    def fix_tables(self, table_analyser: TableAnalyser, options: Mapping[str, str] = None): ...
 
     def save(self) -> None: ...

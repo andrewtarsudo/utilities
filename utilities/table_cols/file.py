@@ -9,7 +9,6 @@ from loguru import logger
 from utilities.common.errors import TableColsTableBorderNotClosedError
 from utilities.common.functions import file_writer
 from utilities.table_cols.analyser import TableAnalyser
-from utilities.table_cols.column import TableColumn
 from utilities.table_cols.table import Table
 
 
@@ -200,7 +199,6 @@ class AsciiDocFile:
                                 f"Опции {k} уже задано значение {table.options.get(k)} "
                                 f"в таблице {table.name} файла {self._path}")
 
-                table_column: TableColumn
                 table_analyser._column_parameters = [
                     table_column.column_parameters() for table_column in table.iter_column_items()]
                 table_analyser._table_id = f"{self._path.name}, {table.name}"

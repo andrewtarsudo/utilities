@@ -8,7 +8,9 @@ from loguru import logger
 
 from utilities.common.functions import file_reader
 from utilities.common.shared import HELP, MAX_SYMBOLS, MIN_COLUMN, StrPath
-from utilities.scripts.cli import APIGroup, clear_logs, cli
+from utilities.scripts.api_group import APIGroup
+from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
 from utilities.table_cols.analyser import TableAnalyser
 from utilities.table_cols.file import AsciiDocFile
@@ -30,6 +32,7 @@ from utilities.table_cols.file import AsciiDocFile
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
+    shell_complete=file_completion,
     default=None)
 @option(
     "-d", "--dir", "directory",
@@ -42,6 +45,7 @@ from utilities.table_cols.file import AsciiDocFile
     multiple=False,
     required=False,
     metavar="DIR",
+    shell_complete=dir_completion,
     default=None)
 @option(
     "-s", "--max-symbols",

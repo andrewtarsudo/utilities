@@ -1,28 +1,27 @@
 [flake8]
 count = True
 exclude =
-    .git,
-    .idea,
-    auxiliary,
-    __pycache__,
-    css,
-    docs,
-    fonts,
-    sources,
-    tests,
-    themes,
-    venv,
-    .venv,
+    .git/,
+    .idea/,
+    auxiliary/,
+    __pycache__/,
+    css/,
+    docs/,
+    fonts/,
+    sources/,
+    tests/,
+    themes/,
+    venv/,
+    .venv/,
     generate_executable.py,
     run_flake8.py
-filename =
-    __main__.py,
-    utilities
 format = pylint
 show-source = True
-hang-closing = True
+hang-closing = False
 max-line-length = 120
 indent-size = 4
 disable-noqa = True
 statistics = True
 tee = False
+per-file-ignores =
+    utilities/scripts/__init__.py:F401
