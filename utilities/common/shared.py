@@ -24,3 +24,4 @@ COEFFICIENT: float = 1.0
 
 ReaderMode: Type[str] = Literal["string", "lines"]
 FileType: Type[str] = Literal["json", "yaml", "toml"]
+TextType: Type[str] = Literal["md", "adoc"]

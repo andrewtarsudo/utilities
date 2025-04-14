@@ -2,13 +2,31 @@
 from itertools import product
 from os import scandir
 from pathlib import Path
-from typing import Iterable
+from sys import stdout
+from typing import Any, Iterable
 
 # noinspection PyProtectedMember
 from frontmatter import load, Post
 import yaml
 
 from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION, StrPath
+
+
+def walk_directory(directory: str | Path, tree: dict[Path, Any] = None):
+    """Recursively build a Tree with directory contents."""
+    # Sort dirs first then by filename
+    if tree is None:
+        tree: dict[Path, list[Path]] = {directory: []}
+
+    for path in Path(directory).iterdir():
+        if path.is_dir():
+            tree[directory].append({path: []})
+            tree[directory].append(walk_directory(path, tree))
+
+        else:
+            tree[directory].append(path)
+
+    return tree
 
 
 class WithFrontMatter:
@@ -114,7 +132,7 @@ class TextFile(WithFrontMatter):
 
 
 class TextFolder(WithFrontMatter):
-    def __init__(self, path: StrPath, file_paths: Iterable[StrPath] = None):
+    def __init__(self, path: StrPath, file_paths: Iterable[StrPath] = None, folder_paths: Iterable[StrPath] = None):
         super().__init__(path)
 
         if file_paths is None:
@@ -124,8 +142,17 @@ class TextFolder(WithFrontMatter):
             file_paths: list[Path] = [
                 Path(file_path).expanduser() for file_path in file_paths]
 
+        if folder_paths is None:
+            folder_paths: list[Path] = []
+
+        else:
+            folder_paths: list[Path] = [
+                Path(folder_path).expanduser() for folder_path in folder_paths]
+
         self._text_files: dict[int, TextFile] = {}
         self._file_paths: list[Path] = file_paths
+        self._text_folders: dict[int, TextFolder] = {}
+        self._folder_paths: list[Path] = folder_paths
         self._index_file: Path | None = None
         self.find_index_file()
         self.set_front_matter()
@@ -136,6 +163,8 @@ class TextFolder(WithFrontMatter):
 
         for name, suffix in product(names, suffixes):
             index_file: Path = self._path.joinpath(f"{name}{suffix}")
+            print(f"{index_file=}")
+            print(f"{index_file.exists()=}")
 
             if index_file.exists(follow_symlinks=True):
                 self._index_file = index_file
@@ -280,4 +309,8 @@ if __name__ == '__main__':
             folder_storage.text_folders[text_folder.weight] = text_folder
 
     folder_storage.sort()
-    print([_.to_dict() for _ in folder_storage.text_folders.values()])
+    data: dict = {k: v.to_dict() for k, v in folder_storage.text_folders.items()}
+    print(yaml.safe_dump(data, stdout, indent=2))
+    # print([_.to_dict() for _ in folder_storage.text_folders.values()])
+
+    print(walk_directory("../"))
