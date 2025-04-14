@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
 from typing import Iterator
-from utilities.common.shared import StrPath as StrPath
-from utilities.common.functions import file_writer as file_writer
-from utilities.convert_tables.line_formatter import LineFormatter as LineFormatter
-from utilities.convert_tables.qualified_name import fqdn as fqdn
-from utilities.convert_tables.xml_formatter import get_all_text as get_all_text
 from xml.etree.ElementTree import Element
+
+from utilities.common.shared import StrPath
+from utilities.convert_tables.line_formatter import LineFormatter
 
 
 class CoreDocument:
