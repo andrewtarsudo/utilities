@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from itertools import product
-from os import scandir
+from os import scandir, walk
 from pathlib import Path
 from sys import stdout
-from typing import Any, Iterable
+from typing import Any, Iterable, ForwardRef
 
 # noinspection PyProtectedMember
 from frontmatter import load, Post
@@ -11,20 +11,19 @@ import yaml
 
 from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION, StrPath
 
+RecursiveDict = ForwardRef("RecursiveDict")
+RecursiveDict.__forward_arg__ = "dict[Path, list[Path | RecursiveDict]]"
 
-def walk_directory(directory: str | Path, tree: dict[Path, Any] = None):
-    """Recursively build a Tree with directory contents."""
-    # Sort dirs first then by filename
-    if tree is None:
-        tree: dict[Path, list[Path]] = {directory: []}
 
-    for path in Path(directory).iterdir():
-        if path.is_dir():
-            tree[directory].append({path: []})
-            tree[directory].append(walk_directory(path, tree))
+def walk_files(root: str | Path, base_path: str | Path = None):
+    if base_path is None:
+        base_path: str | Path = root
 
-        else:
-            tree[directory].append(path)
+    tree: RecursiveDict = {}
+
+    for dirpath, _, filenames in walk(root):
+        folder: Path = Path(dirpath).relative_to(base_path)
+        tree[folder] = [Path(filename) for filename in filenames]
 
     return tree
 
@@ -130,6 +129,10 @@ class TextFile(WithFrontMatter):
     def __bool__(self):
         return bool(self._content)
 
+    @property
+    def is_index(self):
+        return self.path.stem not in ("index", "_index")
+
 
 class TextFolder(WithFrontMatter):
     def __init__(self, path: StrPath, file_paths: Iterable[StrPath] = None, folder_paths: Iterable[StrPath] = None):
@@ -163,8 +166,6 @@ class TextFolder(WithFrontMatter):
 
         for name, suffix in product(names, suffixes):
             index_file: Path = self._path.joinpath(f"{name}{suffix}")
-            print(f"{index_file=}")
-            print(f"{index_file.exists()=}")
 
             if index_file.exists(follow_symlinks=True):
                 self._index_file = index_file
@@ -191,7 +192,8 @@ class TextFolder(WithFrontMatter):
 
         self._text_files = {
             index: text_file
-            for index, text_file in enumerate(sorted(filter(lambda x: not x.draft, text_files)))}
+            for index, text_file in enumerate(
+                sorted(filter(lambda x: not x.draft and not x.is_index, text_files)))}
 
     def to_dict(self):
         if self.draft:
@@ -313,4 +315,4 @@ if __name__ == '__main__':
     print(yaml.safe_dump(data, stdout, indent=2))
     # print([_.to_dict() for _ in folder_storage.text_folders.values()])
 
-    print(walk_directory("../"))
+    print(yaml.safe_dump(walk_files("../docs", ".."), indent=2))
