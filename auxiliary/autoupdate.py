@@ -4,13 +4,27 @@ from enum import Enum
 import faulthandler
 from http.client import HTTPResponse
 from json import loads
+from os import walk
 from pathlib import Path
-from sys import platform as pl
+from sys import platform
 from typing import Any, Optional
 from urllib.parse import quote_plus
 
 from utilities.terms.const import CustomPort, CustomScheme
 from utilities.terms.http_request import CustomHTTPRequest, CustomHTTPResponseChunked
+
+
+def walk_files(root: str | Path, base_path: str | Path = None):
+    if base_path is None:
+        base_path: str | Path = root
+
+    tree: dict = {}
+
+    for dirpath, _, filenames in walk(root):
+        folder: Path = Path(dirpath).relative_to(base_path)
+        tree[folder] = [Path(filename) for filename in filenames]
+
+    return tree
 
 _PROTOCOL: str = "HTTPS"
 _CHUNK_SIZE: int = 4096
@@ -39,7 +53,8 @@ class CustomMethod(Enum):
 class GitlabRequest(CustomHTTPRequest):
     def __init__(self, file_name: Optional[str] = None):
         if file_name is None:
-            file_name: str = _gitlab[pl]
+            file_name: str = _gitlab[platform]
+
         scheme: CustomScheme = CustomScheme.HTTPS
         web_hook: str = f"/api/v4/projects/65722828/repository/files/bin%2F{file_name}"
         host: str = "gitlab.com"
@@ -67,7 +82,7 @@ class GitlabResponse(CustomHTTPResponseChunked):
 
     @property
     def file_name(self) -> Path:
-        return self._path.with_name(_gitlab[pl])
+        return self._path.with_name(_gitlab[platform])
 
     def generate_executable(self):
         with open(self.file_name, "wb") as fb:
@@ -79,6 +94,7 @@ class GitlabResponse(CustomHTTPResponseChunked):
             text: dict[str, Any] = loads(fb.read())
 
         return text
+
 
 def main():
     gitlab_request: GitlabRequest = GitlabRequest()

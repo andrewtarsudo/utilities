@@ -8,7 +8,7 @@ from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
 from utilities.common.functions import file_reader, file_writer, pretty_print
-from utilities.common.shared import HELP, StrPath
+from utilities.common.shared import HELP, INDEX_STEMS, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import clear_logs, cli
 from utilities.scripts.completion import dir_completion
@@ -26,7 +26,7 @@ class File:
         return iter(self._content)
 
     def __bool__(self):
-        return self._path.stem.removeprefix("_") == "index"
+        return self._path.stem in INDEX_STEMS
 
     @property
     def full_links(self) -> list[Path]:
