@@ -96,7 +96,7 @@ def file_reader_type(path: StrPath, file_type: FileType):
     elif file_type == "yaml":
         from yaml import safe_load as load_file
 
-        if suffix not in (".json", ".json5"):
+        if suffix not in (".yml", ".yaml"):
             logger.error(f"Файл {path.name} должен иметь расширение .json или .json5, но получено {suffix}")
             raise FileReaderTypeError
 
@@ -205,6 +205,8 @@ def walk_full(
         language: str | None = None,
         root: Path = None,
         results: list[Path] = None):
+    path: Path = Path(path).expanduser()
+
     if root is None:
         root: Path = Path(path)
 
@@ -227,44 +229,7 @@ def walk_full(
         elif check_path(item, ignored_dirs, ignored_files, extensions, language):
             results.append(item.relative_to(root))
 
-        else:
-            continue
-
     return results
-
-
-# @pass_context
-# def clear_logs(ctx: Context):
-#     keep_logs: bool = ctx.obj.get("keep_logs", False)
-#     debug: bool = ctx.obj.get("debug", False)
-#     no_result: bool = ctx.obj.get("no_result", False)
-#     result_file: Path = ctx.obj.get("result_file", None)
-#
-#     logger.debug(
-#         f"Версия: {get_version()}"
-#         f"\nКоманда: {ctx.command_path}"
-#         f"\nПараметры: {ctx.params}")
-#
-#     logger.remove()
-#
-#     if no_result and result_file is not None:
-#         result_file.unlink(missing_ok=True)
-#
-#     if not keep_logs:
-#         rmtree(NORMAL.parent, ignore_errors=True)
-#
-#     elif not debug:
-#         echo(f"Папка с логами: {NORMAL.parent}")
-#
-#     else:
-#         echo(f"Папка с логами: {DEBUG.parent}")
-#
-#     pause(PRESS_ENTER_KEY)
-#     ctx.exit(0)
-
-
-def _prettify(value: Any):
-    return str(value).strip()
 
 
 def pretty_print(values: Iterable[StrPath] = None):
@@ -275,4 +240,4 @@ def pretty_print(values: Iterable[StrPath] = None):
         return f"{values}"
 
     else:
-        return "\n".join(map(_prettify, values))
+        return "\n".join(map(lambda x: str(x).strip(), values))

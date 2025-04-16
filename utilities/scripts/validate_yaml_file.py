@@ -13,9 +13,10 @@ from click.utils import echo
 from loguru import logger
 
 from utilities.common.functions import file_reader, file_reader_type, file_writer, pretty_print
-from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, StrPath
+from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, separator, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.completion import file_dir_completion
 from utilities.scripts.list_files import get_files
 
 _SETTINGS_NAMES: tuple[str, ...] = (
@@ -78,7 +79,8 @@ def fix_path(ctx: Context, line_no: int, path: Path, root: Path):
         return f"{common_part} -> {style(rel(adoc_file, root), fg="red")}"
 
     elif path.stem.removeprefix("_") == "index":
-        return f"{common_part} Поиск файлов index.* и _index.* не осуществляется"
+        _: str = style(f"# {rel_path}", fg="red")
+        return f"{common_part} -> {_}"
 
     else:
         name: str = path.name
@@ -443,12 +445,13 @@ def validate_file(
         file_okay=True,
         allow_dash=False,
         dir_okay=True),
-    required=True)
+    required=True,
+    shell_complete=file_dir_completion)
 @option(
     "-o", "--output",
     type=ClickPath(
         file_okay=True,
-        readable=True,
+        writable=True,
         resolve_path=True,
         allow_dash=True,
         dir_okay=False),
@@ -458,7 +461,7 @@ def validate_file(
     metavar="FILE",
     default=None)
 @option(
-    "-g/-G", "--guess/--no-guess",
+    "-g/-G", "--guess/--no-guess", "guess",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг вывода возможных корректных путей."
@@ -467,7 +470,7 @@ def validate_file(
     required=False,
     default=True)
 @option(
-    "-v/-q", "--verbose/--quiet",
+    "-v/-q", "--verbose/--quiet", "verbose",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг подробного вывода.\nПо умолчанию: False, выводятся только ошибки",
@@ -475,7 +478,7 @@ def validate_file(
     required=False,
     default=False)
 @option(
-    "-k/-K", "--keep-logs/--remove-logs",
+    "-k/-K", "--keep-logs/--remove-logs", "keep_logs",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг сохранения директории с лог-файлом по завершении"
@@ -499,8 +502,13 @@ def validate_yaml_command(
     if platform.startswith("win"):
         system("color")
 
+    file_or_project: Path = Path(file_or_project).expanduser()
+
+    if output == "-":
+        output: StrPath | None = None
+
     if file_or_project.is_dir():
-        yaml_files: list[Path] = list(filter(lambda x: x.suffix == ".yml", file_or_project.iterdir()))
+        yaml_files: list[Path] = list(filter(lambda x: x.suffix == ".yml" and not x.stem.startswith("."), file_or_project.iterdir()))
 
     elif file_or_project.is_file():
         yaml_files: list[Path] = [file_or_project]
@@ -515,7 +523,7 @@ def validate_yaml_command(
     else:
         for yaml_file in yaml_files:
             yaml_file: Path = Path(yaml_file).expanduser().resolve()
-
+            echo(style(separator, fg="magenta"))
             echo(f"Файл {yaml_file.name}:")
 
             content: dict[str, Any] = file_reader_type(yaml_file, "yaml")
@@ -530,19 +538,25 @@ def validate_yaml_command(
             validate_file(yaml_file.parent, lines, output=output, guess=guess, verbose=verbose)
 
             if general_info.warnings:
-                logger.warning("\nПредупреждения:")
-                logger.warning(pretty_print(general_info.warnings))
+                _warnings: str = pretty_print(general_info.warnings)
+                echo("\nПредупреждения:")
+                echo(_warnings)
+                logger.debug(_warnings)
 
             if guess and general_info.options:
-                logger.success("\nЗамены:")
-                logger.success(pretty_print(general_info.options))
+                _options: str = pretty_print(general_info.options)
+                echo("\nИсправления:")
+                echo(_options)
+                logger.debug(_options)
 
             if verbose and general_info.messages:
-                logger.info("\nСообщения:")
-                logger.info(pretty_print(general_info.messages))
+                _messages: str = pretty_print(general_info.messages)
+                echo("\nСообщения:")
+                echo(_messages)
+                logger.debug(_messages)
 
             if not (verbose or general_info.warnings or general_info.messages or general_info.options):
-                echo("Проблемы с парамерами разделов не обнаружены\n")
+                logger.success("Проблемы с парамерами разделов не обнаружены\n")
 
             general_info.clear()
 

@@ -195,7 +195,7 @@ class LoggerConfiguration:
         Handles KeyError.
         """
         try:
-            _logging_level: str = self._handlers.get("file_rotating")
+            _logging_level: str = self._handlers.get("file_rotating", "INFO")
             _log_path: str = str(self.log_folder.joinpath(f"{self._file_name}_{_logging_level.lower()}.log"))
 
             return {

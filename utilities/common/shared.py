@@ -4,7 +4,7 @@ from typing import Literal, Type, TypeAlias
 
 PRESS_ENTER_KEY: str = "\nНажмите ENTER, чтобы завершить работу скрипта ..."
 HELP: str = """Вывести справочную информацию на экран и завершить работу"""
-BASE_PATH: Path = Path(__file__).parent.parent
+BASE_PATH: Path = Path(__file__).parent.parent.parent
 StrPath: TypeAlias = str | Path
 MD_EXTENSION: str = ".md"
 ADOC_EXTENSION: str = ".adoc"
@@ -13,7 +13,7 @@ FAIL_COLOR: str = '\033[41m'
 PASS_COLOR: str = '\033[42m'
 NORMAL_COLOR: str = '\033[0m'
 
-separator: str = "-" * 80
+separator: str = "=" * 100
 
 DEBUG: Path = Path.cwd().joinpath("_logs/cli_debug.log")
 NORMAL: Path = Path("~/Desktop/_logs/cli_debug.log").expanduser().resolve()

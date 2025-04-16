@@ -324,16 +324,20 @@ def list_files_command(
         f"\nauxiliary = {auxiliary}"
         f"\nkeep_logs = {keep_logs}")
 
-    values: list[Path] | None = walk_full(
-        root_dir,
-        ignored_dirs=ignored_dirs,
-        ignored_files=ignored_files,
-        extensions=extensions,
-        language=language)
+    if not root_dir.exists():
+        echo()
+        logger.warning(f"Директория {root_dir} не найдена")
+        values: list[Path] | None = None
+
+    else:
+        values: list[Path] | None = walk_full(
+            root_dir,
+            ignored_dirs=ignored_dirs,
+            ignored_files=ignored_files,
+            extensions=extensions,
+            language=language)
 
     if values is None or not values:
-        echo(f"Подходящих файлов в директории {root_dir} не найдено")
-
         if auxiliary:
             return None
 

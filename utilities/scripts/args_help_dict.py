@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from utilities.common.functions import file_reader_type, pretty_print
@@ -7,7 +8,8 @@ from utilities.common.shared import BASE_PATH
 
 class ArgsHelpDict(dict):
     def __init__(self):
-        content: dict[str, dict[str, str]] = file_reader_type(BASE_PATH.joinpath("sources/dict.yaml"), "yaml")
+        config_path: Path = BASE_PATH.joinpath("sources/dict.yaml")
+        content: dict[str, dict[str, str]] = file_reader_type(config_path, "yaml")
 
         super().__init__()
         self.update(**content)
@@ -27,7 +29,7 @@ class ArgsHelpDict(dict):
 
     @property
     def max_key(self) -> int:
-        return max(len(k) for _, values in self.items() for k, _ in values.items()) + 2 + 4
+        return max(len(k) for _, values in self.items() for k, _ in values.items()) + 6
 
 
 args_help_dict: ArgsHelpDict = ArgsHelpDict()
