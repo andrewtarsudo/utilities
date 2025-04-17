@@ -39,9 +39,3 @@ package = false
 compile-bytecode = true
 python-downloads = "never"
 python-preference = "managed"
-
-[tool.vulture]
-exclude = ["auxiliary", "bin", "build", "css", "docs", "fonts", "sources", "tests", "themes"]
-make_whitelist = true
-paths = ["__main__.py", "utilities"]
-verbose = true

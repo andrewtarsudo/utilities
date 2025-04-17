@@ -84,7 +84,7 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
 
 
 def file_reader_type(path: StrPath, file_type: FileType):
-    suffix: str = path.suffix
+    suffix: str = Path(path).suffix
 
     if file_type == "json":
         from json import load as load_file

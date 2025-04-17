@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from pathlib import Path
-from subprocess import CompletedProcess, run
 from sys import platform
 from typing import Any, Iterable, Mapping
 
@@ -283,47 +281,6 @@ def print_version(ctx: Context, param: Parameter, value: Any):
     echo(f"Версия {get_version()}")
     pause(PRESS_ENTER_KEY)
     ctx.exit(0)
-
-
-POWERSHELL: str = "%SYSTEMROOT%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
-
-
-def get_current_encoding() -> str:
-    """
-    Determines the current console code page encoding by executing a PowerShell command.
-    Retrieve the active code page from the `chcp` command output and extract code from byte string.
-    Returns:
-        str: The current console code page encoding as a string.
-    """
-    _encoding: CompletedProcess = run(f'{POWERSHELL} -c "(chcp | Out-String).Split(\' \')[-1].Trim()"', shell=False, capture_output=True)
-    return ''.join(chr(byte) for byte in _encoding.stdout if byte not in (b'\r', b'\n'))
-
-
-def install_completion(ctx: Context):
-    stdout: bytes = run([POWERSHELL, "-command", "echo", "$PROFILE"], shell=True, capture_output=True).stdout
-    echo(f"{stdout=}")
-    # encoding: str = get_current_encoding()
-    # echo(f"{encoding}")
-
-    # if get_current_encoding() == "":
-    #     encoding: str | None = "utf-8"
-
-    _profile: str = (
-        stdout
-        .decode(encoding="utf-8", errors="ignore")
-        .strip())
-    profile: Path = Path(_profile)
-
-    # Write the completion script to a local profile
-    completion_varname: str = "_TW_UTILITIES_COMPLETE"
-
-    completion_profile: str = str(profile.parent.joinpath(".tw_utilities_profile.ps1"))
-    run(
-        f"{POWERSHELL} -Command \"$env:{completion_varname} = 'pwsh_source'; tw_utilities > {completion_profile}; $env:{completion_varname} = $null\"",
-        shell=True)
-    run(f'{POWERSHELL} -Command "echo \'"{completion_profile}" | Invoke-Expression\' >> {str(profile)}"', shell=True)
-
-    print("Complete.")
 
 
 class APIGroup(Group):

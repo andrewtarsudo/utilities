@@ -10,6 +10,9 @@ from sys import platform
 from typing import Any, Optional
 from urllib.parse import quote_plus
 
+from httpx import get
+
+from utilities.common.functions import get_version
 from utilities.terms.const import CustomPort, CustomScheme
 from utilities.terms.http_request import CustomHTTPRequest, CustomHTTPResponseChunked
 
@@ -105,6 +108,19 @@ def main():
     gitlab_response.generate_executable()
     print(f"Загружен файл {gitlab_response.file_name}")
     input("Нажмите <Enter>, чтобы закрыть окно ...")
+
+
+
+
+def get_current_version():
+    return get_version()
+
+
+
+def download_file(project_id: int, file_name: str):
+
+
+
 
 
 if __name__ == '__main__':

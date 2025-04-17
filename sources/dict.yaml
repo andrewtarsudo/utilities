@@ -16,3 +16,6 @@ convert-tables:
 
 filter-images:
   project_dir: "Путь до директории проекта"
+
+inspect-updates:
+  filename: "Путь до файла от корня для загрузки"

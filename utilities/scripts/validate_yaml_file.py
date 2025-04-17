@@ -508,7 +508,9 @@ def validate_yaml_command(
         output: StrPath | None = None
 
     if file_or_project.is_dir():
-        yaml_files: list[Path] = list(filter(lambda x: x.suffix == ".yml" and not x.stem.startswith("."), file_or_project.iterdir()))
+        yaml_files: list[Path] = [
+            yaml_file for yaml_file in file_or_project.iterdir()
+            if yaml_file.suffix == ".yml" and not yaml_file.stem.startswith(".")]
 
     elif file_or_project.is_file():
         yaml_files: list[Path] = [file_or_project]
