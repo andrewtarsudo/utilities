@@ -4,9 +4,12 @@ if __name__ == '__main__':
     from pathlib import Path
     from subprocess import CompletedProcess, run
 
-    Path($old_file).unlink(missing_ok=True)
-    old_file: Path = Path(${new_file}).rename(${old_file})
+    old_file: str = r${old_file}
+    new_file: str = r${new_file}
+    shell: bool = ${shell}
+
+    Path(old_file).unlink(missing_ok=True)
+    old_file: Path = Path(new_file).rename(old_file)
     output: CompletedProcess = run([f"{old_file}", "--version"], shell=${shell}, capture_output=True, check=True)
-    print(output.stdout.decode())
-    print("Файл обновлен")
+    print(f"Файл {new_file} --> {old_file} обновлен")
     exit(0)

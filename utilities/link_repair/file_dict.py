@@ -101,7 +101,7 @@ class DirFile:
         self._full_path: Path = Path(full_path)
 
     def __bool__(self):
-        return Path(self._full_path).suffix in (MD_EXTENSION, ADOC_EXTENSION)
+        return Path(self._full_path).suffix in EXTENSIONS
 
     def __str__(self):
         return f"{self._full_path}"
@@ -557,7 +557,7 @@ class FileDict:
                 logger.debug(f"Path {file_path} is already listed")
                 return
 
-            if file_path.suffix in (MD_EXTENSION, ADOC_EXTENSION):
+            if file_path.suffix in EXTENSIONS:
                 text_file: TextFile = get_file(self._root_dir, file_path)
 
                 text_file._content = file_reader(text_file.full_path, "lines", encoding="utf-8")

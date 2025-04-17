@@ -3,13 +3,12 @@ from base64 import b64decode
 from pathlib import Path
 from string import Template
 from subprocess import run
-from sys import platform
 from typing import Any
 
 from httpx import HTTPStatusError, request, RequestError, Response, URL
 from loguru import logger
 
-from utilities.common.functions import file_reader_type, get_version
+from utilities.common.functions import file_reader_type, get_version, is_windows, path_to_exe
 from utilities.common.shared import BASE_PATH, StrPath
 
 
@@ -63,13 +62,22 @@ class GitFile:
     def __repr__(self):
         return f"<{self.__class__.__name__}>({str(self)})"
 
+    @property
+    def download_parent(self):
+        return self.download_destination.parent
+
+    @property
+    def download_destination(self):
+        return BASE_PATH.joinpath(f"{self._temp_dir}/{self._file_name}").expanduser()
+
     def download(self):
-        file_name: Path = BASE_PATH.joinpath(f"{self._temp_dir}/{self._file_name}").expanduser()
-        file_name.parent.mkdir(parents=True, exist_ok=True)
-        file_name.touch(exist_ok=True)
+        logger.error(self.download_parent.as_posix())
+        logger.error(self.download_destination.as_posix())
+        self.download_parent.mkdir(parents=True, exist_ok=True)
+        self.download_destination.touch(exist_ok=True)
 
         try:
-            with open(file_name, "wb") as f:
+            with open(self.download_destination, "wb") as f:
                 response: Response = self.get_response().raise_for_status()
                 logger.debug(f"Запрос: {response.request.method} {response.request.url}")
 
@@ -83,64 +91,24 @@ class GitFile:
             logger.error(f"Ошибка запроса: {str(e)}")
 
         else:
-            logger.debug(f"Файл {file_name} скачан")
-            return file_name.as_posix()
-
-    def delete(self):
-        Path(self._file_name).unlink(missing_ok=True)
+            logger.debug(f"Файл {self.download_destination.name} загружен")
 
 
 def compare_versions():
     current_version: str = get_version()
 
     git_file: GitFile = GitFile("pyproject.toml")
-    pyproject_file: str = git_file.download()
-    content: dict[str, Any] = file_reader_type(pyproject_file, "toml")
+    git_file.download()
+    content: dict[str, Any] = file_reader_type(git_file.download_destination, "toml")
     latest_version: str = content.get("project").get("version")
-    git_file.delete()
+    # rmtree(git_file.download_parent)
 
     return current_version == latest_version
 
 
-# @cli.command(
-#     "inspect-updates",
-#     cls=APIGroup,
-#     help="""Команда для загрузки файла с Git""",
-#     hidden=True)
-# @argument(
-#     "filename",
-#     type=STRING,
-#     required=True,
-#     metavar="FILE")
-# @option(
-#     "-p", "--project-id",
-#     type=INT,
-#     help="\b\nИдентификатор проекта на Git."
-#          "\nПо умолчанию: 65722828",
-#     multiple=False,
-#     required=False,
-#     metavar="PROJECT_ID",
-#     default=65722828)
-# @option(
-#     "-t", "--temp-dir",
-#     type=ClickPath(
-#         file_okay=False,
-#         resolve_path=True,
-#         allow_dash=False,
-#         dir_okay=True,
-#         exists=False),
-#     help="\b\nДиректория для временного хранения файлов."
-#          "\nПо умолчанию: ./_temp/",
-#     multiple=False,
-#     required=False,
-#     metavar="DIR",
-#     default="_temp/")
-# @pass_context
-
-
-def update_exe(exe_file_name: str, project_id: int = 65722828, temp_dir: StrPath = "_temp/", ):
-    executable_file: GitFile = GitFile(exe_file_name, project_id=project_id, temp_dir=temp_dir)
-    return executable_file.download()
+def update_exe(exe_file_name: str, project_id: int = 65722828, temp_dir: StrPath = "_temp/", **kwargs):
+    executable_file: GitFile = GitFile(exe_file_name, project_id=project_id, temp_dir=temp_dir, **kwargs)
+    executable_file.download()
 
 
 def activate_runner(executable_file: str, shell: bool, exe_file_name: str, temp_dir: StrPath = "_temp/"):
@@ -152,12 +120,11 @@ def activate_runner(executable_file: str, shell: bool, exe_file_name: str, temp_
     with open(runner_exe, "wb") as fw, open(runner, "r", encoding="utf-8", errors="ignore") as fr:
         template: Template = Template(fr.read())
         kwargs: dict[str, str] = {
-            "old_file": f"\"{Path.cwd().joinpath("")}\"",
+            "old_file": f"\"{path_to_exe()}\"",
             "new_file": f"\"{BASE_PATH.joinpath(temp_dir).joinpath(exe_file_name)}\"",
-            "shell": shell
-        }
+            "shell": shell}
+
         data: str = template.safe_substitute(kwargs)
-        print(data)
         fw.write(data.encode())
 
         logger.success(f"Файл {runner_exe} записан и готов к запуску")
@@ -165,9 +132,9 @@ def activate_runner(executable_file: str, shell: bool, exe_file_name: str, temp_
     run([executable_file, runner_exe])
 
 
-def update():
+def check_updates(**kwargs):
     if not compare_versions():
-        if platform.startswith("win"):
+        if is_windows():
             exe_file_name: str = "bin/tw_utilities.exe"
             python_exe: str = "python"
             shell: bool = True
@@ -177,12 +144,12 @@ def update():
             python_exe: str = "python3"
             shell: bool = False
 
-        update_exe(exe_file_name)
-        activate_runner(python_exe, shell)
+        update_exe(exe_file_name, **kwargs)
+        activate_runner(python_exe, shell, exe_file_name)
 
     else:
         logger.info("OK")
 
 
 if __name__ == '__main__':
-    update()
+    check_updates()

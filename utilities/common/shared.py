@@ -1,17 +1,22 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
+import sys
 from typing import Literal, Type, TypeAlias
 
 PRESS_ENTER_KEY: str = "\nНажмите ENTER, чтобы завершить работу скрипта ..."
 HELP: str = """Вывести справочную информацию на экран и завершить работу"""
-BASE_PATH: Path = Path(__file__).parent.parent.parent
+
+if getattr(sys, "frozen", False):
+    BASE_PATH: Path = Path(getattr(sys, "_MEIPASS"))
+
+else:
+    BASE_PATH: Path = Path(__file__).parent.parent.parent
+
+
 StrPath: TypeAlias = str | Path
 MD_EXTENSION: str = ".md"
 ADOC_EXTENSION: str = ".adoc"
-
-FAIL_COLOR: str = '\033[41m'
-PASS_COLOR: str = '\033[42m'
-NORMAL_COLOR: str = '\033[0m'
+EXTENSIONS: tuple[str, ...] = (MD_EXTENSION, ADOC_EXTENSION)
 
 separator: str = "=" * 100
 

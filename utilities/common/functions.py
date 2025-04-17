@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from functools import cache
 from io import UnsupportedOperation
 from json import JSONDecodeError
 from os import scandir
 from pathlib import Path
+from sys import platform
 from typing import Any, Callable, Iterable
 
 from loguru import logger
@@ -10,6 +12,20 @@ from yaml.scanner import ScannerError
 
 from utilities.common.errors import FileReaderError, FileReaderTypeError
 from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath
+
+
+@cache
+def is_windows() -> bool:
+    return platform.startswith("win")
+
+
+def path_to_exe() -> Path:
+    if "_MEIPASS" in BASE_PATH.as_posix():
+        return BASE_PATH.joinpath(Path(__file__).name)
+
+    else:
+        suffix: str = ".exe" * int(is_windows())
+        return Path(BASE_PATH).joinpath("bin/").joinpath(f"tw_utilities{suffix}")
 
 
 def get_version():

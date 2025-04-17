@@ -2,7 +2,6 @@
 from collections import Counter
 from os import system
 from pathlib import Path
-from sys import platform
 from typing import Any, get_args, get_origin, Iterable, Mapping, NamedTuple
 
 from click.core import Context
@@ -12,8 +11,8 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.functions import file_reader, file_reader_type, file_writer, pretty_print
-from utilities.common.shared import FAIL_COLOR, HELP, NORMAL_COLOR, PASS_COLOR, separator, StrPath
+from utilities.common.functions import file_reader, file_reader_type, file_writer, is_windows, pretty_print
+from utilities.common.shared import HELP, separator, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import clear_logs, cli
 from utilities.scripts.completion import file_dir_completion
@@ -397,10 +396,10 @@ def validate_file(
     _DICT_RESULTS: dict[bool, dict[str, str]] = {
         True: {
             "status": "OK",
-            "color": PASS_COLOR},
+            "color": "green"},
         False: {
             "status": "FAIL",
-            "color": FAIL_COLOR}}
+            "color": "red"}}
 
     for line_no, path in paths.items():
         _result: bool = path.exists() and path.as_posix().endswith(("md", "adoc"))
@@ -410,7 +409,7 @@ def validate_file(
 
         _path: str = path.relative_to(root).as_posix()
 
-        _line = f"{_color}{line_no + 1:>4}  {_path: <{max_length}}{_status: >5}{NORMAL_COLOR}"
+        _line: str = style(f"{line_no + 1:>4}  {_path: <{max_length}}{_status: >5}", bg=_color)
         _lines.append(_line)
 
         if verbose or _status == "FAIL":
@@ -424,13 +423,7 @@ def validate_file(
         output.unlink(missing_ok=True)
         output.touch(exist_ok=True)
 
-        content: str = (
-            pretty_print(_lines).
-            replace(PASS_COLOR, "").
-            replace(FAIL_COLOR, "").
-            replace(NORMAL_COLOR, ""))
-
-        file_writer(output, content)
+        file_writer(output, _lines)
 
 
 @cli.command(
@@ -499,7 +492,7 @@ def validate_yaml_command(
         guess: bool = True,
         verbose: bool = False,
         keep_logs: bool = False):
-    if platform.startswith("win"):
+    if is_windows():
         system("color")
 
     file_or_project: Path = Path(file_or_project).expanduser()

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from os import system
-from sys import platform
 from typing import Iterable
 
 from click.core import Context
@@ -10,7 +9,7 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.functions import file_reader, pretty_print
+from utilities.common.functions import file_reader, is_windows, pretty_print
 from utilities.common.shared import HELP, separator, StrPath
 from utilities.scripts.api_group import APIGroup
 from utilities.scripts.cli import clear_logs, cli
@@ -134,7 +133,7 @@ def check_russian_command(
         recursive: bool = True,
         verbose: bool = False,
         keep_logs: bool = False):
-    if platform.startswith("win"):
+    if is_windows():
         system("color")
 
     files: list[StrPath] | None = get_files(

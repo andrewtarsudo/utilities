@@ -143,7 +143,7 @@ class GeneralStorage:
         for _ in iglob("**/*.*", root_dir=self._root_dir, recursive=True):
             _path: Path = self.join_path(_)
 
-            if _path.suffix not in (MD_EXTENSION, ADOC_EXTENSION):
+            if _path.suffix not in EXTENSIONS:
                 _non_md_files.append(_path)
 
             elif _path.stem == "_index":

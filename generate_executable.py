@@ -2,13 +2,14 @@
 from os import environ
 from pathlib import Path
 from subprocess import CalledProcessError, CompletedProcess, run
-from sys import platform
+
+from utilities.common.functions import is_windows
 
 if __name__ == "__main__":
     log_file: str = "pyinstaller.log"
     print(f"log: {Path(log_file).resolve()}")
 
-    if platform.startswith("win"):
+    if is_windows():
         spec_file: str = "utilities.exe.spec"
         exe_file: str = r".\bin\tw_utilities.exe"
         environ["VIRTUAL_ENV"] = "venv"
@@ -29,7 +30,7 @@ if __name__ == "__main__":
         "--distpath",
         "./bin",
         f"{spec_file}",
-        f"2> {log_file}"]
+        f"2>{log_file}"]
 
     try:
         _: CompletedProcess = run(

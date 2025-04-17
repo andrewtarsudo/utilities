@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections.abc import Iterable
 from pathlib import Path
-from sys import platform
 
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
@@ -10,7 +9,7 @@ from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.functions import pretty_print, walk_full
+from utilities.common.functions import is_windows, pretty_print, walk_full
 from utilities.common.shared import HELP, PRESS_ENTER_KEY, StrPath
 from utilities.scripts.api_group import MutuallyExclusiveOption, SwitchArgsAPIGroup
 from utilities.scripts.cli import clear_logs, cli
@@ -35,7 +34,7 @@ def generate_base_root(path: Path, content_common_index: int):
         return path
 
     else:
-        if not platform.startswith("win"):
+        if not is_windows():
             parts[0] = ""
 
         return path.relative_to(Path().joinpath("/".join(parts[:content_common_index]))).as_posix()

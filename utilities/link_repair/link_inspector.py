@@ -5,7 +5,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from utilities.common.shared import ADOC_EXTENSION, INDEX_STEMS, MD_EXTENSION, StrPath
+from utilities.common.shared import ADOC_EXTENSION, EXTENSIONS, INDEX_STEMS, MD_EXTENSION, StrPath
 from utilities.link_repair.file_dict import FileDict, TextFile, DirFile
 from utilities.link_repair.link import Link
 from utilities.link_repair.internal_link_inspector import internal_inspector, InternalLinkInspector
@@ -22,9 +22,7 @@ def _prepare_link(link: str) -> str:
     """
     _: str = link.removesuffix("/")
 
-    suffixes: tuple[str, ...] = (MD_EXTENSION, ADOC_EXTENSION)
-
-    for name, suffix in product(INDEX_STEMS, suffixes):
+    for name, suffix in product(INDEX_STEMS, EXTENSIONS):
         item: str = f"{name}{suffix}"
 
         if _.endswith(item):

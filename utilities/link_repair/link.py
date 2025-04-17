@@ -3,7 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import NamedTuple
 
-from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION, StrPath
+from utilities.common.shared import ADOC_EXTENSION, EXTENSIONS, MD_EXTENSION, StrPath
 
 __all__ = ["Link"]
 
@@ -88,7 +88,7 @@ class Link(NamedTuple):
         :return: The type of the link based on the extension and index/_index files.
         :rtype: _LinkType
         """
-        if self.from_file.suffix not in (MD_EXTENSION, ADOC_EXTENSION):
+        if self.from_file.suffix not in EXTENSIONS:
             return _LinkType.IMAGE_TYPE
 
         elif self.from_file.stem.startswith("index"):

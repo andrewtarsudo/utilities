@@ -10,7 +10,7 @@ from click.termui import pause, style
 from loguru import logger
 
 from utilities.common.errors import BaseError, NoArgumentsOptionsError
-from utilities.common.functions import get_version, pretty_print
+from utilities.common.functions import get_version, is_windows, pretty_print
 from utilities.common.shared import HELP, PRESS_ENTER_KEY
 from utilities.scripts.args_help_dict import args_help_dict
 
@@ -84,7 +84,7 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
         opts_str: str = f"{opts_str} | --h/--help"
 
     commands: dict[str, Command] = getattr(cmd, "commands", None)
-    suffix: str = "" if not platform.startswith("win") else ".exe"
+    suffix: str = ".exe" * int(is_windows())
     name: str = ctx.command_path.replace("__main__.py", f"tw_utilities{suffix}")
 
     if commands is not None and commands:

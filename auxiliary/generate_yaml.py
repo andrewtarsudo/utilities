@@ -9,7 +9,7 @@ from typing import ForwardRef, Iterable
 from frontmatter import load, Post
 from yaml import safe_dump
 
-from utilities.common.shared import ADOC_EXTENSION, INDEX_STEMS, MD_EXTENSION, StrPath
+from utilities.common.shared import EXTENSIONS, INDEX_STEMS, StrPath
 
 RecursiveDict = ForwardRef("RecursiveDict")
 RecursiveDict.__forward_arg__ = "dict[Path, list[Path | RecursiveDict]]"
@@ -187,10 +187,7 @@ class TextFolder(WithFrontMatter):
         self.handle_text_files()
 
     def find_index_file(self):
-        names: tuple[str, ...] = ("_index", "index")
-        suffixes: tuple[str, ...] = (MD_EXTENSION, ADOC_EXTENSION)
-
-        for name, suffix in product(names, suffixes):
+        for name, suffix in product(INDEX_STEMS, EXTENSIONS):
             index_file: Path = self._path.joinpath(f"{name}{suffix}")
 
             if index_file.exists(follow_symlinks=True):
@@ -296,13 +293,13 @@ class TextFolder(WithFrontMatter):
             set(self._file_paths)
             .union(
                 item for item in self._path.resolve().iterdir()
-                if item.is_file and item.suffix in (MD_EXTENSION, ADOC_EXTENSION)))
+                if item.is_file and item.suffix in EXTENSIONS))
 
     def handle_text_files(self):
         text_files: list[TextFile] = [
             TextFile(file_path)
             for file_path in self._file_paths
-            if file_path.suffix in (MD_EXTENSION, ADOC_EXTENSION)]
+            if file_path.suffix in EXTENSIONS]
 
         for index, text_file in enumerate(text_files):
             if not text_file.draft and not text_file.is_index:
@@ -398,7 +395,7 @@ class FolderStorage:
 
 
 if __name__ == '__main__':
-    root: Path = Path("../../MME")
+    root: Path = Path("../../DRA")
     WithFrontMatter.root = root
 
     folder_storage: FolderStorage = FolderStorage(root.joinpath("content/common"))

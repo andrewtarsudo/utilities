@@ -15,6 +15,7 @@ from utilities.common.errors import BaseError
 from utilities.common.functions import get_version
 from utilities.common.shared import DEBUG, HELP, NORMAL, PRESS_ENTER_KEY
 from utilities.scripts.api_group import APIGroup, get_full_help, print_version
+from utilities.scripts.inspect_updates import check_updates
 
 
 @group(
@@ -47,6 +48,8 @@ def cli(debug: bool = False):
     try:
         ctx.ensure_object(dict)
         ctx.obj = {"debug": debug}
+
+        check_updates()
 
         result_file: bool = False
 

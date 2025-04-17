@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
 from subprocess import CalledProcessError, CompletedProcess, run
-from sys import platform
+
+from utilities.common.functions import is_windows
 
 if __name__ == "__main__":
     output_file: str = "flake8.txt"
@@ -25,7 +26,7 @@ if __name__ == "__main__":
         "utilities/table_cols/",
         "utilities/terms/"]
 
-    shell: bool = platform.startswith("win")
+    shell: bool = is_windows()
 
     try:
         _: CompletedProcess = run(
