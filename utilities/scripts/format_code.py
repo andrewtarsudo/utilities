@@ -11,7 +11,7 @@ from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatC
 from utilities.common.functions import file_reader, file_writer, pretty_print
 from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, StrPath
 from utilities.scripts.api_group import APIGroup
-from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.cli import cli
 from utilities.scripts.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
 
@@ -141,7 +141,6 @@ def format_code_command(
                 continue
 
     ctx.obj["keep_logs"] = keep_logs
-    ctx.invoke(clear_logs)
 
 
 def split(

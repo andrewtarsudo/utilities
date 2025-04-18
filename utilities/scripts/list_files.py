@@ -12,7 +12,7 @@ from loguru import logger
 from utilities.common.functions import is_windows, pretty_print, walk_full
 from utilities.common.shared import HELP, PRESS_ENTER_KEY, StrPath
 from utilities.scripts.api_group import MutuallyExclusiveOption, SwitchArgsAPIGroup
-from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.cli import cli
 from utilities.scripts.completion import dir_completion, file_completion
 
 
@@ -342,7 +342,6 @@ def list_files_command(
 
         else:
             ctx.obj["keep_logs"] = keep_logs
-            ctx.invoke(clear_logs)
 
     else:
         results: list[Path] = add_prefix(prefix, sorted(values))
@@ -353,7 +352,6 @@ def list_files_command(
         else:
             echo(pretty_print(results))
             ctx.obj["keep_logs"] = keep_logs
-            ctx.invoke(clear_logs)
 
 
 def get_files(

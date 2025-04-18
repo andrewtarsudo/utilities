@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-from click.termui import style
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
+from click.termui import style
 from click.types import BOOL, Path as ClickPath
 
 from utilities.common.shared import HELP, StrPath
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument
 from utilities.scripts.api_group import MutuallyExclusiveOption, SwitchArgsAPIGroup
-from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.cli import cli
 from utilities.scripts.completion import doc_completion
 
 
@@ -144,4 +144,3 @@ def convert_tables_command(
     core_document.delete_temp_archive()
 
     ctx.obj["keep_logs"] = keep_logs
-    ctx.invoke(clear_logs)

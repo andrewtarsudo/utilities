@@ -14,7 +14,7 @@ from loguru import logger
 from utilities.common.functions import file_reader, file_reader_type, file_writer, is_windows, pretty_print
 from utilities.common.shared import HELP, separator, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
-from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.cli import cli
 from utilities.scripts.completion import file_dir_completion
 from utilities.scripts.list_files import get_files
 
@@ -559,4 +559,3 @@ def validate_yaml_command(
         echo(f"Файл с результатами: {output.resolve()}")
 
     ctx.obj["keep_logs"] = keep_logs
-    ctx.invoke(clear_logs)

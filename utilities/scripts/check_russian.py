@@ -12,7 +12,7 @@ from loguru import logger
 from utilities.common.functions import file_reader, is_windows, pretty_print
 from utilities.common.shared import HELP, separator, StrPath
 from utilities.scripts.api_group import APIGroup
-from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.cli import cli
 from utilities.scripts.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
 
@@ -167,4 +167,3 @@ def check_russian_command(
         logger.warning("Не найдено ни одного подходящего файла")
 
     ctx.obj["keep_logs"] = keep_logs
-    ctx.invoke(clear_logs)

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-from sys import platform
+from pathlib import Path
+from shutil import rmtree
 from typing import Any, Iterable, Mapping
 
+from click.decorators import pass_context
 from click.core import Argument, Command, Context, echo, Group, Option, Parameter, UsageError
 from click.formatting import HelpFormatter
 from click.globals import get_current_context
@@ -11,7 +13,7 @@ from loguru import logger
 
 from utilities.common.errors import BaseError, NoArgumentsOptionsError
 from utilities.common.functions import get_version, is_windows, pretty_print
-from utilities.common.shared import HELP, PRESS_ENTER_KEY
+from utilities.common.shared import DEBUG, HELP, NORMAL, PRESS_ENTER_KEY
 from utilities.scripts.args_help_dict import args_help_dict
 
 COL_MAX: int = 52
@@ -45,6 +47,36 @@ def wrap_line(line: str):
 
 def add_brackets(value: str):
     return f"<{value}>"
+
+
+@pass_context
+def clear_logs(ctx: Context, result: Any, **kwargs):
+    keep_logs: bool = ctx.obj.get("keep_logs", False)
+    debug: bool = ctx.obj.get("debug", False)
+    no_result: bool = ctx.obj.get("no_result", False)
+    result_file: Path = ctx.obj.get("result_file", None)
+
+    logger.debug(
+        f"Версия: {get_version()}\n"
+        f"Команда: {ctx.command_path}\n"
+        f"Параметры: {ctx.params}")
+
+    logger.remove()
+
+    if no_result and result_file is not None:
+        result_file.unlink(missing_ok=True)
+
+    if not keep_logs:
+        rmtree(NORMAL.parent, ignore_errors=True)
+
+    elif not debug:
+        echo(f"Папка с логами: {NORMAL.parent}")
+
+    else:
+        echo(f"Папка с логами: {DEBUG.parent}")
+
+    pause(PRESS_ENTER_KEY)
+    ctx.exit(0)
 
 
 def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
@@ -287,7 +319,8 @@ class APIGroup(Group):
     def __init__(self, **attrs: Any):
         kwargs: dict[str, bool] = {
             "invoke_without_command": True,
-            "chain": False}
+            "chain": False,
+            "result_callback": clear_logs}
         attrs.update(kwargs)
         context_settings: dict[str, str] = {
             "auto_envvar_prefix": "TW_UTILITIES"}

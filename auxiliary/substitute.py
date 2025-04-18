@@ -8,9 +8,9 @@ from click.decorators import help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
+from utilities.common.functions import file_reader, file_writer
 from utilities.common.shared import HELP, StrPath
-from utilities.common.functions import file_reader, file_writer, ReaderMode
-from utilities.scripts.cli import APIGroup, clear_logs, cli
+from utilities.scripts.cli import APIGroup, cli
 from utilities.scripts.list_files import get_files
 
 
@@ -145,4 +145,3 @@ def substitute_command(
             substitute(file, dry_run)
 
     ctx.obj["keep_logs"] = keep_logs
-    ctx.invoke(clear_logs)

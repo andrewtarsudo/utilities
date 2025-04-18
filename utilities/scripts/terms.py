@@ -12,7 +12,7 @@ from loguru import logger
 from utilities.common.functions import file_reader, pretty_print
 from utilities.common.shared import BASE_PATH, HELP, PRESS_ENTER_KEY
 from utilities.scripts.api_group import MutuallyExclusiveOption, APIGroup
-from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.cli import cli
 from utilities.terms.ascii_doc_table_terms import AsciiDocTableTerms
 from utilities.terms.git_manager import git_manager
 from utilities.terms.table import Term
@@ -218,4 +218,3 @@ def terms_command(
     logger.success(result)
 
     ctx.obj["keep_logs"] = keep_logs
-    ctx.invoke(clear_logs)

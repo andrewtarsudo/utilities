@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from pathlib import Path
-from shutil import rmtree
 
 from click.core import Context
-from click.decorators import group, help_option, option, pass_context
+from click.decorators import group, help_option, option
 from click.globals import get_current_context
 from click.termui import pause
 from click.types import BOOL
@@ -12,10 +10,9 @@ from loguru import logger
 
 from utilities.common.custom_logger import custom_logging
 from utilities.common.errors import BaseError
-from utilities.common.functions import get_version
-from utilities.common.shared import DEBUG, HELP, NORMAL, PRESS_ENTER_KEY
+from utilities.common.auto_update import check_updates
+from utilities.common.shared import HELP, PRESS_ENTER_KEY
 from utilities.scripts.api_group import APIGroup, get_full_help, print_version
-from utilities.scripts.inspect_updates import check_updates
 
 
 @group(
@@ -49,8 +46,6 @@ def cli(debug: bool = False):
         ctx.ensure_object(dict)
         ctx.obj = {"debug": debug}
 
-        check_updates()
-
         result_file: bool = False
 
         if ctx.invoked_subcommand is None:
@@ -68,38 +63,9 @@ def cli(debug: bool = False):
             result_file: bool = True
 
         custom_logging("cli", is_debug=debug, result_file=result_file)
+        check_updates()
 
     except BaseError as e:
         logger.error(f"Ошибка {e.__class__.__name__}")
         pause(PRESS_ENTER_KEY)
         ctx.exit(1)
-
-
-@pass_context
-def clear_logs(ctx: Context):
-    keep_logs: bool = ctx.obj.get("keep_logs", False)
-    debug: bool = ctx.obj.get("debug", False)
-    no_result: bool = ctx.obj.get("no_result", False)
-    result_file: Path = ctx.obj.get("result_file", None)
-
-    logger.debug(
-        f"Версия: {get_version()}\n"
-        f"Команда: {ctx.command_path}\n"
-        f"Параметры: {ctx.params}")
-
-    logger.remove()
-
-    if no_result and result_file is not None:
-        result_file.unlink(missing_ok=True)
-
-    if not keep_logs:
-        rmtree(NORMAL.parent, ignore_errors=True)
-
-    elif not debug:
-        echo(f"Папка с логами: {NORMAL.parent}")
-
-    else:
-        echo(f"Папка с логами: {DEBUG.parent}")
-
-    pause(PRESS_ENTER_KEY)
-    ctx.exit(0)

@@ -11,7 +11,7 @@ from loguru import logger
 
 from utilities.common.shared import HELP, StrPath
 from utilities.scripts.api_group import APIGroup
-from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.cli import cli
 from utilities.scripts.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
 
@@ -136,4 +136,3 @@ def repair_svg_command(
                     continue
 
     ctx.obj["keep_logs"] = keep_logs
-    ctx.invoke(clear_logs)

@@ -149,3 +149,7 @@ class FileReaderError(BaseError):
 
 class FileReaderTypeError(BaseError):
     """Specified file has an improper extension."""
+
+
+class UpdateProjectIdError(BaseError):
+    """Specified project_id is invalid."""

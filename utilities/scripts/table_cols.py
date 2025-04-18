@@ -9,7 +9,7 @@ from loguru import logger
 from utilities.common.functions import file_reader
 from utilities.common.shared import HELP, MAX_SYMBOLS, MIN_COLUMN, StrPath
 from utilities.scripts.api_group import APIGroup
-from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.cli import cli
 from utilities.scripts.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
 from utilities.table_cols.analyser import TableAnalyser
@@ -141,4 +141,3 @@ def table_cols_command(
             logger.info(f"Файл {file} обработан и сохранен")
 
     ctx.obj["keep_logs"] = keep_logs
-    ctx.invoke(clear_logs)

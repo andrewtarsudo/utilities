@@ -20,7 +20,7 @@ from utilities.link_repair.link import Link
 from utilities.link_repair.link_fixer import link_fixer
 from utilities.link_repair.link_inspector import link_inspector
 from utilities.scripts.api_group import SwitchArgsAPIGroup
-from utilities.scripts.cli import clear_logs, cli
+from utilities.scripts.cli import cli
 from utilities.scripts.completion import dir_completion
 
 
@@ -282,4 +282,3 @@ def link_repair_command(
     ctx.obj["keep_logs"] = keep_logs
     ctx.obj["no_result"] = no_result
     ctx.obj["result_file"] = result_file_path
-    ctx.invoke(clear_logs)
