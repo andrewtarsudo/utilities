@@ -23,16 +23,8 @@ class TermsError(BaseError):
     """Base class for errors associated with the terms."""
 
 
-class TermsRequiredAttributeMissingError(TermsError):
-    """Required attribute has no specified value."""
-
-
 class TermsAsciiDocFileTableRowIndexError(TermsError):
     """Invalid AsciiDocTable row index."""
-
-
-class TermsInvalidProjectIdError(TermsError):
-    """Gitlab project identifier is not a positive integer."""
 
 
 class TermsInvalidVersionError(TermsError):

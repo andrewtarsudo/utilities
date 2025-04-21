@@ -19,3 +19,6 @@ filter-images:
 
 inspect-updates:
   filename: "Путь до файла от корня для загрузки"
+
+substitute:
+  table: "Путь до файла с таблицей замен"

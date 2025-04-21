@@ -49,6 +49,7 @@ def add_brackets(value: str):
     return f"<{value}>"
 
 
+# noinspection PyUnusedLocal
 @pass_context
 def clear_logs(ctx: Context, result: Any, **kwargs):
     keep_logs: bool = ctx.obj.get("keep_logs", False)
@@ -75,6 +76,7 @@ def clear_logs(ctx: Context, result: Any, **kwargs):
     else:
         echo(f"Папка с логами: {DEBUG.parent}")
 
+    rmtree(ctx.obj.get("temp_dir"), ignore_errors=True)
     pause(PRESS_ENTER_KEY)
     ctx.exit(0)
 

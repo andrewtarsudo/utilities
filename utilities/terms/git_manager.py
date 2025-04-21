@@ -4,8 +4,7 @@ from pathlib import Path
 from click.utils import get_app_dir
 from loguru import logger
 
-from utilities.common.functions import file_reader, file_writer
-from utilities.terms.content_git_page import ContentGitPage
+from utilities.common.functions import file_reader, file_writer, GitFile
 from utilities.terms.version_container import Version, VersionContainer
 
 
@@ -21,8 +20,8 @@ class GitManager:
     def __init__(self):
         self._lines: list[str] = []
         self._version_validator: VersionContainer = VersionContainer(self.TEMP_VERSION, self.TEMP_TERMS_VERSION)
-        self._content_git_terms: ContentGitPage | None = None
-        self._content_git_version: ContentGitPage | None = None
+        self._content_git_terms: GitFile | None = None
+        self._content_git_version: GitFile | None = None
 
         self.TEMPORARY_TERMS.mkdir(parents=True, exist_ok=True)
 
@@ -53,23 +52,18 @@ class GitManager:
         return self._version_validator
 
     def set_content_git_pages(self):
-        content_git_terms: ContentGitPage = ContentGitPage(
-            file_name="terms.adoc",
-            path=self.TEMP_TERMS,
-            content=[])
+        content_git_terms: GitFile = GitFile("terms.adoc", 57022544)
         content_git_terms.download()
         self._content_git_terms = content_git_terms
 
-        content_git_version: ContentGitPage = ContentGitPage(
-            file_name="__version__.txt",
-            path=self.TEMP_VERSION,
-            content=[])
+        content_git_version: GitFile = GitFile("__version__.txt", 57022544)
         content_git_version.download()
         self._content_git_version = content_git_version
 
     def set_versions(self):
         self._version_validator.set_version_basic()
-        self._version_validator.version = Version.from_string("".join(self._content_git_version.content))
+        content: str = file_reader(self._content_git_version.path, "string")
+        self._version_validator.version = Version.from_string(content)
 
     def output_if_different(self, message: str):
         logger.info(message)

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from base64 import b64decode
 from functools import cache
 from io import UnsupportedOperation
 from json import JSONDecodeError
@@ -7,10 +8,11 @@ from pathlib import Path
 from sys import platform
 from typing import Any, Callable, Iterable
 
+from httpx import HTTPStatusError, InvalidURL, request, RequestError, Response, StreamError, URL
 from loguru import logger
 from yaml.scanner import ScannerError
 
-from utilities.common.errors import FileReaderError, FileReaderTypeError
+from utilities.common.errors import FileReaderError, FileReaderTypeError, UpdateProjectIdError
 from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath
 
 
@@ -257,3 +259,112 @@ def pretty_print(values: Iterable[StrPath] = None):
 
     else:
         return "\n".join(map(lambda x: str(x).strip(), values))
+
+
+class GitFile:
+    def __init__(
+            self,
+            file_name: str,
+            project_id: int | str, *,
+            scheme: str = "https",
+            host: str = "gitlab.com",
+            port: int = 443,
+            query: bytes = b"ref_type=heads",
+            method: str = "GET",
+            temp_dir: str = "_temp/"):
+        if not isinstance(project_id, int):
+            try:
+                project_id: int = int(project_id)
+
+            except ValueError:
+                logger.error(
+                    "Идентификатор проекта должен быть int или содержать только цифры, "
+                    f"isdecimal(), но получено {project_id}")
+                raise UpdateProjectIdError
+
+        self._file_name: str = file_name
+        self._project_id: int = project_id
+        self._scheme: str = scheme
+        self._host: str = host
+        self._port: int = port
+        self._query: bytes = query
+        self._method: str = method
+        self._temp_dir: str = temp_dir
+        self._success: bool = False
+        self._content: str | None = None
+
+    @property
+    def path(self) -> str:
+        url_file_name: str = self._file_name.replace(".", "%2E").replace("/", "%2F")
+        return f"/api/v4/projects/{self._project_id}/repository/files/{url_file_name}/raw"
+
+    @property
+    def url(self) -> URL:
+        return URL(
+            scheme=self._scheme,
+            host=self._host,
+            path=self.path,
+            query=self._query)
+
+    def get_response(self) -> Response:
+        logger.debug(f"{self.url}")
+        return request(method=self._method, url=self.url, timeout=120.0)
+
+    @property
+    def json(self) -> dict[str, Any]:
+        return self.get_response().json()
+
+    def __bytes__(self):
+        return b64decode(self.json.get("content"))
+
+    def __str__(self):
+        return self.__bytes__().decode("utf-8")
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}>({str(self)})"
+
+    @property
+    def download_destination(self):
+        return BASE_PATH.joinpath(f"{self._temp_dir}/{self._file_name}").expanduser()
+
+    def download(self):
+        self.download_destination.parent.mkdir(parents=True, exist_ok=True)
+        self.download_destination.touch(exist_ok=True)
+
+        try:
+            with open(self.download_destination, "wb") as f:
+                response: Response = self.get_response().raise_for_status()
+                logger.debug(f"Запрос: {response.request.method} {response.request.url}")
+
+                for chunk in response.iter_bytes():
+                    f.write(chunk)
+
+        except HTTPStatusError as e:
+            logger.error(
+                f"Ошибка HTTP, {e.__class__.__name__}: {e.response}"
+                f"\n{e.response.reason_phrase}\n{e.response.status_code}")
+
+        except RequestError as e:
+            logger.error(f"Ошибка запроса, {e.__class__.__name__}: {str(e)}")
+
+        except InvalidURL as e:
+            logger.error(f"Ошибка URL, {e.__class__.__name__}: {str(e)}")
+
+        except StreamError as e:
+            logger.error(f"Ошибка потока, {e.__class__.__name__}: {str(e)}")
+
+        else:
+            logger.debug(f"Файл {self.download_destination.name} загружен")
+            self._success = True
+
+        self.read()
+
+    def __bool__(self):
+        return self._success
+
+    def read(self):
+        self._content = file_reader(self.download_destination, "string")
+
+    @property
+    def content(self):
+        return self._content

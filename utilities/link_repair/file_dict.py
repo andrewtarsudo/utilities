@@ -7,7 +7,7 @@ from loguru import logger
 
 from utilities.common.errors import LinkRepairInternalLinkAnchorError, LinkRepairLineInvalidTypeError
 from utilities.common.functions import file_reader
-from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION, StrPath
+from utilities.common.shared import ADOC_EXTENSION, EXTENSIONS, MD_EXTENSION, StrPath
 from utilities.link_repair.const import FileLanguage, prepare_logging
 from utilities.link_repair.link import Link
 

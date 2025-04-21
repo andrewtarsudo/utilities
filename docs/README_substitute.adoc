@@ -1,0 +1,55 @@
+[[substitute]]
+= Руководство для substitute
+:imagesdir: images
+:stylesdir: ../css
+:stylesheet: default.css
+:pdf-themesdir: themes
+:pdf-theme: base-theme.yml
+:script-name: substitute
+:asciidoctorconfigdir: ..
+
+== Описание
+
+Скрипт подставляет значения из таблицы соответствий.
+
+== Для чего нужно?
+
+В файлах AsciiDoc имеется возможность задать переменные с помощью инструментов из коробки.
+С помощью скрипта можно упростить и ускорить обработку файла.
+
+include::partials/run.adoc[]
+
+=== Опции скрипта
+
+[source,console,subs="attributes+"]
+----
+Использование:
+{name} {script-name} <FILE_TABLE>
+-f/--file FILE ... FILE | -d/--dir DIR | --dry-run | -r/--recursive | -k/--keep-logs |
+--h/--help
+
+  Команда для замены переменных на их значения
+
+Аргументы:
+  file_table (*)                         Путь до файла с таблицей замен
+
+Опции:
+  -f, --file FILE ... FILE               Файл для обработки. Может использоваться несколько раз
+  -d, --dir DIR                          Директория для обработки
+  --dry-run / --no-dry-run               Флаг вывода изменений размеров файлов без их изменения.
+                                         По умолчанию: False, файлы перезаписываются
+  {recursive}
+                                         {recursive-note}
+  {keep-logs}
+                                         {keep-logs-cont}
+                                         {keep-logs-default}
+  {help}
+                                         {help-cont}
+-------------------------------------------------------------------------------------------------
+----
+
+NOTE: Путь может быть как абсолютным, так и относительным.
+
+=== Примеры
+
+include::partials/reduce-image.adoc[]

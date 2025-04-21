@@ -8,9 +8,9 @@ from click.types import BOOL
 from click.utils import echo
 from loguru import logger
 
+from utilities.common.auto_update import check_updates
 from utilities.common.custom_logger import custom_logging
 from utilities.common.errors import BaseError
-from utilities.common.auto_update import check_updates
 from utilities.common.shared import HELP, PRESS_ENTER_KEY
 from utilities.scripts.api_group import APIGroup, get_full_help, print_version
 
@@ -44,7 +44,7 @@ def cli(debug: bool = False):
 
     try:
         ctx.ensure_object(dict)
-        ctx.obj = {"debug": debug}
+        ctx.obj = {"debug": debug, "temp_dir": "_temp/"}
 
         result_file: bool = False
 
@@ -63,7 +63,7 @@ def cli(debug: bool = False):
             result_file: bool = True
 
         custom_logging("cli", is_debug=debug, result_file=result_file)
-        check_updates()
+        check_updates(ctx)
 
     except BaseError as e:
         logger.error(f"Ошибка {e.__class__.__name__}")

@@ -246,6 +246,8 @@ def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = Fal
     :param result_file: Flag to use results.txt file.
     :type result_file: bool, default=False
     """
+    logger.remove()
+
     if not is_debug:
         simplefilter("ignore")
         stream_level: LoggingLevel = "INFO"
@@ -272,6 +274,8 @@ def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = Fal
         handlers: list[dict[str, Any]] = [stream_handler, rotating_file_handler]
 
     logger.configure(handlers=handlers)
+
+    logger.disable("httpx")
 
     # specify the styles for the levels
     for item in LEVEL_COLOR_STYLE:
