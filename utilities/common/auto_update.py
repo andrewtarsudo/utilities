@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from os import getenv
+from os import chmod, getenv
 from pathlib import Path
+from stat import S_IXGRP, S_IXOTH, S_IXUSR
 from string import Template
 from subprocess import CalledProcessError, run, TimeoutExpired
 from typing import Any
@@ -12,38 +13,40 @@ from utilities.common.functions import file_reader_type, get_version, GitFile, i
 from utilities.common.shared import BASE_PATH, StrPath
 
 POWERSHELL_EXE: str = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+_: str = r"..\s"
 ENV_VAR: str = "_TW_UTILITIES_UPDATE"
-SET_ENV_PS: str = f'[Environment]::SetEnvironmentVariable("{ENV_VAR}", 1, "Machine")'
 
 
 def set_env(*, timeout: float | None = 15.0):
     if is_windows():
-        set_env_var: list[str] = [f"{POWERSHELL_EXE}", "setx", f"{ENV_VAR}=1", "/M"]
-        refresh: list[str] = [f"{POWERSHELL_EXE}", "RefreshEnv.cmd"]
+        file: str = "../../sources/set_env.ps1"
+        command: list[str] = [POWERSHELL_EXE, "-File", file]
         shell: bool = True
 
     else:
-        set_env_var: list[str] = ["echo", f"{ENV_VAR}=1", ">>", "~/.bashrc"]
-        refresh: list[str] = ["source", "~/.bashrc"]
+        file: str = "../../sources/set_env.sh"
+        command: list[str] = ["sh", file]
         shell: bool = False
 
     try:
-        run(set_env_var, shell=shell, capture_output=True, timeout=timeout).check_returncode()
-        run(refresh, shell=shell, capture_output=True, timeout=timeout).check_returncode()
+        chmod(file, S_IXUSR | S_IXGRP | S_IXOTH)
+        run(command, shell=shell, timeout=timeout).check_returncode()
 
     except CalledProcessError as e:
         logger.error(
             f"Не удалось задать переменную {ENV_VAR} и обновить оболочку."
-            f"\nВывод команды: {e.output}")
+            f"\nВывод команды: {e.stdout}\nВывод ошибки: {e.stderr}\nКоманда: {e.cmd}")
+        raise
 
     except TimeoutExpired as e:
-        logger.debug(
+        logger.error(
             f"Не удалось задать переменную {ENV_VAR} и обновить оболочку за время {timeout:.0f} секунд."
             f"\nВывод команды: {e.output}")
         set_env(timeout=None)
+        raise
 
     else:
-        logger.debug(f"Задана переменная {ENV_VAR} = 1")
+        logger.debug(f"Задана переменная {ENV_VAR}")
 
 
 def convert_value(value: int | str | bool):
@@ -94,8 +97,7 @@ def update_exe(ctx: Context, exe_file_name: str, project_id: int, **kwargs):
 
 
 def activate_runner(
-        ctx: Context,
-        *,
+        ctx: Context, *,
         executable_file: StrPath,
         exe_file_name: str):
     """Generates a script from the text file to run it.
@@ -129,10 +131,10 @@ def activate_runner(
 
 def check_updates(ctx: Context, **kwargs):
     env_var: Any = getenv(ENV_VAR, None)
-    project_id: int = 65722828
 
     if env_var is None:
         is_update: bool = True
+        set_env()
 
     else:
         is_update: bool = convert_value(env_var)
@@ -142,9 +144,10 @@ def check_updates(ctx: Context, **kwargs):
             "Автообновление отключено."
             f"\nЧтобы включить, необходимо задать переменной {ENV_VAR} значение:"
             "\n1 / \"1\" / \"True\" / true / \"yes\" / \"on\" в любом регистре.")
-        return
 
     else:
+        project_id: int = 65722828
+
         if compare_versions(project_id):
             logger.success("Используется последняя версия")
             return
@@ -159,7 +162,3 @@ def check_updates(ctx: Context, **kwargs):
 
         update_exe(ctx, exe_file_name, project_id, **kwargs)
         activate_runner(ctx, executable_file=executable_file, exe_file_name=exe_file_name)
-
-
-if __name__ == '__main__':
-    check_updates()

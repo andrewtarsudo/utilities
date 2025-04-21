@@ -3,9 +3,10 @@
 if __name__ == '__main__':
     from pathlib import Path
     from subprocess import CalledProcessError, run
+    from click.termui import echo
 
     old_file: str = r${old_file}
     new_file: str = r${new_file}
 
     exe_file: Path = Path(new_file).rename(old_file)
-    print(f"Исполняемый файл {exe_file.name} обновлен")
+    echo(f"Исполняемый файл {exe_file.name} обновлен", fg="green")
