@@ -34,7 +34,9 @@ class GitFile:
                 project_id: int = int(project_id)
 
             except ValueError:
-                logger.error(f"Идентификатор проекта должен быть int или содержать только цифры, isdecimal(), но получено {project_id}")
+                logger.error(
+                    f"Идентификатор проекта должен быть int или содержать только цифры, "
+                    f"isdecimal(), но получено {project_id}")
                 raise UpdateProjectIdError
 
         self._file_name: str = file_name
@@ -94,7 +96,9 @@ class GitFile:
                     f.write(chunk)
 
         except HTTPStatusError as e:
-            logger.error(f"Ошибка HTTP, {e.__class__.__name__}: {e.response}\n{e.response.reason_phrase}\n{e.response.status_code}")
+            logger.error(
+                f"Ошибка HTTP, {e.__class__.__name__}: {e.response}"
+                f"\n{e.response.reason_phrase}\n{e.response.status_code}")
 
         except RequestError as e:
             logger.error(f"Ошибка запроса, {e.__class__.__name__}: {str(e)}")
@@ -190,7 +194,12 @@ def update_exe(exe_file_name: str, project_id: int, temp_dir: StrPath = "_temp/"
     executable_file.download()
 
 
-def activate_runner(*, executable_file: StrPath, shell: bool, exe_file_name: str, temp_dir: StrPath = "_temp/"):
+def activate_runner(
+        *,
+        executable_file: StrPath,
+        shell: bool,
+        exe_file_name: str,
+        temp_dir: StrPath = "_temp/"):
     """Generates a script from the text file to run it.
 
     :param executable_file: The path or name of the Python executable.
@@ -254,5 +263,9 @@ def check_updates(**kwargs):
             shell: bool = False
             exe_file_name: str = "bin/tw_utilities"
 
-        update_exe(exe_file_name, project_id,  **kwargs)
+        # update_exe(exe_file_name, project_id, **kwargs)
         activate_runner(executable_file=executable_file, shell=shell, exe_file_name=exe_file_name)
+
+
+if __name__ == '__main__':
+    check_updates()

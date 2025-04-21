@@ -3,8 +3,8 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Any, Iterable, Mapping
 
-from click.decorators import pass_context
 from click.core import Argument, Command, Context, echo, Group, Option, Parameter, UsageError
+from click.decorators import pass_context
 from click.formatting import HelpFormatter
 from click.globals import get_current_context
 from click.shell_completion import CompletionItem
@@ -311,12 +311,12 @@ def print_version(ctx: Context, param: Parameter, value: Any):
         return
 
     echo(f"Версия {get_version()}")
-    pause(PRESS_ENTER_KEY)
+    # pause(PRESS_ENTER_KEY)
     ctx.exit(0)
 
 
 class APIGroup(Group):
-    def __init__(self, **attrs: Any):
+    def __init__(self, aliases: set[str] = None, **attrs: Any):
         kwargs: dict[str, bool] = {
             "invoke_without_command": True,
             "chain": False,
@@ -326,6 +326,19 @@ class APIGroup(Group):
             "auto_envvar_prefix": "TW_UTILITIES"}
 
         super().__init__(context_settings=context_settings, **attrs)
+
+        if aliases is None:
+            aliases: set[str] = set()
+
+        self.aliases: set[str] = aliases
+
+    def add_command(self, cmd: Command, name: str | None = None) -> None:
+        aliases: set[str] = getattr(cmd, "aliases", set())
+
+        for alias in aliases:
+            self.add_command(cmd, alias)
+
+        super().add_command(cmd, name=name)
 
     def format_help(self, ctx: Context, formatter: HelpFormatter) -> None:
         format_help(self, ctx, formatter)

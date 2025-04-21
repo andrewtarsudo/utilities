@@ -1,6 +1,6 @@
 [project]
 name = "utilities"
-version = "2.0.1"
+version = "2.0.0"
 description = "Command line interface commands for technical writers"
 authors = [
   { name = "Andrew Tarasov", email = "tarasov-a@protei.ru" }
@@ -21,11 +21,7 @@ dependencies = [
   "pyyaml>=6.0",
   "shellingham>=1.5",
 ]
-keywords = ["utilities", "techwriters"]
-license-files = ["LICENSE"]
-
-[project.urls]
-Repository = "https://github.com/tech_writers_protei/utilities.git"
+terms = ""
 
 [project.scripts]
 utilities = "__main__.py"
