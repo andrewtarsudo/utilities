@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
-from re import DOTALL, sub
-from string import ascii_letters, digits
 
-from slugify import slugify
-
-from utilities.common.shared import FileType, TextType
 from utilities.table_cols.coordinate import TableCoordinate
 
 
 class TableCell:
     """Class to represent the table_cols cell."""
-    file_type: TextType
 
     def __init__(
             self,
