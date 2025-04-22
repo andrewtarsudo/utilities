@@ -359,7 +359,7 @@ class MdFile(TextFile):
             if _m:
                 self._anchors.update(_m)
 
-        logger.debug(f"File {self.rel_path}, anchors:\n{prepare_logging(self._anchors)}")
+        logger.debug(f"Файл {self.rel_path}, якори:\n{prepare_logging(self._anchors)}")
 
     def set_links(self):
         """Specifies the links in the Markdown file."""
@@ -368,7 +368,7 @@ class MdFile(TextFile):
                 _link_to: str = _m.group(1)
 
                 if _link_to.startswith(self.__class__.IGNORED_LINKS):
-                    logger.debug(f"Link {_link_to} leads to the external source")
+                    logger.debug(f"Ссылка {_link_to} ведет на внешний ресурс")
                     continue
 
                 else:
@@ -459,7 +459,7 @@ class AsciiDocFile(TextFile):
                     _link_to: str = f"{_m.string[_m.start():_m.end()]}"
 
                 if _link_to.startswith(self.__class__.IGNORED_LINKS):
-                    logger.debug(f"Link {_m} leads to the external source")
+                    logger.debug(f"Ссылка {_m} ведет на внешний ресурс")
                     continue
 
                 else:
@@ -554,7 +554,7 @@ class FileDict:
             file_path: Path = Path(__path).resolve()
 
             if file_path in self:
-                logger.debug(f"Path {file_path} is already listed")
+                logger.debug(f"Путь {file_path} уже добавлен")
                 return
 
             if file_path.suffix in EXTENSIONS:

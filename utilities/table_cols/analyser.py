@@ -63,9 +63,6 @@ class TableAnalyser:
         If the sum of minimum lengths < max table_cols width = Basic_config::analyser::max_symbols,
         then there is no way to fit the table_cols properly.
         """
-        for _ in iter(self):
-            print(f"{_=}")
-
         minimum_lengths: int = sum(column_parameters.minimum_length for column_parameters in iter(self))
 
         if minimum_lengths > self._max_symbols:

@@ -307,7 +307,6 @@ class GitFile:
             query=self._query)
 
     def get_response(self) -> Response:
-        logger.debug(f"{self.url}")
         return request(method=self._method, url=self.url, timeout=120.0)
 
     @property

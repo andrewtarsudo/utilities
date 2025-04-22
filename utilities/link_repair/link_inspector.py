@@ -243,7 +243,7 @@ class LinkInspector:
             return
 
         elif not isinstance(value, Storage):
-            logger.debug(f"Value must be of Storage type, but {type(value)} received")
+            logger.debug(f"Значение должно быть типа Storage, но получено {type(value)}")
             return
 
         else:
@@ -273,7 +273,7 @@ class LinkInspector:
             self._proper_anchor = "/"
 
         elif self._link.anchor in self.destination_file().iter_anchors():
-            logger.debug(f"Anchor {self._link.anchor} is ok")
+            logger.debug(f"Якорь {self._link.anchor} ok")
             self._proper_anchor = f"/#{self._link.anchor}"
 
         else:

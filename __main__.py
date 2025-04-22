@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from io import TextIOWrapper
 
 if __name__ == '__main__':
     from sys import hexversion
@@ -28,13 +28,10 @@ if __name__ == '__main__':
     except (RuntimeError, ShellDetectionFailure):
         shell = None
 
-    if shell in ("powershell", "pwsh"):
-        encoding: str = "cp1251"
+    encoding: str = "cp1251" if shell in ("powershell", "pwsh") or shell is None else "utf-8"
 
-    else:
-        encoding: str = "utf-8"
-
-    stdout.reconfigure(encoding="utf-8")
+    if isinstance(stdout, TextIOWrapper):
+        stdout.reconfigure(encoding=encoding)
 
     from utilities.scripts.cli import cli
 

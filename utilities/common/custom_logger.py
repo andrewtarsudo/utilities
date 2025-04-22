@@ -122,7 +122,7 @@ def _to_stream(record: dict) -> bool:
         The check result for the message.
 
     """
-    return record["level"].no >= 20
+    return record["level"].no >= 20 and record["module"] != "httpx"
 
 
 def _to_result(record: dict) -> bool:
@@ -250,7 +250,7 @@ def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = Fal
 
     if not is_debug:
         simplefilter("ignore")
-        stream_level: LoggingLevel = "INFO"
+        stream_level: LoggingLevel = "DEBUG"
 
     else:
         stream_level: LoggingLevel = "DEBUG"

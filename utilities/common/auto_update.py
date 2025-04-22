@@ -58,10 +58,14 @@ def convert_value(value: int | str | bool):
 
     _value: str = str(value).lower()
 
-    if _value in TRUE:
+    if _value == "-1":
+        return None
+
+    elif _value in TRUE:
         return True
 
     elif _value in FALSE:
+        logger.success(f"{ENV_VAR} = {value}")
         return False
 
     else:
@@ -137,13 +141,17 @@ def check_updates(ctx: Context, **kwargs):
         set_env()
 
     else:
-        is_update: bool = convert_value(env_var)
+        is_update: bool | None = convert_value(env_var)
+
+    if is_update is None:
+        return
 
     if not is_update:
         logger.info(
             "Автообновление отключено."
             f"\nЧтобы включить, необходимо задать переменной {ENV_VAR} значение:"
-            "\n1 / \"1\" / \"True\" / true / \"yes\" / \"on\" в любом регистре.")
+            "\n1 / \"1\" / \"True\" / true / \"yes\" / \"on\" в любом регистре.\n")
+        return
 
     else:
         project_id: int = 65722828

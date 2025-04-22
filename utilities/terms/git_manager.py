@@ -62,32 +62,32 @@ class GitManager:
 
     def set_versions(self):
         self._version_validator.set_version_basic()
-        content: str = file_reader(self._content_git_version.path, "string")
+        content: str = file_reader(self._content_git_version.download_destination, "string")
         self._version_validator.version = Version.from_string(content)
-
-    def output_if_different(self, message: str):
-        logger.info(message)
-        file_writer(self.TEMP_TERMS_VERSION, self._content_git_version.content)
-        logger.debug("Файл с версией записан")
 
     def compare(self):
         self.set_versions()
 
         if self._version_validator.version_basic == Version("0", "0", "0"):
-            self.output_if_different("Версия не определена")
+            message: str = "Версия не определена"
 
         elif not bool(self):
-            self.output_if_different("Версия не последняя")
+            message: str = "Версия не последняя"
 
         elif not Path(self.TEMP_TERMS_BASIC).exists():
-            self.output_if_different("Файл с терминами не найден")
+            message: str = "Файл с терминами не найден"
 
         else:
-            logger.info("Версия актуальна")
+            logger.debug("Версия актуальна")
+            return
+
+        logger.error(message)
+        file_writer(self.TEMP_TERMS_VERSION, self._content_git_version.content)
+        logger.debug("Файл с версией записан")
 
     def set_terms(self):
         file_writer(self.TEMP_TERMS_BASIC, self._content_git_terms.content)
-        lines: list[str] = file_reader(self.TEMP_TERMS_BASIC, "lines", encoding="cp1251")
+        lines: list[str] = file_reader(self.TEMP_TERMS_BASIC, "lines", encoding="utf-8")
         self._lines = lines[6:-1]
 
     def __iter__(self):

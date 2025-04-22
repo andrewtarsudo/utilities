@@ -5,7 +5,7 @@ from typing import TypeAlias
 PRESS_ENTER_KEY: str
 HELP: str
 BASE_PATH: Path
-StrPath: TypeAlias
+StrPath: TypeAlias = str | Path
 MD_EXTENSION: str
 ADOC_EXTENSION: str
 FAIL_COLOR: str

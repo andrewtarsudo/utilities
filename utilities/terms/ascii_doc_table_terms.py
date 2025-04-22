@@ -20,7 +20,7 @@ class AsciiDocTableTerms:
 
     @classmethod
     def from_file(cls, file_path: StrPath):
-        _content: list[str] = file_reader(file_path, "lines", encoding="cp1251")
+        _content: list[str] = file_reader(file_path, "lines", encoding="utf-8")
 
         if not _content or len(_content) < 6:
             logger.error(f"Файл {file_path} пуст")

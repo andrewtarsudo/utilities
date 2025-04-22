@@ -255,7 +255,7 @@ def link_repair_command(
                 continue
 
             # specify link
-            logger.debug(f"link = {link_inspector.link}")
+            logger.debug(f"Ссылка = {link_inspector.link}")
             link_inspector.inspect_anchor()
             link_inspector.find_proper_anchor()
             link_inspector.set_proper_link()

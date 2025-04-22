@@ -408,7 +408,7 @@ class Storage(GeneralStorage):
         :rtype: ComponentStorage
         """
         if name not in self._component_storage_names:
-            logger.debug(f"Component {name} is not found")
+            logger.debug(f"Компонента {name} не найдена")
 
         else:
             return self._component_storages.get(name)
