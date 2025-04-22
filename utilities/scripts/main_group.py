@@ -218,7 +218,7 @@ def recursive_help(cmd: Command, parent: Context = None, lines: Iterable[str] = 
 class MainGroup(TyperGroup):
     def __init__(self, **attrs: Any):
         super().__init__(**attrs)
-        self.add_help_option = False
+        self.add_help_option = True
 
     def parse_args(self, ctx: Context, args: list[str]) -> list[str]:
         if args is None or not args:

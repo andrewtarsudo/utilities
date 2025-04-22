@@ -25,21 +25,21 @@ from utilities.scripts.terms import terms
 from utilities.scripts.validate_yaml_file import validate_yaml
 from utilities.scripts.version import version
 
-app: Typer = Typer(cls=MainGroup, add_help_option=False)
+app: Typer = Typer(cls=MainGroup, add_help_option=True)
 
 
 def main():
-    app.add_typer(check_russian, cls=MainGroup, add_help_option=False)
-    app.add_typer(convert_tables, cls=MainGroup, add_help_option=False)
-    app.add_typer(filter_images, cls=MainGroup, add_help_option=False)
-    app.add_typer(format_code, cls=MainGroup, add_help_option=False)
-    app.add_typer(link_repair, cls=MainGroup, add_help_option=False)
-    app.add_typer(list_files, cls=MainGroup, add_help_option=False)
-    app.add_typer(reduce_image, cls=MainGroup, add_help_option=False)
-    app.add_typer(repair_svg, cls=MainGroup, add_help_option=False)
-    app.add_typer(table_cols, cls=MainGroup, add_help_option=False)
-    app.add_typer(terms, cls=MainGroup, add_help_option=False)
-    app.add_typer(validate_yaml, cls=MainGroup, add_help_option=False)
+    app.add_typer(check_russian, cls=MainGroup, add_help_option=True)
+    app.add_typer(convert_tables, cls=MainGroup, add_help_option=True)
+    app.add_typer(filter_images, cls=MainGroup, add_help_option=True)
+    app.add_typer(format_code, cls=MainGroup, add_help_option=True)
+    app.add_typer(link_repair, cls=MainGroup, add_help_option=True)
+    app.add_typer(list_files, cls=MainGroup, add_help_option=True)
+    app.add_typer(reduce_image, cls=MainGroup, add_help_option=True)
+    app.add_typer(repair_svg, cls=MainGroup, add_help_option=True)
+    app.add_typer(table_cols, cls=MainGroup, add_help_option=True)
+    app.add_typer(terms, cls=MainGroup, add_help_option=True)
+    app.add_typer(validate_yaml, cls=MainGroup, add_help_option=True)
     app.add_typer(version)
     return app()
 

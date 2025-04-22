@@ -6,9 +6,6 @@ authors = ["Andrew Tarasov <tarasov-a@protei.ru>"]
 license = "MIT"
 readme = "README.adoc"
 repository = "https://gitlab.com/tech_writers_protei/utilities/"
-packages = [
-  { include = "utilities" }
-]
 
 [tool.poetry.dependencies]
 python = ">=3.9"

@@ -26,7 +26,7 @@ from utilities.scripts.main_group import MainGroup
 
 link_repair: Typer = Typer(
     cls=MainGroup,
-    add_help_option=False,
+    add_help_option=True,
     rich_markup_mode="rich",
     help="Команда для проверки и исправления ссылок в файлах документации")
 
