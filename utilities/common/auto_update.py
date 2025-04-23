@@ -104,30 +104,29 @@ def update_exe(ctx: Context, exe_file_name: str, project_id: int, **kwargs):
 def activate_runner(
         ctx: Context, *,
         executable_file: StrPath,
-        exe_file_name: str):
+        downloaded_file: StrPath):
     """Generates a script from the text file to run it.
 
     :param ctx: The Click context.
     :type ctx: Context
     :param executable_file: The path or name of the Python executable.
     :type executable_file: str or Path
-    :param exe_file_name: The name of the executable file to replace.
-    :type exe_file_name: str or Path
+    :param downloaded_file: The path to the file downloaded from the git.
+    :type downloaded_file: str or Path
     """
     temp_dir: Path = Path(ctx.obj.get("temp_dir"))
     runner: Path = BASE_PATH.joinpath("sources/runner.txt").expanduser()
-    runner_exe: Path = BASE_PATH.joinpath(temp_dir).joinpath("runner.py")
+    runner_exe: Path = Path.home().joinpath(temp_dir).joinpath("runner.py")
     runner_exe.parent.mkdir(parents=True, exist_ok=True)
     runner_exe.touch(exist_ok=True)
 
     old_file: Path = path_to_exe()
-    new_file: Path = path_to_exe().parent.joinpath(temp_dir).joinpath(exe_file_name)
 
     with open(runner_exe, "wb") as fw, open(runner, "r", encoding="utf-8", errors="ignore") as fr:
         template: Template = Template(fr.read())
         kwargs: dict[str, str] = {
             "old_file": f"\"{old_file}\"",
-            "new_file": f"\"{new_file}\""}
+            "new_file": f"\"{downloaded_file}\""}
 
         data: str = template.safe_substitute(kwargs)
         fw.write(data.encode())
@@ -170,5 +169,5 @@ def check_updates(ctx: Context, **kwargs):
             executable_file: str = "python3"
             exe_file_name: str = "bin/tw_utilities"
 
-        update_exe(ctx, exe_file_name, project_id, **kwargs)
-        activate_runner(ctx, executable_file=executable_file, exe_file_name=exe_file_name.removeprefix("bin/"))
+        downloaded_file: Path = update_exe(ctx, exe_file_name, project_id, **kwargs)
+        activate_runner(ctx, executable_file=executable_file, downloaded_file=downloaded_file)

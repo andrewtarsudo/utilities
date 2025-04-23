@@ -27,7 +27,7 @@ def path_to_exe() -> Path:
 
     else:
         suffix: str = ".exe" * int(is_windows())
-        return Path(BASE_PATH).joinpath("bin/").joinpath(f"tw_utilities{suffix}")
+        return Path(BASE_PATH).joinpath(f"bin/tw_utilities{suffix}")
 
 
 def get_version():
@@ -324,7 +324,7 @@ class GitFile:
 
     @property
     def download_destination(self):
-        return path_to_exe().parent.joinpath(f"{self._temp_dir}/{self._file_name}").expanduser()
+        return Path.home().joinpath(f"{self._temp_dir}/{self._file_name}").expanduser()
 
     def download(self):
         self.download_destination.parent.mkdir(parents=True, exist_ok=True)
