@@ -5,7 +5,7 @@ from io import UnsupportedOperation
 from json import JSONDecodeError
 from os import scandir
 from pathlib import Path
-from sys import executable, platform
+from sys import platform
 from typing import Any, Callable, Iterable
 
 from httpx import HTTPStatusError, InvalidURL, request, RequestError, Response, StreamError, URL
@@ -19,15 +19,6 @@ from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath
 @cache
 def is_windows() -> bool:
     return platform.startswith("win")
-
-
-def path_to_exe() -> Path:
-    if "_MEIPASS" in BASE_PATH.as_posix():
-        return Path(executable)
-
-    else:
-        suffix: str = ".exe" * int(is_windows())
-        return Path(BASE_PATH).joinpath(f"bin/tw_utilities{suffix}")
 
 
 def get_version():

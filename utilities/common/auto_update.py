@@ -4,12 +4,13 @@ from pathlib import Path
 from stat import S_IXGRP, S_IXOTH, S_IXUSR
 from string import Template
 from subprocess import CalledProcessError, run, TimeoutExpired
+import sys
 from typing import Any
 
 from click.core import Context
 from loguru import logger
 
-from utilities.common.functions import file_reader_type, get_version, GitFile, is_windows, path_to_exe
+from utilities.common.functions import file_reader_type, get_version, GitFile, is_windows
 from utilities.common.shared import BASE_PATH, StrPath
 
 ENV_VAR: str = "_TW_UTILITIES_UPDATE"
@@ -104,15 +105,18 @@ def update_exe(ctx: Context, exe_file_name: str, project_id: int, **kwargs):
 def activate_runner(
         ctx: Context, *,
         executable_file: StrPath,
-        downloaded_file: StrPath):
+        old_file: StrPath,
+        new_file: StrPath):
     """Generates a script from the text file to run it.
 
     :param ctx: The Click context.
     :type ctx: Context
     :param executable_file: The path or name of the Python executable.
     :type executable_file: str or Path
-    :param downloaded_file: The path to the file downloaded from the git.
-    :type downloaded_file: str or Path
+    :param old_file: The path to the current file.
+    :type old_file: str or Path
+    :param new_file: The path to the file downloaded from the git.
+    :type new_file: str or Path
     """
     temp_dir: Path = Path(ctx.obj.get("temp_dir"))
     runner: Path = BASE_PATH.joinpath("sources/runner.txt").expanduser()
@@ -120,13 +124,11 @@ def activate_runner(
     runner_exe.parent.mkdir(parents=True, exist_ok=True)
     runner_exe.touch(exist_ok=True)
 
-    old_file: Path = path_to_exe()
-
     with open(runner_exe, "wb") as fw, open(runner, "r", encoding="utf-8", errors="ignore") as fr:
         template: Template = Template(fr.read())
         kwargs: dict[str, str] = {
-            "old_file": f"\"{old_file}\"",
-            "new_file": f"\"{downloaded_file}\""}
+            "old_file": f"\"{str(old_file)}\"",
+            "new_file": f"\"{str(new_file)}\""}
 
         data: str = template.safe_substitute(kwargs)
         fw.write(data.encode())
@@ -169,5 +171,5 @@ def check_updates(ctx: Context, **kwargs):
             executable_file: str = "python3"
             exe_file_name: str = "bin/tw_utilities"
 
-        downloaded_file: Path = update_exe(ctx, exe_file_name, project_id, **kwargs)
-        activate_runner(ctx, executable_file=executable_file, downloaded_file=downloaded_file)
+        new_file: Path = update_exe(ctx, exe_file_name, project_id, **kwargs)
+        activate_runner(ctx, executable_file=executable_file, old_file=sys.executable, new_file=new_file)

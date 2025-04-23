@@ -122,7 +122,7 @@ def _to_stream(record: dict) -> bool:
         The check result for the message.
 
     """
-    return record["level"].no >= 20 and record["module"] != "httpx"
+    return record["level"].no >= 20 and record["module"] not in ("httpx", "http")
 
 
 def _to_result(record: dict) -> bool:
