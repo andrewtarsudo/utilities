@@ -5,7 +5,7 @@ from io import UnsupportedOperation
 from json import JSONDecodeError
 from os import scandir
 from pathlib import Path
-from sys import platform
+from sys import executable, platform
 from typing import Any, Callable, Iterable
 
 from httpx import HTTPStatusError, InvalidURL, request, RequestError, Response, StreamError, URL
@@ -23,7 +23,7 @@ def is_windows() -> bool:
 
 def path_to_exe() -> Path:
     if "_MEIPASS" in BASE_PATH.as_posix():
-        return BASE_PATH.joinpath(Path(__file__).name)
+        return Path(executable)
 
     else:
         suffix: str = ".exe" * int(is_windows())
@@ -324,7 +324,7 @@ class GitFile:
 
     @property
     def download_destination(self):
-        return BASE_PATH.joinpath(f"{self._temp_dir}/{self._file_name}").expanduser()
+        return path_to_exe().parent.joinpath(f"{self._temp_dir}/{self._file_name}").expanduser()
 
     def download(self):
         self.download_destination.parent.mkdir(parents=True, exist_ok=True)

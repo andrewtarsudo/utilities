@@ -192,8 +192,9 @@ ij_python_wrap_long_lines = false
 
 [{*.toml,Cargo.lock,Cargo.toml.orig,Gopkg.lock,Pipfile,poetry.lock,uv.lock}]
 ij_toml_keep_indents_on_empty_lines = false
-indent_size = 2
 ij_toml_indent_size = 2
+ij_toml_tab_width = 2
+ij_toml_continuation_indent_size = 2
 ij_any_spaces_within_braces = true
 ij_any_spaces_within_brackets = true
 

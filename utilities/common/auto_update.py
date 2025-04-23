@@ -12,13 +12,13 @@ from loguru import logger
 from utilities.common.functions import file_reader_type, get_version, GitFile, is_windows, path_to_exe
 from utilities.common.shared import BASE_PATH, StrPath
 
-POWERSHELL_EXE: str = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-_: str = r"..\s"
 ENV_VAR: str = "_TW_UTILITIES_UPDATE"
 
 
 def set_env(*, timeout: float | None = 15.0):
     if is_windows():
+        POWERSHELL_EXE: str = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+
         file: str = "../../sources/set_env.ps1"
         command: list[str] = [POWERSHELL_EXE, "-File", file]
         shell: bool = True
@@ -98,6 +98,7 @@ def compare_versions(project_id: int):
 def update_exe(ctx: Context, exe_file_name: str, project_id: int, **kwargs):
     executable_file: GitFile = GitFile(exe_file_name, project_id, temp_dir=ctx.obj.get("temp_dir"), **kwargs)
     executable_file.download()
+    return executable_file.download_destination
 
 
 def activate_runner(
@@ -119,16 +120,17 @@ def activate_runner(
     runner_exe.parent.mkdir(parents=True, exist_ok=True)
     runner_exe.touch(exist_ok=True)
 
+    old_file: Path = path_to_exe()
+    new_file: Path = path_to_exe().parent.joinpath(temp_dir).joinpath(exe_file_name)
+
     with open(runner_exe, "wb") as fw, open(runner, "r", encoding="utf-8", errors="ignore") as fr:
         template: Template = Template(fr.read())
         kwargs: dict[str, str] = {
-            "old_file": f"\"{path_to_exe()}\"",
-            "new_file": f"\"{BASE_PATH.joinpath(temp_dir).joinpath(exe_file_name)}\""}
+            "old_file": f"\"{old_file}\"",
+            "new_file": f"\"{new_file}\""}
 
         data: str = template.safe_substitute(kwargs)
         fw.write(data.encode())
-
-        logger.debug(f"Файл {runner_exe} обновлен")
 
     run([str(executable_file), runner_exe])
 
@@ -169,4 +171,4 @@ def check_updates(ctx: Context, **kwargs):
             exe_file_name: str = "bin/tw_utilities"
 
         update_exe(ctx, exe_file_name, project_id, **kwargs)
-        activate_runner(ctx, executable_file=executable_file, exe_file_name=exe_file_name)
+        activate_runner(ctx, executable_file=executable_file, exe_file_name=exe_file_name.removeprefix("bin/"))

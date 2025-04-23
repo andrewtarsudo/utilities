@@ -12,7 +12,6 @@ if getattr(sys, "frozen", False):
 else:
     BASE_PATH: Path = Path(__file__).parent.parent.parent
 
-
 StrPath: TypeAlias = str | Path
 MD_EXTENSION: str = ".md"
 ADOC_EXTENSION: str = ".adoc"
