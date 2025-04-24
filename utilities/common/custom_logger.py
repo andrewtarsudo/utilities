@@ -122,7 +122,7 @@ def _to_stream(record: dict) -> bool:
         The check result for the message.
 
     """
-    return record["level"].no >= 20 and record["module"] not in ("httpx", "http")
+    return record["level"].no >= 20 and record["name"] not in ("httpx", "httpcore")
 
 
 def _to_result(record: dict) -> bool:
@@ -277,6 +277,7 @@ def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = Fal
     logger.configure(handlers=handlers)
 
     logger.disable("httpx")
+    logger.disable("httpcore")
 
     # specify the styles for the levels
     for item in LEVEL_COLOR_STYLE:
@@ -285,4 +286,4 @@ def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = Fal
     # add the basic log messages to the logger
     basicConfig(handlers=[InterceptHandler()], level=0)
 
-    logger.catch(level="ERROR", exclude=BaseError, reraise=True)
+    logger.catch(level="DEBUG", exclude=BaseError, reraise=True)
