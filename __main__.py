@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from io import TextIOWrapper
+
 
 if __name__ == '__main__':
     from sys import hexversion
@@ -18,17 +18,13 @@ if __name__ == '__main__':
     if not faulthandler.is_enabled():
         faulthandler.enable()
 
+    from io import TextIOWrapper
     from sys import stdout
+    from utilities.common.functions import get_shell
 
-    try:
-        from shellingham import detect_shell, ShellDetectionFailure
+    shell: str = get_shell()
 
-        shell, _ = detect_shell()
-
-    except (RuntimeError, ShellDetectionFailure):
-        shell = None
-
-    encoding: str = "cp1251" if shell in ("powershell", "pwsh") or shell is None else "utf-8"
+    encoding: str = "cp1251" if shell in ("powershell", "pwsh") else "utf-8"
 
     if isinstance(stdout, TextIOWrapper):
         stdout.reconfigure(encoding=encoding)

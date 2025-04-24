@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from os import chmod, getenv
+from os import chmod, environ
 from pathlib import Path
 from stat import S_IXGRP, S_IXOTH, S_IXUSR
 from string import Template
@@ -10,23 +10,31 @@ from typing import Any
 from click.core import Context
 from loguru import logger
 
-from utilities.common.functions import file_reader_type, get_version, GitFile, is_windows
+from utilities.common.functions import file_reader_type, get_shell, get_version, GitFile, is_macos, is_windows
 from utilities.common.shared import BASE_PATH, StrPath
 
 ENV_VAR: str = "_TW_UTILITIES_UPDATE"
 
 
 def set_env(*, timeout: float | None = 15.0):
-    if is_windows():
-        POWERSHELL_EXE: str = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+    root_dir: Path = Path(getattr(sys, "_MEIPASS"))
 
-        file: str = "../../sources/set_env.ps1"
-        command: list[str] = [POWERSHELL_EXE, "-File", file]
+    shell_exe: str = get_shell()
+
+    if is_windows():
+        exe: str = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+        file: str = root_dir.joinpath("sources/set_env.ps1").resolve().as_posix()
+        command: list[str] = [exe, "-File", file]
         shell: bool = True
 
+    elif is_macos():
+        file: str = root_dir.joinpath("sources/set_env.zsh").as_posix()
+        command: list[str] = [shell_exe, file]
+        shell: bool = False
+
     else:
-        file: str = "../../sources/set_env.sh"
-        command: list[str] = ["sh", file]
+        file: str = root_dir.joinpath("sources/set_env.sh").as_posix()
+        command: list[str] = [shell_exe, file]
         shell: bool = False
 
     try:
@@ -99,6 +107,7 @@ def compare_versions(project_id: int):
 def update_exe(ctx: Context, exe_file_name: str, project_id: int, **kwargs):
     executable_file: GitFile = GitFile(exe_file_name, project_id, temp_dir=ctx.obj.get("temp_dir"), **kwargs)
     executable_file.download()
+
     return executable_file.download_destination
 
 
@@ -137,7 +146,7 @@ def activate_runner(
 
 
 def check_updates(ctx: Context, **kwargs):
-    env_var: Any = getenv(ENV_VAR, None)
+    env_var: Any = environ.get(ENV_VAR)
 
     if env_var is None:
         is_update: bool = True

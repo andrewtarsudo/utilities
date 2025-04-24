@@ -3,7 +3,7 @@ from base64 import b64decode
 from functools import cache
 from io import UnsupportedOperation
 from json import JSONDecodeError
-from os import scandir
+from os import getenv, scandir
 from pathlib import Path
 from sys import platform
 from typing import Any, Callable, Iterable
@@ -19,6 +19,11 @@ from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath
 @cache
 def is_windows() -> bool:
     return platform.startswith("win")
+
+
+@cache
+def is_macos() -> bool:
+    return platform.startswith("darwin")
 
 
 def get_version():
@@ -358,3 +363,27 @@ class GitFile:
     @property
     def content(self):
         return self._content
+
+
+def get_shell():
+    dict_shell: dict[str, tuple[str, str]] = {
+        "win": ("COMSPEC", "cmd"),
+        "darwin": ("SHELL", "zsh"),
+        "linux": ("SHELL", "bash")}
+
+    for k, v in dict_shell.items():
+        if platform.startswith(k):
+            env_variable, default_shell = v
+
+            full_path_shell: str | None = getenv(env_variable)
+
+            if full_path_shell is None:
+                return default_shell
+
+            else:
+                return Path(full_path_shell).stem
+
+        else:
+            continue
+
+    return "cmd"

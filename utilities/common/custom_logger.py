@@ -187,7 +187,7 @@ class LoggerConfiguration:
 
         except KeyError as e:
             print(f"{e.__class__.__name__}, {str(e)}")
-            return
+            return None
 
     def rotating_file_handler(self) -> dict[str, Any] | None:
         """Specifies the rotating file handler.
@@ -212,7 +212,7 @@ class LoggerConfiguration:
 
         except KeyError as e:
             print(f"{e.__class__.__name__}, {str(e)}")
-            return
+            return None
 
     def result_file_handler(self):
         try:
@@ -233,9 +233,10 @@ class LoggerConfiguration:
 
         except KeyError as e:
             print(f"{e.__class__.__name__}, {str(e)}")
-            return
+            return None
 
 
+# noinspection PyTypeChecker
 def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = False):
     """Specifies the loguru Logger.
 
