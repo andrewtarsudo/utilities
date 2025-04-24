@@ -77,7 +77,7 @@ def clear_logs(ctx: Context, result: Any, **kwargs):
         echo(f"Папка с логами: {DEBUG.parent}")
 
     rmtree(ctx.obj.get("temp_dir"), ignore_errors=True)
-    pause(PRESS_ENTER_KEY)
+    input(PRESS_ENTER_KEY)
     ctx.exit(0)
 
 

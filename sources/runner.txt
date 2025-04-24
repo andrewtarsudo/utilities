@@ -10,4 +10,5 @@ if __name__ == '__main__':
     Path(old_file).unlink(missing_ok=True)
 
     exe_file: Path = Path(new_file).rename(old_file)
+    exe_file.chmod(0o775)
     print(f"Исполняемый файл {exe_file.name} обновлен")

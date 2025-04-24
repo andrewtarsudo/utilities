@@ -179,4 +179,3 @@ def check_updates(ctx: Context, **kwargs):
 
         new_file: Path = update_exe(ctx, exe_file_name, project_id, **kwargs)
         activate_runner(ctx, executable_file=executable_file, old_file=sys.executable, new_file=new_file)
-        new_file.chmod(0o775)
