@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
 if __name__ == '__main__':
-    from os import chmod, replace
+    from os import chmod, renames
 
     old_file: str = r${old_file}
     new_file: str = r${new_file}
 
-    replace(new_file, old_file)
-
+    renames(new_file, old_file)
     chmod(old_file, 0o775, follow_symlinks=True)
     print(f"Исполняемый файл {old_file} обновлен")

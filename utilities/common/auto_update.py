@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from os import chmod, environ
+from os import chmod, environ, execv
 from pathlib import Path
 from stat import S_IXGRP, S_IXOTH, S_IXUSR
 from string import Template
@@ -9,6 +9,7 @@ from typing import Any
 
 from click.core import Context
 from loguru import logger
+from psutil import AccessDenied, process_iter
 
 from utilities.common.functions import file_reader_type, get_shell, get_version, GitFile, is_macos, is_windows
 from utilities.common.shared import BASE_PATH, StrPath
@@ -142,7 +143,7 @@ def activate_runner(
         data: str = template.safe_substitute(kwargs)
         fw.write(data.encode())
 
-    run([str(executable_file), runner_exe])
+    execv(executable_file, (executable_file, runner_exe))
 
 
 def check_updates(ctx: Context, **kwargs):
@@ -179,3 +180,23 @@ def check_updates(ctx: Context, **kwargs):
 
         new_file: Path = update_exe(ctx, exe_file_name, project_id, **kwargs)
         activate_runner(ctx, executable_file=executable_file, old_file=sys.executable, new_file=new_file)
+
+
+# def stop_processes(file: StrPath):
+#     is_success: bool = True
+#
+#     file: Path = Path(file).expanduser()
+#
+#     for process in process_iter(["pid", "open_files"]):
+#         try:
+#             for opened_file in process.open_files():
+#                 if file == Path(opened_file.path).expanduser():
+#                     process.kill()
+#                     logger.success(f"Завершен процесс {process.name()}: {process.pid} -- {process.status()}")
+#
+#         except AccessDenied:
+#             logger.error(f"Не удалось завершить процесс {process.name()}: {process.pid} -- {process.status()}")
+#             is_success: bool = False
+#             continue
+#
+#     return is_success
