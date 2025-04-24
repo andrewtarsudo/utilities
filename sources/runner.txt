@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
 if __name__ == '__main__':
-    from pathlib import Path
-    from subprocess import CalledProcessError, run
+    from os import chmod, replace
 
     old_file: str = r${old_file}
     new_file: str = r${new_file}
 
-    Path(old_file).unlink(missing_ok=True)
+    replace(new_file, old_file)
 
-    exe_file: Path = Path(new_file).rename(old_file)
-    exe_file.chmod(0o775)
-    print(f"Исполняемый файл {exe_file.name} обновлен")
+    chmod(old_file, 0o775, follow_symlinks=True)
+    print(f"Исполняемый файл {old_file} обновлен")
