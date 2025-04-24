@@ -155,22 +155,19 @@ def check_updates(ctx: Context, **kwargs):
     else:
         is_update: bool | None = convert_value(env_var)
 
-    if is_update is None:
-        return
-
-    if not is_update:
+    if is_update is None or not is_update:
         logger.info(
             "Автообновление отключено."
             f"\nЧтобы включить, необходимо задать переменной {ENV_VAR} значение:"
             "\n1 / \"1\" / \"True\" / true / \"yes\" / \"on\" в любом регистре.\n")
-        return
+        return False
 
     else:
         project_id: int = 65722828
 
         if compare_versions(project_id):
             logger.success("Используется последняя версия")
-            return
+            return False
 
         elif is_windows():
             executable_file: str = "python"
@@ -182,3 +179,5 @@ def check_updates(ctx: Context, **kwargs):
 
         new_file: Path = update_exe(ctx, exe_file_name, project_id, **kwargs)
         activate_runner(ctx, executable_file=executable_file, old_file=sys.executable, new_file=new_file)
+
+        return True

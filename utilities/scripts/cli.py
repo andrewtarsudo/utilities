@@ -63,7 +63,11 @@ def cli(debug: bool = False):
             result_file: bool = True
 
         custom_logging("cli", is_debug=debug, result_file=result_file)
-        check_updates(ctx)
+        updated: bool = check_updates(ctx)
+
+        if updated:
+            pause("Введите повторно свою команду")
+            ctx.exit(0)
 
     except BaseError as e:
         logger.error(f"Ошибка {e.__class__.__name__}")
