@@ -397,6 +397,16 @@ class APIGroup(Group):
 
         return [*commands, *params]
 
+    def resolve_command(self, ctx: Context, args: list[str]) -> tuple[str | None, Command | None, list[str]]:
+        try:
+            return super().resolve_command(ctx, args)
+
+        except UsageError as e:
+            logger.error(
+                f"Ошибка обработки команды {e.cmd}: {e.message}"
+                f"\n{e.ctx.to_info_dict()}")
+            raise
+
 
 class SwitchArgsAPIGroup(APIGroup):
     def parse_args(self, ctx: Context, args: list[str]) -> list[str]:
