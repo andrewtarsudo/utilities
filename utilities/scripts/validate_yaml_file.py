@@ -387,7 +387,12 @@ def validate_file(
     max_length: int = max(map(len, lines)) + 3
 
     paths: dict[int, Path] = {
-        index: Path(root).joinpath(line.strip().removeprefix("- "))
+        index: Path(root).joinpath(
+            line
+            .strip()
+            .removeprefix("- ")
+            .split("#")[0]
+            .strip())
         for index, line in enumerate(lines)
         if line.strip().startswith("- ") and ".." not in line}
 
@@ -503,7 +508,7 @@ def validate_yaml_command(
     if file_or_project.is_dir():
         yaml_files: list[Path] = [
             yaml_file for yaml_file in file_or_project.iterdir()
-            if yaml_file.suffix == ".yml" and not yaml_file.stem.startswith(".")]
+            if yaml_file.suffix in (".yml", ".yaml") and not yaml_file.stem.startswith(".")]
 
     elif file_or_project.is_file():
         yaml_files: list[Path] = [file_or_project]

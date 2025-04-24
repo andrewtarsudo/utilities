@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-from os import chmod, environ, execv
+from os import chmod, environ
 from pathlib import Path
 from stat import S_IXGRP, S_IXOTH, S_IXUSR
 from string import Template
-from subprocess import CalledProcessError, run, TimeoutExpired
+from subprocess import CalledProcessError, check_output, Popen, run, TimeoutExpired, CREATE_NEW_PROCESS_GROUP
 import sys
 from typing import Any
 
 from click.core import Context
 from loguru import logger
-from psutil import AccessDenied, process_iter
+from psutil import AccessDenied, NoSuchProcess, process_iter, ZombieProcess
 
 from utilities.common.functions import file_reader_type, get_shell, get_version, GitFile, is_macos, is_windows
 from utilities.common.shared import BASE_PATH, StrPath
@@ -138,12 +138,18 @@ def activate_runner(
         template: Template = Template(fr.read())
         kwargs: dict[str, str] = {
             "old_file": f"\"{str(old_file)}\"",
-            "new_file": f"\"{str(new_file)}\""}
+            "new_file": f"\"{str(new_file)}\"",
+            "shell": f"{is_windows()}"}
 
         data: str = template.safe_substitute(kwargs)
         fw.write(data.encode())
 
-    execv(executable_file, (executable_file, runner_exe))
+    logger.error(f"{executable_file=}")
+    logger.error(f"{runner_exe=}")
+
+    Popen([old_file, runner_exe, old_file, new_file], creationflags=CREATE_NEW_PROCESS_GROUP)
+
+    exit(0)
 
 
 def check_updates(ctx: Context, **kwargs):
@@ -182,21 +188,21 @@ def check_updates(ctx: Context, **kwargs):
         activate_runner(ctx, executable_file=executable_file, old_file=sys.executable, new_file=new_file)
 
 
-# def stop_processes(file: StrPath):
-#     is_success: bool = True
-#
-#     file: Path = Path(file).expanduser()
-#
-#     for process in process_iter(["pid", "open_files"]):
-#         try:
-#             for opened_file in process.open_files():
-#                 if file == Path(opened_file.path).expanduser():
-#                     process.kill()
-#                     logger.success(f"Завершен процесс {process.name()}: {process.pid} -- {process.status()}")
-#
-#         except AccessDenied:
-#             logger.error(f"Не удалось завершить процесс {process.name()}: {process.pid} -- {process.status()}")
-#             is_success: bool = False
-#             continue
-#
-#     return is_success
+def stop_processes(file: StrPath):
+    is_success: bool = True
+
+    file: Path = Path(file).expanduser()
+
+    for process in process_iter(["pid", "name"]):
+        try:
+            for opened_file in process.open_files():
+                if file == Path(opened_file.path).expanduser():
+                    process.kill()
+                    logger.success(f"Завершен процесс {process.name()}: {process.pid} -- {process.status()}")
+
+        except (AccessDenied, NoSuchProcess, ZombieProcess):
+            logger.error(f"Не удалось завершить процесс {process.name()}: {process.pid} -- {process.status()}")
+            is_success: bool = False
+            continue
+
+    return is_success

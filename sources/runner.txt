@@ -2,10 +2,27 @@
 
 if __name__ == '__main__':
     from os import chmod, renames
+    from pathlib import Path
+
+    from psutil import process_iter, AccessDenied, NoSuchProcess, ZombieProcess
 
     old_file: str = r${old_file}
     new_file: str = r${new_file}
 
+    old_file: Path = Path(old_file).expanduser()
+
+    for process in process_iter(["pid", "name"]):
+        try:
+            for opened_file in process.open_files():
+                if old_file == Path(opened_file.path).expanduser():
+                    process.kill()
+                    logger.success(f"Завершен процесс {process.name()}: {process.pid} -- {process.status()}")
+
+        except (AccessDenied, NoSuchProcess, ZombieProcess):
+            logger.error(f"Не удалось завершить процесс {process.name()}: {process.pid} -- {process.status()}")
+            continue
+
     renames(new_file, old_file)
     chmod(old_file, 0o775, follow_symlinks=True)
     print(f"Исполняемый файл {old_file} обновлен")
+    Popen([old_file], shell=${shell})
