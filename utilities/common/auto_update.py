@@ -3,7 +3,7 @@ from os import chmod, environ
 from pathlib import Path
 from stat import S_IXGRP, S_IXOTH, S_IXUSR
 from string import Template
-from subprocess import CalledProcessError, CREATE_NEW_PROCESS_GROUP, Popen, run, TimeoutExpired
+from subprocess import CalledProcessError, CREATE_NO_WINDOW, Popen, run, TimeoutExpired
 import sys
 from typing import Any
 
@@ -113,15 +113,12 @@ def update_exe(ctx: Context, exe_file_name: str, project_id: int, **kwargs):
 
 def activate_runner(
         ctx: Context, *,
-        executable_file: StrPath,
         old_file: StrPath,
         new_file: StrPath):
     """Generates a script from the text file to run it.
 
     :param ctx: The Click context.
     :type ctx: Context
-    :param executable_file: The path or name of the Python executable.
-    :type executable_file: str or Path
     :param old_file: The path to the current file.
     :type old_file: str or Path
     :param new_file: The path to the file downloaded from the git.
@@ -143,7 +140,8 @@ def activate_runner(
         data: str = template.safe_substitute(kwargs)
         fw.write(data.encode())
 
-    Popen([runner_exe], executable=executable_file, creationflags=CREATE_NEW_PROCESS_GROUP)
+    runner_exe.chmod(0o775, follow_symlinks=True)
+    Popen([runner_exe], creationflags=CREATE_NO_WINDOW)
 
     sys.exit(0)
 
@@ -173,15 +171,13 @@ def check_updates(ctx: Context, **kwargs):
             return
 
         elif is_windows():
-            executable_file: str = "python"
             exe_file_name: str = "bin/tw_utilities.exe"
 
         else:
-            executable_file: str = "python3"
             exe_file_name: str = "bin/tw_utilities"
 
         new_file: Path = update_exe(ctx, exe_file_name, project_id, **kwargs)
-        activate_runner(ctx, executable_file=executable_file, old_file=sys.executable, new_file=new_file)
+        activate_runner(ctx, old_file=sys.executable, new_file=new_file)
 
 
 # def stop_processes(file: StrPath):

@@ -63,7 +63,8 @@ def cli(debug: bool = False):
             result_file: bool = True
 
         custom_logging("cli", is_debug=debug, result_file=result_file)
-        check_updates(ctx)
+        from utilities.scripts.update import update_command
+        ctx.forward(update_command)
 
     except BaseError as e:
         logger.error(f"Ошибка {e.__class__.__name__}")
