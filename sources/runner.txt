@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
+import sys
 
 if __name__ == '__main__':
-    from os import execv
+    from subprocess import run
     from pathlib import Path
 
     old_file: str = r${old_file}
     new_file: str = r${new_file}
+    args: list[str] = ${args}
 
     old_file: Path = Path(old_file).expanduser()
     new_file: Path = Path(new_file).expanduser()
-    args: list[str] = {$args}
 
     old_file.unlink(missing_ok=True)
     _: Path = new_file.rename(old_file)
     _.chmod(0o775, follow_symlinks=True)
-    execv(${shell}, [${shell}, *args])
+    run(args, capture_output=True)

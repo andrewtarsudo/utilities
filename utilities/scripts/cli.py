@@ -141,7 +141,6 @@ def activate_runner(
         kwargs: dict[str, str] = {
             "old_file": f"\"{str(old_file)}\"",
             "new_file": f"\"{str(new_file)}\"",
-            "shell": f"\"{get_shell()}\"",
             "args": ctx.obj.get("args")}
 
         data: str = template.safe_substitute(kwargs)
