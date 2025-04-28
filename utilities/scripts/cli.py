@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from os import environ, execv
 from pathlib import Path
+from shutil import which
 from string import Template
 from subprocess import CalledProcessError, run, TimeoutExpired
 import sys
@@ -139,7 +140,9 @@ def activate_runner(
         template: Template = Template(fr.read())
         kwargs: dict[str, str] = {
             "old_file": f"\"{str(old_file)}\"",
-            "new_file": f"\"{str(new_file)}\""}
+            "new_file": f"\"{str(new_file)}\"",
+            "shell": f"\"{get_shell()}\"",
+            "args": ctx.obj.get("args")}
 
         data: str = template.safe_substitute(kwargs)
         fw.write(data.encode())
@@ -158,8 +161,14 @@ def check_updates(ctx: Context, **kwargs):
     new_file: Path = update_exe(exe_file_name, **kwargs)
     runner_exe: Path = activate_runner(ctx, old_file=sys.executable, new_file=new_file)
 
+    if is_windows():
+        executable: str = "python"
+
+    else:
+        executable: str = "python3"
+
     # noinspection SpawnShellInjection
-    execv(sys.executable, [sys.executable, runner_exe])
+    execv(which(executable), [which(executable), runner_exe])
 
 
 @group(
@@ -191,7 +200,7 @@ def cli(debug: bool = False):
 
     try:
         ctx.ensure_object(dict)
-        ctx.obj = {"debug": debug, "temp_dir": "_temp/"}
+        ctx.obj = {"debug": debug, "temp_dir": "_temp/", "args": sys.argv}
 
         result_file: bool = False
 
