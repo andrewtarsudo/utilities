@@ -17,4 +17,4 @@ from utilities.scripts.substitute import substitute_command
 from utilities.scripts.table_cols import table_cols_command
 from utilities.scripts.terms import terms_command
 from utilities.scripts.validate_yaml_file import validate_yaml_command
-from utilities.scripts.update import update_command
+# from utilities.scripts.update import update_command

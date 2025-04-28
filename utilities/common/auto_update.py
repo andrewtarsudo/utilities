@@ -135,8 +135,7 @@ def activate_runner(
         template: Template = Template(fr.read())
         kwargs: dict[str, str] = {
             "old_file": f"\"{str(old_file)}\"",
-            "new_file": f"\"{str(new_file)}\"",
-            "shell": f"{is_windows()}"}
+            "new_file": f"\"{str(new_file)}\""}
 
         data: str = template.safe_substitute(kwargs)
         fw.write(data.encode())
