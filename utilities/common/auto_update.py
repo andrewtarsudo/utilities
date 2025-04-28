@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from os import chmod, environ
+from os import chmod, environ, execv
 from pathlib import Path
 from stat import S_IXGRP, S_IXOTH, S_IXUSR
 from string import Template
-from subprocess import CalledProcessError, CREATE_NO_WINDOW, Popen, run, TimeoutExpired
+from subprocess import CalledProcessError, run, TimeoutExpired
 import sys
 from typing import Any
 
@@ -104,13 +104,14 @@ def compare_versions(project_id: int):
         return current_version == latest_version
 
 
-def update_exe(ctx: Context, exe_file_name: str, project_id: int, **kwargs):
-    executable_file: GitFile = GitFile(exe_file_name, project_id, temp_dir=ctx.obj.get("temp_dir"), **kwargs)
+def update_exe(exe_file_name: str, project_id: int, **kwargs):
+    executable_file: GitFile = GitFile(exe_file_name, project_id, **kwargs)
     executable_file.download()
 
     return executable_file.download_destination
 
 
+# noinspection SpawnShellInjection
 def activate_runner(
         ctx: Context, *,
         old_file: StrPath,
@@ -141,9 +142,8 @@ def activate_runner(
         fw.write(data.encode())
 
     runner_exe.chmod(0o775, follow_symlinks=True)
-    Popen([runner_exe], creationflags=CREATE_NO_WINDOW)
 
-    sys.exit(0)
+    execv(sys.executable, [sys.executable, runner_exe])
 
 
 def check_updates(ctx: Context, **kwargs):
@@ -176,9 +176,8 @@ def check_updates(ctx: Context, **kwargs):
         else:
             exe_file_name: str = "bin/tw_utilities"
 
-        new_file: Path = update_exe(ctx, exe_file_name, project_id, **kwargs)
+        new_file: Path = update_exe(exe_file_name, project_id, **kwargs)
         activate_runner(ctx, old_file=sys.executable, new_file=new_file)
-
 
 # def stop_processes(file: StrPath):
 #     is_success: bool = True

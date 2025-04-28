@@ -4,24 +4,11 @@ if __name__ == '__main__':
     from pathlib import Path
     from subprocess import Popen
 
-    from psutil import process_iter, AccessDenied, NoSuchProcess, ZombieProcess
-
     old_file: str = r${old_file}
     new_file: str = r${new_file}
 
     old_file: Path = Path(old_file).expanduser()
     new_file: Path = Path(new_file).expanduser()
-
-    for process in process_iter(["pid", "name"]):
-        try:
-            for opened_file in process.open_files():
-                if old_file == Path(opened_file.path).expanduser():
-                    process.kill()
-                    print(f"Завершен процесс {process.name()}: {process.pid} -- {process.status()}")
-
-        except (AccessDenied, NoSuchProcess, ZombieProcess):
-            print(f"Не удалось завершить процесс {process.name()}: {process.pid} -- {process.status()}")
-            continue
 
     old_file.unlink(missing_ok=True)
     _: Path = new_file.rename(old_file)
