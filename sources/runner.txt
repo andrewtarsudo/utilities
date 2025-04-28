@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 
 if __name__ == '__main__':
-    from os import kill
     from pathlib import Path
-    from signal import SIGTERM
-    from subprocess import CompletedProcess, PIPE, run
     from time import sleep
 
-    from click.termui import echo
+    from click.termui import echo, pause
 
     old_file: str = r${old_file}
     new_file: str = r${new_file}
@@ -28,25 +25,18 @@ if __name__ == '__main__':
         except PermissionError:
             sleep(5.0)
             attempts -= 1
-            echo(f"Осталось попыток: {attempts}")
 
         else:
             break_flag: bool = True
-            echo("Старый exe-файл удален")
 
     if attempts <= 0 and not break_flag:
-        echo(f"Попытка принудительно завершить процесс {pid}")
-        kill(pid, SIGTERM)
+        echo(
+            "Не удалось автоматически заменить старый exe-файл на новый ..."
+            "\nРекомендуется заменить его вручную.")
+        pause(f"Новый файл находится по пути: {new_file}\nФайл для замены: {old_file}")
 
-        try:
-            old_file.unlink(missing_ok=True)
+    else:
+        _: Path = new_file.rename(old_file)
+        _.chmod(0o775, follow_symlinks=True)
 
-        except PermissionError:
-            echo("Не удалось заменить старый exe-файл на новый")
-            raise OSError
-
-    _: Path = new_file.rename(old_file)
-    _.chmod(0o775, follow_symlinks=True)
-
-    result: CompletedProcess = run(args, capture_output=True, text=True, shell=True)
-    echo(result.stdout)
+        pause("Исполняемый файл обновлен. Введите команду в терминал еще раз\n")
