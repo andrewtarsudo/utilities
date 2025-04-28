@@ -30,3 +30,5 @@ ReaderMode: Type[str] = Literal["string", "lines"]
 FileType: Type[str] = Literal["json", "yaml", "toml"]
 
 INDEX_STEMS: tuple[str, ...] = ("index", "_index")
+
+ENV_VAR: str = "_TW_UTILITIES_UPDATE"

@@ -12,4 +12,3 @@ if __name__ == '__main__':
     old_file.unlink(missing_ok=True)
     _: Path = new_file.rename(old_file)
     _.chmod(0o775, follow_symlinks=True)
-    print(f"Исполняемый файл {_} обновлен")
