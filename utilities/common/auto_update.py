@@ -100,7 +100,6 @@ def compare_versions(project_id: int):
         latest_version: str = content.get("project").get("version")
 
         current_version: str = get_version()
-
         return current_version == latest_version
 
 
@@ -141,7 +140,7 @@ def activate_runner(
         fw.write(data.encode())
 
     runner_exe.chmod(0o775, follow_symlinks=True)
-
+    logger.info("runner.py готов")
     execv(sys.executable, [sys.executable, runner_exe])
 
 
@@ -174,6 +173,8 @@ def check_updates(ctx: Context, **kwargs):
 
         else:
             exe_file_name: str = "bin/tw_utilities"
+
+        logger.info("Обновляется исполняемый файл ...")
 
         new_file: Path = update_exe(exe_file_name, project_id, **kwargs)
         activate_runner(ctx, old_file=sys.executable, new_file=new_file)

@@ -2,8 +2,6 @@
 
 if __name__ == '__main__':
     from pathlib import Path
-    from os import execv
-    from sys import executable
 
     old_file: str = r${old_file}
     new_file: str = r${new_file}
@@ -15,4 +13,3 @@ if __name__ == '__main__':
     _: Path = new_file.rename(old_file)
     _.chmod(0o775, follow_symlinks=True)
     print(f"Исполняемый файл {_} обновлен")
-    execv([executable], [executable, old_file])
