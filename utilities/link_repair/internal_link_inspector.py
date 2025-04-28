@@ -8,8 +8,6 @@ from slugify.slugify import slugify
 from utilities.common.errors import LinkRepairFileInvalidTypeError, LinkRepairInvalidMatchError
 from utilities.link_repair.file_dict import TextFile
 
-__all__ = ["InternalLinkInspector", "internal_inspector"]
-
 
 def format_camel_case(match: Match) -> str:
     """Replaces snake_case and kebab-case with camelCase.

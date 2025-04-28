@@ -1,18 +1,52 @@
 # -*- coding: utf-8 -*-
-import sys
 
 if __name__ == '__main__':
-    from subprocess import run
+    from os import kill
     from pathlib import Path
+    from signal import SIGTERM
+    from subprocess import CompletedProcess, PIPE, run
+    from time import sleep
+
+    from click.termui import echo
 
     old_file: str = r${old_file}
     new_file: str = r${new_file}
     args: list[str] = ${args}
+    pid: int = ${pid}
 
     old_file: Path = Path(old_file).expanduser()
     new_file: Path = Path(new_file).expanduser()
 
-    old_file.unlink(missing_ok=True)
+    sleep(5.0)
+    break_flag: bool = False
+    attempts: int = 3
+
+    while not break_flag and attempts > 0:
+        try:
+            old_file.unlink(missing_ok=True)
+
+        except PermissionError:
+            sleep(5.0)
+            attempts -= 1
+            echo(f"Осталось попыток: {attempts}")
+
+        else:
+            break_flag: bool = True
+            echo("Старый exe-файл удален")
+
+    if attempts <= 0 and not break_flag:
+        echo(f"Попытка принудительно завершить процесс {pid}")
+        kill(pid, SIGTERM)
+
+        try:
+            old_file.unlink(missing_ok=True)
+
+        except PermissionError:
+            echo("Не удалось заменить старый exe-файл на новый")
+            raise OSError
+
     _: Path = new_file.rename(old_file)
     _.chmod(0o775, follow_symlinks=True)
-    run(args, capture_output=True)
+
+    result: CompletedProcess = run(args, capture_output=True, text=True, shell=True)
+    echo(result.stdout)

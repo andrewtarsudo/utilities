@@ -5,8 +5,6 @@ from typing import NamedTuple
 
 from utilities.common.shared import ADOC_EXTENSION, EXTENSIONS, MD_EXTENSION, StrPath
 
-__all__ = ["Link"]
-
 
 class _LinkType(Enum):
     """Class to represent the type of the link."""
