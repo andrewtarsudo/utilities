@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import Counter
+from difflib import get_close_matches
 from os import system
 from pathlib import Path
 from typing import Any, get_args, get_origin, Iterable, Mapping, NamedTuple
@@ -11,12 +12,11 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.functions import file_reader, file_reader_type, file_writer, is_windows, pretty_print
+from utilities.common.functions import file_reader, file_reader_type, file_writer, is_windows, pretty_print, walk_full
 from utilities.common.shared import HELP, separator, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
 from utilities.scripts.completion import file_dir_completion
-from utilities.scripts.list_files import get_files
 
 _SETTINGS_NAMES: tuple[str, ...] = (
     "settings", "Settings")
@@ -62,8 +62,8 @@ def rel(path: Path, root: Path):
     return path.relative_to(root).as_posix()
 
 
-@pass_context
-def fix_path(ctx: Context, line_no: int, path: Path, root: Path):
+def fix_path(line_no: int, path: Path, root: Path):
+    file_name: str = path.stem
     rel_path: str = rel(path, root)
 
     md_file: Path = path.with_suffix(".md")
@@ -82,23 +82,52 @@ def fix_path(ctx: Context, line_no: int, path: Path, root: Path):
         return f"{common_part} -> {_}"
 
     else:
-        name: str = path.name
+        # check all files in the project
+        valid_path: str | None = if_failed_dirs(file_name, root)
 
-        options: list[Path] = list(
-            filter(
-                lambda x: x.name == name,
-                get_files(
-                    ctx,
-                    directory=path.parent,
-                    extensions="md adoc")))
+        if valid_path is None:
+            # get the list of files in the same folder
+            neighbours: dict[str, Path] = {file.stem: file for file in path.parent.iterdir()}
+            matches: list[str] = get_close_matches(path.stem, neighbours.keys(), 1, 0.8)
 
-        if options:
-            valid_paths: str = style(pretty_print(map(lambda x: x.relative_to(root), options)), fg="red")
-            return f"{common_part} -> Возможные варианты:\n{valid_paths}"
+            # if any similar are found
+            if matches:
+                valid_name: str = matches[0]
+                valid_path: Path = neighbours.get(valid_name)
 
-        else:
-            comment: str = style(f"# {rel_path}", fg="red")
-            return f"{common_part} -> {comment}"
+            # otherwise, just comment the line
+            else:
+                valid_path: str = style(f"# {rel_path}  (удалить или закомментировать)", fg="red")
+
+        return f"{common_part} -> {valid_path}"
+
+
+def if_failed_dirs(path: StrPath, root: Path) -> str | None:
+    file_name: str = path.stem
+    logger.debug(f"Имя искомого файла: {file_name}")
+
+    all_files: list[Path] = walk_full(
+        root.joinpath("content/common"),
+        ignored_dirs="images",
+        extensions=[".md", ".adoc"],
+        root=root)
+
+    logger.debug(f"Файлы: {pretty_print(all_files)}")
+
+    possible_options: list[Path] = list(filter(lambda f: f.stem == file_name, all_files))
+
+    if not possible_options:
+        logger.debug("Подходящие файлы не найдены")
+        return
+
+    if len(possible_options) > 1:
+        matches: list[str] = get_close_matches(str(path), map(str, possible_options), 1)
+        possible_path: Path = Path(matches[0])
+
+    else:
+        possible_path: Path = possible_options[0]
+
+    return style(possible_path.relative_to(root), fg="red")
 
 
 class GeneralInfo(NamedTuple):
