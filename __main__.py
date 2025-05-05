@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
         print(
             f"Текущая версия Python {version} слишком стара. "
-            f"Необходимо обновить или использовать более новую версию")
+            "Необходимо обновить или использовать более новую версию")
         raise InvalidPythonVersion
 
     import faulthandler

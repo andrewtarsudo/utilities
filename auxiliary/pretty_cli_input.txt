@@ -1,0 +1,12 @@
+commit apply modifications
+rollback cancel modifications
+show show current object
+show-recursive recursive show current object
+show-config show CLI command list for object
+allowed Set allowed video codecs list
+disable-codecs Disable video codecs
+mandatory Set mandatory video codecs list
+prohibited Set prohibited video codecs list
+supported Set supported video codecs list
+default set parameter to default value
+end select parent
