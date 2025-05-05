@@ -110,7 +110,7 @@ class VersionContainer:
                 self._version = version
 
         else:
-            logger.error(f"Значение {value} должно быть типа Version или str, но получено {type(value)}")
+            logger.error(f"Значение {value} должно быть типа Version или str, но получено {type(value).__name__}")
             raise TypeError
 
     @property
@@ -134,7 +134,7 @@ class VersionContainer:
                 self._version_basic = version
 
         else:
-            logger.error(f"Значение {value} должно быть типа Version или str, но получено {type(value)}")
+            logger.error(f"Значение {value} должно быть типа Version или str, но получено {type(value).__name__}")
             raise TermsInvalidTypeVersionError
 
     def __bool__(self):

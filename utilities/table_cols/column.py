@@ -95,7 +95,7 @@ class TableColumn(NamedTuple):
             return self.table_cells[item.start:item.stop:item.step]
 
         else:
-            logger.error(f"Ключ должен быть типа int или slice, но получено {type(item)}")
+            logger.error(f"Ключ должен быть типа int или slice, но получено {type(item).__name__}")
             raise TableColsTableColumnTypeError
 
     def is_spaced(self):

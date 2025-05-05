@@ -59,7 +59,7 @@ class AsciiDocFile:
         else:
             logger.error(
                 f"Ключ {item} для файла {self._path} должен быть типа int или slice,"
-                f"но получен {type(item)}")
+                f"но получен {type(item).__name__}")
             raise TypeError
 
     def __setitem__(self, key, value):
@@ -69,7 +69,7 @@ class AsciiDocFile:
         else:
             logger.error(
                 f"Ключ {key} должен быть типа int, а значение {value} должно быть типа str, "
-                f"но получены {type(key)} и {type(value)}")
+                f"но получены {type(key).__name__} и {type(value).__name__}")
             raise TypeError
 
     def table_borders(self) -> Iterator[tuple[int, int]]:

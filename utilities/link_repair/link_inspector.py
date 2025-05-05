@@ -242,7 +242,7 @@ class LinkInspector:
             return
 
         elif not isinstance(value, Storage):
-            logger.debug(f"Значение должно быть типа Storage, но получено {type(value)}")
+            logger.debug(f"Значение должно быть типа Storage, но получено {type(value).__name__}")
             return
 
         else:
@@ -362,7 +362,7 @@ class LinkInspector:
             logger.debug("FileDict уже инициирован")
 
         elif not isinstance(value, FileDict):
-            logger.debug(f"Присваиваемое значение должно быть типа FileDict, но получено {type(value)}")
+            logger.debug(f"Присваиваемое значение должно быть типа FileDict, но получено {type(value).__name__}")
 
         else:
             self._file_dict = value
@@ -377,7 +377,7 @@ class LinkInspector:
             self._link: Link | None = value
 
         else:
-            logger.debug(f"Присваиваемое значение должно быть типа Link или None, но получено {type(value)}")
+            logger.debug(f"Присваиваемое значение должно быть типа Link или None, но получено {type(value).__name__}")
 
     @property
     def proper_link(self) -> str | None:

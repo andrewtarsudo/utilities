@@ -153,7 +153,7 @@ class TextFile(DirFile):
             return self._content[item]
 
         else:
-            raise LinkRepairLineInvalidTypeError(f"Тип должен быть int, но получен {type(item)}")
+            raise LinkRepairLineInvalidTypeError(f"Тип должен быть int, но получен {type(item).__name__}")
 
     def __setitem__(self, key, value):
         if isinstance(key, int) and isinstance(value, str):
@@ -161,7 +161,7 @@ class TextFile(DirFile):
 
         else:
             raise LinkRepairLineInvalidTypeError(
-                f"Тип ключа должен быть int, а value - str, но получены {type(key)} и {type(value)}")
+                f"Тип ключа должен быть int, а value - str, но получены {type(key).__name__} и {type(value).__name__}")
 
     def __contains__(self, item):
         if not isinstance(item, str):
@@ -579,7 +579,7 @@ class FileDict:
                 _add_file(item)
 
         else:
-            logger.debug(f"Элемент {other} должен быть типа str или Path, но получено {type(other)}")
+            logger.debug(f"Элемент {other} должен быть типа str или Path, но получено {type(other).__name__}")
 
     __radd__ = __add__
     __iadd__ = __add__
@@ -589,7 +589,9 @@ class FileDict:
 
     def __getitem__(self, item):
         if not isinstance(item, (str, Path)):
-            logger.exception(f"Элемент {item} должен быть типа str или Path, но получено {type(item)}", result=True)
+            logger.exception(
+                f"Элемент {item} должен быть типа str или Path, "
+                f"но получено {type(item).__name__}", result=True)
             return
 
         else:
@@ -605,4 +607,4 @@ class FileDict:
         else:
             logger.debug(
                 f"Ключ {key} должен быть типа str или Path, а значение {value} типа TextFile, "
-                f"но получены {type(key)} и {type(value)}")
+                f"но получены {type(key).__name__} и {type(value).__name__}")

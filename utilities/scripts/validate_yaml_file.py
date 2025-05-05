@@ -26,18 +26,20 @@ _RIGHTS_NAMES: tuple[str, ...] = (
 EPILOG: str = (
     "\b\nОпция -g/--guess пытается найти следующие файлы:"
     "\n- файлы с тем же именем, но с расширением *.md и *.adoc;"
-    "\n- файлы с теми же именем и расширением, но в дочерних папках "
-    "относительно той директории, "
-    "\nгде должен был лежать файл."
+    "\n- файлы с теми же именем и расширением, но в папках того же проекта."
     "\n"
-    "\b\nНапример, для файла content/common/directory/file.md выполняется поиск:"
-    "\n- content/common/directory/file.adoc"
-    "\n- content/common/directory/first_subfolder/file.md"
-    "\n- content/common/directory/first_subfolder/first_child/file.md"
-    "\n- content/common/directory/first_subfolder/nth_child/file.md"
-    "\n- content/common/directory/second_subfolder/file.md"
+    "\b\nНапример, для файла content/common/basics/file.md выполняется поиск:"
+    "\n- content/common/basics/file.adoc"
+    "\n- content/common/basics/first_subfolder/file.md"
+    "\n- content/common/basics/first_subfolder/first_child/file.md"
+    "\n- content/common/config/file.md"
+    "\n- content/common/config/nth_subfolder/file.md"
+    "\n- content/common/oam/file.md"
     "\n"
-    "\b\nПримечание. Поиск по дочерним папкам не осуществляется для файлов index.* и _index.*, "
+    "\b\nПути файлов сравниваются, и из выбирается один с помощью нечеткой логики "
+    "\nи расстояний между строками."
+    "\n"
+    "\b\nПримечание. Поиск по папкам не осуществляется для файлов index.* и _index.*, "
     "\nпоскольку в этом случае будет слишком много нерелевантных предложений.")
 
 
@@ -103,7 +105,7 @@ def fix_path(line_no: int, path: Path, root: Path):
 
 
 def if_failed_dirs(path: StrPath, root: Path) -> str | None:
-    file_name: str = path.stem
+    file_name: str = Path(path).stem
     logger.debug(f"Имя искомого файла: {file_name}")
 
     all_files: list[Path] = walk_full(
@@ -170,7 +172,7 @@ def inspect_settings(content: Mapping[str, Any], verbose: bool):
                 if not (isinstance(value, str) or hasattr(value, "__str__")):
                     general_info.messages.append(
                         f"Значение {value} ключа {key} должно быть типа string, "
-                        f"но получен {type(value)}")
+                        f"но получен {type(value).__name__}")
                     __is_ok: bool = False
 
         if __is_ok and verbose:
@@ -188,7 +190,8 @@ def inspect_legal(content: Mapping[str, Any], verbose: bool):
         rights: dict[str, dict[str, str | bool] | list[str]] = content.get(_)
 
         if not isinstance(rights, Mapping):
-            general_info.warnings.append(f"Раздел 'Rights' должен быть типа object, но получено {type(rights)}")
+            general_info.warnings.append(
+                f"Раздел 'Rights' должен быть типа object, но получено {type(rights).__name__}")
             __is_ok: bool = False
 
         if "title" not in rights:
@@ -278,13 +281,14 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
 
         elif name.endswith("cross_docs"):
             general_info.warnings.append(
-                f"Обнаружен раздел {name}, в котором ссылки ведут в другой проект.\n"
-                "На данный момент такие секции пропускаются при проверке")
+                f"Обнаружен раздел {name}, в котором ссылки ведут в другой проект."
+                "\nНа данный момент такие секции пропускаются при проверке")
             continue
 
         else:
             if not isinstance(section, Mapping):
-                general_info.messages.append(f"Раздел '{name}' должна быть типа object, но получено {type(section)}")
+                general_info.messages.append(
+                    f"Раздел '{name}' должен быть типа object, но получено {type(section).__name__}")
 
             else:
                 __is_ok: bool = True
@@ -303,7 +307,7 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
                             if not isinstance(title_files, bool):
                                 general_info.warnings.append(
                                     f"Значение ключа '{name}::title::title-files' должно быть типа bool, "
-                                    f"но получено {type(title_files)}")
+                                    f"но получено {type(title_files).__name__}")
                                 __is_ok: bool = False
 
                         if "value" in title.keys():
@@ -312,7 +316,7 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
                             if not isinstance(value, str):
                                 general_info.warnings.append(
                                     f"Значение ключа '{name}::title::value' должно быть типа str, "
-                                    f"но получено {type(value)}")
+                                    f"но получено {type(value).__name__}")
                                 __is_ok: bool = False
 
                         if "level" in title.keys():
@@ -500,7 +504,8 @@ def validate_file(
     "-v/-q", "--verbose/--quiet", "verbose",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг подробного вывода.\nПо умолчанию: False, выводятся только ошибки",
+    help="\b\nФлаг подробного вывода."
+         "\nПо умолчанию: False, выводятся только ошибки",
     show_default=True,
     required=False,
     default=False)

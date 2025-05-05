@@ -45,7 +45,7 @@ class AnchorInspector:
                 raise LinkRepairMissingFileError
 
         else:
-            logger.error(f"Ключ {item} должен быть типа str, но получен {type(item)}")
+            logger.error(f"Ключ {item} должен быть типа str, но получен {type(item).__name__}")
             raise LinkRepairFileInvalidTypeError
 
     def get(self, item):
@@ -64,7 +64,7 @@ class AnchorInspector:
                 self._dict_anchors[text_file] = list(text_file.iter_anchors())
 
         else:
-            logger.error(f"Элемент {other} должен быть типа TextFile, но получен {type(other)}")
+            logger.error(f"Элемент {other} должен быть типа TextFile, но получен {type(other).__name__}")
 
     @property
     def dict_anchors(self):

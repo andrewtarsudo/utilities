@@ -92,7 +92,7 @@ def format_code_command(
         raise FormatCodeNonPositiveLineLengthError
 
     elif not isinstance(length, int):
-        logger.error(f"Максимальная длина должна быть целым числом, однако получено {type(length)}")
+        logger.error(f"Максимальная длина должна быть целым числом, однако получено {type(length).__name__}")
         raise FormatCodeNonIntegerLineLengthError
 
     files: list[StrPath] | None = get_files(

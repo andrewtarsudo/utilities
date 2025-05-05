@@ -87,7 +87,7 @@ class Table:
             return self._lines[item]
 
         else:
-            logger.error(f"Ключ {item} должен быть типа int или slice, но получен {type(item)}")
+            logger.error(f"Ключ {item} должен быть типа int или slice, но получен {type(item).__name__}")
             logger.debug(f"Таблица:\n{str(self)}")
             raise TypeError
 
@@ -211,7 +211,7 @@ class Table:
 
         else:
             logger.error(
-                f"Столбец задается индексом типа int или именем типа str, но получено {column} типа {type(column)}")
+                f"Столбец задается индексом типа int или именем типа str, но получено {column} типа {type(column).__name__}")
             raise TableColsTableColumnInvalidIdentifierError
 
     def iter_column_items(self) -> Iterator['TableColumn']:
