@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from glob import iglob
-from os.path import relpath
 from pathlib import Path
 
 from click.core import Context
@@ -243,7 +242,7 @@ def link_repair_command(
 
             # if not found
             if not bool(link_inspector):
-                _file_path: str = relpath(link_inspector.link.from_file, _base_dir).replace('\\', '/')
+                _file_path: str = _base_dir.relative_to(link_inspector.link.from_file).as_posix()
                 logger.error(
                     f"Не удалось обработать ссылку в файле.\n"
                     f"Ссылка: {link_inspector.link.link_to}\n"

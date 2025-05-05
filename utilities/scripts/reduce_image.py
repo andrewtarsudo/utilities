@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from os.path import getsize
 from pathlib import Path
 from typing import Iterable
 
@@ -139,11 +138,11 @@ def reduce_image_command(
 
             logger.debug(f"Файл {file}")
 
-            current_size: int = getsize(file)
+            current_size: int = file.stat(follow_symlinks=True).st_size
             before += current_size
 
             result: Path = duplicate_image(file, dry_run)
-            new_size: int = getsize(result)
+            new_size: int = result.stat(follow_symlinks=True).st_size
 
             after += new_size
             logger.info(f"Файл {file.name}: {file_size(current_size)} -> {file_size(new_size)}")

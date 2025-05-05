@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from itertools import product
-from os import walk
 from pathlib import Path
 from sys import stdout
 from typing import ForwardRef, Iterable
@@ -379,7 +378,7 @@ class FolderStorage:
 
         tree: RecursiveDict = {}
 
-        for dirpath, dirnames, filenames in walk(self._path):
+        for dirpath, dirnames, filenames in self._path.walk():
             dirpath: Path = Path(dirpath).expanduser()
             file_paths: list[str | Path] = [dirpath.joinpath(filename) for filename in filenames]
             folder_paths: list[str | Path] = [dirpath.joinpath(dirname) for dirname in dirnames]

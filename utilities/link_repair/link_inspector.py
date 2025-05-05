@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 from itertools import chain, product
-from os.path import relpath
 from pathlib import Path
 
 from loguru import logger
 
 from utilities.common.shared import ADOC_EXTENSION, EXTENSIONS, INDEX_STEMS, MD_EXTENSION, StrPath
-from utilities.link_repair.file_dict import FileDict, TextFile, DirFile
-from utilities.link_repair.link import Link
+from utilities.link_repair.file_dict import DirFile, FileDict, TextFile
+from utilities.link_repair.general_storage import ComponentStorage, GeneralStorage, Storage
 from utilities.link_repair.internal_link_inspector import internal_inspector, InternalLinkInspector
-from utilities.link_repair.general_storage import GeneralStorage, ComponentStorage, Storage
+from utilities.link_repair.link import Link
 
 
 def _prepare_link(link: str) -> str:
@@ -161,7 +160,7 @@ class LinkInspector:
         """Specifies the source text file."""
         return self._file_dict.get(self.source_link())
 
-    def destination_file(self) -> DirFile | TextFile:
+    def destination_file(self) -> DirFile | TextFile | None:
         """Specifies the file given in the link if found."""
         if not self._link.is_component:
             return self._file_dict.get(self._destination) if bool(self) else None
@@ -257,7 +256,7 @@ class LinkInspector:
         :type path: str or Path
         :rtype: str
         """
-        return Path(relpath(path, self.base_dir())).as_posix()
+        return self.base_dir().relative_to(path).as_posix()
 
     def inspect_anchor(self):
         """Sets the anchor from the link if any."""
@@ -305,7 +304,7 @@ class LinkInspector:
         if not bool(self) or self._proper_link is not None:
             return
 
-        _path: str = Path(relpath(self._destination, self.source_link())).as_posix()
+        _path: str = self.source_link().relative_to(self._destination).as_posix()
         proper_link: str = _prepare_link(_path).removesuffix("/")
 
         if self._proper_anchor:
