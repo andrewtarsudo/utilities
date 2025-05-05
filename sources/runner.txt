@@ -1,18 +1,42 @@
 # -*- coding: utf-8 -*-
-import sys
 
 if __name__ == '__main__':
-    from subprocess import run
     from pathlib import Path
+    from time import sleep
+
+    from click.termui import echo, pause
 
     old_file: str = r${old_file}
     new_file: str = r${new_file}
     args: list[str] = ${args}
+    pid: int = ${pid}
 
     old_file: Path = Path(old_file).expanduser()
     new_file: Path = Path(new_file).expanduser()
 
-    old_file.unlink(missing_ok=True)
-    _: Path = new_file.rename(old_file)
-    _.chmod(0o775, follow_symlinks=True)
-    run(args, capture_output=True)
+    sleep(5.0)
+    break_flag: bool = False
+    attempts: int = 3
+
+    while not break_flag and attempts > 0:
+        try:
+            old_file.unlink(missing_ok=True)
+
+        except PermissionError:
+            sleep(5.0)
+            attempts -= 1
+
+        else:
+            break_flag: bool = True
+
+    if attempts <= 0 and not break_flag:
+        echo(
+            "Не удалось автоматически заменить старый exe-файл на новый ..."
+            "\nРекомендуется заменить его вручную.")
+        pause(f"Новый файл находится по пути: {new_file}\nФайл для замены: {old_file}")
+
+    else:
+        _: Path = new_file.rename(old_file)
+        _.chmod(0o775, follow_symlinks=True)
+
+        pause("Исполняемый файл обновлен. Введите команду в терминал еще раз\n")

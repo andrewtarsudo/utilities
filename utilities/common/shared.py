@@ -26,6 +26,8 @@ MAX_SYMBOLS: int = 72
 MIN_COLUMN: int = 5
 COEFFICIENT: float = 1.0
 
+MAX_LENGTH: int = 84
+
 ReaderMode: Type[str] = Literal["string", "lines"]
 FileType: Type[str] = Literal["json", "yaml", "toml"]
 

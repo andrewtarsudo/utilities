@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from os import environ, execv
+from os import environ, execv, getpid
 from pathlib import Path
 from shutil import which
 from string import Template
@@ -141,7 +141,8 @@ def activate_runner(
         kwargs: dict[str, str] = {
             "old_file": f"\"{str(old_file)}\"",
             "new_file": f"\"{str(new_file)}\"",
-            "args": ctx.obj.get("args")}
+            "args": ctx.obj.get("args"),
+            "pid": getpid()}
 
         data: str = template.safe_substitute(kwargs)
         fw.write(data.encode())
@@ -166,8 +167,10 @@ def check_updates(ctx: Context, **kwargs):
     else:
         executable: str = "python3"
 
+    python: str = which(executable)
+
     # noinspection SpawnShellInjection
-    execv(which(executable), [which(executable), runner_exe])
+    execv(python, [python, runner_exe])
 
 
 @group(
