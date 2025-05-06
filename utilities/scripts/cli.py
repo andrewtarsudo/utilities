@@ -154,18 +154,14 @@ def activate_runner(
 def check_updates(ctx: Context, **kwargs):
     if is_windows():
         exe_file_name: str = "bin/tw_utilities.exe"
-
-    else:
-        exe_file_name: str = "bin/tw_utilities"
-
-    new_file: Path = update_exe(exe_file_name, **kwargs)
-    runner_exe: Path = activate_runner(ctx, old_file=sys.executable, new_file=new_file)
-
-    if is_windows():
         executable: str = "python"
 
     else:
+        exe_file_name: str = "bin/tw_utilities"
         executable: str = "python3"
+
+    new_file: Path = update_exe(exe_file_name, **kwargs)
+    runner_exe: Path = activate_runner(ctx, old_file=sys.executable, new_file=new_file)
 
     python: str = which(executable)
 

@@ -22,6 +22,7 @@ _SETTINGS_NAMES: tuple[str, ...] = (
     "settings", "Settings")
 _RIGHTS_NAMES: tuple[str, ...] = (
     "rights", "Rights")
+CUTOFF: float = 0.75
 
 EPILOG: str = (
     "\b\nОпция -g/--guess пытается найти следующие файлы:"
@@ -64,8 +65,9 @@ def rel(path: Path, root: Path):
     return path.relative_to(root).as_posix()
 
 
-def fix_path(line_no: int, path: Path, root: Path):
+def fix_path(line_no: int, path: Path, root: Path) -> str:
     rel_path: str = rel(path, root)
+    file_name: str = path.stem
 
     md_file: Path = path.with_suffix(".md")
     adoc_file: Path = path.with_suffix(".adoc")
@@ -73,14 +75,13 @@ def fix_path(line_no: int, path: Path, root: Path):
     common_part: str = f"{line_no:>4}  {style(rel_path, strikethrough=True)}"
 
     if md_file.exists(follow_symlinks=True):
-        return f"{common_part} -> {style(rel(md_file, root), fg="red")}"
+        valid_path: str = rel(md_file, root)
 
     elif adoc_file.exists(follow_symlinks=True):
-        return f"{common_part} -> {style(rel(adoc_file, root), fg="red")}"
+        valid_path: str = rel(adoc_file, root)
 
-    elif path.stem.removeprefix("_") == "index":
-        _: str = style(f"# {rel_path}", fg="red")
-        return f"{common_part} -> {_}"
+    elif file_name.removeprefix("_") == "index":
+        valid_path: str = f"# {rel_path}"
 
     else:
         # check all files in the project
@@ -88,52 +89,57 @@ def fix_path(line_no: int, path: Path, root: Path):
 
         if valid_path is None:
             # get the list of files in the same folder
-            neighbours: dict[str, Path] = {file.stem: file for file in path.parent.iterdir()}
-            matches: list[str] = get_close_matches(path.stem, neighbours.keys(), 1, 0.8)
+            neighbours: dict[str, str] = {file.stem: file.as_posix() for file in path.parent.iterdir()}
+            matches: list[str] = get_close_matches(file_name, neighbours.keys(), 1, CUTOFF)
 
             # if any similar are found
             if matches:
                 valid_name: str = matches[0]
-                valid_path: Path = neighbours.get(valid_name)
+                valid_path: str = neighbours.get(valid_name)
 
             # otherwise, just comment the line
             else:
                 valid_path: str = style(f"# {rel_path}  (удалить или закомментировать)", fg="red")
 
-        return f"{common_part} -> {valid_path}"
+    suggestion: str = style(valid_path, fg="red")
+    return f"{common_part} -> {suggestion}"
 
 
 def if_failed_dirs(path: StrPath, root: Path) -> str | None:
     path: Path = Path(path)
     file_name: str = path.stem
-
     logger.debug(f"Имя искомого файла: {file_name}")
 
-    language: str = file_name.rsplit(".", maxsplit=1)[-1] if len(path.suffixes) > 1 else "ru"
-
-    all_files: list[Path] = walk_full(
-        root.joinpath("content/common"),
-        ignored_dirs="images",
-        language=language,
-        extensions=[".md", ".adoc"],
-        root=root)
-
-    logger.debug(f"Файлы: {pretty_print(all_files)}")
-
-    possible_options: list[Path] = list(filter(lambda f: f.stem == file_name, all_files))
+    content_common_dir: Path = root.joinpath("content/common")
+    possible_options: list[Path] = list(content_common_dir.glob(f"**/{file_name}*", case_sensitive=False))
 
     if not possible_options:
-        logger.debug("Подходящие файлы не найдены")
-        return
+        language: str = file_name.rsplit(".", maxsplit=1)[-1] if len(path.suffixes) > 1 else "ru"
 
-    if len(possible_options) > 1:
+        all_files: list[Path] = walk_full(
+            content_common_dir,
+            ignored_dirs=["images"],
+            language=language,
+            extensions=[".md", ".adoc"],
+            root=root)
+
+        matches: list[str] = get_close_matches(str(path), map(str, all_files), 1, CUTOFF)
+
+        if matches:
+            possible_path: str | None = Path(matches[0]).as_posix()
+
+        else:
+            logger.debug(f"Файлов для замены {file_name} не найдено")
+            possible_path: str | None = None
+
+    elif len(possible_options) > 1:
         matches: list[str] = get_close_matches(str(path), map(str, possible_options), 1)
-        possible_path: Path = Path(matches[0])
+        possible_path: str | None = Path(matches[0]).as_posix()
 
     else:
-        possible_path: Path = possible_options[0]
+        possible_path: str | None = possible_options[0].as_posix()
 
-    return style(possible_path, fg="red")
+    return possible_path
 
 
 class GeneralInfo(NamedTuple):
@@ -421,6 +427,10 @@ def validate_file(
         output: str | None = None,
         guess: bool = True,
         verbose: bool = False):
+    if lines is None or not lines:
+        echo("В приведенном файле нет не закомментированных путей")
+        return
+
     max_length: int = max(map(len, lines)) + 3
 
     paths: dict[int, Path] = {

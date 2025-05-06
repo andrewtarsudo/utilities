@@ -3,6 +3,7 @@ from os import environ
 
 from click.parser import split_arg_string
 from click.shell_completion import CompletionItem, ShellComplete
+from loguru import logger
 
 _SOURCE_PWSH = """\
 Register-ArgumentCompleter -Native -CommandName %(prog_name)s -ScriptBlock {
@@ -61,6 +62,27 @@ Register-ArgumentCompleter -Native -CommandName %(prog_name)s -ScriptBlock {
         $env:%(complete_var)s = $null | Out-Null
 }
 """
+
+
+APP_NAME = "TW_UTILITIES"  # Replace with your actual CLI command name
+
+
+def activate_cmd_autocompletion():
+    try:
+        import winreg
+
+    except (ImportError, ModuleNotFoundError):
+        logger.error("Текущая операционная система не Windows.")
+        return
+
+    else:
+        from winreg import HKEYType, OpenKeyEx, HKEY_LOCAL_MACHINE, KEY_WRITE, REG_DWORD, SetValueEx, CloseKey
+
+    cmd_params: HKEYType = OpenKeyEx(HKEY_LOCAL_MACHINE, r"SOFTWARE\\Microsoft\\Command Processor", access=KEY_WRITE)
+    SetValueEx(cmd_params, "CompletionChar", 0, REG_DWORD, 0x9)
+    SetValueEx(cmd_params, "PathCompletionChar", 0, REG_DWORD, 0x9)
+    CloseKey(cmd_params)
+    cmd_params.Close()
 
 
 class PowershellComplete(ShellComplete):
