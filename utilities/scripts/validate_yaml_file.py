@@ -65,7 +65,6 @@ def rel(path: Path, root: Path):
 
 
 def fix_path(line_no: int, path: Path, root: Path):
-    file_name: str = path.stem
     rel_path: str = rel(path, root)
 
     md_file: Path = path.with_suffix(".md")
@@ -85,7 +84,7 @@ def fix_path(line_no: int, path: Path, root: Path):
 
     else:
         # check all files in the project
-        valid_path: str | None = if_failed_dirs(file_name, root)
+        valid_path: str | None = if_failed_dirs(path, root)
 
         if valid_path is None:
             # get the list of files in the same folder
@@ -105,12 +104,17 @@ def fix_path(line_no: int, path: Path, root: Path):
 
 
 def if_failed_dirs(path: StrPath, root: Path) -> str | None:
-    file_name: str = Path(path).stem
+    path: Path = Path(path)
+    file_name: str = path.stem
+
     logger.debug(f"Имя искомого файла: {file_name}")
+
+    language: str = file_name.rsplit(".", maxsplit=1)[-1] if len(path.suffixes) > 1 else "ru"
 
     all_files: list[Path] = walk_full(
         root.joinpath("content/common"),
         ignored_dirs="images",
+        language=language,
         extensions=[".md", ".adoc"],
         root=root)
 
@@ -129,7 +133,7 @@ def if_failed_dirs(path: StrPath, root: Path) -> str | None:
     else:
         possible_path: Path = possible_options[0]
 
-    return style(possible_path.relative_to(root), fg="red")
+    return style(possible_path, fg="red")
 
 
 class GeneralInfo(NamedTuple):
