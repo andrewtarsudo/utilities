@@ -6,11 +6,15 @@ from typing import Literal, Type, TypeAlias
 PRESS_ENTER_KEY: str = "\nНажмите ENTER, чтобы завершить работу скрипта ..."
 HELP: str = """Вывести справочную информацию на экран и завершить работу"""
 
+SUFFIX: str = ".exe" if sys.platform.startswith("win") else ""
+
 if getattr(sys, "frozen", False):
     BASE_PATH: Path = Path(getattr(sys, "_MEIPASS"))
+    EXE_FILE: Path = Path(sys.executable)
 
 else:
     BASE_PATH: Path = Path(__file__).parent.parent.parent
+    EXE_FILE: Path = BASE_PATH.joinpath(f"bin/tw_utilities{SUFFIX}")
 
 StrPath: TypeAlias = str | Path
 MD_EXTENSION: str = ".md"
@@ -34,3 +38,6 @@ FileType: Type[str] = Literal["json", "yaml", "toml"]
 INDEX_STEMS: tuple[str, ...] = ("index", "_index")
 
 ENV_VAR: str = "_TW_UTILITIES_UPDATE"
+
+TEMP_DIR: Path = Path.home().joinpath("_temp/")
+TEMP_COMMAND_FILE: Path = TEMP_DIR.joinpath("input_command")

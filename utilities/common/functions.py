@@ -13,7 +13,7 @@ from loguru import logger
 from yaml.scanner import ScannerError
 
 from utilities.common.errors import FileReaderError, FileReaderTypeError, UpdateProjectIdError
-from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath
+from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath, TEMP_DIR
 
 
 @cache
@@ -267,7 +267,7 @@ class GitFile:
             port: int = 443,
             query: bytes = b"ref_type=heads",
             method: str = "GET",
-            temp_dir: str = "_temp/"):
+            temp_dir: Path = TEMP_DIR):
         if not isinstance(project_id, int):
             try:
                 project_id: int = int(project_id)
@@ -285,7 +285,7 @@ class GitFile:
         self._port: int = port
         self._query: bytes = query
         self._method: str = method
-        self._temp_dir: str = temp_dir
+        self._temp_dir: Path = temp_dir
         self._success: bool = False
         self._content: str | None = None
 
@@ -321,7 +321,7 @@ class GitFile:
 
     @property
     def download_destination(self):
-        return Path.home().joinpath(f"{self._temp_dir}/{self._file_name}").expanduser()
+        return self._temp_dir.joinpath(self._file_name).expanduser()
 
     def download(self):
         self.download_destination.parent.mkdir(parents=True, exist_ok=True)

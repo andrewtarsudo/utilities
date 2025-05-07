@@ -6,18 +6,18 @@ def generate_executable_command():
     from subprocess import CalledProcessError, CompletedProcess, run
     from sys import platform
 
-    log_file: Path = Path(__file__).parent.joinpath("pyinstaller.log")
+    log_file: Path = Path.cwd().joinpath("pyinstaller.log")
     print(f"log: {log_file.resolve().as_posix()}")
 
     if platform.startswith("win"):
-        spec_file: Path = Path(__file__).parent.parent.joinpath("utilities.exe.spec")
-        exe_file: Path = Path(__file__).parent.joinpath("bin/tw_utilities.exe")
+        spec_file: Path = Path.cwd().joinpath("utilities.exe.spec")
+        exe_file: Path = Path.cwd().joinpath("bin/tw_utilities.exe")
         environ["VIRTUAL_ENV"] = "venv"
         shell: bool = True
 
     else:
-        spec_file: Path = Path(__file__).parent.parent.joinpath("utilities.spec")
-        exe_file: Path = Path(__file__).parent.joinpath("bin/tw_utilities")
+        spec_file: Path = Path.cwd().joinpath("utilities.spec")
+        exe_file: Path = Path.cwd().joinpath("bin/tw_utilities")
         environ["VIRTUAL_ENV"] = ".venv"
         shell: bool = False
 
@@ -29,17 +29,18 @@ def generate_executable_command():
         "--noconfirm",
         "--distpath",
         "./bin",
-        f"{spec_file.as_posix()}",
-        f"2>{log_file.as_posix()}"]
+        f"{spec_file.as_posix()}"]
 
     try:
-        _: CompletedProcess = run(
-            install,
-            shell=shell,
-            encoding="utf-8",
-            check=True)
+        with open(log_file, "w", encoding="utf-8", errors="ignore") as lf:
+            _: CompletedProcess = run(
+                install,
+                shell=shell,
+                stderr=lf,
+                encoding="utf-8",
+                check=True)
 
-        _.check_returncode()
+            _.check_returncode()
 
     except CalledProcessError as e:
         print(f"{e.__class__.__name__}, код {e.returncode}:\n{e.stderr}")

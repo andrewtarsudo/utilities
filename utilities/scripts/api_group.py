@@ -13,7 +13,7 @@ from loguru import logger
 
 from utilities.common.errors import BaseError, NoArgumentsOptionsError
 from utilities.common.functions import get_version, is_windows, pretty_print
-from utilities.common.shared import DEBUG, HELP, NORMAL, PRESS_ENTER_KEY
+from utilities.common.shared import DEBUG, HELP, NORMAL, PRESS_ENTER_KEY, TEMP_DIR
 from utilities.scripts.args_help_dict import args_help_dict
 
 COL_MAX: int = 52
@@ -76,7 +76,7 @@ def clear_logs(ctx: Context, result: Any, **kwargs):
     else:
         echo(f"Папка с логами: {DEBUG.parent}")
 
-    rmtree(ctx.obj.get("temp_dir"), ignore_errors=True)
+    rmtree(TEMP_DIR, ignore_errors=True)
     input(PRESS_ENTER_KEY)
     ctx.exit(0)
 

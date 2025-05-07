@@ -5,7 +5,7 @@ def check_code_command():
     from subprocess import CompletedProcess, run
     from sys import exit
 
-    path: Path = Path(__file__).parent
+    path: Path = Path.cwd()
     print("Поиск неиспользуемого кода")
 
     try:

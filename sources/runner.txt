@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
 if __name__ == '__main__':
+    from os import execv
     from pathlib import Path
     from time import sleep
 
     from click.termui import echo, pause
 
-    old_file: str = r${old_file}
+    _old_file: str = r${old_file}
     new_file: str = r${new_file}
     args: list[str] = ${args}
-    pid: int = ${pid}
+    shell: str = r${shell}
 
-    old_file: Path = Path(old_file).expanduser()
+    old_file: Path = Path(_old_file).expanduser()
     new_file: Path = Path(new_file).expanduser()
 
     sleep(5.0)
@@ -33,10 +34,14 @@ if __name__ == '__main__':
         echo(
             "Не удалось автоматически заменить старый exe-файл на новый ..."
             "\nРекомендуется заменить его вручную.")
-        pause(f"Новый файл находится по пути: {new_file}\nФайл для замены: {old_file}")
+        pause(f"Новый файл находится по пути: {new_file}\nФайл для замены: {_old_file}")
 
     else:
-        _: Path = new_file.rename(old_file)
-        _.chmod(0o775, follow_symlinks=True)
+        file: Path = new_file.rename(old_file)
+        file.chmod(0o775, follow_symlinks=True)
 
-        pause("Исполняемый файл обновлен. Введите команду в терминал еще раз\n")
+        echo("Исполняемый файл обновлен. Перезапуск файла...\n")
+        sleep(2.5)
+
+        echo(f"{shell=}\n{args=}")
+        execv(shell, args)
