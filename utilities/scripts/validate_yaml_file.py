@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from collections import Counter
 from difflib import get_close_matches
+from functools import lru_cache
 from os import system
 from pathlib import Path
-from typing import Any, get_args, get_origin, Iterable, Mapping, NamedTuple
+from typing import Any, get_args, get_origin, Iterable, Mapping
 
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
@@ -99,10 +100,21 @@ def fix_path(line_no: int, path: Path, root: Path) -> str:
 
             # otherwise, just comment the line
             else:
-                valid_path: str = style(f"# {rel_path}  (удалить или закомментировать)", fg="red")
+                valid_path: str = f"# {rel_path}  (удалить или закомментировать)"
 
-    suggestion: str = style(valid_path, fg="red")
+    suggestion: str = style(valid_path, fg="red", bold=True)
     return f"{common_part} -> {suggestion}"
+
+
+@lru_cache
+def all_files(root: Path, language: str):
+    content_common_dir: Path = root.joinpath("content/common")
+    return walk_full(
+        content_common_dir,
+        ignored_dirs=["images"],
+        language=language,
+        extensions=[".md", ".adoc"],
+        root=root)
 
 
 def if_failed_dirs(path: StrPath, root: Path) -> str | None:
@@ -116,14 +128,11 @@ def if_failed_dirs(path: StrPath, root: Path) -> str | None:
     if not possible_options:
         language: str = file_name.rsplit(".", maxsplit=1)[-1] if len(path.suffixes) > 1 else "ru"
 
-        all_files: list[Path] = walk_full(
-            content_common_dir,
-            ignored_dirs=["images"],
-            language=language,
-            extensions=[".md", ".adoc"],
-            root=root)
-
-        matches: list[str] = get_close_matches(str(path), map(str, all_files), 1, CUTOFF)
+        matches: list[str] = get_close_matches(
+            word=str(path),
+            possibilities=map(str, all_files(root, language)),
+            n=1,
+            cutoff=CUTOFF)
 
         if matches:
             possible_path: str | None = Path(matches[0]).as_posix()
@@ -133,21 +142,25 @@ def if_failed_dirs(path: StrPath, root: Path) -> str | None:
             possible_path: str | None = None
 
     elif len(possible_options) > 1:
-        matches: list[str] = get_close_matches(str(path), map(str, possible_options), 1)
-        possible_path: str | None = Path(matches[0]).as_posix()
+        matches: list[str] = get_close_matches(
+            word=str(path),
+            possibilities=map(str, possible_options),
+            n=1)
+        possible_path: str | None = Path(matches[0]).relative_to(root).as_posix()
 
     else:
-        possible_path: str | None = possible_options[0].as_posix()
+        possible_path: str | None = possible_options[0].relative_to(root).as_posix()
 
     return possible_path
 
 
-class GeneralInfo(NamedTuple):
-    messages: list[str] = []
-    warnings: list[str] = []
-    options: list[str] = []
-    names: set[str] = set()
-    non_unique_names: set[str] = set()
+class GeneralInfo:
+    def __init__(self):
+        self.messages: list[str] = []
+        self.warnings: list[str] = []
+        self.options: list[str] = []
+        self.names: set[str] = set()
+        self.non_unique_names: set[str] = set()
 
     def clear(self):
         self.messages.clear()
@@ -421,6 +434,14 @@ def find_non_unique(lines: list[str]):
         for _non_unique_key, _non_unique_value in non_unique.items())
 
 
+def get_raw_path(line: str) -> str:
+    return line.strip().removeprefix("- ").split("#")[0].strip()
+
+
+def get_length(root: Path, path: Path) -> int:
+    return len(get_raw_path(path.relative_to(root).as_posix()))
+
+
 def validate_file(
         root: StrPath,
         lines: Iterable[str], *,
@@ -431,17 +452,12 @@ def validate_file(
         echo("В приведенном файле нет не закомментированных путей")
         return
 
-    max_length: int = max(map(len, lines)) + 3
-
     paths: dict[int, Path] = {
-        index: Path(root).joinpath(
-            line
-            .strip()
-            .removeprefix("- ")
-            .split("#")[0]
-            .strip())
+        index: Path(root).joinpath(get_raw_path(line))
         for index, line in enumerate(lines)
         if line.strip().startswith("- ") and ".." not in line}
+
+    max_length: int = max(get_length(root, path) for path in paths.values()) + 5
 
     _lines: list[str] = []
 
@@ -461,7 +477,7 @@ def validate_file(
 
         _path: str = path.relative_to(root).as_posix()
 
-        _line: str = style(f"{line_no + 1:>4}  {_path: <{max_length}}{_status: >5}", bg=_color)
+        _line: str = style(f"{line_no + 1:>4}  {_path: <{max_length}}  {_status: >5}", bg=_color)
         _lines.append(_line)
 
         if verbose or _status == "FAIL":
@@ -555,8 +571,8 @@ def validate_yaml_command(
 
     if file_or_project.is_dir():
         yaml_files: list[Path] = [
-            yaml_file for yaml_file in file_or_project.iterdir()
-            if yaml_file.suffix in (".yml", ".yaml") and not yaml_file.stem.startswith(".")]
+            *file_or_project.glob("*.yml"),
+            *file_or_project.glob("*.yaml")]
 
     elif file_or_project.is_file():
         yaml_files: list[Path] = [file_or_project]
@@ -587,13 +603,13 @@ def validate_yaml_command(
 
             if general_info.warnings:
                 _warnings: str = pretty_print(general_info.warnings)
-                echo("\nПредупреждения:")
+                echo(style("\nПредупреждения:", fg="bright_cyan", bold=True))
                 echo(_warnings)
                 logger.debug(_warnings)
 
             if guess and general_info.options:
                 _options: str = pretty_print(general_info.options)
-                echo("\nИсправления:")
+                echo(style("\nИсправления:", fg="bright_cyan", bold=True))
                 echo(_options)
                 logger.debug(_options)
 

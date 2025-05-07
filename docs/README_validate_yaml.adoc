@@ -36,13 +36,13 @@ include::partials/run.adoc[]
 [source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name} <YAML_FILE>
--o/--output FILE | -v/--verbose | -k/--keep-logs | --h/--help
+{name} {script-name} <FILE_OR_PROJECT>
+-o/--output FILE | -g/--guess | -v/--verbose | -k/--keep-logs | --h/--help
 
   Команда для валидации YAML-файла, используемого при генерации PDF
 
 Аргументы:
-  yaml_file (*)                          Путь до файла PDF_*.yml
+  file_or_project (*)                    Путь до файла PDF_*.yml или директории с такими файлами
 
 Опции:
   -o, --output FILE                      Файл для записи вывода. По умолчанию: вывод в консоль

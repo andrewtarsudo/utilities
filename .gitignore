@@ -48,3 +48,4 @@ css/
 pyinstaller.log
 flake8.txt
 _temp/
+.qodo/

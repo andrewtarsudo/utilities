@@ -20,7 +20,10 @@ dependencies = [
   "python-slugify>=8.0",
   "pyyaml>=6.0",
 ]
-keywords = ["utilities", "techwriters"]
+keywords = [
+  "utilities",
+  "techwriters"
+]
 license-files = ["LICENSE"]
 
 [project.urls]
@@ -39,14 +42,42 @@ dev = [
 ]
 
 [tool.uv]
+required-version = "0.6.14"
 managed = true
 package = false
+offline = false
+no-cache = false
+native-tls = true
 compile-bytecode = true
 python-downloads = "never"
 python-preference = "managed"
+dev-dependencies = [
+  "flake8",
+  "mypy",
+  "pyinstaller",
+  "pytest",
+  "vulture"
+]
 
 [tool.vulture]
-exclude = ["auxiliary", "bin", "build", "css", "docs", "fonts", "sources", "tests", "themes"]
+exclude = [
+  ".qodo/*",
+  ".venv/*",
+  "_logs/*",
+  "auxiliary/*",
+  "bin/*",
+  "build/*",
+  "css/*",
+  "docs/*",
+  "fonts/*",
+  "sources/*",
+  "tests/*",
+  "themes/*",
+  "updates/*"
+]
 make_whitelist = true
-paths = ["__main__.py", "utilities"]
-verbose = true
+paths = [
+  "./__main__.py",
+  "./utilities/"]
+sort_by_size = true
+verbose = false

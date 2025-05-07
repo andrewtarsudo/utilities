@@ -299,6 +299,7 @@ class GitFile:
         return URL(
             scheme=self._scheme,
             host=self._host,
+            port=self._port,
             path=self.path,
             query=self._query)
 
