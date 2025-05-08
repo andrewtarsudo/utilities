@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 if __name__ == '__main__':
@@ -7,13 +8,10 @@ if __name__ == '__main__':
 
     from click.termui import echo, pause
 
-    _old_file: str = r${old_file}
-    new_file: str = r${new_file}
     args: list[str] = ${args}
-    shell: str = r${shell}
 
-    old_file: Path = Path(_old_file).expanduser()
-    new_file: Path = Path(new_file).expanduser()
+    old_file: Path = Path(r${old_file}).expanduser()
+    new_file: Path = Path(r${new_file}).expanduser()
 
     sleep(5.0)
     break_flag: bool = False
@@ -30,18 +28,39 @@ if __name__ == '__main__':
         else:
             break_flag: bool = True
 
-    if attempts <= 0 and not break_flag:
+    def fail():
         echo(
             "Не удалось автоматически заменить старый exe-файл на новый ..."
             "\nРекомендуется заменить его вручную.")
-        pause(f"Новый файл находится по пути: {new_file}\nФайл для замены: {_old_file}")
+        pause(
+            f"Новый файл находится по пути: {new_file.as_posix()}"
+            f"\nФайл для замены: {old_file.as_posix()}")
+
+    if attempts <= 0 and not break_flag:
+        fail()
 
     else:
-        file: Path = new_file.rename(old_file)
-        file.chmod(0o775, follow_symlinks=True)
+        try:
+            file: Path = new_file.rename(old_file)
+            file.chmod(0o775, follow_symlinks=True)
 
-        echo("Исполняемый файл обновлен. Перезапуск файла...\n")
-        sleep(2.5)
+            echo("Исполняемый файл обновлен. Перезапуск файла...\n")
+            sleep(2.5)
 
-        echo(f"{shell=}\n{args=}")
-        execv(shell, args)
+            echo(f"{args=}")
+            execv(args[0], args)
+
+        except FileNotFoundError as e:
+            echo(f"Файл для переименования {e.filename} не найден")
+            fail()
+
+        except PermissionError as e:
+            echo(
+                f"{e.__class__.__name__}: недостаточно прав для чтения файла {e.filename}"
+                f"\nДоступ: {new_file.stat().st_mode}")
+            fail()
+
+        except OSError as e:
+            echo(f"Ошибка {e.__class__.__name__}: {e.strerror}")
+            fail()
+

@@ -17,8 +17,10 @@ from loguru import logger
 
 from utilities.common.custom_logger import custom_logging
 from utilities.common.errors import BaseError
-from utilities.common.functions import file_reader, file_reader_type, file_writer, get_shell, get_version, GitFile, is_macos, is_windows
-from utilities.common.shared import BASE_PATH, ENV_VAR, EXE_FILE, HELP, PRESS_ENTER_KEY, StrPath, TEMP_COMMAND_FILE, TEMP_DIR
+from utilities.common.functions import file_reader, file_reader_type, file_writer, get_shell, get_version, GitFile, \
+    is_macos, is_windows
+from utilities.common.shared import BASE_PATH, ENV_VAR, EXE_FILE, HELP, PRESS_ENTER_KEY, StrPath, TEMP_COMMAND_FILE, \
+    TEMP_DIR
 from utilities.scripts.api_group import APIGroup, get_full_help, print_version
 
 
@@ -136,17 +138,10 @@ def activate_runner(
     with open(runner_exe, "wb") as fw, open(runner, "r", encoding="utf-8", errors="ignore") as fr:
         template: Template = Template(fr.read())
 
-        shell: str = get_shell()
-        shell_path: str = which(shell)
-
-        if shell.lower() == "cmd":
-            shell_path: str = f"{shell_path} /c"
-
         kwargs: dict[str, str | list[str]] = {
             "old_file": f"\"{str(old_file)}\"",
             "new_file": f"\"{str(new_file)}\"",
-            "args": f"{get_command()}",
-            "shell": f"\"{shell_path}\""}
+            "args": f"{get_command()}"}
 
         data: str = template.safe_substitute(kwargs)
         fw.write(data.encode())
@@ -181,7 +176,9 @@ def record_command(args: Iterable[str]):
 
 def get_command() -> list[str]:
     command: str = file_reader(TEMP_COMMAND_FILE, "string")
-    return command.split()
+    args: list[str] = command.split()
+    args[0] = str(Path(args[0]).resolve().absolute())
+    return args
 
 
 @group(
@@ -264,19 +261,16 @@ def cli(debug: bool = False, skip_update: bool = False):
                 f"\nЧтобы включить, необходимо задать переменной {ENV_VAR} значение:"
                 "\n1 / \"1\" / \"True\" / true / \"yes\" / \"on\" в любом регистре.\n")
 
+        elif compare_versions():
+            logger.info("Версия актуальна")
+
         else:
-            version_diff: bool = compare_versions()
-
-            if version_diff:
-                logger.info("Версия актуальна")
-
-            else:
-                args: list[str] = sys.argv[:]
-                args[0]: str = str(EXE_FILE.resolve().absolute())
-                args.insert(1, "--no-update")
-                record_command(args)
-                check_updates()
-                logger.success("Исполняемый файл обновлен")
+            args: list[str] = sys.argv[:]
+            args[0]: str = str(EXE_FILE.resolve().absolute())
+            args.insert(1, "--no-update")
+            record_command(args)
+            check_updates()
+            logger.success("Исполняемый файл обновлен")
 
     except BaseError as e:
         logger.error(f"Ошибка {e.__class__.__name__}")
