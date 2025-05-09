@@ -5,7 +5,8 @@ from typing import Iterable, Iterator, NamedTuple
 
 from loguru import logger
 
-from utilities.common.errors import LinkRepairInternalLinkAnchorError, LinkRepairLineInvalidTypeError
+from utilities.common.errors import LinkRepairInternalLinkAnchorError, LinkRepairLineInvalidTypeError, \
+    LinkRepairTextFileInvalidPathError
 from utilities.common.functions import file_reader
 from utilities.common.shared import ADOC_EXTENSION, EXTENSIONS, MD_EXTENSION, StrPath
 from utilities.link_repair.const import FileLanguage, prepare_logging
@@ -499,6 +500,12 @@ def get_file(root_dir: StrPath, full_path: StrPath) -> MdFile | AsciiDocFile:
     elif full_path.suffix == ADOC_EXTENSION:
         return AsciiDocFile(root_dir, full_path)
 
+    else:
+        logger.error(
+            f"Указан некорректный путь до файла Markdown или AsciiDoc:"
+            f"\n{full_path}")
+        raise LinkRepairTextFileInvalidPathError
+
 
 # noinspection PyUnresolvedReferences
 class FileDict:
@@ -557,7 +564,7 @@ class FileDict:
                 logger.debug(f"Путь {file_path} уже добавлен")
                 return
 
-            if file_path.suffix in EXTENSIONS:
+            elif file_path.suffix in EXTENSIONS:
                 text_file: TextFile = get_file(self._root_dir, file_path)
 
                 text_file._content = file_reader(text_file.full_path, "lines", encoding="utf-8")

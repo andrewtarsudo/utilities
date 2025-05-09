@@ -81,7 +81,7 @@ class GitManager:
             logger.debug("Версия актуальна")
             return
 
-        logger.error(message)
+        logger.success(message)
         file_writer(self.TEMP_TERMS_VERSION, self._content_git_version.content)
         logger.debug("Файл с версией записан")
 

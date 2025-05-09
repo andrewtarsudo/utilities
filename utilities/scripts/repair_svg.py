@@ -9,6 +9,7 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
+from utilities.common.config import config_file
 from utilities.common.shared import HELP, StrPath
 from utilities.scripts.api_group import APIGroup
 from utilities.scripts.cli import cli
@@ -33,7 +34,7 @@ from utilities.scripts.list_files import get_files
     required=False,
     metavar="FILE ... FILE",
     shell_complete=file_completion,
-    default=None)
+    default=config_file.get_commands("repair-svg", "files"))
 @option(
     "-d", "--dir", "directory",
     type=ClickPath(
@@ -46,7 +47,7 @@ from utilities.scripts.list_files import get_files
     required=False,
     metavar="DIR",
     shell_complete=dir_completion,
-    default=None)
+    default=config_file.get_commands("repair-svg", "directory"))
 @option(
     "-r/-R", "--recursive/--no-recursive",
     type=BOOL,
@@ -55,7 +56,7 @@ from utilities.scripts.list_files import get_files
          "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
-    default=True)
+    default=config_file.get_commands("repair-svg", "recursive"))
 @option(
     "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
@@ -65,7 +66,7 @@ from utilities.scripts.list_files import get_files
          "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("repair-svg", "keep_logs"))
 @help_option(
     "-h", "--help",
     help=HELP,

@@ -2,13 +2,14 @@
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from utilities.common.config import config_file
 from utilities.common.functions import file_reader_type, pretty_print
 from utilities.common.shared import BASE_PATH
 
 
 class ArgsHelpDict(dict):
     def __init__(self):
-        config_path: Path = BASE_PATH.joinpath("sources/dict.yaml")
+        config_path: Path = BASE_PATH.joinpath(config_file.get_general("config_path"))
         content: dict[str, dict[str, str]] = file_reader_type(config_path, "yaml")
 
         super().__init__()

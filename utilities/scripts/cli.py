@@ -15,13 +15,17 @@ from click.types import BOOL
 from click.utils import echo
 from loguru import logger
 
+from utilities.common.config import config_file
 from utilities.common.custom_logger import custom_logging
 from utilities.common.errors import BaseError
 from utilities.common.functions import file_reader, file_reader_type, file_writer, get_shell, get_version, GitFile, \
     is_macos, is_windows
-from utilities.common.shared import BASE_PATH, ENV_VAR, EXE_FILE, HELP, PRESS_ENTER_KEY, StrPath, TEMP_COMMAND_FILE, \
-    TEMP_DIR
+from utilities.common.shared import BASE_PATH, EXE_FILE, HELP, PRESS_ENTER_KEY, StrPath
 from utilities.scripts.api_group import APIGroup, get_full_help, print_version
+
+ENV_VAR: str = config_file.get_update("env_var")
+TEMP_DIR: Path = Path(config_file.get_update("temp_dir")).expanduser()
+TEMP_COMMAND_FILE: Path = Path(config_file.get_update("temp_command_file")).expanduser()
 
 
 def set_env(*, timeout: float | None = 15.0):
@@ -95,7 +99,7 @@ def convert_value(value: int | str | bool):
         return True
 
 
-def compare_versions(project_id: int = 65722828):
+def compare_versions(project_id: int):
     git_file: GitFile = GitFile("pyproject.toml", project_id)
     git_file.download()
 
@@ -111,7 +115,7 @@ def compare_versions(project_id: int = 65722828):
         return current_version == latest_version
 
 
-def update_exe(exe_file_name: str, project_id: int = 65722828, **kwargs):
+def update_exe(exe_file_name: str, project_id: int, **kwargs):
     executable_file: GitFile = GitFile(exe_file_name, project_id, **kwargs)
     executable_file.download()
 
@@ -150,6 +154,7 @@ def activate_runner(
     return runner_exe
 
 
+# noinspection SpawnShellInjection
 def check_updates(**kwargs):
     if is_windows():
         exe_file_name: str = "bin/tw_utilities.exe"
@@ -169,8 +174,7 @@ def check_updates(**kwargs):
 
 def record_command(args: Iterable[str]):
     TEMP_COMMAND_FILE.touch(exist_ok=True)
-    line: str = " ".join([which(get_shell()), *args])
-    logger.error(f"{line=}")
+    line: str = " ".join(args)
     file_writer(TEMP_COMMAND_FILE, line)
 
 
@@ -185,13 +189,6 @@ def get_command() -> list[str]:
     cls=APIGroup,
     help="Набор скриптов для технических писателей")
 @option(
-    "--version",
-    is_flag=True,
-    expose_value=False,
-    is_eager=True,
-    help="Вывести версию скрипта на экран и завершить работу",
-    callback=print_version)
-@option(
     "--debug",
     type=BOOL,
     is_flag=True,
@@ -200,22 +197,29 @@ def get_command() -> list[str]:
     show_default=True,
     required=False,
     default=False,
-    hidden=True)
+    hidden=False)
 @option(
-    "-U", "--no-update", "skip_update",
+    "-u/-U", "--update/--no-update", "update",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг отключения автообновления."
-         "\nПо умолчанию: False, автообновление активно",
+    help="\b\nФлаг автообновления перед выполнением команды."
+         "\nПо умолчанию: True, автообновление активно",
     show_default=True,
     required=False,
-    default=False,
-    hidden=True)
+    default=True,
+    hidden=False)
+@option(
+    "--version",
+    is_flag=True,
+    expose_value=False,
+    is_eager=True,
+    help="Вывести версию скрипта на экран и завершить работу",
+    callback=print_version)
 @help_option(
     "-h", "--help",
     help=HELP,
     is_eager=True)
-def cli(debug: bool = False, skip_update: bool = False):
+def cli(debug: bool = False, update: bool = True):
     ctx: Context = get_current_context()
 
     try:
@@ -241,6 +245,7 @@ def cli(debug: bool = False, skip_update: bool = False):
         custom_logging("cli", is_debug=debug, result_file=result_file)
 
         env_var: Any = environ.get(ENV_VAR)
+        config_var: bool = config_file.get_update("auto_update")
 
         if env_var is None:
             env_update: bool = True
@@ -249,10 +254,13 @@ def cli(debug: bool = False, skip_update: bool = False):
         else:
             env_update: bool | None = convert_value(env_var)
 
-        if env_update is None:
+        if not config_var:
+            logger.debug("Автообновление отключено на уровне конфигурационного файла")
+
+        elif env_update is None:
             logger.debug("Автообновление отключено на уровне системы")
 
-        elif skip_update:
+        elif update:
             logger.debug("Автообновление отключено на уровне общей команды")
 
         elif not env_update:
@@ -261,7 +269,7 @@ def cli(debug: bool = False, skip_update: bool = False):
                 f"\nЧтобы включить, необходимо задать переменной {ENV_VAR} значение:"
                 "\n1 / \"1\" / \"True\" / true / \"yes\" / \"on\" в любом регистре.\n")
 
-        elif compare_versions():
+        elif compare_versions(config_file.get_update("project_id")):
             logger.info("Версия актуальна")
 
         else:
@@ -273,6 +281,6 @@ def cli(debug: bool = False, skip_update: bool = False):
             logger.success("Исполняемый файл обновлен")
 
     except BaseError as e:
-        logger.error(f"Ошибка {e.__class__.__name__}")
+        logger.error(f"Ошибка {e.__class__.__name__}: {str(e)}")
         pause(PRESS_ENTER_KEY)
         ctx.exit(1)

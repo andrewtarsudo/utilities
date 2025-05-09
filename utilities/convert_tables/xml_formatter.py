@@ -59,7 +59,7 @@ def get_run_text(r: Element) -> dict[str, list[Formatting]]:
     text: str = t.text if t is not None else ""
 
     if r_pr is None:
-        return {text: Formatting.NONE}
+        return {text: [Formatting.NONE]}
 
     _formats: list[str] = [*find_children(r_pr, tags)]
 

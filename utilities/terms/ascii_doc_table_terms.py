@@ -9,13 +9,16 @@ from more_itertools import pairwise
 from utilities.common.errors import TermsAsciiDocFileTableRowIndexError, TermsEmptyFileError, TermsInvalidTermIndexError
 from utilities.common.functions import file_reader
 from utilities.common.shared import StrPath
-from utilities.terms.table import TableCellCoordinate, TableItem, Term
+from utilities.terms.table import Coordinate, TableItem, Term
 
 
 class AsciiDocTableTerms:
     def __init__(self, lines: Iterable[str] = None):
+        if lines is None:
+            lines: list[str] = []
+
         self._content: list[str] = [*lines]
-        self._items: dict[TableCellCoordinate, TableItem] = {}
+        self._items: dict[Coordinate, TableItem] = {}
         self._dict_terms: dict[str, tuple[Term, ...]] = {}
 
     @classmethod
@@ -159,7 +162,7 @@ class AsciiDocTableTerms:
             _: list[str] = "".join(lines).split("|")
 
             for column_index, text in enumerate(_[1:]):
-                _key: TableCellCoordinate = TableCellCoordinate(row_index, column_index)
+                _key: Coordinate = Coordinate(row_index, column_index)
                 _value: TableItem = TableItem(row_index, column_index, text.strip("|"))
                 self._items[_key] = _value
 

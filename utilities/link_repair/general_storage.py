@@ -399,13 +399,13 @@ class Storage(GeneralStorage):
             component_storage.prepare()
             self._component_storages[_name] = component_storage
 
-    def get_component_storage(self, name: str) -> ComponentStorage:
+    def get_component_storage(self, name: str) -> ComponentStorage | None:
         """Gets the ComponentStorage instance by its name.
 
         :param name: The component storage name.
         :type name: str
-        :return: The ComponentStorage instance
-        :rtype: ComponentStorage
+        :return: The ComponentStorage instance if exists.
+        :rtype: ComponentStorage or None
         """
         if name not in self._component_storage_names:
             logger.debug(f"Компонента {name} не найдена")

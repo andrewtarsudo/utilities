@@ -48,9 +48,3 @@ def normalize_lines(lines: Iterable[str] = None, *, separator: str = "\t\t", ind
         formatted_lines.append(result_line)
 
     return "\n".join(formatted_lines)
-
-
-if __name__ == "__main__":
-    path: Path = Path(__file__).with_name("pretty_cli_input.txt")
-    content: list[str] = from_file(path)
-    print(normalize_lines(content, indent=2))

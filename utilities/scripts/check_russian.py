@@ -9,6 +9,7 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
+from utilities.common.config import config_file
 from utilities.common.functions import file_reader, is_windows, pretty_print
 from utilities.common.shared import HELP, separator, StrPath
 from utilities.scripts.api_group import APIGroup
@@ -65,20 +66,6 @@ def file_inspection(path: str, is_color: bool = True):
     cls=APIGroup,
     help="Команда для проверки наличия непереведенных слов")
 @option(
-    "-d", "--dir", "directory",
-    type=ClickPath(
-        exists=True,
-        file_okay=False,
-        resolve_path=True,
-        allow_dash=False,
-        dir_okay=True),
-    help="Директория для обработки",
-    multiple=False,
-    required=False,
-    metavar="DIR",
-    shell_complete=dir_completion,
-    default=None)
-@option(
     "-f", "--file", "files",
     type=ClickPath(
         exists=True,
@@ -92,7 +79,21 @@ def file_inspection(path: str, is_color: bool = True):
     required=False,
     metavar="FILE ... FILE",
     shell_complete=file_completion,
-    default=None)
+    default=config_file.get_commands("check-russian", "files"))
+@option(
+    "-d", "--dir", "directory",
+    type=ClickPath(
+        exists=True,
+        file_okay=False,
+        resolve_path=True,
+        allow_dash=False,
+        dir_okay=True),
+    help="Директория для обработки",
+    multiple=False,
+    required=False,
+    metavar="DIR",
+    shell_complete=dir_completion,
+    default=config_file.get_commands("check-russian", "directory"))
 @option(
     "-v/-q", "--verbose/--quiet",
     type=BOOL,
@@ -101,7 +102,7 @@ def file_inspection(path: str, is_color: bool = True):
          "\nПо умолчанию: False, выводятся только ошибки",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("check-russian", "verbose"))
 @option(
     "-r/-R", "--recursive/--no-recursive",
     type=BOOL,
@@ -110,7 +111,7 @@ def file_inspection(path: str, is_color: bool = True):
          "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
-    default=True)
+    default=config_file.get_commands("check-russian", "recursive"))
 @option(
     "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
@@ -120,7 +121,7 @@ def file_inspection(path: str, is_color: bool = True):
          "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("check-russian", "keep_logs"))
 @help_option(
     "-h", "--help",
     help=HELP,

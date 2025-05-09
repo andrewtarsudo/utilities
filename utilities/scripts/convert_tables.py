@@ -4,6 +4,7 @@ from click.decorators import argument, help_option, option, pass_context
 from click.termui import style
 from click.types import BOOL, Path as ClickPath
 
+from utilities.common.config import config_file
 from utilities.common.shared import HELP, StrPath
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument
@@ -39,7 +40,7 @@ from utilities.scripts.completion import doc_completion
     multiple=False,
     required=False,
     metavar="DIR_TABLES",
-    default="./tables/")
+    default=config_file.get_commands("convert-tables", "tables_dir"))
 @option(
     "-t", "--temp", "temp_dir",
     type=ClickPath(
@@ -53,7 +54,7 @@ from utilities.scripts.completion import doc_completion
     multiple=False,
     required=False,
     metavar="TEMP_DIR",
-    default="./_temp/")
+    default=config_file.get_commands("convert-tables", "temp_dir"))
 @option(
     "-e/-E", "--escape/--no-escape", "escape",
     type=BOOL,
@@ -61,7 +62,7 @@ from utilities.scripts.completion import doc_completion
          "\nПо умолчанию: True, добавление '\\' перед символами",
     show_default=True,
     required=False,
-    default=True)
+    default=config_file.get_commands("convert-tables", "escape"))
 @option(
     "-r/-R", "--remove/--no-remove", "remove",
     type=BOOL,
@@ -70,7 +71,7 @@ from utilities.scripts.completion import doc_completion
          "\nПо умолчанию: True, удаление всех лишних пробелов",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("convert-tables", "remove"))
 @option(
     "--fix/--no-fix", "fix",
     cls=MutuallyExclusiveOption,
@@ -82,7 +83,7 @@ from utilities.scripts.completion import doc_completion
          f"\nПриоритет выше, чем у опций {style('--escape', fg='magenta')} и {style('--remove', fg='magenta')}",
     show_default=True,
     required=False,
-    default=None)
+    default=config_file.get_commands("convert-tables", "fix"))
 @option(
     "--keep/--no-keep", "keep",
     cls=MutuallyExclusiveOption,
@@ -94,7 +95,7 @@ from utilities.scripts.completion import doc_completion
          f"\nПриоритет выше, чем у опций {style('--escape', fg='magenta')} и {style('--remove', fg='magenta')}",
     show_default=True,
     required=False,
-    default=None)
+    default=config_file.get_commands("convert-tables", "keep"))
 @option(
     "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
@@ -104,7 +105,7 @@ from utilities.scripts.completion import doc_completion
          "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("convert-tables", "keep_logs"))
 @help_option(
     "-h", "--help",
     help=HELP,

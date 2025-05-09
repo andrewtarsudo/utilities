@@ -9,6 +9,7 @@ from click.types import BOOL
 from click.utils import echo
 from loguru import logger
 
+from utilities.common.config import config_file
 from utilities.common.functions import file_reader, pretty_print
 from utilities.common.shared import BASE_PATH, HELP, PRESS_ENTER_KEY
 from utilities.scripts.api_group import MutuallyExclusiveOption, APIGroup
@@ -17,10 +18,10 @@ from utilities.terms.ascii_doc_table_terms import AsciiDocTableTerms
 from utilities.terms.git_manager import git_manager
 from utilities.terms.table import Term
 
-_SOURCES: Path = BASE_PATH.joinpath("sources")
-INFO_FILE: Path = _SOURCES.joinpath("help.txt")
-README_FILE: Path = _SOURCES.joinpath("readme.txt")
-SAMPLES_FILE: Path = _SOURCES.joinpath("samples.txt")
+SOURCES: Path = BASE_PATH.joinpath(config_file.get_commands("get-terms", "sources"))
+INFO_FILE: Path = SOURCES.joinpath(config_file.get_commands("get-terms", "info_file"))
+README_FILE: Path = SOURCES.joinpath(config_file.get_commands("get-terms", "readme_file"))
+SAMPLES_FILE: Path = SOURCES.joinpath(config_file.get_commands("get-terms", "samples_file"))
 
 
 # noinspection PyUnusedLocal
@@ -42,7 +43,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
 
 
 @cli.command(
-    "terms",
+    "get-terms",
     cls=APIGroup,
     help="Команда для вывода расшифровки аббревиатур")
 @argument(
@@ -60,7 +61,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     show_default=True,
     required=False,
     is_eager=True,
-    default=False)
+    default=config_file.get_commands("get-terms", "common_flag"))
 @option(
     "-f", "--full", "full_flag",
     is_flag=True,
@@ -70,7 +71,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     show_default=True,
     required=False,
     is_eager=True,
-    default=False)
+    default=config_file.get_commands("get-terms", "common_flag"))
 @option(
     "-i", "--info", "info_flag",
     is_flag=True,
@@ -81,7 +82,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     required=False,
     is_eager=True,
     callback=print_file,
-    default=False)
+    default=config_file.get_commands("get-terms", "common_flag"))
 @option(
     "-r", "--readme", "readme_flag",
     is_flag=True,
@@ -92,7 +93,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     required=False,
     is_eager=True,
     callback=print_file,
-    default=False)
+    default=config_file.get_commands("get-terms", "common_flag"))
 @option(
     "-s", "--samples", "samples_flag",
     is_flag=True,
@@ -103,7 +104,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     required=False,
     is_eager=True,
     callback=print_file,
-    default=False)
+    default=config_file.get_commands("get-terms", "common_flag"))
 @option(
     "--abbr", "abbr_flag",
     is_flag=True,
@@ -112,7 +113,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     help="\b\nФлаг вывода сокращения для добавления в файл Markdown.\nФормат: <abbr title=\"\"></abbr>",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("get-terms", "common_flag"))
 @option(
     "--ascii", "ascii_flag",
     is_flag=True,
@@ -121,7 +122,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     help="\b\nФлаг вывода сокращения для добавления в файл AsciiDoc.\nФормат: pass:q[<abbr title=\"\"></abbr>]",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("get-terms", "common_flag"))
 @option(
     "--common", "common_flag",
     is_flag=True,
@@ -130,7 +131,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     help="\b\nФлаг вывода сокращения в свободном виде",
     show_default=True,
     required=False,
-    default=True)
+    default=config_file.get_commands("get-terms", "common_flag"))
 @option(
     "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
@@ -140,13 +141,13 @@ def print_file(ctx: Context, param: Parameter, value: Any):
          "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("get-terms", "keep_logs"))
 @help_option(
     "-h", "--help",
     help=HELP,
     is_eager=True)
 @pass_context
-def terms_command(
+def get_terms_command(
         ctx: Context,
         terms: Iterable[str] = None, *,
         all_flag: bool = False,

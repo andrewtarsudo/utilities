@@ -9,8 +9,9 @@ from click.types import BOOL, Path as ClickPath, STRING
 from click.utils import echo
 from loguru import logger
 
+from utilities.common.config import config_file
 from utilities.common.functions import is_windows, pretty_print, walk_full
-from utilities.common.shared import HELP, PRESS_ENTER_KEY, StrPath
+from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.scripts.api_group import MutuallyExclusiveOption, SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
 from utilities.scripts.completion import dir_completion, file_completion
@@ -74,7 +75,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     metavar="DIR ... DIR",
     show_default=True,
     shell_complete=dir_completion,
-    default=["_temp_folder", "_temp_storage", "private"])
+    default=config_file.get_commands("list-files", "ignored_dirs"))
 @option(
     "--all-dirs", "all_dirs",
     cls=MutuallyExclusiveOption,
@@ -84,7 +85,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     multiple=False,
     required=False,
     show_default=True,
-    default=False)
+    default=config_file.get_commands("list-files", "all_dirs"))
 @option(
     "-f", "--ignored-files", "ignored_files",
     cls=MutuallyExclusiveOption,
@@ -98,7 +99,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     metavar="FILE ... FILE",
     show_default=True,
     shell_complete=file_completion,
-    default=["README", "_check_list"])
+    default=config_file.get_commands("list-files", "ignored_files"))
 @option(
     "--all-files", "all_files",
     cls=MutuallyExclusiveOption,
@@ -110,7 +111,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     multiple=False,
     required=False,
     show_default=True,
-    default=False)
+    default=config_file.get_commands("list-files", "all_files"))
 @option(
     "-e", "--extensions", "extensions",
     cls=MutuallyExclusiveOption,
@@ -122,7 +123,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     required=False,
     metavar="\"EXT ... EXT\"",
     show_default=True,
-    default="md adoc")
+    default=config_file.get_commands("list-files", "extensions"))
 @option(
     "--all-ext", "all_extensions",
     cls=MutuallyExclusiveOption,
@@ -134,7 +135,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     multiple=False,
     required=False,
     show_default=True,
-    default=False)
+    default=config_file.get_commands("list-files", "all_extensions"))
 @option(
     "-l", "--language", "language",
     cls=MutuallyExclusiveOption,
@@ -145,7 +146,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     required=False,
     metavar="LANG",
     show_default=True,
-    default=None)
+    default=config_file.get_commands("list-files", "language"))
 @option(
     "--all-langs", "all_languages",
     cls=MutuallyExclusiveOption,
@@ -156,7 +157,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     multiple=False,
     required=False,
     show_default=True,
-    default=True)
+    default=config_file.get_commands("list-files", "all_languages"))
 @option(
     "-i/-I", "--ignore-index/--keep-index", "ignore_index",
     type=BOOL,
@@ -165,7 +166,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
          "\nПо умолчанию: False, файл включается в список",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("list-files", "ignore_index"))
 @option(
     "-p", "--prefix", "prefix",
     type=STRING,
@@ -178,7 +179,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
     required=False,
     metavar="PFX",
     show_default=True,
-    default=None)
+    default=config_file.get_commands("list-files", "prefix"))
 @option(
     "-n/-N", "--no-prefix/--with-prefix", "no_prefix",
     type=BOOL,
@@ -189,7 +190,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
          "\nПримечание. Имеет приоритет над опцией --prefix",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("list-files", "no_prefix"))
 @option(
     "-H", "--hidden",
     type=BOOL,
@@ -198,7 +199,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
          "\nПо умолчанию: False, скрытые файлы игнорируются",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("list-files", "hidden"))
 @option(
     "-r/-R", "--recursive/--no-recursive",
     type=BOOL,
@@ -207,7 +208,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
          "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
-    default=True)
+    default=config_file.get_commands("list-files", "recursive"))
 @option(
     "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
@@ -217,7 +218,7 @@ def add_prefix(prefix: str, values: Iterable[StrPath] = None):
          "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("list-files", "keep_logs"))
 @help_option(
     "-h", "--help",
     help=HELP,
@@ -244,7 +245,7 @@ def list_files_command(
     root_dir: Path = root_dir.expanduser()
 
     if extensions is None and not all_extensions:
-        extensions: set[str] = {".md", ".adoc"}
+        extensions: set[str] = {MD_EXTENSION, ADOC_EXTENSION}
 
     elif extensions is None:
         extensions: set[str] = set()

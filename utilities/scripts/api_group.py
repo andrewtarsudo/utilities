@@ -10,21 +10,19 @@ from click.globals import get_current_context
 from click.shell_completion import CompletionItem
 from click.termui import pause, style
 from loguru import logger
+from more_itertools import flatten
 
+from utilities.common.config import config_file, ConfigFile
 from utilities.common.errors import BaseError, NoArgumentsOptionsError
 from utilities.common.functions import get_version, is_windows, pretty_print
 from utilities.common.shared import DEBUG, HELP, NORMAL, PRESS_ENTER_KEY, TEMP_DIR
 from utilities.scripts.args_help_dict import args_help_dict
 
-COL_MAX: int = 52
-MAX_CONTENT_WIDTH: int = 96
-TERMINAL_WIDTH: int = 96
+COL_MAX: int = config_file.get_general("col_max")
+MAX_CONTENT_WIDTH: int = config_file.get_general("max_content_width")
+TERMINAL_WIDTH: int = config_file.get_general("terminal_width")
 
 SEPARATOR: str = "-" * MAX_CONTENT_WIDTH
-
-
-def up(value: str):
-    return value.upper() if not value.startswith("--") else value
 
 
 def prepare_option(value: str, *, prefix: bool = True, remove_suffix: str | None = "-flag"):
@@ -43,10 +41,6 @@ def wrap_line(line: str):
         line: str = f"{line[:index + 1]}\n{wrap_line(line[index + 2:])}"
 
     return line
-
-
-def add_brackets(value: str):
-    return f"<{value}>"
 
 
 # noinspection PyUnusedLocal
@@ -122,13 +116,11 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     name: str = ctx.command_path.replace("__main__.py", f"tw_utilities{suffix}")
 
     if commands is not None and commands:
-        commands_str: str = wrap_line(" | ".join(map(add_brackets, commands)))
+        commands_str: str = wrap_line(" | ".join(f"<{command}>" for command in commands))
         formatter.write(
             f"{style('Использование', fg='bright_cyan', bold=True)}:"
-            f"\n{name}"
-            f"\n{commands_str}"
-            f"\n{wrap_line(opts_str)}"
-            f"\n{wrap_line(args_str)}\n")
+            f"\n{name} {wrap_line(opts_str)}"
+            f"\n{commands_str}\n")
 
     elif cmd.name != "help":
         formatter.write(
@@ -162,8 +154,7 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
         else:
             option_help: str = option_help[:_index]
 
-        finally:
-            return style(_, fg="cyan", bold=True), option_help
+        return style(_, fg="cyan", bold=True), option_help
 
     rows: list[tuple[str, str]] = []
 
@@ -188,6 +179,15 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
             formatter.write_dl(rows, col_max, col_spacing)
 
 
+def join_names(cmd: Command, aliases: dict[Command, set[str]]):
+    names: str = " / ".join(aliases.get(cmd)) if cmd in aliases else None
+
+    if names:
+        names: str = f" / {names}"
+
+    return f"{cmd.name}{names}"
+
+
 def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter = None) -> None:
     if parent is None:
         parent: Context = get_current_context()
@@ -198,16 +198,21 @@ def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter
     formatter.width = MAX_CONTENT_WIDTH
 
     commands: dict[str, Command] = getattr(cmd, "commands", dict())
+    aliases: dict[Command, set[str]] = getattr(cmd.__class__, "aliases", {})
 
     if commands:
+        dict_commands: dict[Command, str] = {
+            command: join_names(command, aliases)
+            for command in sorted(commands.values(), key=lambda x: x.name)
+            if not command.hidden}
+
         with formatter.section(style("Подкоманды", fg="green", bold=True)):
             rows: list[tuple[str, str]] = [
-                (style(sub.name, fg="green", bold=True), style(sub.help, fg="green", bold=True))
-                for sub in sorted(commands.values(), key=lambda x: x.name)
-                if not sub.hidden]
+                (style(v, fg="green", bold=True),
+                 style(k.help, fg="green", bold=True))
+                for k, v in dict_commands.items()]
 
-            sub_names: list[str] = [sub.name for sub in commands.values() if not sub.hidden]
-            col_spacing: int = COL_MAX - 2 * max(map(len, sub_names)) + 1
+            col_spacing: int = COL_MAX - 2 * max(map(len, dict_commands.values())) + 8
             col_max: int = MAX_CONTENT_WIDTH
 
             formatter.write_dl(rows, col_max, col_spacing)
@@ -318,6 +323,39 @@ def print_version(ctx: Context, param: Parameter, value: Any):
 
 
 class APIGroup(Group):
+    aliases: dict[Command, set[str]] = {}
+
+    @classmethod
+    def all_alias_names(cls) -> set[str]:
+        return set(flatten(cls.aliases.values()))
+
+    @classmethod
+    def from_alias(cls, cmd_name: str) -> Command | None:
+        for k, v in cls.aliases.items():
+            if cmd_name in v:
+                return k
+
+        else:
+            return None
+
+    def get_aliases(self, ctx: Context, cmd_name: str):
+        if cmd_name in self.list_commands(ctx):
+            cmd: Command = self.get_command(ctx, cmd_name)
+
+        elif cmd_name in self.__class__.all_alias_names():
+            cmd: Command = self.__class__.from_alias(cmd_name)
+
+        else:
+            raise KeyError
+
+        aliases: set[str] | None = self.__class__.aliases.get(cmd, None)
+
+        if aliases is None:
+            return f"{cmd.name}"
+
+        else:
+            return f"{cmd.name} / {' / '.join(aliases)}"
+
     def __init__(self, aliases: set[str] = None, **attrs: Any):
         kwargs: dict[str, bool] = {
             "invoke_without_command": True,
@@ -332,19 +370,23 @@ class APIGroup(Group):
         if aliases is None:
             aliases: set[str] = set()
 
-        self.aliases: set[str] = aliases
+        self.__class__.aliases[self] = aliases
+        self.config_file: ConfigFile = config_file
 
-    def add_command(self, cmd: Command, name: str | None = None) -> None:
-        aliases: set[str] = getattr(cmd, "aliases", set())
+    def get_command(self, ctx: Context, cmd_name: str) -> Command | None:
+        if cmd_name in self.list_commands(ctx):
+            return self.commands.get(cmd_name, None)
 
-        for alias in aliases:
-            self.add_command(cmd, alias)
+        elif cmd_name in self.__class__.all_alias_names():
+            return self.__class__.from_alias(cmd_name)
 
-        super().add_command(cmd, name=name)
+        else:
+            logger.error(f"Подкоманда {cmd_name} не найдена")
+            return None
 
     def format_help(self, ctx: Context, formatter: HelpFormatter) -> None:
         format_help(self, ctx, formatter)
-        self.format_epilog(ctx, formatter)
+        # self.format_epilog(ctx, formatter)
 
     def format_usage(self, ctx: Context, formatter: HelpFormatter) -> None:
         format_usage(self, ctx, formatter)
@@ -376,11 +418,15 @@ class APIGroup(Group):
             return super().parse_args(ctx, args)
 
     def invoke(self, ctx: Context) -> Any:
+        for param in self.params:
+            if isinstance(param, Option):
+                param.default = self.config_file.get_commands(ctx.invoked_subcommand, param.name)
+
         try:
             super().invoke(ctx)
 
         except BaseError as e:
-            logger.error(f"Ошибка {e.__class__.__name__}")
+            logger.error(f"Ошибка {e.__class__.__name__}, {str(e)}")
             pause(PRESS_ENTER_KEY)
             ctx.exit(1)
 
@@ -423,7 +469,11 @@ class TermsAPIGroup(APIGroup):
             args: list[str] = []
 
         else:
-            args: list[str] = list(map(up, args))
+            args: list[str] = [
+                value.upper()
+                if not value.startswith("--")
+                else value
+                for value in args]
 
             if all(not x.startswith("-") for x in args):
                 args.insert(0, '--common')

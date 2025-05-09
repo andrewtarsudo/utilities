@@ -47,6 +47,10 @@ class LinkRepairError(BaseError):
     """Base class for errors associated with the link-repair."""
 
 
+class LinkRepairTextFileInvalidPathError(LinkRepairError):
+    """Text file has an invalid extension."""
+
+
 class LinkRepairLineInvalidTypeError(LinkRepairError):
     """Line index type must be int and its value must be str."""
 
@@ -104,7 +108,7 @@ class FormatCodeNonIntegerLineLengthError(FormatCodeError):
 
 
 class TableColsError(BaseError):
-    """Base class for errors associated with the table_cols-cols."""
+    """Base class for errors associated with the table-cols."""
 
 
 class TableColsTableBorderNotClosedError(TableColsError):
@@ -145,3 +149,15 @@ class FileReaderTypeError(BaseError):
 
 class UpdateProjectIdError(BaseError):
     """Specified project_id is invalid."""
+
+
+class ConfigFileError(BaseError):
+    """Base class for errors associated with the config file sources/config.toml."""
+
+
+class ConfigFileGeneralKeyError(ConfigFileError):
+    """Specified key has not been found in the section 'general'."""
+
+
+class ConfigFileUpdateKeyError(ConfigFileError):
+    """Specified key has not been found in the section 'update'."""

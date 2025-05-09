@@ -47,7 +47,6 @@ if __name__ == '__main__':
             echo("Исполняемый файл обновлен. Перезапуск файла...\n")
             sleep(2.5)
 
-            echo(f"{args=}")
             execv(args[0], args)
 
         except FileNotFoundError as e:

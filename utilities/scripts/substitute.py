@@ -8,6 +8,7 @@ from click.decorators import help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
+from utilities.common.config import config_file
 from utilities.common.errors import FileReaderTypeError
 from utilities.common.functions import file_reader, file_reader_type, file_writer
 from utilities.common.shared import FileType, HELP, StrPath
@@ -17,14 +18,14 @@ from utilities.scripts.list_files import get_files
 
 
 def substitute(replace_table: Mapping[str, str], file: StrPath, dry_run: bool = False):
-    logger.info(f"Обработка файла {file}:")
+    logger.debug(f"Обработка файла {file}:")
 
     lines: list[str] = file_reader(file, "lines")
 
     def repl(m: Match):
         if m.group(1) in replace_table:
             substitution: str = replace_table.get(m.group(1))
-            logger.info(f"Замена {m.group(1)} -> {substitution}")
+            logger.debug(f"Замена {m.group(1)} -> {substitution}")
             return substitution
 
         else:
@@ -66,7 +67,7 @@ def substitute(replace_table: Mapping[str, str], file: StrPath, dry_run: bool = 
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
-    default=None)
+    default=config_file.get_commands("substitute", "files"))
 @option(
     "-d", "--dir", "directory",
     type=ClickPath(
@@ -78,7 +79,7 @@ def substitute(replace_table: Mapping[str, str], file: StrPath, dry_run: bool = 
     multiple=False,
     required=False,
     metavar="DIR",
-    default=None)
+    default=config_file.get_commands("substitute", "directory"))
 @option(
     "--dry-run/--no-dry-run",
     type=BOOL,
@@ -87,7 +88,7 @@ def substitute(replace_table: Mapping[str, str], file: StrPath, dry_run: bool = 
          "По умолчанию: False, файлы перезаписываются",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("substitute", "dry_run"))
 @option(
     "-r/-R", "--recursive/--no-recursive",
     type=BOOL,
@@ -96,7 +97,7 @@ def substitute(replace_table: Mapping[str, str], file: StrPath, dry_run: bool = 
          "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
-    default=True)
+    default=config_file.get_commands("substitute", "recursive"))
 @option(
     "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
@@ -106,7 +107,7 @@ def substitute(replace_table: Mapping[str, str], file: StrPath, dry_run: bool = 
          "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("substitute", "keep_logs"))
 @help_option(
     "-h", "--help",
     help=HELP,

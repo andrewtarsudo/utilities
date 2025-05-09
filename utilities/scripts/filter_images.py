@@ -7,6 +7,7 @@ from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
+from utilities.common.config import config_file
 from utilities.common.functions import file_reader, file_writer, pretty_print
 from utilities.common.shared import HELP, INDEX_STEMS, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
@@ -37,7 +38,7 @@ class File:
 
 
 class MdFile(File):
-    pattern = r"!\[.*?\]\((.+?)\)"
+    pattern: str = r"!\[.*?\]\((.+?)\)"
 
     @property
     def full_links(self):
@@ -48,7 +49,7 @@ class MdFile(File):
 
 
 class AsciiDocFile(File):
-    pattern = r"image:+(.+?)\[.*?\]"
+    pattern: str = r"image:+(.+?)\[.*?\]"
 
     @property
     def imagesdir(self):
@@ -92,7 +93,7 @@ class AsciiDocFile(File):
          "\nПо умолчанию: False, файлы удаляются",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("filter-images", "dry_run"))
 @option(
     "-o", "--output", "output",
     type=ClickPath(
@@ -105,7 +106,7 @@ class AsciiDocFile(File):
     multiple=False,
     required=False,
     metavar="FILE",
-    default=None)
+    default=config_file.get_commands("filter-images", "output"))
 @option(
     "-r/-R", "--recursive/--no-recursive",
     type=BOOL,
@@ -114,7 +115,7 @@ class AsciiDocFile(File):
          "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
-    default=True)
+    default=config_file.get_commands("filter-images", "recursive"))
 @option(
     "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
@@ -124,7 +125,7 @@ class AsciiDocFile(File):
          "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("filter-images", "keep_logs"))
 @help_option(
     "-h", "--help",
     help=HELP,

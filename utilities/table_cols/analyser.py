@@ -20,7 +20,7 @@ The general steps:
 
 from loguru import logger
 
-from utilities.common.shared import COEFFICIENT, MAX_SYMBOLS, MIN_COLUMN
+from utilities.common.config import config_file
 from utilities.table_cols.column import TableColumnParameters
 
 
@@ -29,10 +29,10 @@ class TableAnalyser:
 
     def __init__(self, *, max_symbols: int = None, min_column: int = None):
         if max_symbols is None:
-            max_symbols: int = MAX_SYMBOLS
+            max_symbols: int = config_file.get_commands("set-table-cols", "max_symbols")
 
         if min_column is None:
-            min_column: int = MIN_COLUMN
+            min_column: int = config_file.get_commands("set-table-cols", "min_column")
 
         self._max_symbols: int = max_symbols
         self._min_column: int = min_column
@@ -42,7 +42,7 @@ class TableAnalyser:
         self._table_id: str | None = None
 
     def adjust(self):
-        self._max_symbols -= int(len(self) * COEFFICIENT)
+        self._max_symbols -= int(len(self) * config_file.get_commands("set-table-cols", "coefficient"))
 
     def nullify(self):
         """Deallocates the used resources."""

@@ -47,5 +47,6 @@ themes/
 css/
 pyinstaller.log
 flake8.txt
+vulture.txt
 _temp/
 .qodo/

@@ -17,6 +17,7 @@ else:
     EXE_FILE: Path = BASE_PATH.joinpath(f"bin/tw_utilities{SUFFIX}")
 
 StrPath: TypeAlias = str | Path
+ConfigType: TypeAlias = dict[str, None | str | int | dict[str, str | int | float | bool | list[str]]]
 MD_EXTENSION: str = ".md"
 ADOC_EXTENSION: str = ".adoc"
 EXTENSIONS: tuple[str, ...] = (MD_EXTENSION, ADOC_EXTENSION)
@@ -26,18 +27,10 @@ separator: str = "=" * 100
 DEBUG: Path = Path.cwd().joinpath("_logs/cli_debug.log")
 NORMAL: Path = Path("~/Desktop/_logs/cli_debug.log").expanduser().resolve()
 
-MAX_SYMBOLS: int = 72
-MIN_COLUMN: int = 5
-COEFFICIENT: float = 1.0
-
-MAX_LENGTH: int = 84
-
 ReaderMode: Type[str] = Literal["string", "lines"]
 FileType: Type[str] = Literal["json", "yaml", "toml"]
 
 INDEX_STEMS: tuple[str, ...] = ("index", "_index")
-
-ENV_VAR: str = "_TW_UTILITIES_UPDATE"
 
 TEMP_DIR: Path = Path.home().joinpath("_temp/")
 TEMP_COMMAND_FILE: Path = TEMP_DIR.joinpath("input_command")

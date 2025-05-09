@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
-from typing import NamedTuple
+from typing import Any, Callable, NamedTuple
+
+
+def check_bool(func: Callable):
+    def wrapper(obj: Any, *args, **kwargs):
+        if bool(obj):
+            return "Не найдено"
+        return func(obj, *args, **kwargs)
+
+    return wrapper
 
 
 class Term(NamedTuple):
@@ -9,8 +18,9 @@ class Term(NamedTuple):
     commentary: str | None = None
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}(short={self.short}, full={self.full}, rus={self.rus}, " \
-               f"commentary={self.commentary})>"
+        return (
+            f"<{self.__class__.__name__}"
+            f"(short={self.short}, full={self.full}, rus={self.rus}, commentary={self.commentary})>")
 
     def __str__(self):
         return f"{self.short}\n{self.full}, {self.rus} -- {self.commentary}"
@@ -38,36 +48,26 @@ class Term(NamedTuple):
             2: f"{self.rus}",
             3: f"{self.full}, {self.rus}",
             4: f"{self.commentary}",
-            5: f"{self.full} — {self.commentary}",
-            6: f"{self.rus} — {self.commentary}",
-            7: f"{self.full}, {self.rus} — {self.commentary}"}
+            5: f"{self.full} -- {self.commentary}",
+            6: f"{self.rus} -- {self.commentary}",
+            7: f"{self.full}, {self.rus} -- {self.commentary}"}
 
         return _.get(self._formatting_type(), "")
 
+    @check_bool
     def abbr(self) -> str:
-        if bool(self):
-            return "Не найдено"
+        return f"<abbr title=\"{self.full}\">{self.short}</abbr>"
 
-        else:
-            return f'<abbr title="{self.full}">{self.short}</abbr>'
-
+    @check_bool
     def adoc(self) -> str:
-        if bool(self):
-            return "Не найдено"
+        return f":{self.short.lower()}: pass:[<abbr title=\"{self.full}\">{self.short}</abbr>]"
 
-        else:
-            return f':{self.short.lower()}: {self.short}\n' \
-                   f':{self.short.lower()}: pass:[<abbr title="{self.full}">{self.short}</abbr>]'
-
+    @check_bool
     def formatted(self) -> str:
-        if bool(self):
-            return "Не найдено"
-
-        else:
-            return f"{self.short}\n{self._formatting_description()}"
+        return f"{self.short}\n{self._formatting_description()}"
 
 
-class TableCellCoordinate(NamedTuple):
+class Coordinate(NamedTuple):
     row_index: int
     column_index: int
 
@@ -153,8 +153,8 @@ class TableItem(NamedTuple):
     text: str | None = None
 
     @property
-    def coord(self) -> TableCellCoordinate:
-        return TableCellCoordinate(self.row_index, self.column_index)
+    def coord(self) -> Coordinate:
+        return Coordinate(self.row_index, self.column_index)
 
     def __str__(self):
         return f"{self.text}"

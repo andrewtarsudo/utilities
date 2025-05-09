@@ -7,13 +7,16 @@ from click.decorators import help_option, option, pass_context
 from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
+from utilities.common.config import config_file
 from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatCodeNonPositiveLineLengthError
 from utilities.common.functions import file_reader, file_writer, pretty_print
-from utilities.common.shared import ADOC_EXTENSION, HELP, MAX_LENGTH, MD_EXTENSION, StrPath
+from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, StrPath
 from utilities.scripts.api_group import APIGroup
 from utilities.scripts.cli import cli
 from utilities.scripts.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
+
+MAX_LENGTH: int = config_file.get_commands("format-code", "length")
 
 
 @cli.command(
@@ -33,7 +36,7 @@ from utilities.scripts.list_files import get_files
     required=False,
     metavar="FILE ... FILE",
     shell_complete=file_completion,
-    default=None)
+    default=config_file.get_commands("format-code", "files"))
 @option(
     "-d", "--dir", "directory",
     type=ClickPath(
@@ -46,7 +49,7 @@ from utilities.scripts.list_files import get_files
     required=False,
     metavar="DIR",
     shell_complete=dir_completion,
-    default=None)
+    default=config_file.get_commands("format-code", "directory"))
 @option(
     "-l", "--length",
     type=INT,
@@ -55,7 +58,7 @@ from utilities.scripts.list_files import get_files
     multiple=False,
     required=False,
     metavar="LEN",
-    default=MAX_LENGTH)
+    default=config_file.get_commands("format-code", "length"))
 @option(
     "-r/-R", "--recursive/--no-recursive",
     type=BOOL,
@@ -64,7 +67,7 @@ from utilities.scripts.list_files import get_files
          "\nПо умолчанию: True, вложенные файлы учитываются",
     show_default=True,
     required=False,
-    default=True)
+    default=config_file.get_commands("format-code", "recursive"))
 @option(
     "-k/-K", "--keep-logs/--remove-logs",
     type=BOOL,
@@ -74,7 +77,7 @@ from utilities.scripts.list_files import get_files
          "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("format-code", "keep_logs"))
 @help_option(
     "-h", "--help",
     help=HELP,

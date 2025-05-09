@@ -26,6 +26,7 @@ def is_macos() -> bool:
     return platform.startswith("darwin")
 
 
+@cache
 def get_version():
     content: dict[str, dict[str, str]] = file_reader_type(BASE_PATH.joinpath("pyproject.toml"), "toml")
     return content["project"]["version"]
@@ -199,14 +200,14 @@ def check_path(
     conditions: list[bool] = [
         is_dir, is_in_ignored_dirs, has_ignored_name, is_in_ignored_files, has_ignored_extension, has_ignored_language]
 
-    logger.debug(
-        f"Проверка пути {path}:"
-        f"\nis_dir = {is_dir}"
-        f"\nis_in_ignored_dirs = {is_in_ignored_dirs}"
-        f"\nhas_ignored_name = {has_ignored_name}"
-        f"\nis_in_ignored_files = {is_in_ignored_files}"
-        f"\nhas_ignored_extension = {has_ignored_extension}"
-        f"\nhas_ignored_language = {has_ignored_language}\n")
+    # logger.debug(
+    #     f"Проверка пути {path}:"
+    #     f"\nis_dir = {is_dir}"
+    #     f"\nis_in_ignored_dirs = {is_in_ignored_dirs}"
+    #     f"\nhas_ignored_name = {has_ignored_name}"
+    #     f"\nis_in_ignored_files = {is_in_ignored_files}"
+    #     f"\nhas_ignored_extension = {has_ignored_extension}"
+    #     f"\nhas_ignored_language = {has_ignored_language}\n")
 
     return not any(conditions)
 
