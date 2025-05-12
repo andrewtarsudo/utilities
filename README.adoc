@@ -40,12 +40,12 @@ link:docs/README_convert_tables.adoc#convert-tables[convert-tables]:: коман
 link:docs/README_filter_images.adoc#filter-images[filter-images]:: команда для удаления неиспользуемых изображений
 link:docs/README_format_code.adoc#format-code[format-code]:: команда для форматирования блоков кода
 link:docs/README_help.adoc#help[help]:: команда для вывода полной справочной информации
-link:docs/README_link_repair.adoc#link-repair[link-repair]:: команда для исправления ссылок в проекте
+link:docs/README_repair_links.adoc#repair-links[repair-links]:: команда для исправления ссылок в проекте
 link:docs/README_list_files.adoc#list-files[list-files]:: команда для вывода файлов в директории с использованием ряда фильтров
-link:docs/README_reduce_image.adoc#reduce-image[reduce-image]:: команда для сжатия файлов изображений
+link:docs/README_reduce_images.adoc#reduce-image[reduce-image]:: команда для сжатия файлов изображений
 link:docs/README_repair_svg.adoc#repair-svg[repair-svg]:: команда для корректирования SVG-файлов
-link:docs/README_table_cols.adoc#table-cols[table-cols]:: команда для задания ширин столбцов таблиц в файлах AsciiDoc
-link:docs/README_terms.adoc#terms[terms]:: команда для получения расшифровок аббревиатур
+link:docs/README_set_table_cols.adoc#set-table-cols[set-table-cols]:: команда для задания ширин столбцов таблиц в файлах AsciiDoc
+link:docs/README_get_terms.adoc#get-terms[get-terms]:: команда для получения расшифровок аббревиатур
 link:docs/README_validate_yaml.adoc#validate-yaml[validate-yaml]:: команда для валидации YAML-файлов, используемых для генерации PDF
 
 Вся документация для скриптов выше лежит в директории link:docs/[docs/].
@@ -70,40 +70,43 @@ $ <path/to/{name}> COMMAND OPTIONS
 [source,console,subs="attributes+,macros+"]
 ----
 Использование:
-{name}
-Использование:
-tw_utilities
+{name} --debug | -u/--update | --version | --h/--help
 <list-files> | <check-russian> | <convert-tables> | <filter-images> | <format-code> | <help> |
-<link-repair> | <reduce-image> | <repair-svg> | <table-cols> | <terms> | <validate-yaml>
---version | --h/--help
-
+<repair-links> | <reduce-images> | <repair-svg> | <substitute> | <set-table-cols> | <get-terms> |
+<validate-yaml>
 
   Набор скриптов для технических писателей
 
 Опции:
-  --version                             Вывести версию скрипта на экран и завершить работу
-  -h, --help                            Вывести справочную информацию на экран и завершить
-                                        работу
+  --debug                                Флаг активации режима отладки.
+                                         По умолчанию: False, режим отключен
+  -u, --update / -U, --no-update         Флаг автообновления перед выполнением команды.
+                                         По умолчанию: True, автообновление активно
+  --version                              Вывести версию скрипта на экран и завершить работу
+  -h, --help                             Вывести справочную информацию на экран и завершить
+                                         работу
 
 Подкоманды:
-  check-russian                         Команда для проверки наличия непереведенных
-                                        слов
-  convert-tables                        Команда для корректного извлечения таблиц из
-                                        файлов docx в формат Markdown
-  filter-images                         Команда для удаления неиспользуемых
-                                        изображений
-  format-code                           Команда для форматирования блоков кода
-  help                                  Команда для вызова полной справки
-  link-repair                           Команда для проверки и исправления ссылок в
-                                        файлах документации
-  list-files                            Команда для вывода файлов в директории
-  reduce-image                          Команда для уменьшения размера изображений JPG,
-                                        PNG
-  repair-svg                            Команда для исправления файлов SVG
-  table-cols                            Команда для задания ширины столбцам таблиц
-  terms                                 Команда для вывода расшифровки аббревиатур
-  validate-yaml                         Команда для валидации YAML-файла, используемого
-                                        при генерации PDF
+  check-russian                          Команда для проверки наличия непереведенных
+                                         слов
+  convert-tables                         Команда для корректного извлечения таблиц из
+                                         файлов docx в формат Markdown
+  filter-images                          Команда для удаления неиспользуемых
+                                         изображений
+  format-code                            Команда для форматирования блоков кода
+  get-terms                              Команда для вывода расшифровки аббревиатур
+  help                                   Команда для вызова полной справки
+  list-files                             Команда для вывода файлов в директории
+  reduce-images                          Команда для уменьшения веса изображений JPG,
+                                         PNG
+  repair-links                           Команда для проверки и исправления ссылок в
+                                         файлах документации
+  repair-svg                             Команда для исправления файлов SVG
+  set-table-cols                         Команда для задания ширины столбцам таблиц
+  substitute                             Команда для замены переменных на их
+                                         значения
+  validate-yaml / check                  Команда для валидации YAML-файла,
+                                         используемого при генерации PDF
 ----
 
 === Примеры
@@ -143,7 +146,7 @@ $ {name} convert-tables "..\Word File.docx"
 [source,bash,subs="attributes+"]
 ----
 $ {name} <command> <ARGUMENT> <ARGUMENT> <ARGUMENT>
-$ {name} terms CAP MAP ISUP
+$ {name} get_terms CAP MAP ISUP
 ----
 +
 * Вызов команды с опциями с единственными значениями
@@ -209,22 +212,24 @@ include::docs/README_filter_images.adoc[]
 
 include::docs/README_format_code.adoc[]
 
-include::docs/README_help.adoc[]
+include::docs/README_get_terms.adoc[]
 
-include::docs/README_link_repair.adoc[]
+include::docs/README_help.adoc[]
 
 include::docs/README_list_files.adoc[]
 
-include::docs/README_reduce_image.adoc[]
+include::docs/README_reduce_images.adoc[]
+
+include::docs/README_repair_links.adoc[]
 
 include::docs/README_repair_svg.adoc[]
 
+include::docs/README_set_table_cols.adoc[]
+
 include::docs/README_substitute.adoc[]
 
-include::docs/README_table_cols.adoc[]
-
-include::docs/README_terms.adoc[]
-
 include::docs/README_validate_yaml.adoc[]
+
+include::docs/README_config_file.adoc[]
 
 :leveloffset: -1

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from utilities.table_cols.column import TableColumnParameters
+from utilities.set_table_cols.column import TableColumnParameters
 
 
 class TableAnalyser:

@@ -12,7 +12,7 @@ from click.termui import pause, style
 from loguru import logger
 from more_itertools import flatten
 
-from utilities.common.config import config_file, ConfigFile
+from utilities.common.config_file import config_file, ConfigFile
 from utilities.common.errors import BaseError, NoArgumentsOptionsError
 from utilities.common.functions import get_version, is_windows, pretty_print
 from utilities.common.shared import DEBUG, HELP, NORMAL, PRESS_ENTER_KEY, TEMP_DIR
@@ -255,9 +255,8 @@ def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
 
         keys: list[str] = [item.removesuffix(".exe") for item in ctx.command_path.split(" ")]
         rows: list[tuple[str, str]] = [
-            (
-                f"{style(arg.name, fg='cyan', bold=True)} {asterisk}",
-                args_help_dict.get_multiple_keys(keys=keys).get(arg.name))
+            (f"{style(arg.name, fg='cyan', bold=True)} {asterisk}",
+             args_help_dict.get_multiple_keys(keys=keys).get(arg.name))
             for arg in args]
 
         args_names: list[str] = [arg.name for arg in args]
@@ -419,7 +418,7 @@ class APIGroup(Group):
 
     def invoke(self, ctx: Context) -> Any:
         for param in self.params:
-            if isinstance(param, Option):
+            if isinstance(param, Option) and param.default:
                 param.default = self.config_file.get_commands(ctx.invoked_subcommand, param.name)
 
         try:

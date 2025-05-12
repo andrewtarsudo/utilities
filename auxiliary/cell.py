@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from utilities.table_cols.coordinate import TableCoordinate
+from utilities.set_table_cols.coordinate import TableCoordinate
 
 
 class TableCell:
-    """Class to represent the table_cols cell."""
+    """Class to represent the set_table_cols cell."""
 
     def __init__(
             self,

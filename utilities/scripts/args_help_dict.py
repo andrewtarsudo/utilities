@@ -2,7 +2,7 @@
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from utilities.common.config import config_file
+from utilities.common.config_file import config_file
 from utilities.common.functions import file_reader_type, pretty_print
 from utilities.common.shared import BASE_PATH
 

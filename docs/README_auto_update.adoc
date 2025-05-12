@@ -81,6 +81,20 @@ $ echo "_TW_UTILITIES_UPDATE=0" >> ~/.bashrc;
 $ source ~/.bashrc
 ----
 +
+. Использовать опцию -U/--no-update в команде:
+* Windows:
++
+[source,powershell]
+----
+.\tw_utilities.exe  --no-update <command> <options>
+----
+* ++*++nix:
++
+[source,shell]
+----
+$ tw_utilities --no-update <command> <options>
+----
++
 . Разорвать соединение с Интернетом, чтобы запросы к репозиторию git были неуспешными.
 
 [CAUTION]

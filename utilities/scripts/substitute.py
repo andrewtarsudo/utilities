@@ -8,7 +8,7 @@ from click.decorators import help_option, option, pass_context
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
-from utilities.common.config import config_file
+from utilities.common.config_file import config_file
 from utilities.common.errors import FileReaderTypeError
 from utilities.common.functions import file_reader, file_reader_type, file_writer
 from utilities.common.shared import FileType, HELP, StrPath

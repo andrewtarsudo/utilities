@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import Iterable, Iterator, Mapping
 
-from utilities.table_cols.column import TableColumn
+from utilities.set_table_cols.column import TableColumn
 
 
 class Table:

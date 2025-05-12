@@ -1,7 +1,7 @@
 [general]
 separator = "===================================================================================================="
 debug_log_folder = "_logs/cli_debug.log"
-log_folder = "~/Desktop/_logs/cli_debug.log"
+log_path = "~/Desktop/_logs/cli_debug.log"
 config_path = "sources/dict.yaml"
 col_max = 52
 max_content_width = 96
@@ -15,6 +15,7 @@ temp_command_file = "~/_temp/input_command"
 project_id = 65722828
 
 [commands.shared]
+debug = false
 directory = "!None"
 files = []
 verbose = false

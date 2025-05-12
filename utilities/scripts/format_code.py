@@ -7,7 +7,7 @@ from click.decorators import help_option, option, pass_context
 from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
-from utilities.common.config import config_file
+from utilities.common.config_file import config_file
 from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatCodeNonPositiveLineLengthError
 from utilities.common.functions import file_reader, file_writer, pretty_print
 from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, StrPath

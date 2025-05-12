@@ -15,7 +15,7 @@ from auxiliary.coordinate import TableCoordinate
 
 
 class Table:
-    """Class to represent the AsciiDoc table_cols."""
+    """Class to represent the AsciiDoc set_table_cols."""
 
     def __init__(
             self,
@@ -38,7 +38,7 @@ class Table:
         self._table_cells: dict[TableCoordinate, TableCell] = {}
 
     def has_horizontal_span(self):
-        """Detects if the table_cols has span cells.
+        """Detects if the set_table_cols has span cells.
 
         At the time such tables are skipped since they require separate algorithm to determine the rows.
         """
@@ -95,13 +95,13 @@ class Table:
         self._table_cells.clear()
 
     def content(self) -> str:
-        """Gets the table_cols content as a string."""
+        """Gets the set_table_cols content as a string."""
         return "\n".join(self._lines)
 
     def define_cells(self):
-        """Divides the table_cols into cells.
+        """Divides the set_table_cols into cells.
 
-        Returns if the table_cols is valid and proper to continue processing.
+        Returns if the set_table_cols is valid and proper to continue processing.
         """
         # if some part of text looks similar to the table_cols but is not a table_cols
         if not self.num_columns:
@@ -147,7 +147,7 @@ class Table:
             self._table_cells[table_coordinate] = table_cell
 
     def options_str(self) -> str:
-        """Gets the string of table_cols options."""
+        """Gets the string of set_table_cols options."""
         if not self._options:
             return ""
 
@@ -186,7 +186,7 @@ class Table:
         return Counter(self[0]).get("|")
 
     def get_column_item(self, column: int | str) -> TableColumn:
-        """Gets the table_cols column as TableColumn instance."""
+        """Gets the set_table_cols column as TableColumn instance."""
         if isinstance(column, int):
             if 0 <= column < self.num_columns:
                 table_cells: list[TableCell] = [
@@ -215,7 +215,7 @@ class Table:
             raise TableColsTableColumnInvalidIdentifierError
 
     def iter_column_items(self) -> Iterator['TableColumn']:
-        """Iterates over the table_cols columns.
+        """Iterates over the set_table_cols columns.
 
         Used for specifying the column widths if activated.
         """

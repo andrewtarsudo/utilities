@@ -6,15 +6,15 @@ from click.decorators import help_option, option, pass_context
 from click.types import BOOL, INT, Path as ClickPath
 from loguru import logger
 
-from utilities.common.config import config_file
+from utilities.common.config_file import config_file
 from utilities.common.functions import file_reader
 from utilities.common.shared import HELP, StrPath
 from utilities.scripts.api_group import APIGroup
 from utilities.scripts.cli import cli
 from utilities.scripts.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
-from utilities.table_cols.analyser import TableAnalyser
-from utilities.table_cols.file import AsciiDocFile
+from utilities.set_table_cols.analyser import TableAnalyser
+from utilities.set_table_cols.file import AsciiDocFile
 
 MAX_SYMBOLS: int = config_file.get_commands("set-table-cols", "max_symbols")
 MIN_COLUMN: int = config_file.get_commands("set-table-cols", "min_column")

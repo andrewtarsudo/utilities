@@ -7,7 +7,7 @@ from utilities.common.errors import TableColsTableCoordinateInitError
 
 
 class TableCoordinate(NamedTuple):
-    """Class to represent the cell coordinates in the table_cols.
+    """Class to represent the cell coordinates in the set_table_cols.
 
     At the time a bit over-complicated since there is no need to compare or order cells,
     but may be used in other scripts.
@@ -41,9 +41,9 @@ class TableCoordinate(NamedTuple):
 
     @classmethod
     def as_element(cls, number: int, num_columns: int):
-        """Generates the coordinate from the table_cols index.
+        """Generates the coordinate from the set_table_cols index.
 
-        :param number: The table_cols cell index.
+        :param number: The set_table_cols cell index.
         :type number: int
         :param num_columns: The number of columns.
         :type num_columns: int
@@ -57,12 +57,12 @@ class TableCoordinate(NamedTuple):
             raise TableColsTableCoordinateInitError
 
     def shift(self, row_offset: int = 0, column_offset: int = 0):
-        """Generates the table_cols coordinates displaced from the given one.
+        """Generates the set_table_cols coordinates displaced from the given one.
 
         :param row_offset: The number of rows to displace downwards. To displace upwards, use negative value.
         :type row_offset: int (default: 0)
         :param column_offset: The number of rows to displace to the right. To displace to the left, use negative value.
         :type column_offset: int (default: 0)
-        :return: The new instance with the specified place in the table_cols grid.
+        :return: The new instance with the specified place in the set_table_cols grid.
         """
         return TableCoordinate(self.row + row_offset, self.column + column_offset)

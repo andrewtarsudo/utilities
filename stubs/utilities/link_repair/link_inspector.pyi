@@ -2,9 +2,9 @@
 from pathlib import Path
 
 from utilities.common.shared import StrPath
-from utilities.link_repair.file_dict import DirFile, FileDict, TextFile
-from utilities.link_repair.general_storage import GeneralStorage, Storage
-from utilities.link_repair.link import Link
+from utilities.repair_links.file_dict import DirFile, FileDict, TextFile
+from utilities.repair_links.general_storage import GeneralStorage, Storage
+from utilities.repair_links.link import Link
 
 
 def get_options(path: StrPath) -> tuple[str, ...]: ...

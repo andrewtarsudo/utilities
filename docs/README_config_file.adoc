@@ -1,0 +1,477 @@
+[[config-file]]
+= Конфигурационный файл
+:imagesdir: images
+:stylesdir: ../css
+:stylesheet: default.css
+:toc-title: Содержание
+:pdf-themesdir: themes
+:pdf-theme: base-theme.yml
+:asciidoctorconfigdir: ../
+:experimental:
+:icons: font
+:table-caption: Таблица
+
+Возможно изменить значения по умолчанию для вызываемых команд.
+
+Файл конфигурации config.toml / config.yaml проверяется по пути:
+
+[horizontal]
+Windows:: `~\AppData\Local\utilities\`
+++*++nix:: `~/.config/utilities/`
+MacOS:: `~/Library/Application Support/utilities/`
+
+NOTE: В исполняемый файл уже вшит конфигурационный файл со значениями по умолчанию, поэтому `config.*` не обязателен.
+
+По умолчанию, в TOML отсутствует тип None.
+В файле он задается как `"!None"`.
+
+.Параметры конфигурации
+[options="header"]
+|===
+|Параметр |Описание |Тип |По умолчанию
+
+|general
+|Общие параметры.
+|object
+|
+
+|separator
+|Разделитель между частями вывода скрипта.
+|str
+|`= * 100`
+
+|debug_log_folder
+|Директория с логами уровня DEBUG.
+|str
+|`_logs/cli_debug.log`
+
+|log_path
+|Директория с логами.
+|str
+|`~/Desktop/_logs/cli_debug.log`
+
+|config_path
+|Файл с описаниями аргументов.
+|str
+|`sources/dict.yaml`
+
+|col_max
+|Ширина колонки справки.
+|int
+|52
+
+|max_content_width
+|Максимальная длина текста в справке.
+|int
+|96
+
+|terminal_width
+|Максимальная длина текста в окне терминала.
+|int
+|96
+
+|update
+|Параметры обновления.
+|object
+|
+
+|auto_update
+|Флаг автообновления.
+|bool
+|true
+
+|env_var
+|Название переменной окружения.
+|str
+|`_TW_UTILITIES_UPDATE`
+
+|temp_dir
+|Временная директория для хранения и запуска промежуточных файлов.
+|str
+|`~/_temp/`
+
+|temp_command_file
+|Файл для записи ввода пользователя до обновления исполняемого файла.
+|str
+|`~/_temp/input_command`
+
+|project_id
+|Идентификатор проекта на git.
+|int
+|`65722828`
+
+|commands
+|Параметры команд.
+|object
+|
+
+|shared
+|Общие параметры для всех команд.
+|object
+|
+
+|debug
+|Флаг запуска в режиме отладки по умолчанию.
+|bool
+|false
+
+|directory
+|Обрабатываемая директория по умолчанию.
+|str
+|`!None`
+
+|files
+|Обрабатываемые файлы по умолчанию.
+|list<str>
+|[]
+
+|verbose
+|Флаг вывода подробной информации.
+|bool
+|false
+
+|recursive
+|Флаг рекурсивного обхода директории.
+|bool
+|true
+
+|dry_run
+|Флаг запуска команды без действительного изменения файлов.
+|bool
+|false
+
+|output
+|Файл для записи.
+|str
+|`!None`
+
+|keep_logs
+|Флаг сохранения логов.
+|bool
+|false
+
+|convert-tables
+|Параметры команды `convert-tables`.
+|object
+|
+
+|tables_dir
+|Директория для записи файлов с таблицами.
+|str
+|`./tables/`
+
+|temp_dir
+|Временная директория для разархивирования.
+|str
+|`./_temp/`
+
+|[[escape]]escape
+|Флаг экранирования символов '<', '>'.
+|bool
+|true
+
+|[[remove]]remove
+|Флаг удаления всех множественных пробелов и пробелов перед знаками препинания.
+|bool
+|false
+
+|fix
+|Флаг удаления лишних пробелов и экранирования символов. +
+Приоритет выше, чем у опций <<escape,--escape>> и <<remove,--remove>>.
+|bool
+|`!None`
+
+|keep
+|Флаг извлечения текста без дополнительной обработки. +
+Приоритет выше, чем у опций <<escape,--escape>> и <<remove,--remove>>.
+|bool
+|`!None`
+
+|format-code
+|Параметры команды `format-code`.
+|object
+|
+
+|length
+|Максимальная длина текста кода.
+|int
+|`84`
+
+|repair-links
+|Параметры команды `repair-links`.
+|object
+|
+
+|result_file_path
+|Файл для записи результатов проверки.
+|str
+|`./results.txt`
+
+|anchor_validation
+|Флаг проверки якорей.
+|bool
+|true
+
+|no_result
+|Флаг удаления файла с результатами проверки.
+|bool
+|false
+
+|separate_languages
+|Флаг раздельной обработки файлов по языкам.
+|bool
+|true
+
+|skip_en
+|Флаг игнорирования файлов на английском языке.
+|bool
+|false
+
+|list-files
+|Параметры команды `list-files`.
+|object
+|
+
+|ignored_dirs
+|Перечень игнорируемых директорий.
+|list<str>
+|`["temp_folder", "_temp_folder", "private"]`
+
+|all_dirs
+|Флаг обработки всех директорий.
+|bool
+|false
+
+|ignored_files
+|Перечень имен игнорируемых файлов без расширения.
+|list<str>
+|["README"]
+
+|all_files
+|Флаг обработки файлов всех расширений.
+|bool
+|false
+
+|extensions
+|Расширения обрабатываемых файлов в виде строки с разделителем пробелом.
+|str
+|`"md adoc"`
+
+|all_extensions
+|Флаг обработки файлов всех расширений.
+|bool
+|false
+
+|language
+|Язык обрабатываемых файлов, остальные игнорируются.
+|str
+|`!None`
+
+|all_languages
+|Флаг обработки файлов на всех языках.
+|bool
+|true
+
+|ignore_index
+|Флаг игнорирования файлов `index.*` и `_index.*`.
+|bool
+|false
+
+|prefix
+|Префикс, добавляемый к найденным путям.
+|str
+|`!None`
+
+|no_prefix
+|Флаг отсутствия добавляемого префикса.
+|bool
+|false
+
+|hidden
+|Флаг обработки скрытых файлов.
+|bool
+|false
+
+|set-table-cols
+|Параметры команды `set-table-cols`.
+|object
+|
+
+|max_symbols
+|Максимальное количество символов в строке таблицы.
+|int
+|`72`
+
+|min_column
+|Минимальная количество символов в столбце таблицы.
+|int
+|4
+
+|add_options
+|Флаг добавления опций для таблицы, если не задано.
+|bool
+|true
+
+|coefficient
+|Специальный коэффициент высоты строки, уникальный для шрифта.
+|float
+|1.0
+
+|get-terms
+|Параметры команды `get-terms`.
+|object
+|
+
+|sources
+|Директория с текстовыми файлами.
+|str
+|`sources/`
+
+|project_id
+|Идентификатор проекта на Git с файлом терминов.
+|int
+|`57022544`
+
+|samples_flag
+|Флаг вывода примеров использования.
+|bool
+|false
+
+|samples_flag
+|Флаг вывода примеров использования.
+|bool
+|false
+
+|info_file
+|Флаг вывода примеров использования.
+|bool
+|false
+
+|readme_file
+|Файл со справочной информацией.
+|str
+|false
+
+|samples_file
+|Файл с примерами использования.
+|str
+|samples.txt
+
+|abbr_flag
+|Флаг вывода терминов для использования в HTML-теге `abbr[title]`.
+|bool
+|false
+
+|common_flag
+|Флаг стандартного вывода для терминов.
+|bool
+|false
+
+|validate-yaml
+|Параметры команды `validate-yaml`.
+|object
+|
+
+|cutoff
+|Минимальный уровень схожести путей файлов.
+|float
+|0.75
+
+|guess
+|Флаг предложения исправлений для найденных ошибок.
+|bool
+|true
+
+|===
+
+[source,toml]
+----
+[general]
+separator = "===================================================================================================="
+debug_log_folder = "_logs/cli_debug.log"
+log_folder = "~/Desktop/_logs/cli_debug.log"
+config_path = "sources/dict.yaml"
+col_max = 52
+max_content_width = 96
+terminal_width = 96
+
+[update]
+auto_update = true
+env_var = "_TW_UTILITIES_UPDATE"
+temp_dir = "~/_temp/"
+temp_command_file = "~/_temp/input_command"
+project_id = 65722828
+
+[commands.shared]
+debug = false
+directory = "!None"
+files = []
+verbose = false
+recursive = true
+dry_run = false
+output = "!None"
+keep_logs = false
+
+[commands.convert-tables]
+tables_dir = "./tables/"
+temp_dir = "./_temp/"
+escape = true
+remove = false
+fix = "!None"
+keep = "!None"
+
+[commands.format-code]
+length = 84
+
+[commands.repair-links]
+result_file_path = "./results.txt"
+anchor_validation = true
+no_result = false
+separate_languages = true
+skip_en = false
+
+[commands.list-files]
+ignored_dirs = [
+  "temp_folder",
+  "_temp_folder",
+  "private"
+]
+all_dirs = false
+ignored_files = [
+  "README"
+]
+all_files = false
+extensions = "md adoc"
+all_extensions = false
+language = "!None"
+all_languages = true
+ignore_index = false
+prefix = "!None"
+no_prefix = false
+hidden = false
+
+[commands.set-table-cols]
+max_symbols = 72
+min_column = 4
+add_options = true
+coefficient = 1.0
+
+[commands.get-terms]
+sources = "sources/"
+info_file = "help.txt"
+readme_file = "readme.txt"
+samples_file = "samples.txt"
+project_id = 57022544
+all_flag = false
+full_flag = false
+info_flag = false
+readme_flag = false
+samples_flag = false
+abbr_flag = false
+ascii_flag = false
+common_flag = false
+
+[commands.validate-yaml]
+cutoff = 0.75
+guess = true
+----

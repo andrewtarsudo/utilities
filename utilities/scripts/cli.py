@@ -15,7 +15,7 @@ from click.types import BOOL
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.config import config_file
+from utilities.common.config_file import config_file
 from utilities.common.custom_logger import custom_logging
 from utilities.common.errors import BaseError
 from utilities.common.functions import file_reader, file_reader_type, file_writer, get_shell, get_version, GitFile, \
@@ -239,7 +239,7 @@ def cli(debug: bool = False, update: bool = True):
             echo(text)
             ctx.exit(0)
 
-        elif ctx.invoked_subcommand == "link-repair":
+        elif ctx.invoked_subcommand == "repair-links":
             result_file: bool = True
 
         custom_logging("cli", is_debug=debug, result_file=result_file)

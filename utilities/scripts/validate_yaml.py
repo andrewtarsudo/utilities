@@ -13,7 +13,7 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.config import config_file
+from utilities.common.config_file import config_file
 from utilities.common.functions import file_reader, file_reader_type, file_writer, is_windows, pretty_print, walk_full
 from utilities.common.shared import HELP, separator, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
@@ -525,7 +525,7 @@ def validate_file(
     multiple=False,
     required=False,
     metavar="FILE",
-    default=None)
+    default=config_file.get_commands("validate-yaml", "output"))
 @option(
     "-g/-G", "--guess/--no-guess", "guess",
     type=BOOL,
@@ -534,7 +534,7 @@ def validate_file(
          "\nПо умолчанию: True, отображаются предполагаемые замены",
     show_default=True,
     required=False,
-    default=True)
+    default=config_file.get_commands("validate-yaml", "guess"))
 @option(
     "-v/-q", "--verbose/--quiet", "verbose",
     type=BOOL,
@@ -543,7 +543,7 @@ def validate_file(
          "\nПо умолчанию: False, выводятся только ошибки",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("validate-yaml", "verbose"))
 @option(
     "-k/-K", "--keep-logs/--remove-logs", "keep_logs",
     type=BOOL,
@@ -553,7 +553,7 @@ def validate_file(
          "\nПо умолчанию: False, лог-файл и директория удаляются",
     show_default=True,
     required=False,
-    default=False)
+    default=config_file.get_commands("validate-yaml", "keep_logs"))
 @help_option(
     "-h", "--help",
     help=HELP,

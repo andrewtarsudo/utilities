@@ -12,13 +12,13 @@ def folder():
 @fixture(scope="module")
 def folder_result():
     return (
-        "README_terms.adoc"
+        "README_get_terms.adoc"
         "\nREADME_list_files.adoc"
         "\nREADME_check_russian.adoc"
         "\nREADME_validate_yaml.adoc"
         "\nREADME_format_code.adoc"
         "\nREADME_convert_tables.adoc"
-        "\nREADME_link_repair.adoc"
+        "\nREADME_repair_links.adoc"
         "\nREADME_repair_svg.adoc"
         "\nВременные журналы скрипта удалены\n")
 
@@ -29,7 +29,7 @@ def help_result():
 Использование:
 command-line-interface
 <list-files> | <check-russian> | <convert-tables> | <filter-images> | <format-code> |
-<link-repair> | <reduce-image> | <repair-svg> | <table-cols> | <terms> | <validate-yaml>
+<link-repair> | <reduce-image> | <repair-svg> | <table-cols> | <get_terms> | <validate-yaml>
 -v/--version | --h/--help
 
 
@@ -55,7 +55,7 @@ command-line-interface
                                          PNG
   repair-svg                             Команда для исправления файлов SVG
   table-cols                             Команда для задания ширины столбцам таблиц
-  terms                                  Команда для вывода расшифровки аббревиатур
+  get_terms                                  Команда для вывода расшифровки аббревиатур
   validate-yaml                          Команда для валидации YAML-файла, используемого
                                          при генерации PDF
 ------------------------------------------------------------------------------------------------
@@ -330,14 +330,14 @@ command-line-interface table-cols
 ------------------------------------------------------------------------------------------------
 
 Использование:
-command-line-interface terms <TERMS>
+command-line-interface get_terms <TERMS>
 -a/--all | -f/--full | -i/--info | -r/--readme | -s/--samples | --abbr | --ascii | --common |
 --keep-logs/-k | --h/--help
 
   Команда для вывода расшифровки аббревиатур
 
 Аргументы:
-  terms                                  Перечень запрашиваемых аббревиатур
+  get_terms                                  Перечень запрашиваемых аббревиатур
 
 Опции:
   -a, --all                              Флаг вывода всех сокращений.

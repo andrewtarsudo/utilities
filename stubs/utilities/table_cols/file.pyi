@@ -2,7 +2,7 @@
 from pathlib import Path
 from typing import Iterable, Iterator, Mapping
 
-from utilities.table_cols.analyser import TableAnalyser
+from utilities.set_table_cols.analyser import TableAnalyser
 
 
 class AsciiDocFile:

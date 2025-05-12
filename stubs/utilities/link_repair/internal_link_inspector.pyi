@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from utilities.link_repair.file_dict import TextFile
+from utilities.repair_links.file_dict import TextFile
 
 __all__ = ['InternalLinkInspector', 'internal_inspector']
 

@@ -52,4 +52,4 @@ NOTE: Путь может быть как абсолютным, так и отн
 
 === Примеры
 
-include::partials/reduce-image.adoc[]
+include::partials/reduce-images.adoc[]

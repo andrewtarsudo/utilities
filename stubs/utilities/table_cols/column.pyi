@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from typing import Iterator, NamedTuple
-from utilities.table_cols.cell import TableCell
+from utilities.set_table_cols.cell import TableCell
 
 
 class TableColumnParameters(NamedTuple):

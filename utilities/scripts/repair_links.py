@@ -8,17 +8,17 @@ from click.termui import echo, pause
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
-from utilities.common.config import config_file
+from utilities.common.config_file import config_file
 from utilities.common.errors import LinkRepairInvalidFileDictAttributeError, LinkRepairInvalidStorageAttributeError
 from utilities.common.functions import file_reader, file_writer
 from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
-from utilities.link_repair.const import FileLanguage, prepare_logging
-from utilities.link_repair.file_dict import FileDict, FileLinkItem, TextFile
-from utilities.link_repair.general_storage import Storage
-from utilities.link_repair.internal_link_inspector import internal_inspector
-from utilities.link_repair.link import Link
-from utilities.link_repair.link_fixer import link_fixer
-from utilities.link_repair.link_inspector import link_inspector
+from utilities.repair_links.const import FileLanguage, prepare_logging
+from utilities.repair_links.file_dict import FileDict, FileLinkItem, TextFile
+from utilities.repair_links.general_storage import Storage
+from utilities.repair_links.internal_link_inspector import internal_inspector
+from utilities.repair_links.link import Link
+from utilities.repair_links.link_fixer import link_fixer
+from utilities.repair_links.link_inspector import link_inspector
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
 from utilities.scripts.completion import dir_completion
@@ -38,12 +38,14 @@ def validate_dir_path(path: StrPath | None) -> bool:
         logger.debug(f"Путь {path} указывает не на директорию")
         return False
 
-    return True
+    else:
+        return True
 
 
 def has_no_required_files(path: StrPath) -> bool:
     bool_md: bool = next(iglob(f"**/*{MD_EXTENSION}", root_dir=path, recursive=True), None) is None
     bool_adoc: bool = next(iglob(f"**/*{ADOC_EXTENSION}", root_dir=path, recursive=True), None) is None
+
     return bool_md and bool_adoc
 
 
@@ -172,7 +174,7 @@ def repair_links_command(
     logger.debug(prepare_logging(file_dict.dict_files.items()))
 
     if anchor_validation:
-        from utilities.link_repair.anchor_inspector import anchor_inspector
+        from utilities.repair_links.anchor_inspector import anchor_inspector
 
         # operate with AnchorInspector
         anchor_inspector + iter(file_dict.dict_files.values())

@@ -8,9 +8,9 @@ from auxiliary.cell import TableCell
 
 
 class TableColumnParameters(NamedTuple):
-    """Class to represent the main parameters to define the table_cols column widths.
+    """Class to represent the main parameters to define the set_table_cols column widths.
 
-    :param index: The 0-based column index in the table_cols.
+    :param index: The 0-based column index in the set_table_cols.
     :type index: int
     :param minimum_length: The minimum length of the cell texts to avoid unpredictable hyphenation.
     :type minimum_length: int
@@ -67,7 +67,7 @@ class TableColumnParameters(NamedTuple):
 
 
 class TableColumn(NamedTuple):
-    """Class to represent the row in the table_cols."""
+    """Class to represent the row in the set_table_cols."""
     table_cells: list[TableCell]
     column: int
 

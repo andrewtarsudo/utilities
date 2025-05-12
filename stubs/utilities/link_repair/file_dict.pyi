@@ -2,8 +2,8 @@
 from typing import Iterable, Iterator, NamedTuple
 
 from utilities.common.shared import StrPath
-from utilities.link_repair.const import FileLanguage
-from utilities.link_repair.link import Link
+from utilities.repair_links.const import FileLanguage
+from utilities.repair_links.link import Link
 
 
 class FilePattern(NamedTuple):

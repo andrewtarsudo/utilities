@@ -17,7 +17,7 @@ else:
     EXE_FILE: Path = BASE_PATH.joinpath(f"bin/tw_utilities{SUFFIX}")
 
 StrPath: TypeAlias = str | Path
-ConfigType: TypeAlias = dict[str, None | str | int | dict[str, str | int | float | bool | list[str]]]
+ConfigType: TypeAlias = dict[str, None | str | int | dict[str, str | int | float | bool | list[str]]] | None
 MD_EXTENSION: str = ".md"
 ADOC_EXTENSION: str = ".adoc"
 EXTENSIONS: tuple[str, ...] = (MD_EXTENSION, ADOC_EXTENSION)

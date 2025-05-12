@@ -5,10 +5,10 @@ validate-yaml:
 list-files:
   root_dir: "Путь до директории"
 
-terms:
+get-terms:
   terms: "Перечень запрашиваемых аббревиатур"
 
-link-repair:
+repair-links:
   pathdir: "Путь до директории для обработки *.md- и *.adoc-файлов"
 
 convert-tables:
@@ -21,4 +21,4 @@ inspect-updates:
   filename: "Путь до файла от корня для загрузки"
 
 substitute:
-  table: "Путь до файла с таблицей замен"
+  file_table: "Путь до файла с таблицей замен"

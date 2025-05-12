@@ -20,10 +20,10 @@ def run_flake8_command():
         "__main__.py",
         "utilities/common/",
         "utilities/convert_tables/",
-        "utilities/link_repair/",
+        "utilities/repair_links/",
         "utilities/scripts/",
-        "utilities/table_cols/",
-        "utilities/terms/"]
+        "utilities/set_table_cols/",
+        "utilities/get_terms/"]
 
     shell: bool = platform.startswith("win")
 

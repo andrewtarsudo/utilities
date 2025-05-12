@@ -4,6 +4,7 @@ include pyproject.toml
 include README.adoc
 graft docs/*.adoc
 graft sources
+graft updates
 include LICENSE
 include MANIFEST.in
 graft stubs

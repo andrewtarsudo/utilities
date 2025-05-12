@@ -4,7 +4,7 @@ from click.decorators import argument, help_option, option, pass_context
 from click.termui import style
 from click.types import BOOL, Path as ClickPath
 
-from utilities.common.config import config_file
+from utilities.common.config_file import config_file
 from utilities.common.shared import HELP, StrPath
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument

@@ -134,38 +134,38 @@ def file_reader_type(path: StrPath, file_type: FileType):
 
     except FileNotFoundError as e:
         logger.error(f"{e.__class__.__name__}: файл {path} не найден")
-        raise
+        raise FileReaderError
 
     except PermissionError as e:
         from os import stat
 
         logger.error(f"{e.__class__.__name__}: недостаточно прав для чтения файла {path}")
         logger.error(f"Доступ: {stat(path).st_mode}")
-        raise
+        raise FileReaderError
 
     except RuntimeError as e:
         logger.error(f"{e.__class__.__name__}: произошла ошибка обработки во время записи файла {path}")
-        raise
+        raise FileReaderError
 
     except UnsupportedOperation as e:
         logger.error(f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}")
-        raise
+        raise FileReaderError
 
     except ScannerError as e:
         logger.error(
             f"{e.__class__.__name__}: ошибка обработки файла {e.context_mark.name}"
             f"\nв символе {e.context_mark.line + 1}:{e.context_mark.column + 1}")
-        raise
+        raise FileReaderError
 
     except JSONDecodeError as e:
         logger.error(
             f"{e.__class__.__name__}: ошибка обработки файла {path.name}"
             f"\nв символе {e.lineno + 1}:{e.colno + 1}")
-        raise
+        raise FileReaderError
 
     except OSError as e:
         logger.error(f"{e.__class__.__name__}: {e.strerror}")
-        raise
+        raise FileReaderError
 
 
 def check_path(

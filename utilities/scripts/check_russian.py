@@ -9,7 +9,7 @@ from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
-from utilities.common.config import config_file
+from utilities.common.config_file import config_file
 from utilities.common.functions import file_reader, is_windows, pretty_print
 from utilities.common.shared import HELP, separator, StrPath
 from utilities.scripts.api_group import APIGroup

@@ -20,7 +20,7 @@ class TimerStoppedError(TimerError):
 
 
 class TermsError(BaseError):
-    """Base class for errors associated with the terms."""
+    """Base class for errors associated with the get_terms."""
 
 
 class TermsAsciiDocFileTableRowIndexError(TermsError):
@@ -112,7 +112,7 @@ class TableColsError(BaseError):
 
 
 class TableColsTableBorderNotClosedError(TableColsError):
-    """Specified file has closing table_cols border mark '|===' missing."""
+    """Specified file has closing set_table_cols border mark '|===' missing."""
 
 
 class TableColsTableCoordinateInitError(TableColsError):

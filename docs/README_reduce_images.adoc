@@ -1,0 +1,52 @@
+[[reduce-image]]
+= Руководство для reduce-image
+:imagesdir: images
+:stylesdir: ../css
+:stylesheet: default.css
+:pdf-themesdir: themes
+:pdf-theme: base-theme.yml
+:script-name: reduce-image
+:asciidoctorconfigdir: ..
+
+== Описание
+
+Скрипт немного изменяет цветовую палитру и значительно уменьшает занимаемое пространство.
+
+== Для чего нужно?
+
+Для документации продуктов с графическим интерфейсом приходится делать множество скриншотов.
+При создании PDF все эти изображения добавляются, что существенно увеличивает размер файла.
+
+include::partials/run.adoc[]
+
+=== Опции скрипта
+
+[source,console,subs="attributes+"]
+----
+Использование:
+{name} {script-name}
+-f/--file FILE ... FILE | -d/--dir DIR | --dry-run | -r/--recursive | -k/--keep-logs |
+--h/--help
+
+  Команда для уменьшения размера изображений JPG, PNG
+
+Опции:
+  -f, --file FILE ... FILE               Файл для обработки. Может использоваться несколько раз
+  -d, --dir DIR                          Директория для обработки
+  --dry-run / --no-dry-run               Флаг вывода изменений размеров файлов без их изменения.
+                                         По умолчанию: False, файлы перезаписываются
+  {recursive}
+                                         {recursive-note}
+  {keep-logs}
+                                         {keep-logs-cont}
+                                         {keep-logs-default}
+  {help}
+                                         {help-cont}
+-------------------------------------------------------------------------------------------------
+----
+
+NOTE: Путь может быть как абсолютным, так и относительным.
+
+=== Примеры
+
+include::partials/reduce-images.adoc[]

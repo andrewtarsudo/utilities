@@ -10,6 +10,7 @@ from warnings import simplefilter
 
 from loguru import logger
 
+from utilities.common.config_file import config_file
 from utilities.common.shared import DEBUG, NORMAL
 from utilities.common.errors import BaseError
 
@@ -196,7 +197,10 @@ class LoggerConfiguration:
         """
         try:
             _logging_level: str = self._handlers.get("file_rotating", "INFO")
-            _log_path: str = str(self.log_folder.joinpath(f"{self._file_name}_{_logging_level.lower()}.log"))
+            _log_path: str = (
+                Path(config_file.get_general("log_path"))
+                .joinpath(f"{self._file_name}_{_logging_level.lower()}.log")
+                .as_posix())
 
             return {
                 "sink": _log_path,
