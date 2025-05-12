@@ -9,10 +9,18 @@ from loguru import logger
 
 from utilities.common.errors import TableColsTableColumnIndexError, TableColsTableColumnInvalidIdentifierError, \
     TableColsTableColumnInvalidNameError
-from utilities.common.functions import file_reader
+from utilities.common.functions import file_reader, file_writer
 from utilities.common.shared import StrPath
 
 TableType: Type[str] = Literal[".md", ".adoc"]
+
+
+def reorder_text(content: str):
+    replacements: set[str] = {"<br>", "<br/>", ". ", " +\n"}
+
+    content: str = content.replace("<br>")
+
+    parts: list[str] = content.split("<br>")
 
 
 class TableCoordinate(NamedTuple):
@@ -372,6 +380,10 @@ class Table:
         """Gets the set_table_cols content as a string."""
         return "\n".join(self._lines)
 
+    @property
+    def headers(self) -> list[str]:
+        return [cell.text for cell in self.get_row(0)]
+
     # noinspection PyTypeChecker
     def define_cells(self):
         """Divides the set_table_cols into cells.
@@ -663,14 +675,17 @@ class Table:
 
         self.add_column(new_column)
 
-    # def save(self):
-    #     lines: list[str] = file_reader(self._path, "lines")
-    #
-    #     for i in reversed(range(self._start, self._stop + 1)):
-    #         lines.pop(i)
-    #
-    #     lines.insert(self._start, str(self))
-    #     file_writer(self._path, lines)
+    @property
+    def is_invalid(self):
+        return self.num_columns < 5
+
+    def fix_config(self):
+        parameter: TableColumn = self.get_column("Параметр")
+        ompr: TableColumn = self.get_column("OMPR")
+        description: TableColumn = self.get_column("Описание")
+
+        self.separate_column("OMPR", 3, "/")
+        self.split_column("Описание", r"Тип\s.+\s(\w+?)\s?\.?")
 
 
 class File:
@@ -678,6 +693,9 @@ class File:
         self._path: Path = Path(path).expanduser()
         self._content: list[str] = []
         self._tables: dict[str, Table] = {}
+
+    def save(self):
+        file_writer(self._path, self._content)
 
     @property
     def table_type(self):
