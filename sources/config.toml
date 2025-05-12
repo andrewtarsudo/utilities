@@ -46,11 +46,14 @@ skip_en = false
 ignored_dirs = [
   "temp_folder",
   "_temp_folder",
+  "temp_dir",
+  "_temp_dir",
   "private"
 ]
 all_dirs = false
 ignored_files = [
-  "README"
+  "README",
+  "_check_list"
 ]
 all_files = false
 extensions = "md adoc"
@@ -84,5 +87,13 @@ ascii_flag = false
 common_flag = false
 
 [commands.validate-yaml]
+cutoff = 0.75
+guess = true
+
+[commands.check]
+cutoff = 0.75
+guess = true
+
+[commands.yaml]
 cutoff = 0.75
 guess = true

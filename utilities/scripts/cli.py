@@ -14,6 +14,7 @@ from click.termui import pause
 from click.types import BOOL
 from click.utils import echo
 from loguru import logger
+from prettyprinter import pformat
 
 from utilities.common.config_file import config_file
 from utilities.common.custom_logger import custom_logging
@@ -22,6 +23,7 @@ from utilities.common.functions import file_reader, file_reader_type, file_write
     is_macos, is_windows
 from utilities.common.shared import BASE_PATH, EXE_FILE, HELP, PRESS_ENTER_KEY, StrPath
 from utilities.scripts.api_group import APIGroup, get_full_help, print_version
+from utilities.scripts.args_help_dict import args_help_dict
 
 ENV_VAR: str = config_file.get_update("env_var")
 TEMP_DIR: Path = Path(config_file.get_update("temp_dir")).expanduser()
@@ -110,8 +112,11 @@ def compare_versions(project_id: int):
     else:
         content: dict[str, Any] = file_reader_type(git_file.download_destination, "toml")
         latest_version: str = content.get("project").get("version")
+        logger.debug(f"Последняя версия: {latest_version}")
 
         current_version: str = get_version()
+        logger.debug(f"Текущая версия: {current_version}")
+
         return current_version == latest_version
 
 
@@ -244,8 +249,17 @@ def cli(debug: bool = False, update: bool = True):
 
         custom_logging("cli", is_debug=debug, result_file=result_file)
 
+        config_file_log: str = pformat(config_file.kwargs, indent=2, width=120, compact=False, sort_dict_keys=True)
+        logger.debug(f"Файл конфигурации:\n{config_file_log}")
+
+        args_help_dict_log: str = pformat(args_help_dict, indent=2, width=120, compact=False, sort_dict_keys=True)
+        logger.debug(f"Файл описания аргументов:\n{args_help_dict_log}")
+
         env_var: Any = environ.get(ENV_VAR)
+        logger.info(f"Переменная окружения: {ENV_VAR}={env_var}")
+
         config_var: bool = config_file.get_update("auto_update")
+        logger.debug(f"Параметр автообновления в командах по умолчанию: {config_var}")
 
         if env_var is None:
             env_update: bool = True

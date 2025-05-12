@@ -10,10 +10,11 @@ from typing import Any, Callable, Iterable
 
 from httpx import HTTPStatusError, InvalidURL, request, RequestError, Response, StreamError, URL
 from loguru import logger
+from prettyprinter import pformat
 from yaml.scanner import ScannerError
 
 from utilities.common.errors import FileReaderError, FileReaderTypeError, UpdateProjectIdError
-from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath, TEMP_DIR
+from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath
 
 
 @cache
@@ -173,43 +174,39 @@ def check_path(
         ignored_dirs: Iterable[str] = None,
         ignored_files: Iterable[str] = None,
         extensions: Iterable[str] = None,
-        language: str | None = None):
-    if ignored_dirs is None:
-        ignored_dirs: set[str] = set()
+        language: str | None = None) -> bool:
+    path: Path = Path(path).expanduser()
 
-    if ignored_files is None:
-        ignored_files: set[str] = set()
+    # Skip directories (handled in walk_full)
+    if path.is_dir():
+        return False
 
-    path: Path = Path(path)
+    # Check ignored dirs (if any parent folder is ignored)
+    if ignored_dirs and any(part in ignored_dirs for part in path.parts):
+        return False
 
-    is_dir: bool = path.is_dir()
-    is_in_ignored_dirs: bool = any(part in ignored_dirs for part in path.parts)
-    has_ignored_name: bool = path.name in ignored_dirs
-    is_in_ignored_files: bool = path.stem in ignored_files
-    has_ignored_extension: bool = path.suffix not in extensions if extensions else False
+    # Check ignored files (exact name match)
+    if ignored_files and path.stem in ignored_files:
+        return False
 
-    if language is None:
-        has_ignored_language: bool = False
+    if extensions is not None and extensions and path.suffix not in {*extensions, }:
+        return False
 
-    elif not language:
-        has_ignored_language: bool = len(path.suffixes) == 1
+    # Check language (if provided)
+    if language is not None:
+        suffixes: list[str] = path.suffixes  # e.g., ['.en', '.md'] for 'file.en.md'
 
-    else:
-        has_ignored_language: bool = f".{language}" not in path.suffixes
+        # Case 1: Language is specified (e.g., "en")
+        if language:
+            # Look for ".en" in suffixes (but not ".en.txt")
+            if f".{language}" not in suffixes:
+                return False
 
-    conditions: list[bool] = [
-        is_dir, is_in_ignored_dirs, has_ignored_name, is_in_ignored_files, has_ignored_extension, has_ignored_language]
+        # Case 2: Language is empty (expect no language suffix)
+        elif any(len(suffix) == 3 and suffix[1:].isalpha() for suffix in suffixes):
+            return False
 
-    # logger.debug(
-    #     f"Проверка пути {path}:"
-    #     f"\nis_dir = {is_dir}"
-    #     f"\nis_in_ignored_dirs = {is_in_ignored_dirs}"
-    #     f"\nhas_ignored_name = {has_ignored_name}"
-    #     f"\nis_in_ignored_files = {is_in_ignored_files}"
-    #     f"\nhas_ignored_extension = {has_ignored_extension}"
-    #     f"\nhas_ignored_language = {has_ignored_language}\n")
-
-    return not any(conditions)
+    return True  # Passed all checks
 
 
 def walk_full(
@@ -219,27 +216,49 @@ def walk_full(
         extensions: Iterable[str] = None,
         language: str | None = None,
         root: Path = None,
+        hidden: bool = False,
         results: list[Path] = None):
     path: Path = Path(path).expanduser()
 
     if root is None:
-        root: Path = Path(path)
+        root: Path = path
 
     if results is None:
         results: list[Path] = []
 
+    if ignored_dirs is None:
+        ignored_dirs: set[str] = set()
+
+    else:
+        ignored_dirs: set[str] = set(ignored_dirs)
+
+    if ignored_files is None:
+        ignored_files: set[str] = set()
+
+    else:
+        ignored_files: set[str] = set(ignored_files)
+
+    if extensions:
+        extensions: set[str] | None = {f".{extension.lstrip(".")}" for extension in extensions}
+
+    else:
+        extensions: set[str] | None = None
+
     for element in scandir(path):
         item: Path = Path(element.path)
 
-        if element.is_dir(follow_symlinks=True):
-            walk_full(
-                item,
-                ignored_dirs=ignored_dirs,
-                ignored_files=ignored_files,
-                extensions=extensions,
-                language=language,
-                root=root,
-                results=results)
+        if element.is_dir():
+            if item.name not in ignored_dirs:
+                values = walk_full(
+                    item,
+                    ignored_dirs=ignored_dirs,
+                    ignored_files=ignored_files,
+                    extensions=extensions,
+                    language=language,
+                    root=root,
+                    hidden=hidden,
+                    results=None)
+                results.extend(values)
 
         elif check_path(item, ignored_dirs, ignored_files, extensions, language):
             results.append(item.relative_to(root))
@@ -268,7 +287,7 @@ class GitFile:
             port: int = 443,
             query: bytes = b"ref_type=heads",
             method: str = "GET",
-            temp_dir: Path = TEMP_DIR):
+            temp_dir: Path = None):
         if not isinstance(project_id, int):
             try:
                 project_id: int = int(project_id)
@@ -278,6 +297,11 @@ class GitFile:
                     "Идентификатор проекта должен быть int или содержать только цифры, "
                     f"isdecimal(), но получено {project_id}")
                 raise UpdateProjectIdError
+
+        if temp_dir is None:
+            from utilities.common.config_file import config_file
+
+            temp_dir: Path = Path(config_file.get_general("temp_dir")).expanduser()
 
         self._file_name: str = file_name
         self._project_id: int = project_id
@@ -331,7 +355,7 @@ class GitFile:
         try:
             with open(self.download_destination, "wb") as f:
                 response: Response = self.get_response().raise_for_status()
-                logger.debug(f"Запрос: {response.request.method} {response.request.url}")
+                logger.debug(pformat(f"Запрос: {response.request.method} {response.request.url}"))
 
                 for chunk in response.iter_bytes():
                     f.write(chunk)
@@ -389,3 +413,8 @@ def get_shell():
             continue
 
     return "cmd"
+
+
+if __name__ == '__main__':
+    files: list[Path] = walk_full(Path.cwd().joinpath(r"..\..\..\XGate\content\common"), extensions=[".md .adoc"])
+    pretty_print(files)

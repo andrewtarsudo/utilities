@@ -11,11 +11,12 @@ from click.shell_completion import CompletionItem
 from click.termui import pause, style
 from loguru import logger
 from more_itertools import flatten
+from prettyprinter import pformat
 
 from utilities.common.config_file import config_file, ConfigFile
 from utilities.common.errors import BaseError, NoArgumentsOptionsError
 from utilities.common.functions import get_version, is_windows, pretty_print
-from utilities.common.shared import DEBUG, HELP, NORMAL, PRESS_ENTER_KEY, TEMP_DIR
+from utilities.common.shared import HELP, PRESS_ENTER_KEY
 from utilities.scripts.args_help_dict import args_help_dict
 
 COL_MAX: int = config_file.get_general("col_max")
@@ -51,6 +52,9 @@ def clear_logs(ctx: Context, result: Any, **kwargs):
     no_result: bool = ctx.obj.get("no_result", False)
     result_file: Path = ctx.obj.get("result_file", None)
 
+    log_path: Path = Path(config_file.get_general("log_path")).parent
+    debug_log_folder: Path = Path(config_file.get_general("debug_log_folder")).parent
+
     logger.debug(
         f"Версия: {get_version()}\n"
         f"Команда: {ctx.command_path}\n"
@@ -62,15 +66,15 @@ def clear_logs(ctx: Context, result: Any, **kwargs):
         result_file.unlink(missing_ok=True)
 
     if not keep_logs:
-        rmtree(NORMAL.parent, ignore_errors=True)
+        rmtree(log_path, ignore_errors=True)
 
     elif not debug:
-        echo(f"Папка с логами: {NORMAL.parent}")
+        echo(f"Папка с логами: {log_path}")
 
     else:
-        echo(f"Папка с логами: {DEBUG.parent}")
+        echo(f"Папка с логами: {debug_log_folder}")
 
-    rmtree(TEMP_DIR, ignore_errors=True)
+    rmtree(config_file.get_general("temp_dir"), ignore_errors=True)
     input(PRESS_ENTER_KEY)
     ctx.exit(0)
 
@@ -449,7 +453,7 @@ class APIGroup(Group):
         except UsageError as e:
             logger.error(
                 f"Ошибка обработки команды {e.cmd}: {e.message}"
-                f"\n{e.ctx.to_info_dict()}")
+                f"\n{pformat(e.ctx.to_info_dict())}")
             raise
 
 

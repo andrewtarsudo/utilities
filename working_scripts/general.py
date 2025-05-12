@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 if __name__ == '__main__':
     from check_code import check_code_command
     from delete_pycache import delete_pycache_command

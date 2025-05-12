@@ -41,12 +41,15 @@ def generate_base_root(path: Path, content_common_index: int):
         return path.relative_to(Path().joinpath("/".join(parts[:content_common_index]))).as_posix()
 
 
-def add_prefix(prefix: str, values: Iterable[StrPath] = None):
+def add_prefix(prefix: str | None = None, values: Iterable[StrPath] = None):
     if values is None:
         return []
 
+    elif prefix is None or prefix == "!None" or not prefix:
+        return [Path(value).as_posix() for value in iter(values)]
+
     else:
-        return [f"{prefix}{value}" for value in values]
+        return [f"{prefix}{Path(value).as_posix()}" for value in iter(values)]
 
 
 @cli.command(
@@ -245,70 +248,64 @@ def list_files_command(
     root_dir: Path = root_dir.expanduser()
 
     if extensions is None and not all_extensions:
-        extensions: set[str] = {MD_EXTENSION, ADOC_EXTENSION}
-
-    elif extensions is None:
-        extensions: set[str] = set()
+        extensions: set[str] | None = {MD_EXTENSION, ADOC_EXTENSION}
 
     elif not all_extensions:
-        extensions: set[str] = {
-            f".{extension.removeprefix('.')}"
+        extensions: set[str] | None = {
+            f".{extension.lstrip(".")}"
             for extension in extensions.strip().split(" ")}
 
     else:
-        extensions: set[str] = set()
+        extensions: set[str] | None = None
 
-    if ignored_files is None and all_files is None:
-        ignored_files: set[str] = {"README", "_check_list"}
+    if all_files:
+        ignored_files: set[str] | None = set()
 
-    elif ignored_files is None or not ignored_files or ignored_files == [""]:
-        ignored_files: set[str] = set()
-
-    elif all_files is None and all_files is False:
-        ignored_files: set[str] = {
-            ignored_file.split(".")[-1] for ignored_file in ignored_files}
+    elif ignored_files:
+        ignored_files: set[str] | None = set(ignored_files)
 
     else:
-        ignored_files: set[str] = set()
+        ignored_files: set[str] = {"README", "_check_list"}
 
     if ignore_index:
         ignored_files.add("_index")
 
-    if ignored_dirs is None and all_dirs is None:
-        ignored_dirs: set[str] = {"_temp_folder", "private", "_temp_storage"}
+    if all_dirs:
+        ignored_dirs: set[str] | None = set()
 
-    elif ignored_dirs is None or not ignored_dirs or ignored_dirs == [""]:
-        ignored_dirs: set[str] = set()
-
-    elif all_dirs is None and all_dirs is False:
-        ignored_dirs: set[str] = set(ignored_dirs)
+    elif ignored_dirs:
+        ignored_dirs: set[str] | None = set(ignored_dirs)
 
     else:
-        ignored_dirs: set[str] = set()
+        ignored_dirs: set[str] = {"_temp_folder", "temp_folder", "private", "_temp_dir", "temp_dir"}
 
-    if language is None:
-        language: str | None = None
+    if all_languages:
+        language: str | None = None  # Disable language filtering
 
-    elif language.lower() == "ru" or all_languages is True:
+    elif language:
+        language: str | None = language.lower()
+
+    elif language.lower() == "ru":
         language: str | None = ""
 
     else:
-        language: str | None = language.lower()
+        language: str | None = ""  # No language suffix allowed
 
     content_common_index: int = check_content_common(root_dir)
 
     if no_prefix:
         prefix: str = ""
 
-    elif prefix is None:
-        if content_common_index > 0:
-            prefix: str = f"- {generate_base_root(root_dir, content_common_index)}/"
+    elif prefix is None or prefix == "!None":
+        if content_common_index >= 0:
+            prefix: str = f"  - {generate_base_root(root_dir, content_common_index)}/"
 
         else:
-            prefix: str = ""
+            prefix: str = "  - "
 
     logger.debug(
-        f"ignored_dirs = {ignored_dirs}"
+        f"root_dir = {root_dir}"
+        f"\nignored_dirs = {ignored_dirs}"
         f"\nall_dirs = {all_dirs}"
         f"\nignored_files = {ignored_files}"
         f"\nall_files = {all_files}"
@@ -325,7 +322,6 @@ def list_files_command(
         f"\nkeep_logs = {keep_logs}")
 
     if not root_dir.exists():
-        echo()
         logger.warning(f"Директория {root_dir} не найдена")
         values: list[Path] | None = None
 
@@ -335,7 +331,8 @@ def list_files_command(
             ignored_dirs=ignored_dirs,
             ignored_files=ignored_files,
             extensions=extensions,
-            language=language)
+            language=language,
+            hidden=hidden)
 
     if values is None or not values:
         if auxiliary:
@@ -345,7 +342,8 @@ def list_files_command(
             ctx.obj["keep_logs"] = keep_logs
 
     else:
-        results: list[Path] = add_prefix(prefix, sorted(values))
+        sorted_values: list[Path] = sorted(values, key=lambda p: (len(p.parent.parts), str(p.parent), p.name))
+        results: list[Path] = add_prefix(prefix, sorted_values)
 
         if auxiliary:
             return results
