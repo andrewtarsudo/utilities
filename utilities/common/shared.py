@@ -24,13 +24,7 @@ EXTENSIONS: tuple[str, ...] = (MD_EXTENSION, ADOC_EXTENSION)
 
 separator: str = "=" * 100
 
-DEBUG: Path = Path.cwd().joinpath("_logs/cli_debug.log")
-NORMAL: Path = Path("~/Desktop/_logs/cli_debug.log").expanduser().resolve()
-
 ReaderMode: Type[str] = Literal["string", "lines"]
 FileType: Type[str] = Literal["json", "yaml", "toml"]
 
 INDEX_STEMS: tuple[str, ...] = ("index", "_index")
-
-TEMP_DIR: Path = Path.home().joinpath("_temp/")
-TEMP_COMMAND_FILE: Path = TEMP_DIR.joinpath("input_command")

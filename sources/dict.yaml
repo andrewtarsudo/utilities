@@ -22,3 +22,9 @@ inspect-updates:
 
 substitute:
   file_table: "Путь до файла с таблицей замен"
+
+check:
+  file_or_project: "Путь до файла PDF_*.yml или директории с такими файлами"
+
+yaml:
+  file_or_project: "Путь до файла PDF_*.yml или директории с такими файлами"

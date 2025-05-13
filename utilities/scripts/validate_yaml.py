@@ -20,10 +20,8 @@ from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
 from utilities.scripts.completion import file_dir_completion
 
-_SETTINGS_NAMES: tuple[str, ...] = (
-    "settings", "Settings")
-_RIGHTS_NAMES: tuple[str, ...] = (
-    "rights", "Rights")
+_SETTINGS_NAMES: tuple[str, ...] = ("settings", "Settings")
+_RIGHTS_NAMES: tuple[str, ...] = ("rights", "Rights")
 CUTOFF: float = config_file.get_commands("validate-yaml", "cutoff")
 
 EPILOG: str = (
@@ -46,15 +44,16 @@ EPILOG: str = (
     "\nпоскольку в этом случае будет слишком много нерелевантных предложений.")
 
 
-def determine_key(item: Mapping, keys: Iterable[str]):
+def determine_key(item: Mapping, keys: Iterable[str]) -> str | None:
     for key in keys:
         if key in item:
             return key
 
-    return None
+    else:
+        return None
 
 
-def detect_extra_keys(item: Mapping[str, Any]):
+def detect_extra_keys(item: Mapping[str, Any]) -> set[str] | None:
     extra_keys: set[str] | None = set(item.keys()).difference({"title", "index", "files"})
 
     if not extra_keys:
@@ -501,7 +500,7 @@ def validate_file(
 @cli.command(
     "validate-yaml",
     cls=SwitchArgsAPIGroup,
-    aliases=["check"],
+    aliases=["check", "yaml"],
     help="Команда для валидации YAML-файла, используемого при генерации PDF",
     epilog=EPILOG)
 @argument(

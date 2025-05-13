@@ -63,7 +63,6 @@ Register-ArgumentCompleter -Native -CommandName %(prog_name)s -ScriptBlock {
 }
 """
 
-
 APP_NAME = "TW_UTILITIES"  # Replace with your actual CLI command name
 
 

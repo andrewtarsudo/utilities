@@ -7,7 +7,7 @@ def generate_executable_command():
     from sys import platform
 
     log_file: Path = Path.cwd().joinpath("pyinstaller.log")
-    print(f"log: {log_file.resolve().as_posix()}")
+    print(f"Лог: {log_file.resolve().as_posix()}")
 
     if platform.startswith("win"):
         spec_file: Path = Path.cwd().joinpath("utilities.exe.spec")

@@ -3,7 +3,7 @@ import logging
 from logging import basicConfig, Handler, LogRecord
 from pathlib import Path
 # noinspection PyProtectedMember
-from sys import _getframe, stdout as sysout
+from sys import _getframe, __stdout__
 from types import FrameType
 from typing import Any, Literal, NamedTuple, Type
 from warnings import simplefilter
@@ -11,7 +11,6 @@ from warnings import simplefilter
 from loguru import logger
 
 from utilities.common.config_file import config_file
-from utilities.common.shared import DEBUG, NORMAL
 from utilities.common.errors import BaseError
 
 HandlerType: Type[str] = Literal["stream", "file_rotating", "result_file"]
@@ -164,10 +163,10 @@ class LoggerConfiguration:
     @property
     def log_folder(self) -> Path:
         if self._is_debug:
-            return DEBUG.parent
+            return config_file.get_general("debug_log_folder").parent
 
         else:
-            return NORMAL.parent
+            return config_file.get_general("log_path").parent
 
     def stream_handler(self) -> dict[str, Any] | None:
         """Specifies the stream handler.
@@ -175,10 +174,10 @@ class LoggerConfiguration:
         Handles KeyError.
         """
         try:
-            _logging_level: str | None = self._handlers.get("stream")
+            _logging_level: str | None = self._handlers.get("stream", "INFO")
 
             return {
-                "sink": sysout,
+                "sink": __stdout__,
                 "level": _logging_level,
                 "format": self.__class__._USER_FORMAT,
                 "colorize": True,
@@ -255,7 +254,7 @@ def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = Fal
 
     if not is_debug:
         simplefilter("ignore")
-        stream_level: LoggingLevel = "DEBUG"
+        stream_level: LoggingLevel = "INFO"
 
     else:
         stream_level: LoggingLevel = "DEBUG"
@@ -290,4 +289,4 @@ def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = Fal
     # add the basic log messages to the logger
     basicConfig(handlers=[InterceptHandler()], level=0)
 
-    logger.catch(level="DEBUG", exclude=BaseError, reraise=True)
+    logger.catch(level="DEBUG", exclude=BaseError, reraise=False)
