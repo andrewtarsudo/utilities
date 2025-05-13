@@ -14,7 +14,8 @@ from more_itertools import flatten
 from prettyprinter import pformat
 
 from utilities.common.config_file import config_file, ConfigFile
-from utilities.common.errors import BaseError, NoArgumentsOptionsError
+from utilities.common.custom_logger import custom_logging, LoggerConfiguration
+from utilities.common.errors import BaseError, CommandNotFoundError, NoArgumentsOptionsError
 from utilities.common.functions import get_version, is_windows, pretty_print
 from utilities.common.shared import HELP, PRESS_ENTER_KEY
 from utilities.scripts.args_help_dict import args_help_dict
@@ -360,6 +361,9 @@ class APIGroup(Group):
             return f"{cmd.name} / {' / '.join(aliases)}"
 
     def __init__(self, aliases: set[str] = None, **attrs: Any):
+        self.logging_config: LoggerConfiguration = custom_logging(
+            name=self.__class__.__name__.lower(),
+            is_debug=attrs.get("debug", False))
         kwargs: dict[str, bool] = {
             "invoke_without_command": True,
             "chain": False,
@@ -385,7 +389,7 @@ class APIGroup(Group):
 
         else:
             logger.error(f"Подкоманда {cmd_name} не найдена")
-            return None
+            raise CommandNotFoundError
 
     def format_help(self, ctx: Context, formatter: HelpFormatter) -> None:
         format_help(self, ctx, formatter)
@@ -429,7 +433,7 @@ class APIGroup(Group):
             super().invoke(ctx)
 
         except BaseError as e:
-            logger.error(f"Ошибка {e.__class__.__name__}, {str(e)}")
+            logger.error(f"Ошибка {e.__class__.__name__}")
             pause(PRESS_ENTER_KEY)
             ctx.exit(1)
 
@@ -451,10 +455,16 @@ class APIGroup(Group):
             return super().resolve_command(ctx, args)
 
         except UsageError as e:
-            logger.error(
-                f"Ошибка обработки команды {e.cmd}: {e.message}"
-                f"\n{pformat(e.ctx.to_info_dict())}")
-            raise
+            logger.error("Ошибка обработки команды")
+            logger.debug(
+                f"Параметры команд:"
+                f"\n{pformat(
+                    e.ctx.to_info_dict(),
+                    indent=2,
+                    width=120,
+                    compact=False,
+                    sort_dict_keys=True)}")
+            raise CommandNotFoundError
 
 
 class SwitchArgsAPIGroup(APIGroup):

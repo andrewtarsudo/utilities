@@ -159,8 +159,8 @@ def get_terms_command(
         ascii_flag: bool = False,
         keep_logs: bool = False,
         common_flag: bool = False):
-    git_manager.set_content_git_pages()
-    git_manager.compare()
+    git_manager.set_content_git_files()
+    git_manager.compare_versions()
     git_manager.set_terms()
 
     lines: list[str] = list(iter(git_manager))

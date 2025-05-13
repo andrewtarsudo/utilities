@@ -177,7 +177,7 @@ general_info: GeneralInfo = GeneralInfo()
 def inspect_settings(content: Mapping[str, Any], verbose: bool):
     keys: set[str] = {k.lower() for k in content.keys()}
 
-    if all("settings" not in keys):
+    if "settings" not in keys:
         general_info.messages.append("Отсутствует раздел с параметрами 'Settings'")
 
     else:
@@ -206,7 +206,9 @@ def inspect_settings(content: Mapping[str, Any], verbose: bool):
 
 
 def inspect_legal(content: Mapping[str, Any], verbose: bool):
-    if all(key not in content for key in iter(_RIGHTS_NAMES)):
+    keys: set[str] = {k.lower() for k in content.keys()}
+
+    if "rights" not in keys:
         general_info.warnings.append("Отсутствует раздел с юридической информацией 'Rights'")
 
     else:
@@ -574,9 +576,11 @@ def validate_yaml_command(
         output: StrPath | None = None
 
     if file_or_project.is_dir():
-        yaml_files: list[Path] = [
+        files: list[Path] = [
             *file_or_project.glob("*.yml"),
             *file_or_project.glob("*.yaml")]
+        file_beginnings: tuple[str, ...] = tuple(config_file.get_commands("validate-yaml", "file_beginnings"))
+        yaml_files: list[Path] = [_ for _ in files if _.name.lower().startswith(file_beginnings)]
 
     elif file_or_project.is_file():
         yaml_files: list[Path] = [file_or_project]

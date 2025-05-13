@@ -3,6 +3,10 @@ class BaseError(Exception):
     """Base class to inherit."""
 
 
+class CommandNotFoundError(BaseError):
+    """Input command has not been found."""
+
+
 class InvalidPythonVersion(BaseError):
     """Installed Python version is outdated."""
 

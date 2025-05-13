@@ -59,16 +59,20 @@ class GitManager:
         else:
             return NotImplemented
 
-    def set_content_git_pages(self):
-        content_git_terms: GitFile = GitFile("terms.adoc", config_file.get_commands("get-terms", "project_id"))
+    def set_content_git_files(self):
+        content_git_terms: GitFile = GitFile(
+            config_file.get_commands("get-terms", "terms_file"),
+            config_file.get_commands("get-terms", "project_id"))
         content_git_terms.download()
         self._content_git_terms = content_git_terms
 
-        content_git_version: GitFile = GitFile("__version__.txt", config_file.get_commands("get-terms", "project_id"))
+        content_git_version: GitFile = GitFile(
+            config_file.get_commands("get-terms", "version_file"),
+            config_file.get_commands("get-terms", "project_id"))
         content_git_version.download()
         self._content_git_version = content_git_version
 
-    def compare(self):
+    def compare_versions(self):
         if parse_version(self.TEMP_TERMS_VERSION) is None:
             message: str = "Файл версии не найден"
 

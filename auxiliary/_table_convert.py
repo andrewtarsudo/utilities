@@ -2,7 +2,7 @@
 from collections import Counter
 from itertools import product
 from pathlib import Path
-from re import compile, DOTALL, finditer, match, Match, MULTILINE, Pattern, search, split, sub, VERBOSE
+from re import compile, DOTALL, finditer, match, Match, MULTILINE, Pattern, search, split, sub, UNICODE, VERBOSE
 from typing import Iterable, Iterator, Literal, NamedTuple, Optional, Type
 
 from loguru import logger
@@ -13,39 +13,123 @@ from utilities.common.functions import file_reader, file_writer
 from utilities.common.shared import StrPath
 
 TableType: Type[str] = Literal[".md", ".adoc"]
+Attrs: Type[str] = Literal["possible_values", "type", "default", "range", "notes"]
 
 
-def reorder_text(content: str):
-    replacements: set[str] = {r".<br/?>", r"\.\s+", r"\.\s+\+\n"}
+class FieldText:
+    range_pattern: Pattern = compile(r"\bДиапазон\b(?:[^.|]|<br\s*/?>|\s+\+\n)+\.?", flags=UNICODE)
+    type_pattern: Pattern = compile(r"\bТип\b(?:[^.|]|<br\s*/?>|\s+\+\n)+\.?", flags=UNICODE)
+    possible_values_pattern: Pattern = compile(r"(?:Возможные значения:|(?<!\.)\G)(?:[^.;|]|<br\s*/?>|\s+\+\n)*?(?:\w+|`\w+`)\s*--?\s*(?:[^.;|]|<br\s*/?>|\s+\+\n)+[.;]?", flags=UNICODE)
+    default_pattern: Pattern = compile(r"(?:\bЗначение\b\s)?\b[Пп]о умолчанию\b(?:[^.|]|<br\s*/?>|\s+\+\n)+\.?", flags=UNICODE)
 
+    patterns: dict[Attrs, Pattern] = {
+        "possible_values": possible_values_pattern,
+        "type": type_pattern,
+        "default": default_pattern,
+        "range": range_pattern
+    }
+
+    replacements: set[str] = {r"\.<br/?>", r"\.\s+", r"\.\s+\+\n"}
     pattern: str = "|".join(replacements)
-    _: str = sub(pattern, ".@@@", content)
 
-    parts: list[str] = _.split("@@@")
+    __slots__ = ("_content", "_description_text", "_range_text", "_possible_values_text", "_default_text", "_type_text", "_notes_text")
 
-    main_description: list[str] = []
-    range_pattern: str = r"Диапазон[^.]+."
-    type_pattern: str = r"Тип[^.]+."
-    default_pattern: str = r"(?:Значение)?\s?[Пп]о умолчанию[^.]+."
+    def __init__(self, content: str):
+        self._content: str = content
+        self._description_text: str | None = None
+        self._possible_values_text: str | None = None
+        self._range_text: str | None = None
+        self._default_text: str | None = None
+        self._type_text: str | None = None
+        self._notes_text: list[str] = []
 
-    main_description.append(parts.pop(0))
-
-    for part in parts:
-        m_range: Match = match(range_pattern, part)
-        m_type: Match = match(type_pattern, part)
-        m_default: Match = match(default_pattern, part)
-
-        if m_range:
-            range_str: str = m_range.group()
-
-        elif m_type:
-            type_str: str = m_type.group()
-
-        elif m_default:
-            default_str: str = m_default.group()
+    def getattr(self, attr: Attrs):
+        if attr in {"possible_values", "type", "default", "range", "notes"}:
+            return self.__getattribute__(f"_{attr}_text")
 
         else:
-            main_description.append(part)
+            raise KeyError
+
+    def setattr(self, attr: Attrs, value: str | None):
+        if self.getattr(attr) is None:
+            self.__setattr__(f"_{attr}_text", value)
+
+        else:
+            logger.error(f"Атрибуту {attr} уже задано значение")
+
+    def extract_text(self):
+        text: str = f"{self._content}"
+
+        for name, pattern in self.patterns.items():
+            if m := pattern.search(text):
+                self.setattr(name, m.group().strip())
+                text.replace(m.group(), "")
+
+            else:
+                self.setattr(name, None)
+
+        parts: list[str] = text.split()
+
+        self._description_text = parts.pop(0).strip()
+        self._notes_text.extend(part.strip() for part in parts)
+
+    def update_possible_values(self):
+        def repl(m: Match):
+            return f"{m.group(1)}<br>"
+
+        possible_values: str | None = self.getattr("possible_values")
+
+        if possible_values:
+            _: str = sub(r"Возможные значения:?\s+", "Возможные значения:<br>", possible_values)
+            _: str = sub(r"([.;])\s", repl, _)
+
+            self.setattr("possible_values", None)
+            self.setattr("possible_values", _)
+
+    def stringify(self, attr: Attrs):
+        _: str | None = self.getattr(attr)
+        return f"<br>{_}" if _ is not None else ""
+
+    # def reorder_text(self):
+    #     _: str = sub(self.pattern, ".@@@", self._content)
+    #
+    #     parts: list[str] = _.split("@@@")
+    #
+    #     self._description_text = parts.pop(0)
+    #
+    #     for part in parts:
+    #         if part.startswith("Возможные значения"):
+    #             self._possible_values.append(part)
+    #             continue
+    #
+    #         m_range: Match = match(self.range_pattern, part)
+    #         m_type: Match = match(self.type_pattern, part)
+    #         m_default: Match = match(self.default_pattern, part)
+    #         m_possible_values: Match = match(self.possible_values_pattern, part)
+    #
+    #         if m_range:
+    #             self._range_text: str = m_range.group()
+    #
+    #         elif m_type:
+    #             self._type_text: str = m_type.group()
+    #
+    #         elif m_default:
+    #             self._default_text: str = m_default.group()
+    #
+    #         elif m_possible_values:
+    #             self._possible_values.append(part)
+    #
+    #         else:
+    #             self._notes_text.append(part)
+
+    def __str__(self):
+        return (
+            f"{self._description_text}"
+            f"{self.stringify("range")}"
+            f"{self.stringify("possible_values")}"
+            f"{self.stringify("default")}"
+            f"<br>{' '.join(self._notes_text)}")
+
 
 class TableCoordinate(NamedTuple):
     """Class to represent the cell coordinates in the set_table_cols.
@@ -173,6 +257,10 @@ class TableCell:
     @property
     def table_coordinate(self):
         return self._table_coordinate
+
+    @property
+    def field_text(self):
+        return FieldText(self._text)
 
 
 class TableRow(NamedTuple):
@@ -359,8 +447,6 @@ class Table:
             lines: list[str] = [_.removesuffix("\n").strip() for _ in lines if _.removesuffix("\n").strip()]
 
         self._path: Path = Path(path).expanduser()
-        # self._start: int = start
-        # self._stop: int = stop
         self._lines: list[str] = lines
         self._table_cells: dict[TableCoordinate, TableCell] = {}
 
@@ -657,7 +743,7 @@ class Table:
         """Gets the names of the columns."""
         return [_.name for _ in self.iter_columns()]
 
-    def separate_column(self, column: int | str, new_columns: int, splitter: str):
+    def divide_column(self, column: int | str, new_columns: int, splitter: str):
         first_column_cells: list[TableCell] = []
         second_column_cells: list[TableCell] = []
 
@@ -709,7 +795,7 @@ class Table:
         ompr: TableColumn = self.get_column("OMPR")
         description: TableColumn = self.get_column("Описание")
 
-        self.separate_column("OMPR", 3, "/")
+        self.divide_column("OMPR", 3, "/")
         self.split_column("Описание", r"Тип\s.+\s(\w+?)\s?\.?")
 
 

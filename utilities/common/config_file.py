@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-from typing import MutableMapping
 
 from click.utils import get_app_dir
 from loguru import logger
@@ -12,43 +11,35 @@ from utilities.common.shared import BASE_PATH, ConfigType, FileType
 
 
 class ConfigFile(dict):
-    path: Path = BASE_PATH.joinpath("sources/config.toml")
+    path: Path = BASE_PATH.joinpath("sources/config.yaml")
     user_path: Path = Path(get_app_dir("utilities")).joinpath("config")
 
     # noinspection PyTypeChecker
     def __init__(self):
-        kwargs: ConfigType = file_reader_type(self.path, "toml")
-
-        self.kwargs: ConfigType = kwargs
-
-        for k, v in kwargs.items():
-            if v == "!None":
-                kwargs[k] = None
-
-            elif isinstance(v, MutableMapping):
-                for key, value in v.items():
-                    if value == "!None":
-                        v[key] = None
-
-            kwargs[k] = v
-
+        kwargs: ConfigType = file_reader_type(self.path, "yaml")
         super().__init__(**kwargs)
 
-    def read_user_configs(self, suffix: str, file_type: FileType):
-        path: Path = Path(self.user_path.with_suffix(suffix))
+    def read_user_configs(self):
+        possible_user_configs: set[tuple[str, FileType]] = {
+            (".json", "json"),
+            (".json5", "json"),
+            (".yml", "yaml"),
+            (".yaml", "yaml"),
+            (".toml", "toml")}
 
-        try:
-            user_kwargs: ConfigType = file_reader_type(path, file_type)
+        for suffix, file_type in possible_user_configs:
+            path: Path = Path(self.user_path.with_suffix(suffix))
 
-            for k, v in user_kwargs.items():
-                self[k] = v
+            try:
+                user_kwargs: ConfigType = file_reader_type(path, file_type)
 
-            logger.debug(pformat(user_kwargs, indent=2, width=120, sort_dict_keys=True))
+                for k, v in user_kwargs.items():
+                    self[k] = v
 
-        except FileReaderError:
-            logger.debug(
-                f"Пользовательский конфигурационный файл {path.name} не найден или не обработан"
-                f"\nПоэтому конфигурация по умолчанию не изменена")
+                logger.debug(pformat(user_kwargs, indent=2, width=120, sort_dict_keys=True))
+
+            except FileReaderError:
+                logger.debug(f"Пользовательский конфигурационный файл {path.name} не найден или не обработан")
 
     def get_commands(self, command: str, key: str) -> str | int | float | bool | list[str] | None:
         if command is None:

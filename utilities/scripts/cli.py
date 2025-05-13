@@ -17,7 +17,7 @@ from loguru import logger
 from prettyprinter import pformat
 
 from utilities.common.config_file import config_file
-from utilities.common.custom_logger import custom_logging
+from utilities.common.custom_logger import LoggerConfiguration
 from utilities.common.errors import BaseError
 from utilities.common.functions import file_reader, file_reader_type, file_writer, get_shell, get_version, GitFile, \
     is_macos, is_windows
@@ -225,13 +225,11 @@ def get_command() -> list[str]:
     help=HELP,
     is_eager=True)
 def cli(debug: bool = False, update: bool = True):
-    ctx: Context = get_current_context()
-
     try:
+        ctx: Context = get_current_context()
         ctx.ensure_object(dict)
         ctx.obj = {"debug": debug}
-
-        result_file: bool = False
+        logger_configuration: LoggerConfiguration = getattr(ctx.command, "logging_config")
 
         if ctx.invoked_subcommand is None:
             echo("Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help")
@@ -245,11 +243,9 @@ def cli(debug: bool = False, update: bool = True):
             ctx.exit(0)
 
         elif ctx.invoked_subcommand == "repair-links":
-            result_file: bool = True
+            logger_configuration.add_handler("result_file", "SUCCESS", logger_configuration.result_file_handler())
 
-        custom_logging("cli", is_debug=debug, result_file=result_file)
-
-        config_file_log: str = pformat(config_file.kwargs, indent=2, width=120, compact=False, sort_dict_keys=True)
+        config_file_log: str = pformat(config_file, indent=2, width=120, compact=False, sort_dict_keys=True)
         logger.debug(f"Файл конфигурации:\n{config_file_log}")
 
         args_help_dict_log: str = pformat(args_help_dict, indent=2, width=120, compact=False, sort_dict_keys=True)
@@ -295,6 +291,6 @@ def cli(debug: bool = False, update: bool = True):
             logger.success("Исполняемый файл обновлен")
 
     except BaseError as e:
-        logger.error(f"Ошибка {e.__class__.__name__}: {str(e)}")
+        logger.error(f"Ошибка {e.__class__.__name__}")
         pause(PRESS_ENTER_KEY)
-        ctx.exit(1)
+        sys.exit(1)
