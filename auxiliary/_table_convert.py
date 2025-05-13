@@ -16,12 +16,36 @@ TableType: Type[str] = Literal[".md", ".adoc"]
 
 
 def reorder_text(content: str):
-    replacements: set[str] = {"<br>", "<br/>", ". ", " +\n"}
+    replacements: set[str] = {r".<br/?>", r"\.\s+", r"\.\s+\+\n"}
 
-    content: str = content.replace("<br>")
+    pattern: str = "|".join(replacements)
+    _: str = sub(pattern, ".@@@", content)
 
-    parts: list[str] = content.split("<br>")
+    parts: list[str] = _.split("@@@")
 
+    main_description: list[str] = []
+    range_pattern: str = r"Диапазон[^.]+."
+    type_pattern: str = r"Тип[^.]+."
+    default_pattern: str = r"(?:Значение)?\s?[Пп]о умолчанию[^.]+."
+
+    main_description.append(parts.pop(0))
+
+    for part in parts:
+        m_range: Match = match(range_pattern, part)
+        m_type: Match = match(type_pattern, part)
+        m_default: Match = match(default_pattern, part)
+
+        if m_range:
+            range_str: str = m_range.group()
+
+        elif m_type:
+            type_str: str = m_type.group()
+
+        elif m_default:
+            default_str: str = m_default.group()
+
+        else:
+            main_description.append(part)
 
 class TableCoordinate(NamedTuple):
     """Class to represent the cell coordinates in the set_table_cols.
@@ -96,6 +120,7 @@ class TableCell:
             column_modifier: int = 1):
         self._table_coordinate: TableCoordinate = table_coordinate
         self._text: str | None = text
+        self._parts: list[str] = []
         self._row_modifier: int = row_modifier
         self._column_modifier: int = column_modifier
 
