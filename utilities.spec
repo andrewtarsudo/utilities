@@ -9,7 +9,7 @@ a = Analysis(
     ['__main__.py'],
     pathex=['./utilities'],
     binaries=binaries,
-    datas=[('LICENSE', '.'), ('MANIFEST.in', '.'), ('pyproject.toml', '.'), ('sources/', './sources/'), ('utilities/', './utilities/'), ('updates/', './updates/')],
+    datas=[('LICENSE', '.'), ('MANIFEST.in', '.'), ('pyproject.toml', '.'), ('sources/', './sources/'), ('utilities/', './utilities/'), ('updates/', './updates/'), ('.venv/lib/python3.12/site-packages/colorful/data/rgb.txt', 'colorful/data')],
     hiddenimports=['loguru', 'yaml', 'more_itertools', 'click', 'slugify', 'PIL', 'certifi', 'httpx', 'frontmatter', 'prettyprinter'],
     hookspath=[],
     hooksconfig={},

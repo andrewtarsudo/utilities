@@ -121,7 +121,7 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     name: str = ctx.command_path.replace("__main__.py", f"tw_utilities{suffix}")
 
     if commands is not None and commands:
-        commands_str: str = wrap_line(" | ".join(f"<{command}>" for command in commands))
+        commands_str: str = wrap_line(" | ".join(f"<{command}>" for command in sorted(commands)))
         formatter.write(
             f"{style('Использование', fg='bright_cyan', bold=True)}:"
             f"\n{name} {wrap_line(opts_str)}"
@@ -179,7 +179,7 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
         with formatter.section(style("Опции", fg="blue", bold=True)):
             opt_names: list[str] = [item[0] for item in rows]
 
-            col_spacing: int = COL_MAX - max(map(len, opt_names))
+            col_spacing: int = COL_MAX - max(map(len, opt_names)) - 7
             col_max: int = MAX_CONTENT_WIDTH
             formatter.write_dl(rows, col_max, col_spacing)
 
