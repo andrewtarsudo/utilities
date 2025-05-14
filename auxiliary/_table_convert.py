@@ -19,8 +19,10 @@ Attrs: Type[str] = Literal["possible_values", "type", "default", "range", "notes
 class FieldText:
     range_pattern: Pattern = compile(r"\bДиапазон\b(?:[^.|]|<br\s*/?>|\s+\+\n)+\.?", flags=UNICODE)
     type_pattern: Pattern = compile(r"\bТип\b(?:[^.|]|<br\s*/?>|\s+\+\n)+\.?", flags=UNICODE)
-    possible_values_pattern: Pattern = compile(r"(?:Возможные значения:|(?<!\.)\G)(?:[^.;|]|<br\s*/?>|\s+\+\n)*?(?:\w+|`\w+`)\s*--?\s*(?:[^.;|]|<br\s*/?>|\s+\+\n)+[.;]?", flags=UNICODE)
-    default_pattern: Pattern = compile(r"(?:\bЗначение\b\s)?\b[Пп]о умолчанию\b(?:[^.|]|<br\s*/?>|\s+\+\n)+\.?", flags=UNICODE)
+    possible_values_pattern: Pattern = compile(
+        r"(?:Возможные значения:|(?<!\.))(?:[^.;|]|<br\s*/?>|\s+\+\n)*?(?:\w+|`\w+`)\s*--?\s*(?:[^.;|]|<br\s*/?>|\s+\+\n)+[.;]?", flags=UNICODE)
+    default_pattern: Pattern = compile(
+        r"(?:\bЗначение\b\s)?\b[Пп]о умолчанию\b(?:[^.|]|<br\s*/?>|\s+\+\n)+\.?", flags=UNICODE)
 
     patterns: dict[Attrs, Pattern] = {
         "possible_values": possible_values_pattern,
@@ -324,7 +326,7 @@ class TableRow(NamedTuple):
             return NotImplemented
 
     def __ge__(self, other):
-        if isinstance(other, self.__class__):
+        if isinstance(other, TableRow):
             return self.row >= other.row
 
         else:
@@ -340,7 +342,7 @@ class TableRow(NamedTuple):
             return f"|{cell_str}"
 
         else:
-            return super().__format__(format_spec)
+            return object.__format__(self, format_spec)
 
 
 class TableColumn(NamedTuple):
@@ -582,6 +584,8 @@ class Table:
     @property
     def num_columns(self) -> int:
         """Gets the number of columns."""
+        print(Counter(self._lines[0].strip("|").strip()))
+        print(self._lines[0])
         return Counter(self._lines[0].strip("|").strip()).get("|") + 1
 
     @property
@@ -747,10 +751,10 @@ class Table:
         first_column_cells: list[TableCell] = []
         second_column_cells: list[TableCell] = []
 
-        for row, cell in enumerate(iter(self.get_column(column))):
+        for row, cell in enumerate(iter(self.get_column(column)[1:])):
             first_column_text, second_column_text = cell.text.split(splitter, maxsplit=1)
-            first_column_table_coordinate: TableCoordinate = TableCoordinate(row, new_columns + 1)
-            second_column_table_coordinate: TableCoordinate = TableCoordinate(row, new_columns + 2)
+            first_column_table_coordinate: TableCoordinate = TableCoordinate(row, new_columns)
+            second_column_table_coordinate: TableCoordinate = TableCoordinate(row, new_columns + 1)
 
             first_column_cell: TableCell = TableCell(first_column_table_coordinate, first_column_text)
             second_column_cell: TableCell = TableCell(second_column_table_coordinate, second_column_text)
@@ -758,8 +762,8 @@ class Table:
             first_column_cells.append(first_column_cell)
             second_column_cells.append(second_column_cell)
 
-        first_column: TableColumn = TableColumn(new_columns + 1, first_column_cells)
-        second_column: TableColumn = TableColumn(new_columns + 2, second_column_cells)
+        first_column: TableColumn = TableColumn(new_columns, first_column_cells)
+        second_column: TableColumn = TableColumn(new_columns + 1, second_column_cells)
 
         self.add_column(first_column)
         self.add_column(second_column)
@@ -805,8 +809,14 @@ class File:
         self._content: list[str] = []
         self._tables: dict[str, Table] = {}
 
-    def save(self):
-        file_writer(self._path, self._content)
+    def save(self, content: str | None = None):
+        if content is None:
+            content: list[str] = self._content
+
+        file_writer(self._path, content)
+
+    def __str__(self):
+        return "\n".join(self._content)
 
     @property
     def table_type(self):
@@ -827,6 +837,14 @@ class File:
 
             table: Table = Table(self._path, lines)
             self._tables[m.group(0)] = table
+
+    def update_tables(self):
+        content: str = str(self)
+        for pattern, table in self._tables.items():
+            content: str = content.replace(pattern, str(table))
+
+        self.save(content)
+
 
 
 def find_tables(text: str) -> list[str]:
@@ -1029,12 +1047,20 @@ def process_tables_in_text(text: str, input_format: str = "markdown", output_for
 
 
 if __name__ == '__main__':
-    with open(
-            "/Users/andrewtarasov/PycharmProjects/SB/content/common/config/congestion.cfg.md",
-            "r",
-            encoding="utf-8",
-            errors="ignore") as f:
-        text: str = f.read()
-
-    result: str = process_tables_in_text(text, "markdown", "markdown")
-    print(result)
+    # with open(
+    #         "/Users/andrewtarasov/PycharmProjects/SB/content/common/config/congestion.cfg.md",
+    #         "r",
+    #         encoding="utf-8",
+    #         errors="ignore") as f:
+    #     text: str = f.read()
+    #
+    # result: str = process_tables_in_text(text, "markdown", "markdown")
+    # print(result)
+    path: str = "congestion.md"
+    Table.table_type = ".md"
+    file: File = File(path)
+    file.find_tables()
+    for table in file._tables.values():
+        table.define_cells()
+        table.fix_config()
+    file.update_tables()
