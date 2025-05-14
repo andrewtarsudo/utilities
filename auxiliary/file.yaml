@@ -1,0 +1,983 @@
+.:
+  index:
+  - content/common/_index.md
+alarm:
+  index:
+  - content/common/alarm/_index.md
+alarm/mib:
+  files:
+  - content/common/alarm/mib/PROTEI-SG-SIGTRAN-M3UA-MIB.md
+appendices:
+  files:
+  - content/common/appendices/internal_status.md
+  - content/common/appendices/transaction_states.md
+  - content/common/appendices/user_actions.md
+  - content/common/appendices/server_assignment_types.md
+  - content/common/appendices/csi_type_ids.md
+  - content/common/appendices/session_types_ids.md
+  - content/common/appendices/authentication_algorithm_codes.md
+  - content/common/appendices/ss_codes.md
+  - content/common/appendices/access_restriction_data.md
+  - content/common/appendices/odb.md
+  - content/common/appendices/op_code.md
+  - content/common/appendices/tcap_error_codes.md
+  - content/common/appendices/diam_error_codes.md
+  - content/common/appendices/db_status.md
+  - content/common/appendices/bearerservice_codes.md
+  - content/common/appendices/subscriber_status_codes.md
+  - content/common/appendices/tr_status.md
+  - content/common/appendices/teleservice_codes.md
+  - content/common/appendices/user_rights.md
+  - content/common/appendices/http_request_status.md
+  - content/common/appendices/operation_states.md
+  - content/common/appendices/operation_types.md
+basics:
+  files:
+  - content/common/basics/general.md
+  - content/common/basics/qos_apply.md
+  - content/common/basics/roaming_control.md
+  - content/common/basics/functionalities.md
+  - content/common/basics/operation_scenarios.md
+config:
+  index:
+  - content/common/config/_index.md
+config/API:
+  index:
+  - content/common/config/API/_index.md
+  files:
+  - content/common/config/API/hlr_mib.md
+  - content/common/config/API/hlr_ap.md
+  - content/common/config/API/italtel.md
+  - content/common/config/API/jdbc.md
+  - content/common/config/API/logback.md
+  - content/common/config/API/omi.md
+  - content/common/config/API/profiles.md
+  - content/common/config/API/winter.md
+config/Core:
+  index:
+  - content/common/config/Core/_index.md
+  files:
+  - content/common/config/Core/ap.md
+  - content/common/config/Core/auc.md
+  - content/common/config/Core/diameter.md
+  - content/common/config/Core/hlr.md
+  - content/common/config/Core/hsm.md
+  - content/common/config/Core/license.md
+  - content/common/config/Core/om_interface.md
+  - content/common/config/Core/pcap.md
+  - content/common/config/Core/protei.md
+  - content/common/config/Core/sccp_routing.md
+  - content/common/config/Core/statistics.md
+  - content/common/config/Core/trace.md
+  - content/common/config/Core/udp.md
+  - content/common/config/Core/metrics.md
+config/Core/component:
+  index:
+  - content/common/config/Core/component/_index.md
+  files:
+  - content/common/config/Core/component/config.md
+  - content/common/config/Core/component/diameter.md
+  - content/common/config/Core/component/m2pa.md
+  - content/common/config/Core/component/m3ua.md
+  - content/common/config/Core/component/mtp.md
+  - content/common/config/Core/component/physical.md
+  - content/common/config/Core/component/sccp.md
+  - content/common/config/Core/component/tcap.md
+logging: {}
+logging/API:
+  index:
+  - content/common/logging/API/_index.md
+logging/API/log:
+  index:
+  - content/common/logging/API/log/_index.md
+  files:
+  - content/common/logging/API/log/bs_operation_journal.md
+  - content/common/logging/API/log/http_statistics.md
+  - content/common/logging/API/log/omi_statistics.md
+  - content/common/logging/API/log/operation_journal.md
+logging/Core:
+  index:
+  - content/common/logging/Core/_index.md
+logging/Core/log:
+  index:
+  - content/common/logging/Core/log/_index.md
+  files:
+  - content/common/logging/Core/log/trman_diam_cdr.md
+  - content/common/logging/Core/log/trman_tcap_cdr.md
+  - content/common/logging/Core/log/trman_cdr.md
+  - content/common/logging/Core/log/tcap_transactions_cdr.md
+  - content/common/logging/Core/log/hlr.md
+  - content/common/logging/Core/log/hss.md
+logging/Core/metrics:
+  files:
+  - content/common/logging/Core/metrics/Cx-interface.md
+  - content/common/logging/Core/metrics/Diameter.md
+  - content/common/logging/Core/metrics/S6a-interface.md
+  - content/common/logging/Core/metrics/S6t-interface.md
+  - content/common/logging/Core/metrics/Sh-interface.md
+  - content/common/logging/Core/metrics/Subscribers.md
+logging/Core/stat:
+  index:
+  - content/common/logging/Core/stat/_index.md
+  files:
+  - content/common/logging/Core/stat/abonent_operative_stat.md
+  - content/common/logging/Core/stat/abonent_stat.md
+  - content/common/logging/Core/stat/traffic_stat.md
+oam:
+  files:
+  - content/common/oam/installation.md
+oam/API: {}
+oam/API/pudr: {}
+oam/API/pudr/registrations:
+  files:
+  - content/common/oam/API/pudr/registrations/imsrestorationinformations.md
+  - content/common/oam/API/pudr/registrations/mme.md
+  - content/common/oam/API/pudr/registrations/scscf.md
+  - content/common/oam/API/pudr/registrations/scscfRestorationInformation.md
+  - content/common/oam/API/pudr/registrations/sgsn.md
+  - content/common/oam/API/pudr/registrations/sgsn4g.md
+  - content/common/oam/API/pudr/registrations/vlr.md
+oam/cli:
+  index:
+  - content/common/oam/cli/_index.md
+  files:
+  - content/common/oam/cli/add_auc_profile.md
+  - content/common/oam/cli/add_eps.md
+  - content/common/oam/cli/add_qos_eps.md
+  - content/common/oam/cli/add_qos_gprs.md
+  - content/common/oam/cli/add_subscriber.md
+  - content/common/oam/cli/add_subscriber_profile.md
+  - content/common/oam/cli/add_bl.md
+  - content/common/oam/cli/add_wl.md
+  - content/common/oam/cli/ard_control.md
+  - content/common/oam/cli/bl_list.md
+  - content/common/oam/cli/bl_plmn_control.md
+  - content/common/oam/cli/bl_vlr_control.md
+  - content/common/oam/cli/ch_msisdn.md
+  - content/common/oam/cli/ch_nam.md
+  - content/common/oam/cli/change_imsi.md
+  - content/common/oam/cli/change_status.md
+  - content/common/oam/cli/control_csi.md
+  - content/common/oam/cli/del_bl.md
+  - content/common/oam/cli/del_eps.md
+  - content/common/oam/cli/del_msisdn.md
+  - content/common/oam/cli/del_qos_eps.md
+  - content/common/oam/cli/del_qos_gprs.md
+  - content/common/oam/cli/del_subscriber.md
+  - content/common/oam/cli/del_wl.md
+  - content/common/oam/cli/eps_control.md
+  - content/common/oam/cli/get_csi.md
+  - content/common/oam/cli/get_profile.md
+  - content/common/oam/cli/odb_control.md
+  - content/common/oam/cli/pdp_control.md
+  - content/common/oam/cli/qos_eps_control.md
+  - content/common/oam/cli/qos_eps_list.md
+  - content/common/oam/cli/qos_gprs_control.md
+  - content/common/oam/cli/qos_gprs_list.md
+  - content/common/oam/cli/cancel_location.md
+oam/control:
+  files:
+  - content/common/oam/control/connection_check.md
+  - content/common/oam/control/state_check.md
+  - content/common/oam/control/db_control.md
+  - content/common/oam/control/HLR_node_control.md
+  - content/common/oam/control/HLR_API_node_control.md
+oam/Functionality_setting:
+  files:
+  - content/common/oam/Functionality_setting/nbiot.md
+  - content/common/oam/Functionality_setting/psi_routing.md
+provisioning:
+  index:
+  - content/common/provisioning/_index.md
+  files:
+  - content/common/provisioning/addAndActivateEmptySubscribers.md
+  - content/common/provisioning/addAucProfile.md
+  - content/common/provisioning/addAucProfileCampaign.md
+  - content/common/provisioning/addAucProfileBatch.md
+  - content/common/provisioning/addSubscriber.md
+  - content/common/provisioning/addSubscriberBatch.md
+  - content/common/provisioning/addSubscriberProfile.md
+  - content/common/provisioning/addSubscriberProfileCampaign.md
+  - content/common/provisioning/changeAucConfig.md
+  - content/common/provisioning/changeAucProfile.md
+  - content/common/provisioning/changeCapabilitiesSet.md
+  - content/common/provisioning/changeExternalGroupIdentifier.md
+  - content/common/provisioning/changeGroup.md
+  - content/common/provisioning/changeImsi.md
+  - content/common/provisioning/changeImsiCampaign.md
+  - content/common/provisioning/changeImsSubscription.md
+  - content/common/provisioning/changeLcsProfile.md
+  - content/common/provisioning/changeNiddAuthorization.md
+  - content/common/provisioning/changeProfileTemplate.md
+  - content/common/provisioning/changeQosProfile.md
+  - content/common/provisioning/changeRegionalZoneCodeIdentity.md
+  - content/common/provisioning/changeScef.md
+  - content/common/provisioning/changeSifcSet.md
+  - content/common/provisioning/changeSnssai.md
+  - content/common/provisioning/changeStatus.md
+  - content/common/provisioning/changeWhiteBlackLists.md
+  - content/common/provisioning/controlAs.md
+  - content/common/provisioning/controlChargingInformation.md
+  - content/common/provisioning/controlConfig.md
+  - content/common/provisioning/controlCsiProfile.md
+  - content/common/provisioning/controlEpsProfile.md
+  - content/common/provisioning/controlPdpProfile.md
+  - content/common/provisioning/controlPrefferedScscfSet.md
+  - content/common/provisioning/controlRoamingAgreement.md
+  - content/common/provisioning/controlUser.md
+  - content/common/provisioning/deleteSubscriber.md
+  - content/common/provisioning/deleteSubscriberCampaign.md
+  - content/common/provisioning/deleteSubscriberProfile.md
+  - content/common/provisioning/deleteSubscriberProfileCampaign.md
+  - content/common/provisioning/editIMSI.md
+  - content/common/provisioning/exportSubscriberProfile.md
+  - content/common/provisioning/getAllBlackLists.md
+  - content/common/provisioning/getAllWhiteLists.md
+  - content/common/provisioning/getAs.md
+  - content/common/provisioning/getAucConfig.md
+  - content/common/provisioning/getAucProfile.md
+  - content/common/provisioning/getAucProfileBatch.md
+  - content/common/provisioning/getAudit.md
+  - content/common/provisioning/getCampaignStatDetail.md
+  - content/common/provisioning/getCapabilitiesSet.md
+  - content/common/provisioning/getChargingInformation.md
+  - content/common/provisioning/getConfig.md
+  - content/common/provisioning/getCsiProfile.md
+  - content/common/provisioning/getEpsProfile.md
+  - content/common/provisioning/getExportFile.md
+  - content/common/provisioning/getGroup.md
+  - content/common/provisioning/getGroups.md
+  - content/common/provisioning/getImsSubscription.md
+  - content/common/provisioning/getLcsProfile.md
+  - content/common/provisioning/getPdpProfile.md
+  - content/common/provisioning/getPrefferedScscfSet.md
+  - content/common/provisioning/getProfile.md
+  - content/common/provisioning/getProfilesByFilter.md
+  - content/common/provisioning/getProfileBatchFile.md
+  - content/common/provisioning/getProfilesIdentity.md
+  - content/common/provisioning/getProfilesValue.md
+  - content/common/provisioning/getProfileTemplate.md
+  - content/common/provisioning/getProperties.md
+  - content/common/provisioning/getQosProfile.md
+  - content/common/provisioning/getRegionalZoneCodeIdentity.md
+  - content/common/provisioning/getRoamingAgreement.md
+  - content/common/provisioning/getScef.md
+  - content/common/provisioning/getSifcSet.md
+  - content/common/provisioning/getStatsCampaign.md
+  - content/common/provisioning/getUser.md
+  - content/common/provisioning/getUserBatch.md
+  - content/common/provisioning/getUserLocation.md
+  - content/common/provisioning/getWhiteBlackLists.md
+  - content/common/provisioning/profileControl.md
+  - content/common/provisioning/profileControlCampaign.md
+  - content/common/provisioning/sendAlertSc.md
+  - content/common/provisioning/sendCancelLocation.md
+  - content/common/provisioning/sendProvideRoamingNumber.md
+  - content/common/provisioning/sendProvideSubscriberInformation.md
+  - content/common/provisioning/sendRegistrationTermination.md
+  - content/common/provisioning/sendReset.md
+  - content/common/provisioning/setMsisdn.md
+  - content/common/provisioning/setMsisdnCampaign.md
+  - content/common/provisioning/setMsisdnBatch.md
+  - content/common/provisioning/setOnTrace.md
+  - content/common/provisioning/stopCampaign.md
+  - content/common/provisioning/validateAucConfig.md
+provisioning/entities:
+  index:
+  - content/common/provisioning/entities/_index.md
+  files:
+  - content/common/provisioning/entities/accessRestrictionData.md
+  - content/common/provisioning/entities/apiProperties.md
+  - content/common/provisioning/entities/applicationServer.md
+  - content/common/provisioning/entities/aucData.md
+  - content/common/provisioning/entities/aucFilter.md
+  - content/common/provisioning/entities/aucProfile.md
+  - content/common/provisioning/entities/audit.md
+  - content/common/provisioning/entities/auditFilter.md
+  - content/common/provisioning/entities/baseFilter.md
+  - content/common/provisioning/entities/basicService.md
+  - content/common/provisioning/entities/blackList.md
+  - content/common/provisioning/entities/blPlmnMask.md
+  - content/common/provisioning/entities/blVlrMask.md
+  - content/common/provisioning/entities/campaign.md
+  - content/common/provisioning/entities/campaignCounter.md
+  - content/common/provisioning/entities/campaignFilter.md
+  - content/common/provisioning/entities/capabilitiesSet.md
+  - content/common/provisioning/entities/capability.md
+  - content/common/provisioning/entities/ccNdcZc.md
+  - content/common/provisioning/entities/changeEpsData.md
+  - content/common/provisioning/entities/chargingInformation.md
+  - content/common/provisioning/entities/coreProperties.md
+  - content/common/provisioning/entities/cParam.md
+  - content/common/provisioning/entities/csiLink.md
+  - content/common/provisioning/entities/csPsLocationInformation.md
+  - content/common/provisioning/entities/dbConfig.md
+  - content/common/provisioning/entities/dbProperties.md
+  - content/common/provisioning/entities/dCsi.md
+  - content/common/provisioning/entities/dCsiCriteria.md
+  - content/common/provisioning/entities/edrxCycleLength.md
+  - content/common/provisioning/entities/emptySubscriber.md
+  - content/common/provisioning/entities/entity.md
+  - content/common/provisioning/entities/epsData.md
+  - content/common/provisioning/entities/epsLocationInformation.md
+  - content/common/provisioning/entities/epsProfile.md
+  - content/common/provisioning/entities/epsUserState.md
+  - content/common/provisioning/entities/extension.md
+  - content/common/provisioning/entities/externalGroupIdentifier.md
+  - content/common/provisioning/entities/externalProfileIdentity.md
+  - content/common/provisioning/entities/gprsCsi.md
+  - content/common/provisioning/entities/gprsCsiTdp.md
+  - content/common/provisioning/entities/group.md
+  - content/common/provisioning/entities/groupGt.md
+  - content/common/provisioning/entities/ifc.md
+  - content/common/provisioning/entities/impi.md
+  - content/common/provisioning/entities/implicitlyRegisteredSet.md
+  - content/common/provisioning/entities/impu.md
+  - content/common/provisioning/entities/imsProfile.md
+  - content/common/provisioning/entities/imsSubscription.md
+  - content/common/provisioning/entities/imsUserData.md
+  - content/common/provisioning/entities/lcsGmlc.md
+  - content/common/provisioning/entities/lcsMolr.md
+  - content/common/provisioning/entities/lcsPrivacy.md
+  - content/common/provisioning/entities/lcsPrivacyEc.md
+  - content/common/provisioning/entities/lcsPrivacyPlmn.md
+  - content/common/provisioning/entities/lcsProfile.md
+  - content/common/provisioning/entities/linkEpsData.md
+  - content/common/provisioning/entities/locationInformation.md
+  - content/common/provisioning/entities/mCsi.md
+  - content/common/provisioning/entities/mCsiMt.md
+  - content/common/provisioning/entities/mmeLocationInformation.md
+  - content/common/provisioning/entities/niddAuthorization.md
+  - content/common/provisioning/entities/noPsiGt.md
+  - content/common/provisioning/entities/nssai.md
+  - content/common/provisioning/entities/oCsi.md
+  - content/common/provisioning/entities/oCsiTdp.md
+  - content/common/provisioning/entities/oCsiTdpBsCriteria.md
+  - content/common/provisioning/entities/oCsiTdpCtCriteria.md
+  - content/common/provisioning/entities/oCsiTdpCvCriteria.md
+  - content/common/provisioning/entities/oCsiTdpDnCriteria.md
+  - content/common/provisioning/entities/oCsiTdpDnCriteriaDn.md
+  - content/common/provisioning/entities/oCsiTdpDnCriteriaDnl.md
+  - content/common/provisioning/entities/odb.md
+  - content/common/provisioning/entities/odbParam.md
+  - content/common/provisioning/entities/opParam.md
+  - content/common/provisioning/entities/pdpData.md
+  - content/common/provisioning/entities/pdpProfile.md
+  - content/common/provisioning/entities/permission.md
+  - content/common/provisioning/entities/plmnZc.md
+  - content/common/provisioning/entities/prefferedScscf.md
+  - content/common/provisioning/entities/prefferedScscfSet.md
+  - content/common/provisioning/entities/problemDetails.md
+  - content/common/provisioning/entities/profileTemplate.md
+  - content/common/provisioning/entities/qosEps.md
+  - content/common/provisioning/entities/qosGprs.md
+  - content/common/provisioning/entities/raVlr.md
+  - content/common/provisioning/entities/regional.md
+  - content/common/provisioning/entities/regionalZoneCodeLink.md
+  - content/common/provisioning/entities/repositoryData.md
+  - content/common/provisioning/entities/roaming.md
+  - content/common/provisioning/entities/roamingScscfInfo.md
+  - content/common/provisioning/entities/roamingSgsn.md
+  - content/common/provisioning/entities/rParam.md
+  - content/common/provisioning/entities/scef.md
+  - content/common/provisioning/entities/permissionSeparate.md
+  - content/common/provisioning/entities/servicePointTrigger.md
+  - content/common/provisioning/entities/serviceProfile.md
+  - content/common/provisioning/entities/sgsnLocationInformation.md
+  - content/common/provisioning/entities/sIfcSet.md
+  - content/common/provisioning/entities/sipDigest.md
+  - content/common/provisioning/entities/smsCsi.md
+  - content/common/provisioning/entities/smsCsiTdp.md
+  - content/common/provisioning/entities/smsRegistrationInfo.md
+  - content/common/provisioning/entities/snssai.md
+  - content/common/provisioning/entities/ssBarring.md
+  - content/common/provisioning/entities/ssCsi.md
+  - content/common/provisioning/entities/ssCsiCriteria.md
+  - content/common/provisioning/entities/ssCugFeat.md
+  - content/common/provisioning/entities/ssCugSub.md
+  - content/common/provisioning/entities/ssCugSubBs.md
+  - content/common/provisioning/entities/ssData.md
+  - content/common/provisioning/entities/ssForwarding.md
+  - content/common/provisioning/entities/subscriberFilter.md
+  - content/common/provisioning/entities/subscriberProfile.md
+  - content/common/provisioning/entities/subscriberProfileRequested.md
+  - content/common/provisioning/entities/subSnssai.md
+  - content/common/provisioning/entities/taskResult.md
+  - content/common/provisioning/entities/tCsi.md
+  - content/common/provisioning/entities/tCsiTdp.md
+  - content/common/provisioning/entities/tCsiTdpBsCriteria.md
+  - content/common/provisioning/entities/tCsiTdpCvCriteria.md
+  - content/common/provisioning/entities/tkParam.md
+  - content/common/provisioning/entities/triggerPoint.md
+  - content/common/provisioning/entities/user.md
+  - content/common/provisioning/entities/userCsgInformation.md
+  - content/common/provisioning/entities/ussdCsi.md
+  - content/common/provisioning/entities/ussdCsiCriteria.md
+  - content/common/provisioning/entities/whiteList.md
+  - content/common/provisioning/entities/wlPlmnMask.md
+  - content/common/provisioning/entities/wlVlrMask.md
+  - content/common/provisioning/entities/zoneCode.md
+version_history: {}
+version_history/API:
+  index:
+  - content/common/version_history/API/_index.md
+version_history/Core:
+  index:
+  - content/common/version_history/Core/_index.md
+version_history/UI:
+  index:
+  - content/common/version_history/UI/_index.md
+web:
+  index:
+  - content/common/web/_index.md
+  files:
+  - content/common/web/history_of_changes.md
+  - content/common/web/purpose.md
+  - content/common/web/functionalities.md
+  - content/common/web/access_rights.md
+  - content/common/web/authorization.md
+  - content/common/web/system_messages.md
+  - content/common/web/exit.md
+  - content/common/web/main_page.md
+  - content/common/web/user_password_change.md
+  - content/common/web/system_info.md
+  - content/common/web/page_navigation.md
+  - content/common/web/used_data_types.md
+  - content/common/web/calendar.md
+web/annex:
+  index:
+  - content/common/web/annex/_index.md
+  files:
+  - content/common/web/annex/teleservice.md
+  - content/common/web/annex/bearer.md
+  - content/common/web/annex/ss.md
+  - content/common/web/annex/operation_statuses.md
+  - content/common/web/annex/operation_types.md
+  - content/common/web/annex/regular_expressions.md
+  - content/common/web/annex/cs_error.md
+  - content/common/web/annex/eps_error.md
+  - content/common/web/annex/forwarding_types.md
+  - content/common/web/annex/possible_errors.md
+web/section:
+  index:
+  - content/common/web/section/_index.md
+web/section/AUC_params:
+  index:
+  - content/common/web/section/AUC_params/_index.md
+web/section/AUC_params/C:
+  index:
+  - content/common/web/section/AUC_params/C/_index.md
+  files:
+  - content/common/web/section/AUC_params/C/add_c.md
+  - content/common/web/section/AUC_params/C/view_c.md
+  - content/common/web/section/AUC_params/C/edit_c.md
+  - content/common/web/section/AUC_params/C/check_c.md
+  - content/common/web/section/AUC_params/C/delete_c.md
+web/section/AUC_params/external_AUC:
+  index:
+  - content/common/web/section/AUC_params/external_AUC/_index.md
+  files:
+  - content/common/web/section/AUC_params/external_AUC/add_external_auc.md
+  - content/common/web/section/AUC_params/external_AUC/edit_external_auc.md
+  - content/common/web/section/AUC_params/external_AUC/delete_external_auc.md
+web/section/AUC_params/OP:
+  index:
+  - content/common/web/section/AUC_params/OP/_index.md
+  files:
+  - content/common/web/section/AUC_params/OP/add_op.md
+  - content/common/web/section/AUC_params/OP/view_op.md
+  - content/common/web/section/AUC_params/OP/edit_op.md
+  - content/common/web/section/AUC_params/OP/check_op.md
+  - content/common/web/section/AUC_params/OP/delete_op.md
+web/section/AUC_params/R:
+  index:
+  - content/common/web/section/AUC_params/R/_index.md
+  files:
+  - content/common/web/section/AUC_params/R/add_R.md
+  - content/common/web/section/AUC_params/R/view_R.md
+  - content/common/web/section/AUC_params/R/edit_R.md
+  - content/common/web/section/AUC_params/R/check_R.md
+  - content/common/web/section/AUC_params/R/delete_R.md
+web/section/AUC_params/TK:
+  index:
+  - content/common/web/section/AUC_params/TK/_index.md
+  files:
+  - content/common/web/section/AUC_params/TK/add_tk.md
+  - content/common/web/section/AUC_params/TK/view_tk.md
+  - content/common/web/section/AUC_params/TK/edit_tk.md
+  - content/common/web/section/AUC_params/TK/check_tk.md
+  - content/common/web/section/AUC_params/TK/delete_tk.md
+web/section/camel_profile_config:
+  index:
+  - content/common/web/section/camel_profile_config/_index.md
+web/section/camel_profile_config/D_CSI:
+  index:
+  - content/common/web/section/camel_profile_config/D_CSI/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/D_CSI/add_d_csi.md
+  - content/common/web/section/camel_profile_config/D_CSI/delete_d_csi.md
+web/section/camel_profile_config/D_CSI/edit_d_csi:
+  index:
+  - content/common/web/section/camel_profile_config/D_CSI/edit_d_csi/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/D_CSI/edit_d_csi/main_d_csi_params.md
+web/section/camel_profile_config/D_CSI/edit_d_csi/d_csi_criteria_params:
+  index:
+  - content/common/web/section/camel_profile_config/D_CSI/edit_d_csi/d_csi_criteria_params/_index.md
+web/section/camel_profile_config/D_IM_CSI:
+  index:
+  - content/common/web/section/camel_profile_config/D_IM_CSI/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/D_IM_CSI/add_d_im_csi.md
+  - content/common/web/section/camel_profile_config/D_IM_CSI/delete_d_im_csi.md
+web/section/camel_profile_config/D_IM_CSI/edit_d_im_csi:
+  index:
+  - content/common/web/section/camel_profile_config/D_IM_CSI/edit_d_im_csi/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/D_IM_CSI/edit_d_im_csi/main_d_im_csi_params.md
+web/section/camel_profile_config/D_IM_CSI/edit_d_im_csi/d_im_csi_criteria_param:
+  index:
+  - content/common/web/section/camel_profile_config/D_IM_CSI/edit_d_im_csi/d_im_csi_criteria_param/_index.md
+web/section/camel_profile_config/GPRS_CSI:
+  index:
+  - content/common/web/section/camel_profile_config/GPRS_CSI/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/GPRS_CSI/add_gprs_csi.md
+  - content/common/web/section/camel_profile_config/GPRS_CSI/delete_gprs_csi.md
+web/section/camel_profile_config/GPRS_CSI/edit_gprs_csi:
+  index:
+  - content/common/web/section/camel_profile_config/GPRS_CSI/edit_gprs_csi/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/GPRS_CSI/edit_gprs_csi/main_gprs_csi_params.md
+web/section/camel_profile_config/GPRS_CSI/edit_gprs_csi/gprs_csi_tdp_params:
+  index:
+  - content/common/web/section/camel_profile_config/GPRS_CSI/edit_gprs_csi/gprs_csi_tdp_params/_index.md
+web/section/camel_profile_config/M_CSI:
+  index:
+  - content/common/web/section/camel_profile_config/M_CSI/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/M_CSI/add_m_csi.md
+  - content/common/web/section/camel_profile_config/M_CSI/delete_m_csi.md
+web/section/camel_profile_config/M_CSI/edit_m_csi:
+  index:
+  - content/common/web/section/camel_profile_config/M_CSI/edit_m_csi/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/M_CSI/edit_m_csi/main_m_csi_params.md
+web/section/camel_profile_config/M_CSI/edit_m_csi/m_csi_mt_params:
+  index:
+  - content/common/web/section/camel_profile_config/M_CSI/edit_m_csi/m_csi_mt_params/_index.md
+web/section/camel_profile_config/O_CSI:
+  index:
+  - content/common/web/section/camel_profile_config/O_CSI/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/O_CSI/add_o_csi.md
+  - content/common/web/section/camel_profile_config/O_CSI/delete_o_csi.md
+web/section/camel_profile_config/O_CSI/edit_o_csi:
+  index:
+  - content/common/web/section/camel_profile_config/O_CSI/edit_o_csi/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/O_CSI/edit_o_csi/main_o_csi_params.md
+web/section/camel_profile_config/O_CSI/edit_o_csi/o_csi_tdp_params:
+  index:
+  - content/common/web/section/camel_profile_config/O_CSI/edit_o_csi/o_csi_tdp_params/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/O_CSI/edit_o_csi/o_csi_tdp_params/main_tdp_params.md
+  - content/common/web/section/camel_profile_config/O_CSI/edit_o_csi/o_csi_tdp_params/destination_number_criteria_params.md
+  - content/common/web/section/camel_profile_config/O_CSI/edit_o_csi/o_csi_tdp_params/main_service_criteria_params.md
+  - content/common/web/section/camel_profile_config/O_CSI/edit_o_csi/o_csi_tdp_params/call_type_criteria_params.md
+  - content/common/web/section/camel_profile_config/O_CSI/edit_o_csi/o_csi_tdp_params/cause_criteria_params.md
+web/section/camel_profile_config/O_IM_CSI:
+  index:
+  - content/common/web/section/camel_profile_config/O_IM_CSI/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/O_IM_CSI/add_o_im_csi.md
+  - content/common/web/section/camel_profile_config/O_IM_CSI/delete_o_im_csi.md
+web/section/camel_profile_config/O_IM_CSI/edit_o_im_csi:
+  index:
+  - content/common/web/section/camel_profile_config/O_IM_CSI/edit_o_im_csi/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/O_IM_CSI/edit_o_im_csi/main_o_im_csi_params.md
+web/section/camel_profile_config/O_IM_CSI/edit_o_im_csi/o_im_csi_tdp_params:
+  index:
+  - content/common/web/section/camel_profile_config/O_IM_CSI/edit_o_im_csi/o_im_csi_tdp_params/_index.md
+web/section/camel_profile_config/SMS_CSI:
+  index:
+  - content/common/web/section/camel_profile_config/SMS_CSI/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/SMS_CSI/add_sms_csi.md
+  - content/common/web/section/camel_profile_config/SMS_CSI/delete_sms_csi.md
+web/section/camel_profile_config/SMS_CSI/edit_sms_csi:
+  index:
+  - content/common/web/section/camel_profile_config/SMS_CSI/edit_sms_csi/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/SMS_CSI/edit_sms_csi/main_sms_csi_params.md
+web/section/camel_profile_config/SMS_CSI/edit_sms_csi/sms_csi_tdp_params:
+  index:
+  - content/common/web/section/camel_profile_config/SMS_CSI/edit_sms_csi/sms_csi_tdp_params/_index.md
+web/section/camel_profile_config/SS_CSI:
+  index:
+  - content/common/web/section/camel_profile_config/SS_CSI/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/SS_CSI/add_ss_csi.md
+  - content/common/web/section/camel_profile_config/SS_CSI/delete_ss_csi.md
+web/section/camel_profile_config/SS_CSI/edit_ss_csi:
+  index:
+  - content/common/web/section/camel_profile_config/SS_CSI/edit_ss_csi/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/SS_CSI/edit_ss_csi/main_ss_csi_params.md
+web/section/camel_profile_config/SS_CSI/edit_ss_csi/ss_csi_criteria_params:
+  index:
+  - content/common/web/section/camel_profile_config/SS_CSI/edit_ss_csi/ss_csi_criteria_params/_index.md
+web/section/camel_profile_config/T_CSI:
+  index:
+  - content/common/web/section/camel_profile_config/T_CSI/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/T_CSI/add_t_csi.md
+  - content/common/web/section/camel_profile_config/T_CSI/delete_t_csi.md
+web/section/camel_profile_config/T_CSI/edit_t_csi:
+  index:
+  - content/common/web/section/camel_profile_config/T_CSI/edit_t_csi/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/T_CSI/edit_t_csi/main_t_csi_params.md
+web/section/camel_profile_config/T_CSI/edit_t_csi/t_csi_tdp_params:
+  index:
+  - content/common/web/section/camel_profile_config/T_CSI/edit_t_csi/t_csi_tdp_params/_index.md
+web/section/camel_profile_config/USSD_CSI:
+  index:
+  - content/common/web/section/camel_profile_config/USSD_CSI/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/USSD_CSI/add_ussd_csi.md
+  - content/common/web/section/camel_profile_config/USSD_CSI/delete_ussd_csi.md
+web/section/camel_profile_config/USSD_CSI/edit_ussd_csi:
+  index:
+  - content/common/web/section/camel_profile_config/USSD_CSI/edit_ussd_csi/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/USSD_CSI/edit_ussd_csi/main_ussd_csi_params.md
+web/section/camel_profile_config/USSD_CSI/edit_ussd_csi/ussd_csi_criteria_params:
+  index:
+  - content/common/web/section/camel_profile_config/USSD_CSI/edit_ussd_csi/ussd_csi_criteria_params/_index.md
+web/section/camel_profile_config/VT_IM_CSI:
+  index:
+  - content/common/web/section/camel_profile_config/VT_IM_CSI/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/VT_IM_CSI/add_vt_im_csi.md
+  - content/common/web/section/camel_profile_config/VT_IM_CSI/delete_vt_im_csi.md
+web/section/camel_profile_config/VT_IM_CSI/edit_vt_im_csi:
+  index:
+  - content/common/web/section/camel_profile_config/VT_IM_CSI/edit_vt_im_csi/_index.md
+  files:
+  - content/common/web/section/camel_profile_config/VT_IM_CSI/edit_vt_im_csi/main_vt_im_csi_params.md
+web/section/camel_profile_config/VT_IM_CSI/edit_vt_im_csi/vt_im_csi_tdp_params:
+  index:
+  - content/common/web/section/camel_profile_config/VT_IM_CSI/edit_vt_im_csi/vt_im_csi_tdp_params/_index.md
+web/section/group_oper_setting:
+  index:
+  - content/common/web/section/group_oper_setting/_index.md
+web/section/group_oper_setting/create_task:
+  index:
+  - content/common/web/section/group_oper_setting/create_task/_index.md
+  files:
+  - content/common/web/section/group_oper_setting/create_task/load_info.md
+  - content/common/web/section/group_oper_setting/create_task/delete_card_profile.md
+  - content/common/web/section/group_oper_setting/create_task/delete_subscriber_profile.md
+  - content/common/web/section/group_oper_setting/create_task/update_subscriber_profile.md
+  - content/common/web/section/group_oper_setting/create_task/add_subscriber_profile.md
+web/section/group_oper_setting/subscriber_reregistration:
+  index:
+  - content/common/web/section/group_oper_setting/subscriber_reregistration/_index.md
+web/section/group_oper_setting/view_tasks_list:
+  index:
+  - content/common/web/section/group_oper_setting/view_tasks_list/_index.md
+  files:
+  - content/common/web/section/group_oper_setting/view_tasks_list/create_task.md
+  - content/common/web/section/group_oper_setting/view_tasks_list/create_report_by_task.md
+web/section/IMS_params_setting:
+  index:
+  - content/common/web/section/IMS_params_setting/_index.md
+web/section/IMS_params_setting/Application_server:
+  index:
+  - content/common/web/section/IMS_params_setting/Application_server/_index.md
+  files:
+  - content/common/web/section/IMS_params_setting/Application_server/add_application_server.md
+  - content/common/web/section/IMS_params_setting/Application_server/edit_application_server.md
+  - content/common/web/section/IMS_params_setting/Application_server/copy_application_server.md
+  - content/common/web/section/IMS_params_setting/Application_server/delete_application_server.md
+web/section/IMS_params_setting/Capability_sets:
+  index:
+  - content/common/web/section/IMS_params_setting/Capability_sets/_index.md
+  files:
+  - content/common/web/section/IMS_params_setting/Capability_sets/add_capability_sets.md
+  - content/common/web/section/IMS_params_setting/Capability_sets/edit_capability_sets.md
+  - content/common/web/section/IMS_params_setting/Capability_sets/delete_capability_sets.md
+web/section/IMS_params_setting/Charging_information:
+  index:
+  - content/common/web/section/IMS_params_setting/Charging_information/_index.md
+  files:
+  - content/common/web/section/IMS_params_setting/Charging_information/add_charging_information.md
+  - content/common/web/section/IMS_params_setting/Charging_information/edit_charging_information.md
+  - content/common/web/section/IMS_params_setting/Charging_information/delete_charging_information.md
+web/section/IMS_params_setting/Preferred_S_CSCF_sets:
+  index:
+  - content/common/web/section/IMS_params_setting/Preferred_S_CSCF_sets/_index.md
+  files:
+  - content/common/web/section/IMS_params_setting/Preferred_S_CSCF_sets/add_s_cscf_set.md
+  - content/common/web/section/IMS_params_setting/Preferred_S_CSCF_sets/edit_s_cscf_set.md
+  - content/common/web/section/IMS_params_setting/Preferred_S_CSCF_sets/delete_s_cscf_set.md
+web/section/IMS_params_setting/Shared_IFC_set:
+  index:
+  - content/common/web/section/IMS_params_setting/Shared_IFC_set/_index.md
+  files:
+  - content/common/web/section/IMS_params_setting/Shared_IFC_set/add_shared_IFC_set.md
+  - content/common/web/section/IMS_params_setting/Shared_IFC_set/delete_shared_IFC_set.md
+web/section/IMS_params_setting/Shared_IFC_set/edit_shared_IFC_set:
+  index:
+  - content/common/web/section/IMS_params_setting/Shared_IFC_set/edit_shared_IFC_set/_index.md
+  files:
+  - content/common/web/section/IMS_params_setting/Shared_IFC_set/edit_shared_IFC_set/shared_IFC_set.md
+web/section/IMS_params_setting/Shared_IFC_set/edit_shared_IFC_set/IFC_params:
+  index:
+  - content/common/web/section/IMS_params_setting/Shared_IFC_set/edit_shared_IFC_set/IFC_params/_index.md
+  files:
+  - content/common/web/section/IMS_params_setting/Shared_IFC_set/edit_shared_IFC_set/IFC_params/main_IFC_params.md
+  - content/common/web/section/IMS_params_setting/Shared_IFC_set/edit_shared_IFC_set/IFC_params/SPT_params.md
+web/section/main_profile_and_card_params:
+  index:
+  - content/common/web/section/main_profile_and_card_params/_index.md
+web/section/main_profile_and_card_params/card_setup:
+  index:
+  - content/common/web/section/main_profile_and_card_params/card_setup/_index.md
+  files:
+  - content/common/web/section/main_profile_and_card_params/card_setup/add_sim_card.md
+  - content/common/web/section/main_profile_and_card_params/card_setup/view_sim_card_params.md
+  - content/common/web/section/main_profile_and_card_params/card_setup/add_delete_sim_card_using_file.md
+  - content/common/web/section/main_profile_and_card_params/card_setup/delete_sim_card.md
+web/section/main_profile_and_card_params/main_profile:
+  index:
+  - content/common/web/section/main_profile_and_card_params/main_profile/_index.md
+  files:
+  - content/common/web/section/main_profile_and_card_params/main_profile/add_subscriber_profile.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/import_subscriber_profiles.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/export_subscriber_profiles.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/delete_subscriber_profile.md
+web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile:
+  index:
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/_index.md
+  files:
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/general_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_main_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_registration_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_pdp_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_eps_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_nssai_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_odb_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_roaming_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_CSI_profile_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_service_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_nidd_authorization_params.md
+web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_IMS_profile_params:
+  index:
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_IMS_profile_params/_index.md
+  files:
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_IMS_profile_params/IMS_profile_main_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_IMS_profile_params/IMS_profile_repository_params.md
+web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_IMS_subscription_params:
+  index:
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_IMS_subscription_params/_index.md
+  files:
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_IMS_subscription_params/IMS_subscription_main_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_IMS_subscription_params/IMS_subscription_service_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_IMS_subscription_params/IMS_subscription_ifcs_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_IMS_subscription_params/IMS_subscription_spts_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_IMS_subscription_params/IMS_subscription_implicitly_registered_set_params.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_IMS_subscription_params/IMS_subscription_impu_params.md
+web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_SS_params:
+  index:
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_SS_params/_index.md
+  files:
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_SS_params/ss_data.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_SS_params/ss_barring.md
+  - content/common/web/section/main_profile_and_card_params/main_profile/edit_subscriber_profile/subscriber_profile_SS_params/ss_forwarding.md
+web/section/NBIOT_params_setting:
+  index:
+  - content/common/web/section/NBIOT_params_setting/_index.md
+web/section/NBIOT_params_setting/External_groups:
+  index:
+  - content/common/web/section/NBIOT_params_setting/External_groups/_index.md
+  files:
+  - content/common/web/section/NBIOT_params_setting/External_groups/add_external_group.md
+  - content/common/web/section/NBIOT_params_setting/External_groups/delete_external_group.md
+web/section/NBIOT_params_setting/SCEF:
+  index:
+  - content/common/web/section/NBIOT_params_setting/SCEF/_index.md
+  files:
+  - content/common/web/section/NBIOT_params_setting/SCEF/add_scef.md
+  - content/common/web/section/NBIOT_params_setting/SCEF/edit_scef.md
+  - content/common/web/section/NBIOT_params_setting/SCEF/delete_scef.md
+web/section/packet_data_object_setting:
+  index:
+  - content/common/web/section/packet_data_object_setting/_index.md
+web/section/packet_data_object_setting/EPS_context:
+  index:
+  - content/common/web/section/packet_data_object_setting/EPS_context/_index.md
+  files:
+  - content/common/web/section/packet_data_object_setting/EPS_context/add_eps_context.md
+  - content/common/web/section/packet_data_object_setting/EPS_context/edit_eps_context.md
+  - content/common/web/section/packet_data_object_setting/EPS_context/copy_eps_context.md
+  - content/common/web/section/packet_data_object_setting/EPS_context/delete_eps_context.md
+web/section/packet_data_object_setting/PDP_context:
+  index:
+  - content/common/web/section/packet_data_object_setting/PDP_context/_index.md
+  files:
+  - content/common/web/section/packet_data_object_setting/PDP_context/add_pdp_context.md
+  - content/common/web/section/packet_data_object_setting/PDP_context/edit_pdp_context.md
+  - content/common/web/section/packet_data_object_setting/PDP_context/copy_pdp_context.md
+  - content/common/web/section/packet_data_object_setting/PDP_context/delete_pdp_context.md
+web/section/packet_data_object_setting/QoS_EPS:
+  index:
+  - content/common/web/section/packet_data_object_setting/QoS_EPS/_index.md
+  files:
+  - content/common/web/section/packet_data_object_setting/QoS_EPS/add_qos_eps.md
+  - content/common/web/section/packet_data_object_setting/QoS_EPS/edit_qos_eps.md
+  - content/common/web/section/packet_data_object_setting/QoS_EPS/copy_qos_eps.md
+  - content/common/web/section/packet_data_object_setting/QoS_EPS/delete_qos_eps.md
+web/section/packet_data_object_setting/QoS_GPRS:
+  index:
+  - content/common/web/section/packet_data_object_setting/QoS_GPRS/_index.md
+  files:
+  - content/common/web/section/packet_data_object_setting/QoS_GPRS/add_qos_gprs.md
+  - content/common/web/section/packet_data_object_setting/QoS_GPRS/edit_qos_gprs.md
+  - content/common/web/section/packet_data_object_setting/QoS_GPRS/copy_qos_gprs.md
+  - content/common/web/section/packet_data_object_setting/QoS_GPRS/delete_qos_gprs.md
+web/section/packet_data_object_setting/slice_service_network:
+  index:
+  - content/common/web/section/packet_data_object_setting/slice_service_network/_index.md
+  files:
+  - content/common/web/section/packet_data_object_setting/slice_service_network/add_slice_service_network.md
+  - content/common/web/section/packet_data_object_setting/slice_service_network/edit_slice_service_network.md
+  - content/common/web/section/packet_data_object_setting/slice_service_network/copy_slice_service_network.md
+  - content/common/web/section/packet_data_object_setting/slice_service_network/delete_slice_service_network.md
+web/section/roaming_params_setting:
+  index:
+  - content/common/web/section/roaming_params_setting/_index.md
+web/section/roaming_params_setting/black_list:
+  index:
+  - content/common/web/section/roaming_params_setting/black_list/_index.md
+  files:
+  - content/common/web/section/roaming_params_setting/black_list/add_black_list.md
+  - content/common/web/section/roaming_params_setting/black_list/delete_black_list.md
+web/section/roaming_params_setting/black_list/edit_black_list:
+  index:
+  - content/common/web/section/roaming_params_setting/black_list/edit_black_list/_index.md
+  files:
+  - content/common/web/section/roaming_params_setting/black_list/edit_black_list/main_params.md
+  - content/common/web/section/roaming_params_setting/black_list/edit_black_list/vlr_sgsn_mask.md
+  - content/common/web/section/roaming_params_setting/black_list/edit_black_list/plmn_mask.md
+web/section/roaming_params_setting/VLR_roaming_params:
+  index:
+  - content/common/web/section/roaming_params_setting/VLR_roaming_params/_index.md
+  files:
+  - content/common/web/section/roaming_params_setting/VLR_roaming_params/add_vlr_roaming_params.md
+  - content/common/web/section/roaming_params_setting/VLR_roaming_params/edit_vlr_roaming_params.md
+  - content/common/web/section/roaming_params_setting/VLR_roaming_params/delete_vlr_roaming_params.md
+web/section/roaming_params_setting/white_list:
+  index:
+  - content/common/web/section/roaming_params_setting/white_list/_index.md
+  files:
+  - content/common/web/section/roaming_params_setting/white_list/add_white_list.md
+  - content/common/web/section/roaming_params_setting/white_list/delete_white_list.md
+web/section/roaming_params_setting/white_list/edit_white_list:
+  index:
+  - content/common/web/section/roaming_params_setting/white_list/edit_white_list/_index.md
+  files:
+  - content/common/web/section/roaming_params_setting/white_list/edit_white_list/main_params.md
+web/section/roaming_params_setting/white_list/edit_white_list/plmn_mask:
+  index:
+  - content/common/web/section/roaming_params_setting/white_list/edit_white_list/plmn_mask/_index.md
+  files:
+  - content/common/web/section/roaming_params_setting/white_list/edit_white_list/plmn_mask/add_plmn_mask.md
+  - content/common/web/section/roaming_params_setting/white_list/edit_white_list/plmn_mask/edit_plmn_mask.md
+  - content/common/web/section/roaming_params_setting/white_list/edit_white_list/plmn_mask/delete_plmn_mask.md
+web/section/roaming_params_setting/white_list/edit_white_list/vlr_sgsn_mask:
+  index:
+  - content/common/web/section/roaming_params_setting/white_list/edit_white_list/vlr_sgsn_mask/_index.md
+  files:
+  - content/common/web/section/roaming_params_setting/white_list/edit_white_list/vlr_sgsn_mask/add_vlr_sgsn_mask.md
+  - content/common/web/section/roaming_params_setting/white_list/edit_white_list/vlr_sgsn_mask/edit_vlr_sgsn_mask.md
+  - content/common/web/section/roaming_params_setting/white_list/edit_white_list/vlr_sgsn_mask/delete_vlr_sgsn_mask.md
+web/section/roaming_params_setting/zone_codes:
+  index:
+  - content/common/web/section/roaming_params_setting/zone_codes/_index.md
+  files:
+  - content/common/web/section/roaming_params_setting/zone_codes/delete_zone_codes.md
+web/section/roaming_params_setting/zone_codes/add_zone_codes:
+  index:
+  - content/common/web/section/roaming_params_setting/zone_codes/add_zone_codes/_index.md
+  files:
+  - content/common/web/section/roaming_params_setting/zone_codes/add_zone_codes/main_params.md
+web/section/roaming_params_setting/zone_codes/add_zone_codes/ccndcs:
+  index:
+  - content/common/web/section/roaming_params_setting/zone_codes/add_zone_codes/ccndcs/_index.md
+  files:
+  - content/common/web/section/roaming_params_setting/zone_codes/add_zone_codes/ccndcs/add_ccndc.md
+  - content/common/web/section/roaming_params_setting/zone_codes/add_zone_codes/ccndcs/edit_ccndc.md
+  - content/common/web/section/roaming_params_setting/zone_codes/add_zone_codes/ccndcs/delete_ccndc.md
+web/section/roaming_params_setting/zone_codes/add_zone_codes/plmn:
+  index:
+  - content/common/web/section/roaming_params_setting/zone_codes/add_zone_codes/plmn/_index.md
+  files:
+  - content/common/web/section/roaming_params_setting/zone_codes/add_zone_codes/plmn/add_plmn.md
+  - content/common/web/section/roaming_params_setting/zone_codes/add_zone_codes/plmn/edit_plmn.md
+  - content/common/web/section/roaming_params_setting/zone_codes/add_zone_codes/plmn/delete_plmn.md
+web/section/roaming_params_setting/zone_codes/edit_zone_codes:
+  index:
+  - content/common/web/section/roaming_params_setting/zone_codes/edit_zone_codes/_index.md
+  files:
+  - content/common/web/section/roaming_params_setting/zone_codes/edit_zone_codes/main_params.md
+  - content/common/web/section/roaming_params_setting/zone_codes/edit_zone_codes/ccndcs.md
+  - content/common/web/section/roaming_params_setting/zone_codes/edit_zone_codes/plmn.md
+web/section/subscriber_settings:
+  index:
+  - content/common/web/section/subscriber_settings/_index.md
+  files:
+  - content/common/web/section/subscriber_settings/DB_settings.md
+web/section/subscriber_settings/subscriber_group_settings:
+  index:
+  - content/common/web/section/subscriber_settings/subscriber_group_settings/_index.md
+  files:
+  - content/common/web/section/subscriber_settings/subscriber_group_settings/add_subscriber_group.md
+  - content/common/web/section/subscriber_settings/subscriber_group_settings/edit_subscriber_group.md
+  - content/common/web/section/subscriber_settings/subscriber_group_settings/delete_subscriber_group.md
+web/section/subscriber_settings/subscriber_profile_template:
+  index:
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/_index.md
+  files:
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/add_subscriber_profile_template.md
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/import_subscriber_profile_templates.md
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/export_subscriber_profile_templates.md
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/delete_subscriber_profile_template.md
+web/section/subscriber_settings/subscriber_profile_template/edit_subscriber_profile_template:
+  index:
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/edit_subscriber_profile_template/_index.md
+  files:
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/edit_subscriber_profile_template/subscriber_profile_template_main_params.md
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/edit_subscriber_profile_template/subscriber_profile_template_pdp_params.md
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/edit_subscriber_profile_template/subscriber_profile_template_eps_params.md
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/edit_subscriber_profile_template/subscriber_profile_template_odb_params.md
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/edit_subscriber_profile_template/subscriber_profile_template_roaming_params.md
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/edit_subscriber_profile_template/subscriber_profile_template_CSI_profile_params.md
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/edit_subscriber_profile_template/subscriber_profile_template_service_params.md
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/edit_subscriber_profile_template/subscriber_profile_template_ss_params.md
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/edit_subscriber_profile_template/subscriber_profile_template_IMS_subscription.md
+  - content/common/web/section/subscriber_settings/subscriber_profile_template/edit_subscriber_profile_template/subscriber_profile_template_IMS_profile.md
+web/section/user_settings_audit_journal:
+  index:
+  - content/common/web/section/user_settings_audit_journal/_index.md
+  files:
+  - content/common/web/section/user_settings_audit_journal/view_audit_journal.md
+web/section/user_settings_audit_journal/user_settings:
+  index:
+  - content/common/web/section/user_settings_audit_journal/user_settings/_index.md
+  files:
+  - content/common/web/section/user_settings_audit_journal/user_settings/add_user.md
+  - content/common/web/section/user_settings_audit_journal/user_settings/edit_user.md
+  - content/common/web/section/user_settings_audit_journal/user_settings/delete_user.md
