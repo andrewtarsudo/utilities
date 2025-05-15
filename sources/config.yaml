@@ -3,6 +3,7 @@ general:
   debug_log_folder: "_logs/cli_debug.log"
   log_path: "~/Desktop/_logs/cli_debug.log"
   config_path: "sources/dict.yaml"
+  temp_dir: "~/_temp/"
   col_max: 52
   max_content_width: 96
   terminal_width: 96
@@ -18,6 +19,7 @@ commands:
   shared:
     debug: false
     directory: null
+    temp_dir: "~/_temp/"
     files: []
     verbose: false
     recursive: true
@@ -27,7 +29,6 @@ commands:
 
   convert-tables:
     tables_dir: "./tables/"
-    temp_dir: "./_temp/"
     escape: true
     remove: false
     fix: null

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
+from shutil import copyfile, move
 
 from click.utils import get_app_dir
 from loguru import logger
@@ -10,12 +11,7 @@ from utilities.common.shared import StrPath
 
 
 def parse_version(file: StrPath) -> str | None:
-    if not Path(file).exists():
-
-        return None
-
-    else:
-        return file_reader(file, "string")
+    return file_reader(file, "string") if Path(file).exists() else None
 
 
 def compare_versions(version_file: StrPath, basic_version_file: StrPath):
@@ -73,11 +69,16 @@ class GitManager:
         self._content_git_version = content_git_version
 
     def compare_versions(self):
-        if parse_version(self.TEMP_TERMS_VERSION) is None:
-            message: str = "Файл версии не найден"
+        v1: str = parse_version(self.TEMP_TERMS_VERSION)
+        v2: str = parse_version(self.TEMP_VERSION)
 
-        elif not compare_versions(self.TEMP_TERMS_VERSION, self.TEMP_VERSION):
-            message: str = "Версия не последняя"
+        if v1 is None:
+            message: str = "Файл версии не найден"
+            copyfile(self.TEMP_VERSION, self.TEMP_TERMS_VERSION)
+
+        elif v1 != v2:
+            message: str = f"Текущая версия: {v1}\nПоследняя версия: {v2}"
+            move(self.TEMP_VERSION, self.TEMP_TERMS_VERSION)
 
         elif not Path(self.TEMP_TERMS_BASIC).exists():
             message: str = "Файл с терминами не найден"
@@ -87,8 +88,7 @@ class GitManager:
             return
 
         logger.warning(message)
-        file_writer(self.TEMP_TERMS_VERSION, self._content_git_version.content)
-        logger.debug("Файл с версией записан")
+        logger.info(f"Файл с версией {self.TEMP_TERMS_VERSION} обновлен")
 
     def set_terms(self):
         file_writer(self.TEMP_TERMS_BASIC, self._content_git_terms.content)

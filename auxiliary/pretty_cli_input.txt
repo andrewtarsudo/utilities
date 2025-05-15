@@ -1,8 +1,31 @@
-commit apply modifications
-rollback cancel modifications
-show show current object
-show-recursive recursive show current object
-show-config show CLI command list for object
-port-count * Set port count
-port-start * Set start port
-end select parent
+  show        show current object
+  show-recursive        recursive show current object
+  show-config    show CLI command list for object
+  route    Configure routes for operator
+  cps    Set calls peer seconds
+  cps-exceed-mode    Select behavior when exceeding the CPS
+  description    Set description
+  hide-display-name    Hide display name in SIP headers
+  max-call-duration    Set maximum call duration
+  max-calls    Set max calls count
+  max-incoming-calls    Set max incoming calls count
+  max-outgoing-calls    Set max outgoing calls count
+  mcu-network    * Set MCU network ID for external media
+  media-gateway    Configure media gateways for operator
+  media-profile    Set media profile ID for external network
+  no-ping-cause    Setup release cause for unreachable SIP trunks
+  no-response-cause    Setup release cause on no response calls
+  p-asserted-identity forward Forward P-Asserted-Identity (PAI) header
+  prack    Setup functioning of operator with PRACK
+  public-dst-hostname    Set public destination hostname
+  public-dst-hostname-mask    Set allowed public hostname for destination SIP-URI
+  sip-i-enabled    Set SIP-I/SIP-T mode
+  sp-number    * Set service platform number
+  transport    Select transport type for outgoing calls
+  user-phone-to-sip-uri    Add ‘user=phone’ parameter to SIP URI
+  default    set parameter to default value
+  end    return to parent
+  delete    delete object
+  block    Block the object
+  show-state    Show current state of the object
+  unblock    Unblock the object

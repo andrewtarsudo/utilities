@@ -1,4 +1,6 @@
-TEMP_TERMS  # unused variable (utilities\get_terms\git_manager.py:33)
+TEMP_TERMS  # unused variable (utilities\get_terms\git_manager.py:29)
+_._content_git_version  # unused attribute (utilities\get_terms\git_manager.py:35)
+_._content_git_version  # unused attribute (utilities\get_terms\git_manager.py:69)
 _.__doc__  # unused attribute (utilities\repair_links\anchor_inspector.py:196)
 _.__doc__  # unused attribute (utilities\repair_links\internal_link_inspector.py:146)
 _.__doc__  # unused attribute (utilities\repair_links\link_fixer.py:125)

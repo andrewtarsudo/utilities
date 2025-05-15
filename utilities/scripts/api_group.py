@@ -363,7 +363,7 @@ class APIGroup(Group):
     def __init__(self, aliases: set[str] = None, **attrs: Any):
         self.logging_config: LoggerConfiguration = custom_logging(
             name=self.__class__.__name__.lower(),
-            is_debug=attrs.get("debug", False))
+            is_debug=attrs.get("debug", True))
         kwargs: dict[str, bool] = {
             "invoke_without_command": True,
             "chain": False,
@@ -484,7 +484,7 @@ class TermsAPIGroup(APIGroup):
         else:
             args: list[str] = [
                 value.upper()
-                if not value.startswith("--")
+                if not value.startswith("-")
                 else value
                 for value in args]
 
