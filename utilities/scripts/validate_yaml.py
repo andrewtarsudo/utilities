@@ -24,7 +24,7 @@ _SETTINGS_NAMES: tuple[str, ...] = ("settings", "Settings")
 _RIGHTS_NAMES: tuple[str, ...] = ("rights", "Rights")
 CUTOFF: float = config_file.get_commands("validate-yaml", "cutoff")
 
-EPILOG: str = (
+EPILOG_VALIDATE_YAML: str = (
     "\b\nОпция -g/--guess пытается найти следующие файлы:"
     "\n- файлы с тем же именем, но с расширением *.md и *.adoc;"
     "\n- файлы с теми же именем и расширением, но в папках того же проекта."
@@ -504,7 +504,7 @@ def validate_file(
     cls=SwitchArgsAPIGroup,
     aliases=["check", "yaml"],
     help="Команда для валидации YAML-файла, используемого при генерации PDF",
-    epilog=EPILOG)
+    epilog=EPILOG_VALIDATE_YAML)
 @argument(
     "file_or_project",
     type=ClickPath(

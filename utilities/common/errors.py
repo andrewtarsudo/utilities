@@ -165,3 +165,15 @@ class ConfigFileGeneralKeyError(ConfigFileError):
 
 class ConfigFileUpdateKeyError(ConfigFileError):
     """Specified key has not been found in the section 'update'."""
+
+
+class GenerateYamlError(BaseError):
+    """Base class for errors associated with the generate-yaml."""
+
+
+class GenerateYamlMissingAttributeError(GenerateYamlError):
+    """At least one of 'title-page', 'version' required parameters is missing."""
+
+
+class GenerateYamlMissingIndexFileError(GenerateYamlError):
+    """Files index/_index have not been found."""

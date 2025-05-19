@@ -8,6 +8,7 @@ from utilities.scripts.check_russian import check_russian_command
 from utilities.scripts.convert_tables import convert_tables_command
 from utilities.scripts.filter_images import filter_images_command
 from utilities.scripts.format_code import format_code_command
+from utilities.scripts.generate_yaml import generate_yaml_command
 from utilities.scripts.get_terms import get_terms_command
 from utilities.scripts.help import help_command
 from utilities.scripts.list_files import list_files_command

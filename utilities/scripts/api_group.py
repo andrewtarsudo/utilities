@@ -151,13 +151,23 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
         _, option_help = parameter.get_help_record(ctx)
 
         try:
-            _index: int = option_help.index("[default")
+            _default: int = option_help.index("[default")
 
         except ValueError:
             pass
 
         else:
-            option_help: str = option_help[:_index]
+            option_help: str = option_help[:_default]
+
+        try:
+            _required: int = option_help.index(" [required]")
+
+        except ValueError:
+            pass
+
+        else:
+            option_help: str = option_help[:_required]
+            _: str = f"{_} (*)"
 
         return style(_, fg="cyan", bold=True), option_help
 
@@ -179,7 +189,7 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
         with formatter.section(style("Опции", fg="blue", bold=True)):
             opt_names: list[str] = [item[0] for item in rows]
 
-            col_spacing: int = COL_MAX - max(map(len, opt_names)) - 7
+            col_spacing: int = COL_MAX - max(map(len, opt_names)) - 4
             col_max: int = MAX_CONTENT_WIDTH
             formatter.write_dl(rows, col_max, col_spacing)
 
@@ -217,7 +227,7 @@ def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter
                  style(k.help, fg="green", bold=True))
                 for k, v in dict_commands.items()]
 
-            col_spacing: int = COL_MAX - 2 * max(map(len, dict_commands.values())) + 8
+            col_spacing: int = COL_MAX - 2 * max(map(len, dict_commands.values())) + 11
             col_max: int = MAX_CONTENT_WIDTH
 
             formatter.write_dl(rows, col_max, col_spacing)

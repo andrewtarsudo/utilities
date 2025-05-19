@@ -66,3 +66,7 @@ def file_dir_completion(ctx: Context, parameter: Parameter, incomplete: str):
             paths.append(path.path)
 
     return [CompletionItem(path) for path in paths]
+
+
+def language_completion(ctx: Context, parameter: Parameter, incomplete: str):
+    return [CompletionItem(lang) for lang in ["ru", "en", "fr"]if lang.startswith(incomplete)]

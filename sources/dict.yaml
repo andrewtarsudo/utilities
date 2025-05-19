@@ -28,3 +28,6 @@ check:
 
 yaml:
   file_or_project: "Путь до файла PDF_*.yml или директории с такими файлами"
+
+generate-yaml:
+  project: "Путь до директории проекта"
