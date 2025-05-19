@@ -177,3 +177,7 @@ class GenerateYamlMissingAttributeError(GenerateYamlError):
 
 class GenerateYamlMissingIndexFileError(GenerateYamlError):
     """Files index/_index have not been found."""
+
+
+class GenerateYamlMissingBranchError(GenerateYamlError):
+    """Branch instance cannot be None."""

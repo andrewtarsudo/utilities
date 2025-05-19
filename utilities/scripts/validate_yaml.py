@@ -88,7 +88,7 @@ def fix_path(line_no: int, path: Path, root: Path) -> str:
         # check all files in the project
         valid_path: str | None = if_failed_dirs(path, root)
 
-        if valid_path is None:
+        if valid_path is None and path.parent.exists():
             # get the list of files in the same folder
             neighbours: dict[str, str] = {file.stem: file.as_posix() for file in path.parent.iterdir()}
             matches: list[str] = get_close_matches(file_name, neighbours.keys(), 1, CUTOFF)
@@ -99,8 +99,8 @@ def fix_path(line_no: int, path: Path, root: Path) -> str:
                 valid_path: str = neighbours.get(valid_name)
 
             # otherwise, just comment the line
-            else:
-                valid_path: str = f"# {rel_path}  (удалить или закомментировать)"
+        else:
+            valid_path: str = f"# {rel_path}  (удалить или закомментировать)"
 
     suggestion: str = style(valid_path, fg="red", bold=True)
     return f"{common_part} -> {suggestion}"

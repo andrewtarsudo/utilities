@@ -11,7 +11,8 @@ from loguru import logger
 from yaml import dump
 
 from utilities.common.config_file import config_file
-from utilities.common.errors import GenerateYamlMissingAttributeError, GenerateYamlMissingIndexFileError
+from utilities.common.errors import GenerateYamlMissingAttributeError, GenerateYamlMissingBranchError, GenerateYamlMissingIndexFileError
+from utilities.common.functions import pretty_print
 from utilities.common.shared import HELP, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
@@ -60,7 +61,11 @@ class Frontmatter(NamedTuple):
             return cls(weight, title, filename, path, draft)
 
         except OSError:
+            logger.info(f"В файле {filepath} отсутствует frontmatter")
             return None
+
+    def __str__(self):
+        return pretty_print([f"{k} = {v}" for k, v in self._asdict().items()])
 
 
 class Branch:
@@ -68,36 +73,33 @@ class Branch:
     root: Path
 
     def __init__(self, path: Path) -> None:
-        self.path: Path = path
-        self.relative_path: str = path.relative_to(self.__class__.root).as_posix()
-        self.index: str | None = None
-        self.title: dict[str, int | str] = {}
-        self.files: list[str] = []
-        self.subdirs: dict[str, Branch] = {}
-        self.weight: int | None = None
+        self._path: Path = path
+        self._index: list[str] = []
+        self._title: dict[str, int | str] = {}
+        self._files: list[str] = []
+        self._subdirs: dict[str, Branch] = {}
+        self._weight: int | None = None
 
-    def add_file(self, filename: str) -> None:
-        self.files.append(filename)
-
-    def add_subdir(self, subdir: "Branch") -> None:
-        self.subdirs[subdir.path.name] = subdir
+    @property
+    def relpath(self):
+        return self._path.relative_to(self.__class__.root).as_posix()
 
     def to_dict(self) -> dict[str, Any]:
         result: dict[str, Any] = {}
 
-        if self.index:
-            result["index"] = [self.index]
+        if self._index:
+            result["index"] = self._index
 
-        if self.title:
-            result["title"] = self.title
+        if self._title:
+            result["title"] = self._title
 
-        if self.files:
-            result["files"] = sorted(self.files)
+        if self._files:
+            result["files"] = sorted(self._files)
 
-        if self.subdirs:
+        if self._subdirs:
             # Sort subdirs by weight (None last), then by name
             sorted_subdirs = sorted(
-                self.subdirs.items(),
+                self._subdirs.items(),
                 key=lambda item: (
                     -1 if item[1].weight is None else item[1].weight,
                     item[0].lower()))
@@ -105,31 +107,60 @@ class Branch:
 
         return result
 
+    def __str__(self):
+        lines: list[str] = [f"{self.__class__.__name__}: {self._path}"]
+        lines.extend([f"{k} = {v}" for k, v in self.to_dict().items()])
+        return pretty_print(lines)
+
     def flatten(self) -> dict[str, dict[str, Any]]:
         """Flatten the branch structure for YAML output"""
         flat: dict[str, dict[str, Any]] = {}
 
-        if self.index or self.files:
-            flat[self.relative_path] = {}
+        if self._index or self._files or self._title:
+            flat[self.relpath] = {}
 
-            if self.index:
-                flat[self.relative_path]["index"] = [self.index]
+            if self._index:
+                flat[self.relpath]["index"] = self._index
 
-            if self.files:
-                flat[self.relative_path]["files"] = self.files
+            if self._files:
+                flat[self.relpath]["files"] = self._files
 
-            if self.title:
-                flat[self.relative_path]["title"] = self.title
+            if self._title:
+                flat[self.relpath]["title"] = self._title
 
         # Sort subdirs by weight before flattening
         for subdir in sorted(
-                self.subdirs.values(),
+                self._subdirs.values(),
                 key=lambda b: (
                         -1 if b.weight is None else b.weight,
                         b.path.name.lower())):
             flat.update(subdir.flatten())
 
         return flat
+
+    @property
+    def path(self):
+        return self._path
+
+    @property
+    def title(self):
+        return self._title
+
+    @property
+    def files(self):
+        return self._files
+
+    @property
+    def index(self):
+        return self._index
+
+    @property
+    def subdirs(self):
+        return self._subdirs
+
+    @property
+    def weight(self):
+        return self._weight
 
 
 class Tree:
@@ -140,44 +171,49 @@ class Tree:
         self.root: Path = root
         self.branches: dict[str, Branch] = {}
 
-    def process_directory(self, dirpath: Path) -> Branch | None:
-        """Process a directory and return its Branch"""
-        branch: Branch = Branch(dirpath)
-
-        # Check for index files to get directory weight
+    def get_directory_weight(self, dirpath: StrPath, branch: Branch) -> Branch | None:
         try:
             filepath: Path = find_index(dirpath, self.__class__.language)
 
         except GenerateYamlMissingIndexFileError:
-            return
+            raise GenerateYamlMissingBranchError
 
-        front_matter: Frontmatter | None = Frontmatter.parse_frontmatter(filepath, self.root)
+        else:
+            front_matter: Frontmatter | None = Frontmatter.parse_frontmatter(filepath, self.root)
 
-        if front_matter:
-            branch.weight = front_matter.weight
+            if front_matter:
+                branch._weight = front_matter.weight
 
-            if has_content(filepath):
-                branch.index = front_matter.filename
+                if has_content(filepath):
+                    branch.index.append(front_matter.filename)
 
-            else:
-                branch.title["value"] = front_matter.title
+                else:
+                    branch.title["value"] = front_matter.title
 
-            level: int = len(Path(branch.relative_path).parts) + 1
-            branch.title["level"] = level
+                level: int = len(Path(branch.relpath).parts) + 1
+                branch.title["level"] = level
 
-        # Process files
+            return branch
+
+    def process_files(self, dirpath: StrPath, branch: Branch | None) -> Branch | None:
+        if branch is None:
+            logger.debug(f"В директории {dirpath} отсутствует файл index.*/_index.*")
+            raise GenerateYamlMissingBranchError
+
         for filepath in dirpath.iterdir():
-            is_file: bool = not filepath.is_file()
-            is_valid: bool = not is_valid_file(filepath, self.__class__.language)
-            is_stem: bool = filepath.stem in ("_index", "index")
+            if not filepath.is_file():
+                continue
 
-            if is_file or not is_valid or is_stem:
+            if not is_valid_file(filepath, self.__class__.language):
+                continue
+
+            if filepath.stem in ("_index", "index"):
                 continue
 
             front_matter: Frontmatter = Frontmatter.parse_frontmatter(filepath, self.root)
 
             if front_matter:
-                branch.add_file(front_matter.filename)
+                branch.files.append(front_matter.filename)
 
         # Sort files by weight then title
         branch.files.sort(
@@ -185,26 +221,110 @@ class Tree:
                 (Frontmatter.parse_frontmatter(self.root.joinpath(x), self.root)).weight,
                 (Frontmatter.parse_frontmatter(self.root.joinpath(x), self.root)).title.lower()))
 
-        # Process subdirectories
+        return branch
+
+    def process_subdirectories(self, dirpath: StrPath, branch: Branch | None) -> Branch | None:
+        if branch is None:
+            raise GenerateYamlMissingBranchError
+
+        dirpath: Path = Path(dirpath)
         subdirs: list[Path] = sorted(dirpath.iterdir())  # First sort by name for consistent processing
 
         for subdir in subdirs:
             if subdir.is_dir():
-                sub_branch: Branch | None = self.process_directory(subdir)
+                sub_branch: Branch | None = self.generate_branch(subdir)
 
                 if sub_branch:
-                    branch.add_subdir(sub_branch)
+                    branch.subdirs[sub_branch.path.name] = sub_branch
 
-        # Only keep branches with content
-        if branch.index or branch.files or branch.subdirs:
-            return branch
+        return branch
 
-        else:
+    def generate_branch(self, dirpath: StrPath, branch: Branch | None = None) -> Branch | None:
+        if branch is None:
+            branch: Branch = Branch(dirpath)
+
+        try:
+            branch = self.get_directory_weight(dirpath, branch)
+            branch = self.process_files(dirpath, branch)
+            branch = self.process_subdirectories(dirpath, branch)
+
+            if branch.index or branch.files or branch.subdirs:
+                return branch
+
+            else:
+                return None
+
+        except GenerateYamlMissingBranchError:
             return None
+
+    # def process_directory(self, dirpath: Path) -> Branch | None:
+    #     """Process a directory and return its Branch"""
+    #     branch: Branch = Branch(dirpath)
+    #     language: str = self.__class__.language
+    #
+    #     # Check for index files to get directory weight
+    #     try:
+    #         filepath: Path = find_index(dirpath, language)
+    #
+    #     except GenerateYamlMissingIndexFileError:
+    #         return
+    #
+    #     front_matter: Frontmatter | None = Frontmatter.parse_frontmatter(filepath, self.root)
+    #
+    #     if front_matter:
+    #         branch._weight = front_matter.weight
+    #
+    #         if has_content(filepath):
+    #             branch.index.append(front_matter.filename)
+    #
+    #         else:
+    #             branch.title["value"] = front_matter.title
+    #
+    #         level: int = len(Path(branch.relpath).parts) + 1
+    #         branch.title["level"] = level
+    #
+    #     # Process files
+    #     for filepath in dirpath.iterdir():
+    #         if not filepath.is_file():
+    #             continue
+    #
+    #         if not is_valid_file(filepath, language):
+    #             continue
+    #
+    #         if filepath.stem in ("_index", "index"):
+    #             continue
+    #
+    #         front_matter: Frontmatter = Frontmatter.parse_frontmatter(filepath, self.root)
+    #
+    #         if front_matter:
+    #             branch.files.append(front_matter.filename)
+    #
+    #     # Sort files by weight then title
+    #     branch.files.sort(
+    #         key=lambda x: (
+    #             (Frontmatter.parse_frontmatter(self.root.joinpath(x), self.root)).weight,
+    #             (Frontmatter.parse_frontmatter(self.root.joinpath(x), self.root)).title.lower()))
+    #
+    #     # Process subdirectories
+    #     subdirs: list[Path] = sorted(dirpath.iterdir())  # First sort by name for consistent processing
+    #
+    #     for subdir in subdirs:
+    #         if subdir.is_dir():
+    #             sub_branch: Branch | None = self.process_directory(subdir)
+    #
+    #             if sub_branch:
+    #                 branch.subdirs[sub_branch.path.name] = sub_branch
+    #
+    #     # Only keep branches with content
+    #     if branch.index or branch.files or branch.subdirs:
+    #         return branch
+    #
+    #     else:
+    #         return None
 
     def build(self) -> None:
         """Build the complete tree structure"""
-        root_branch: Branch | None = self.process_directory(self.root)
+        root_branch: Branch | None = self.generate_branch(self.root)
 
         if root_branch:
             self.branches = root_branch.subdirs
@@ -212,9 +332,9 @@ class Tree:
     def to_yaml(self) -> dict[str, dict[str, Any]]:
         """Save the flattened tree structure to YAML"""
         root_branch: Branch = Branch(self.root)
-        root_branch.subdirs = self.branches
-        flat: dict[str, dict[str, Any]] = root_branch.flatten()
-        return flat
+        root_branch.subdirs.update(self.branches)
+
+        return root_branch.flatten()
 
 
 class YAMLConfig(NamedTuple):
@@ -271,7 +391,7 @@ class YAMLConfig(NamedTuple):
         else:
             value: str = "Legal Information"
 
-        index_file: Path = find_index(self.root.joinpath("content/common"), self.language)
+        index_file: str = find_index(self.root.joinpath("content/common"), self.language).as_posix()
         title_files: bool = False
 
         rights: dict[str, list[str] | dict[str, str | bool]] = {
@@ -282,7 +402,7 @@ class YAMLConfig(NamedTuple):
             }
         }
 
-        self.rights = rights
+        self.rights.update(rights)
 
     def write(self, output: StrPath):
         kwargs: dict[str, Any] = {
@@ -290,7 +410,7 @@ class YAMLConfig(NamedTuple):
             "rights": self.rights,
             **self.subdirs}
 
-        with open(output, "w") as f:
+        with open(output, "w", encoding="utf-8", errors="ignore") as f:
             dump(kwargs, f, indent=2, allow_unicode=True, sort_keys=False)
 
 
@@ -436,7 +556,7 @@ def generate_yaml_command(
     Branch.root = project
     Tree.language = language
 
-    tree: Tree = Tree(project)
+    tree: Tree = Tree(project.joinpath("content/common/"))
     tree.build()
 
     yaml_config: YAMLConfig = YAMLConfig(language, project)
