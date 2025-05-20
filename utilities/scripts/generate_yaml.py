@@ -4,16 +4,17 @@ from typing import Any, NamedTuple
 
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
-from click.types import BOOL, Path as ClickPath, STRING, Choice
+from click.types import BOOL, Choice, Path as ClickPath, STRING
 # noinspection PyProtectedMember
 from frontmatter import load, Post
 from loguru import logger
 from yaml import dump
 
 from utilities.common.config_file import config_file
-from utilities.common.errors import GenerateYamlMissingAttributeError, GenerateYamlMissingBranchError, GenerateYamlMissingIndexFileError
+from utilities.common.errors import GenerateYamlMissingAttributeError, GenerateYamlMissingBranchError, \
+    GenerateYamlMissingIndexFileError
 from utilities.common.functions import pretty_print
-from utilities.common.shared import HELP, StrPath
+from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
 from utilities.scripts.completion import dir_completion, language_completion
@@ -36,7 +37,7 @@ EPILOG_GENERATE_YAML: str = (
 
 
 class Frontmatter(NamedTuple):
-    """Structured representation of the file frontmatter metadata."""
+    """Class to represent the file frontmatter metadata."""
     weight: int
     title: str
     filename: str
@@ -69,7 +70,7 @@ class Frontmatter(NamedTuple):
 
 
 class Branch:
-    """Represents a directory branch in the tree."""
+    """Class to represent a directory branch in the tree."""
     root: Path
 
     def __init__(self, path: Path) -> None:
@@ -165,7 +166,7 @@ class Branch:
 
 class Tree:
     language: str
-    """Represents the complete directory tree"""
+    """Class to represent the complete directory tree."""
 
     def __init__(self, root: Path) -> None:
         self.root: Path = root
@@ -201,13 +202,7 @@ class Tree:
             raise GenerateYamlMissingBranchError
 
         for filepath in dirpath.iterdir():
-            if not filepath.is_file():
-                continue
-
             if not is_valid_file(filepath, self.__class__.language):
-                continue
-
-            if filepath.stem in ("_index", "index"):
                 continue
 
             front_matter: Frontmatter = Frontmatter.parse_frontmatter(filepath, self.root)
@@ -257,71 +252,6 @@ class Tree:
         except GenerateYamlMissingBranchError:
             return None
 
-    # def process_directory(self, dirpath: Path) -> Branch | None:
-    #     """Process a directory and return its Branch"""
-    #     branch: Branch = Branch(dirpath)
-    #     language: str = self.__class__.language
-    #
-    #     # Check for index files to get directory weight
-    #     try:
-    #         filepath: Path = find_index(dirpath, language)
-    #
-    #     except GenerateYamlMissingIndexFileError:
-    #         return
-    #
-    #     front_matter: Frontmatter | None = Frontmatter.parse_frontmatter(filepath, self.root)
-    #
-    #     if front_matter:
-    #         branch._weight = front_matter.weight
-    #
-    #         if has_content(filepath):
-    #             branch.index.append(front_matter.filename)
-    #
-    #         else:
-    #             branch.title["value"] = front_matter.title
-    #
-    #         level: int = len(Path(branch.relpath).parts) + 1
-    #         branch.title["level"] = level
-    #
-    #     # Process files
-    #     for filepath in dirpath.iterdir():
-    #         if not filepath.is_file():
-    #             continue
-    #
-    #         if not is_valid_file(filepath, language):
-    #             continue
-    #
-    #         if filepath.stem in ("_index", "index"):
-    #             continue
-    #
-    #         front_matter: Frontmatter = Frontmatter.parse_frontmatter(filepath, self.root)
-    #
-    #         if front_matter:
-    #             branch.files.append(front_matter.filename)
-    #
-    #     # Sort files by weight then title
-    #     branch.files.sort(
-    #         key=lambda x: (
-    #             (Frontmatter.parse_frontmatter(self.root.joinpath(x), self.root)).weight,
-    #             (Frontmatter.parse_frontmatter(self.root.joinpath(x), self.root)).title.lower()))
-    #
-    #     # Process subdirectories
-    #     subdirs: list[Path] = sorted(dirpath.iterdir())  # First sort by name for consistent processing
-    #
-    #     for subdir in subdirs:
-    #         if subdir.is_dir():
-    #             sub_branch: Branch | None = self.process_directory(subdir)
-    #
-    #             if sub_branch:
-    #                 branch.subdirs[sub_branch.path.name] = sub_branch
-    #
-    #     # Only keep branches with content
-    #     if branch.index or branch.files or branch.subdirs:
-    #         return branch
-    #
-    #     else:
-    #         return None
-
     def build(self) -> None:
         """Build the complete tree structure"""
         root_branch: Branch | None = self.generate_branch(self.root)
@@ -369,20 +299,24 @@ class YAMLConfig(NamedTuple):
 
         main_attributes: dict[str, str | int | bool] = {
             "doctype": "book",
-            "outlinelevels": kwargs.get("outlinelevels", 4),
-            "sectnumlevels": kwargs.get("sectnumlevels", 4),
-            "toclevels": kwargs.get("toclevels", 3),
-            "toc": kwargs.get("toc", True),
-            "chapter-signifier": kwargs.get("chapter-signifier", False),
+            "outlinelevels": 4,
+            "sectnumlevels": 4,
+            "toclevels": 3,
+            "toc": True,
+            "chapter-signifier": False,
             "title-page": kwargs.get("title-page"),
             "version": kwargs.get("version")
         }
 
-        settings: dict[str, str | int | bool] = {k.replace("_", "-"): v for k, v in kwargs.items()}
+        settings: dict[str, str | int | bool] = {}
         settings.update(lang_attributes)
         settings.update(main_attributes)
+        user_kwargs: dict[str, str | int | bool] = {k.replace("_", "-"): v for k, v in kwargs.items()}
+        settings.update(user_kwargs)
 
         self.settings.update(settings)
+
+        logger.debug(f"Раздел settings:\n{to_yaml(self.settings)}")
 
     def set_legal_info(self):
         if self.language == "ru":
@@ -404,14 +338,31 @@ class YAMLConfig(NamedTuple):
 
         self.rights.update(rights)
 
-    def write(self, output: StrPath):
-        kwargs: dict[str, Any] = {
+        logger.debug(f"Раздел rights:\n{to_yaml(self.rights)}")
+
+    def write(self, output: StrPath, is_execute: bool = True):
+        logger.success(f"Конфигурационный файл:\n{str(self)}")
+
+        if is_execute:
+            with open(output, "w", encoding="utf-8", errors="ignore") as f:
+                f.write(str(self))
+            logger.success(f"Записан файл {Path(output).resolve()}")
+
+        else:
+            logger.warning("Файл не был записан согласно используемым опциям в команде")
+
+    def to_dict(self):
+        return {
             "settings": self.settings,
             "rights": self.rights,
             **self.subdirs}
 
-        with open(output, "w", encoding="utf-8", errors="ignore") as f:
-            dump(kwargs, f, indent=2, allow_unicode=True, sort_keys=False)
+    def __str__(self):
+        return to_yaml(self.to_dict())
+
+
+def to_yaml(kwargs):
+    return dump(kwargs, indent=2, allow_unicode=True, sort_keys=False)
 
 
 def has_content(filepath: StrPath) -> bool:
@@ -424,8 +375,14 @@ def has_content(filepath: StrPath) -> bool:
 
 
 def is_valid_file(filepath: Path, language: str) -> bool:
+    if not filepath.is_file():
+        return False
+
+    if filepath.stem in ("_index", "index") or filepath.stem.startswith((".", "_")):
+        return False
+
     if language == "ru":
-        is_language: bool = filepath.suffixes[0] in (".md", ".adoc")
+        is_language: bool = filepath.suffixes[0] in (MD_EXTENSION, ADOC_EXTENSION)
 
     else:
         is_language: bool = filepath.suffixes[0] == language
@@ -465,6 +422,29 @@ def prepare_title(title: str):
     return title.replace(" ", "_")
 
 
+def prepare_attributes(attrs: dict[str, Any] = None):
+    if attrs is None:
+        attrs: dict[str, Any] = {}
+
+    for key, value in attrs.items():
+        key: str = key.strip()
+        value: str = value.strip()
+
+        if value.isnumeric():
+            attrs[key] = int(value)
+
+        elif value == "true":
+            attrs[key] = True
+
+        elif value == "false":
+            attrs[key] = False
+
+        else:
+            attrs[key] = value
+
+    return attrs
+
+
 @cli.command(
     "generate-yaml",
     cls=SwitchArgsAPIGroup,
@@ -480,33 +460,45 @@ def prepare_title(title: str):
     required=True,
     shell_complete=dir_completion)
 @option(
-    "-l", "--language", "language",
-    type=Choice(["ru", "en", "fr"]),
-    help="\b\nИспользуемый язык в файлах",
-    nargs=1,
-    required=True,
-    metavar="LANG",
-    shell_complete=language_completion,
-    show_choices=True)
-@option(
     "-t", "--title-page",
     type=STRING,
     help="\b\nНазвание продукта, отображаемое на титульном листе",
     required=True,
     nargs=1,
-    metavar="TITLE")
+    metavar="<TITLE>")
 @option(
     "-v", "--version",
     type=STRING,
     help="\b\nНомер версии продукта",
     nargs=1,
-    metavar="VERSION",
+    metavar="<VERSION>",
     required=True)
 @option(
+    "-d/-D", "--dry-run/--no-dry-run",
+    type=BOOL,
+    is_flag=True,
+    help="\b\nФлаг вывода текста на экран без записи в файл "
+         "\nв директории проекта."
+         "\nПо умолчанию: False, файл создается",
+    show_default=True,
+    required=False,
+    default=config_file.get_commands("generate-yaml", "dry_run"))
+@option(
+    "-l", "--language", "language",
+    type=Choice(["ru", "en", "fr"]),
+    help="\b\nИспользуемый язык в файлах."
+         "\nВозможные значения: ru, en, fr. По умолчанию: ru",
+    multiple=False,
+    required=False,
+    metavar="<LANG>",
+    shell_complete=language_completion,
+    show_choices=True,
+    default=config_file.get_commands("generate-yaml", "language"))
+@option(
     "-a", "--args", "args",
-    type=tuple[str, ...],
-    help="\b\nДополнительные параметры AsciiDoc, добавляемые "
-         "\nк файлу, или изменяющие значения по умолчанию."
+    type=STRING,
+    help="\b\nДополнительные параметры AsciiDoc, добавляемые к файлу, "
+         "\nили изменяющие значения по умолчанию."
          "\nПо умолчанию: null",
     multiple=True,
     required=False,
@@ -530,27 +522,26 @@ def prepare_title(title: str):
 def generate_yaml_command(
         ctx: Context,
         project: str,
-        language: str,
         title_page: str,
         version: str,
+        dry_run: bool = False,
+        language: str = "ru",
         args: tuple[str, ...] = None,
         keep_logs: bool = False):
     kwargs: dict[str, str] = {
-        "language": language,
         "title-page": title_page,
         "version": version}
 
-    if args is None:
-        args: list[str] = []
-
-    else:
+    if args is not None:
         args: list[str] = [*args]
 
-    attrs: dict[str, Any] = {
-        attribute.split("=", 1)[0]: attribute.split("=", 1)[1]
-        for attribute in args}
+        kw: dict[str, Any] = {
+            attribute.split("=", 1)[0]: attribute.split("=", 1)[1]
+            for attribute in args}
 
-    kwargs.update(**attrs)
+        attrs: dict[str, Any] = prepare_attributes(kw)
+
+        kwargs.update(attrs)
 
     project: Path = Path(project)
     Branch.root = project
@@ -564,8 +555,8 @@ def generate_yaml_command(
     yaml_config.set_legal_info()
     yaml_config.subdirs.update(**tree.to_yaml())
 
-    output: str = f"PDF_{prepare_title(title_page)}.yml"
+    output: Path = project.joinpath(f"PDF_{prepare_title(title_page)}.yml")
 
-    yaml_config.write(output)
+    yaml_config.write(output, not dry_run)
 
     ctx.obj["keep_logs"] = keep_logs

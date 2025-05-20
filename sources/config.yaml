@@ -4,7 +4,7 @@ general:
   log_path: "~/Desktop/_logs/cli_debug.log"
   config_path: "sources/dict.yaml"
   temp_dir: "~/_temp/"
-  col_max: 50
+  col_max: 56
   max_content_width: 100
   terminal_width: 100
 
@@ -20,7 +20,7 @@ commands:
     debug: false
     directory: null
     temp_dir: "~/_temp/"
-    files: []
+    files: [ ]
     verbose: false
     recursive: true
     dry_run: false
@@ -111,3 +111,5 @@ commands:
 
   generate-yaml:
     args: null
+    dry_run: false
+    language: ru

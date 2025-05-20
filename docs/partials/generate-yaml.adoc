@@ -1,0 +1,206 @@
+:asciidoctorconfigdir: ../..
+
+[source,console,subs="attributes+"]
+----
+{name} generate-yaml ../MME --language ru --version 1.16.1 --title-page "PROTEI MME" --args outlinelevels=3 --dry-run
+
+Конфигурационный файл:
+settings:
+  figure-caption: Рисунок
+  table-caption: Таблица
+  toc-title: Содержание
+  title-logo-image: images/logo.svg[top=4%,align=right,pdfwidth=3cm]
+  doctype: book
+  outlinelevels: 3
+  sectnumlevels: 4
+  toclevels: 3
+  toc: true
+  chapter-signifier: false
+  title-page: PROTEI MME
+  version: 1.16.1
+rights:
+  index:
+  - ../MME/content/common/_index.md
+  title:
+    value: Юридическая информация
+    title-files: false
+content/common/basics:
+  files:
+  - basics/general.md
+  - basics/functionalities.md
+  - basics/network_architecture.md
+  - basics/internal_architecture.md
+  - basics/vnf_arch.md
+  - basics/requirements_hw_sw.md
+  - basics/lifecycle.md
+  - basics/specifications.md
+  title:
+    value: Общее описание
+    level: 4
+content/common/oam:
+  files:
+  - oam/system_management.md
+  - oam/api.md
+  - oam/cli.md
+  - oam/update.md
+  - oam/add_imsi.md
+  - oam/backup_recovery.md
+  - oam/performance_kpi.md
+  title:
+    value: Эксплуатация, администрирование и обслуживание
+    level: 4
+content/common/config:
+  index:
+  - config/_index.md
+  files:
+  - config/ap.md
+  - config/diameter.md
+  - config/dns.md
+  - config/gtp_c.md
+  - config/http.md
+  - config/keydb_ranges.md
+  - config/long_mnc.md
+  - config/metrics.md
+  - config/mme.md
+  - config/pcap.md
+  - config/plmn.md
+  - config/protei.md
+  - config/redis.md
+  - config/s1ap.md
+  - config/sgd.md
+  - config/sgsap.md
+  - config/trace.md
+  - config/ue_trace.md
+  - config/watchdog.md
+  title:
+    level: 4
+content/common/config/component:
+  files:
+  - config/component/diameter.md
+  - config/component/sgsap.md
+  title:
+    value: Описание конфигурационных файлов компонент
+    level: 5
+content/common/config/rules:
+  files:
+  - config/rules/apn_rules.md
+  - config/rules/code_mapping_rules.md
+  - config/rules/emergency_numbers.md
+  - config/rules/emergency_pdn.md
+  - config/rules/forbidden_imei_rules.md
+  - config/rules/imsi_rules.md
+  - config/rules/qos_rules.md
+  - config/rules/rac_rules.md
+  - config/rules/tac_rules.md
+  - config/rules/zc_rules.md
+  title:
+    value: Описание конфигурационных файлов правил
+    level: 5
+content/common/logging:
+  index:
+  - logging/_index.md
+  title:
+    level: 4
+content/common/logging/edr:
+  index:
+  - logging/edr/_index.md
+  files:
+  - logging/edr/connect.md
+  - logging/edr/dedicated_bearer.md
+  - logging/edr/diam.md
+  - logging/edr/enodeb.md
+  - logging/edr/gtp_c.md
+  - logging/edr/gtp_c_overload.md
+  - logging/edr/http.md
+  - logging/edr/irat_handover.md
+  - logging/edr/internal_resource_manager.md
+  - logging/edr/lte_handover.md
+  - logging/edr/paging.md
+  - logging/edr/reject.md
+  - logging/edr/s1ap_context.md
+  - logging/edr/s1ap.md
+  - logging/edr/s1ap_overload.md
+  - logging/edr/sgsap.md
+  - logging/edr/sgsap_overload.md
+  - logging/edr/tau.md
+  - logging/edr/error_code.md
+  title:
+    level: 5
+content/common/logging/stat:
+  index:
+  - logging/stat/_index.md
+  files:
+  - logging/stat/MME_Diameter.md
+  - logging/stat/MME_handover.md
+  - logging/stat/MME_resource.md
+  - logging/stat/MME_paging.md
+  - logging/stat/MME_s1_Attach.md
+  - logging/stat/MME_s1_Bearer_Activation.md
+  - logging/stat/MME_s1_Bearer_Deactivation.md
+  - logging/stat/MME_s1_Bearer_Modification.md
+  - logging/stat/MME_s1_Detach.md
+  - logging/stat/MME_s1_Security.md
+  - logging/stat/MME_s1_Service.md
+  - logging/stat/MME_s11_Interface.md
+  - logging/stat/MME_s1_Interface.md
+  - logging/stat/MME_S6a_interface.md
+  - logging/stat/MME_sgs_Interface.md
+  - logging/stat/MME_sv_Interface.md
+  - logging/stat/MME_tau.md
+  - logging/stat/MME_users.md
+  title:
+    level: 5
+content/common/product_info:
+  index:
+  - product_info/_index.md
+  title:
+    level: 4
+content/common/fault_management:
+  title:
+    value: Диагностика и устранение неполадок
+    level: 4
+content/common/fault_management/alarms_handling:
+  index:
+  - fault_management/alarms_handling/_index.adoc
+  files:
+  - fault_management/alarms_handling/chrony_leap_status.adoc
+  - fault_management/alarms_handling/config_backup_status.adoc
+  - fault_management/alarms_handling/diameter_flap.adoc
+  - fault_management/alarms_handling/diameter_link_state.adoc
+  - fault_management/alarms_handling/diameter_long_failure.adoc
+  - fault_management/alarms_handling/dns_status.adoc
+  - fault_management/alarms_handling/gtp_gngp_peer_long_failure.adoc
+  - fault_management/alarms_handling/gtp_gngp_peer_state.adoc
+  - fault_management/alarms_handling/gtp_s10_peer_long_failure.adoc
+  - fault_management/alarms_handling/gtp_s10_peer_state.adoc
+  - fault_management/alarms_handling/gtp_s11_peer_long_failure.adoc
+  - fault_management/alarms_handling/gtp_s11_peer_state.adoc
+  - fault_management/alarms_handling/gtp_sv_peer_long_failure.adoc
+  - fault_management/alarms_handling/gtp_sv_peer_state.adoc
+  - fault_management/alarms_handling/high_disk_space_usage.adoc
+  - fault_management/alarms_handling/high_load_average.adoc
+  - fault_management/alarms_handling/high_used_cpu_percent.adoc
+  - fault_management/alarms_handling/high_used_memory_percent.adoc
+  - fault_management/alarms_handling/increasing_swap_usage.adoc
+  - fault_management/alarms_handling/restart.adoc
+  - fault_management/alarms_handling/restart_counter.adoc
+  - fault_management/alarms_handling/rorw_file_system.adoc
+  - fault_management/alarms_handling/rss_usage.adoc
+  - fault_management/alarms_handling/rss_usage_increasing.adoc
+  - fault_management/alarms_handling/s1_peer_flap.adoc
+  - fault_management/alarms_handling/s1peer_state.adoc
+  - fault_management/alarms_handling/sgs_peer_long_failure.adoc
+  - fault_management/alarms_handling/sgs_peer_state.adoc
+  - fault_management/alarms_handling/stop.adoc
+  title:
+    level: 5
+content/common/fault_management/troubleshooting:
+  index:
+  - fault_management/troubleshooting/_index.adoc
+  files:
+  - fault_management/troubleshooting/reachability.md
+  title:
+    level: 5
+
+Файл не был записан согласно используемым опциям в команде
+----

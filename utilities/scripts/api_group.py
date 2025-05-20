@@ -276,7 +276,7 @@ def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
 
         args_names: list[str] = [arg.name for arg in args]
 
-        col_spacing: int = COL_MAX - args_help_dict.max_key - max(map(len, args_names)) + 4
+        col_spacing: int = COL_MAX - args_help_dict.max_key - max(map(len, args_names))
         col_max: int = MAX_CONTENT_WIDTH
 
         with formatter.section(style("Аргументы", fg="blue", bold=True)):
