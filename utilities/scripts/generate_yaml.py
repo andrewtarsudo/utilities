@@ -10,14 +10,14 @@ from frontmatter import load, Post
 from loguru import logger
 from yaml import dump
 
+from utilities.common.completion import dir_completion, language_completion
 from utilities.common.config_file import config_file
-from utilities.common.errors import GenerateYamlMissingAttributeError, GenerateYamlMissingBranchError, \
-    GenerateYamlMissingIndexFileError
+from utilities.common.errors import GenerateYamlInvalidLevelError, GenerateYamlMissingAttributeError, \
+    GenerateYamlMissingBranchError, GenerateYamlMissingIndexFileError
 from utilities.common.functions import pretty_print
-from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, StrPath
+from utilities.common.shared import EXTENSIONS, HELP, INDEX_STEMS, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
-from utilities.scripts.completion import dir_completion, language_completion
 
 EPILOG_GENERATE_YAML: str = (
     "\b\nЗначения атрибутов AsciiDoc по умолчанию, добавляемые в файл:"
@@ -44,12 +44,14 @@ class Frontmatter(NamedTuple):
     path: str
     draft: bool = False
 
+    # noinspection PyTypeChecker
     @classmethod
     def parse_frontmatter(cls, filepath: StrPath, root: StrPath):
         try:
             post: Post = load(str(filepath))
+            draft: bool = post.get("draft", False)
 
-            if not post.metadata or post.get("draft", False):
+            if not post.metadata or draft:
                 return None
 
             filepath: Path = Path(filepath)
@@ -57,12 +59,11 @@ class Frontmatter(NamedTuple):
             title: str = str(post.get("title"))
             filename: str = filepath.relative_to(root).as_posix()
             path: str = filepath.as_posix()
-            draft: bool = bool(post.get("draft", False))
 
             return cls(weight, title, filename, path, draft)
 
         except OSError:
-            logger.info(f"В файле {filepath} отсутствует frontmatter")
+            logger.debug(f"В файле {filepath} отсутствует frontmatter")
             return None
 
     def __str__(self):
@@ -191,7 +192,13 @@ class Tree:
                 else:
                     branch.title["value"] = front_matter.title
 
-                level: int = len(Path(branch.relpath).parts) + 1
+                # +1 because compare not file but parent dir, -2 because content/common/ are taken into account
+                level: int = len(Path(branch.relpath).parts) + 1 - 2
+
+                if level < 1:
+                    logger.error(f"Для директории {dirpath} получилось значение level = {level}")
+                    raise GenerateYamlInvalidLevelError
+
                 branch.title["level"] = level
 
             return branch
@@ -252,7 +259,7 @@ class Tree:
         except GenerateYamlMissingBranchError:
             return None
 
-    def build(self) -> None:
+    def build(self):
         """Build the complete tree structure"""
         root_branch: Branch | None = self.generate_branch(self.root)
 
@@ -378,16 +385,16 @@ def is_valid_file(filepath: Path, language: str) -> bool:
     if not filepath.is_file():
         return False
 
-    if filepath.stem in ("_index", "index") or filepath.stem.startswith((".", "_")):
+    if filepath.stem in INDEX_STEMS or filepath.stem.startswith((".", "_")):
         return False
 
     if language == "ru":
-        is_language: bool = filepath.suffixes[0] in (MD_EXTENSION, ADOC_EXTENSION)
+        is_language: bool = filepath.suffixes[0] in EXTENSIONS
 
     else:
         is_language: bool = filepath.suffixes[0] == language
 
-    return filepath.suffix in (".md", ".adoc") and is_language
+    return filepath.suffix in EXTENSIONS and is_language
 
 
 def find_index(directory: StrPath, language: str):

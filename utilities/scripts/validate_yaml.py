@@ -18,7 +18,7 @@ from utilities.common.functions import file_reader, file_reader_type, file_write
 from utilities.common.shared import HELP, separator, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
-from utilities.scripts.completion import file_dir_completion
+from utilities.common.completion import file_dir_completion
 
 _SETTINGS_NAMES: tuple[str, ...] = ("settings", "Settings")
 _RIGHTS_NAMES: tuple[str, ...] = ("rights", "Rights")
@@ -98,7 +98,7 @@ def fix_path(line_no: int, path: Path, root: Path) -> str:
                 valid_name: str = matches[0]
                 valid_path: str = neighbours.get(valid_name)
 
-            # otherwise, just comment the line
+        # otherwise, just comment the line
         else:
             valid_path: str = f"# {rel_path}  (удалить или закомментировать)"
 

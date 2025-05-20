@@ -10,7 +10,7 @@ from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument
 from utilities.scripts.api_group import MutuallyExclusiveOption, SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
-from utilities.scripts.completion import doc_completion
+from utilities.common.completion import doc_completion
 
 
 @cli.command(

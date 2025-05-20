@@ -11,7 +11,7 @@ from click.shell_completion import CompletionItem
 from click.termui import pause, style
 from loguru import logger
 from more_itertools import flatten
-from prettyprinter import pformat
+from yaml import safe_dump
 
 from utilities.common.config_file import config_file, ConfigFile
 from utilities.common.custom_logger import custom_logging, LoggerConfiguration
@@ -468,12 +468,11 @@ class APIGroup(Group):
             logger.error("Ошибка обработки команды")
             logger.debug(
                 f"Параметры команд:"
-                f"\n{pformat(
+                f"\n{safe_dump(
                     e.ctx.to_info_dict(),
                     indent=2,
                     width=120,
-                    compact=False,
-                    sort_dict_keys=True)}")
+                    sort_keys=True)}")
             raise CommandNotFoundError
 
 

@@ -181,3 +181,7 @@ class GenerateYamlMissingIndexFileError(GenerateYamlError):
 
 class GenerateYamlMissingBranchError(GenerateYamlError):
     """Branch instance cannot be None."""
+
+
+class GenerateYamlInvalidLevelError(GenerateYamlError):
+    """Chapter level cannot be less than 1."""

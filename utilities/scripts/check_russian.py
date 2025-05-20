@@ -14,7 +14,7 @@ from utilities.common.functions import file_reader, is_windows, pretty_print
 from utilities.common.shared import HELP, separator, StrPath
 from utilities.scripts.api_group import APIGroup
 from utilities.scripts.cli import cli
-from utilities.scripts.completion import dir_completion, file_completion
+from utilities.common.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
 
 RUSSIAN_CHARS: str = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"

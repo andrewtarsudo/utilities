@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from utilities.scripts.args_help_dict import ArgsHelpDict
 from utilities.scripts.api_group import APIGroup, NoArgsAPIGroup, SwitchArgsAPIGroup, TermsAPIGroup
-from utilities.scripts.completion import dir_completion, doc_completion, file_completion, file_dir_completion
 
 from utilities.scripts.cli import cli
 from utilities.scripts.check_russian import check_russian_command

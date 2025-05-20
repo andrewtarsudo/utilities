@@ -14,7 +14,7 @@ from utilities.common.functions import is_windows, pretty_print, walk_full
 from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.scripts.api_group import MutuallyExclusiveOption, SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
-from utilities.scripts.completion import dir_completion, file_completion
+from utilities.common.completion import dir_completion, file_completion
 
 
 def check_content_common(path: Path):

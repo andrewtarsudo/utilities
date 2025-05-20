@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from os import scandir
 from pathlib import Path
 
 from click.core import Context, Parameter
@@ -12,13 +11,13 @@ from utilities.common.shared import ADOC_EXTENSION, MD_EXTENSION
 def file_completion(ctx: Context, parameter: Parameter, incomplete: str):
     paths: list[str] = []
 
-    for path in scandir("."):
+    for path in Path.cwd().iterdir():
         is_suffix: bool = Path(path).suffix in (MD_EXTENSION, ADOC_EXTENSION)
-        is_file: bool = path.is_file(follow_symlinks=True)
+        is_file: bool = path.is_file()
         is_incomplete: bool = path.name.startswith(incomplete)
 
         if is_suffix and is_file and is_incomplete:
-            paths.append(path.path)
+            paths.append(path.as_posix())
 
     return [CompletionItem(path) for path in paths]
 
@@ -27,13 +26,13 @@ def file_completion(ctx: Context, parameter: Parameter, incomplete: str):
 def dir_completion(ctx: Context, parameter: Parameter, incomplete: str):
     paths: list[str] = []
 
-    for path in scandir("."):
+    for path in Path.cwd().iterdir():
         is_suffix: bool = Path(path).suffix in (MD_EXTENSION, ADOC_EXTENSION)
-        is_dir: bool = path.is_dir(follow_symlinks=True)
+        is_dir: bool = path.is_dir()
         is_incomplete: bool = path.name.startswith(incomplete)
 
         if is_suffix and is_dir and is_incomplete:
-            paths.append(path.path)
+            paths.append(path.as_posix())
 
     return [CompletionItem(path) for path in paths]
 
@@ -42,13 +41,13 @@ def dir_completion(ctx: Context, parameter: Parameter, incomplete: str):
 def doc_completion(ctx: Context, parameter: Parameter, incomplete: str):
     paths: list[str] = []
 
-    for path in scandir("."):
+    for path in Path.cwd().iterdir():
         is_suffix: bool = Path(path).suffix in (".docx", ".docm")
-        is_file: bool = path.is_file(follow_symlinks=True)
+        is_file: bool = path.is_file()
         is_incomplete: bool = path.name.startswith(incomplete)
 
         if is_suffix and is_file and is_incomplete:
-            paths.append(path.path)
+            paths.append(path.as_posix())
 
     return [CompletionItem(path) for path in paths]
 
@@ -57,16 +56,17 @@ def doc_completion(ctx: Context, parameter: Parameter, incomplete: str):
 def file_dir_completion(ctx: Context, parameter: Parameter, incomplete: str):
     paths: list[str] = []
 
-    for path in scandir("."):
+    for path in Path.cwd().iterdir():
         is_file: bool = path.is_file() and Path(path).suffix in (MD_EXTENSION, ADOC_EXTENSION)
-        is_dir: bool = path.is_dir(follow_symlinks=True)
+        is_dir: bool = path.is_dir()
         is_incomplete: bool = path.name.startswith(incomplete)
 
         if (is_file or is_dir) and is_incomplete:
-            paths.append(path.path)
+            paths.append(path.as_posix())
 
     return [CompletionItem(path) for path in paths]
 
 
+# noinspection PyUnusedLocal
 def language_completion(ctx: Context, parameter: Parameter, incomplete: str):
-    return [CompletionItem(lang) for lang in ["ru", "en", "fr"]if lang.startswith(incomplete)]
+    return [CompletionItem(lang) for lang in ["ru", "en", "fr"] if lang.startswith(incomplete)]

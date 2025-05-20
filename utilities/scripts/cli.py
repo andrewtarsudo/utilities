@@ -14,7 +14,7 @@ from click.termui import pause
 from click.types import BOOL
 from click.utils import echo
 from loguru import logger
-from prettyprinter import pformat
+from yaml import safe_dump
 
 from utilities.common.config_file import config_file
 from utilities.common.custom_logger import LoggerConfiguration
@@ -245,10 +245,10 @@ def cli(debug: bool = False, update: bool = True):
         elif ctx.invoked_subcommand == "repair-links":
             logger_configuration.add_handler("result_file", "SUCCESS", logger_configuration.result_file_handler())
 
-        config_file_log: str = pformat(config_file, indent=2, width=120, compact=False, sort_dict_keys=True)
+        config_file_log: str = safe_dump(config_file, indent=2, width=120, sort_keys=True)
         logger.debug(f"Файл конфигурации:\n{config_file_log}")
 
-        args_help_dict_log: str = pformat(args_help_dict, indent=2, width=120, compact=False, sort_dict_keys=True)
+        args_help_dict_log: str = safe_dump(args_help_dict, indent=2, width=120, sort_keys=True)
         logger.debug(f"Файл описания аргументов:\n{args_help_dict_log}")
 
         env_var: Any = environ.get(ENV_VAR)

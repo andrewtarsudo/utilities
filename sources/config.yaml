@@ -77,8 +77,8 @@ commands:
     readme_file: "readme.txt"
     samples_file: "samples.txt"
     project_id: 57022544
-    terms_file: terms.adoc
-    version_file: __version__.txt
+    terms_file: "terms.adoc"
+    version_file: "__version__.txt"
     all_flag: false
     full_flag: false
     info_flag: false
@@ -86,7 +86,7 @@ commands:
     samples_flag: false
     abbr_flag: false
     ascii_flag: false
-    common_flag: false
+    common_flag: true
 
   validate-yaml:
     cutoff: 0.75

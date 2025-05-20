@@ -43,7 +43,7 @@ def generate_executable_command():
             _.check_returncode()
 
     except CalledProcessError as e:
-        print(f"{e.__class__.__name__}, код {e.returncode}:\n{e.stderr}")
+        print(f"{e.__class__.__name__}, код {e.returncode}:\n{e.stderr}\n{e.output}\n{e.stdout}")
         raise
 
     except PermissionError as e:
@@ -61,7 +61,7 @@ def generate_executable_command():
         raise
 
     else:
-        print(f"Исполняемый файл {exe_file} успешно создан")
+        print(f"Исполняемый файл {exe_file.as_posix()} успешно создан")
 
 
 if __name__ == '__main__':

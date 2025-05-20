@@ -3,7 +3,7 @@ from pathlib import Path
 
 from click.utils import get_app_dir
 from loguru import logger
-from prettyprinter import pformat
+from yaml import safe_dump
 
 from utilities.common.errors import ConfigFileGeneralKeyError, ConfigFileUpdateKeyError, FileReaderError
 from utilities.common.functions import file_reader_type
@@ -36,7 +36,7 @@ class ConfigFile(dict):
                 for k, v in user_kwargs.items():
                     self[k] = v
 
-                logger.debug(pformat(user_kwargs, indent=2, width=120, sort_dict_keys=True))
+                logger.debug(safe_dump(user_kwargs, indent=2, width=120, sort_keys=True))
 
             except FileReaderError:
                 logger.debug(f"Пользовательский конфигурационный файл {path.name} не найден или не обработан")

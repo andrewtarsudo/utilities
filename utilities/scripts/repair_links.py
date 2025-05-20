@@ -21,7 +21,7 @@ from utilities.repair_links.link_fixer import link_fixer
 from utilities.repair_links.link_inspector import link_inspector
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
-from utilities.scripts.completion import dir_completion
+from utilities.common.completion import dir_completion
 
 
 def validate_dir_path(path: StrPath | None) -> bool:

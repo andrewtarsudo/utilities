@@ -12,7 +12,7 @@ from utilities.common.functions import file_reader, file_writer, pretty_print
 from utilities.common.shared import HELP, INDEX_STEMS, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
-from utilities.scripts.completion import dir_completion
+from utilities.common.completion import dir_completion
 from utilities.scripts.list_files import get_files
 
 

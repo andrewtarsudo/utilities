@@ -12,7 +12,7 @@ from utilities.common.config_file import config_file
 from utilities.common.errors import FileReaderTypeError
 from utilities.common.functions import file_reader, file_reader_type, file_writer
 from utilities.common.shared import FileType, HELP, StrPath
-from utilities.scripts import file_completion
+from utilities.common.completion import file_completion
 from utilities.scripts.cli import APIGroup, cli
 from utilities.scripts.list_files import get_files
 

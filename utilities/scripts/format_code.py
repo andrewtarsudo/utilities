@@ -13,7 +13,7 @@ from utilities.common.functions import file_reader, file_writer, pretty_print
 from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, StrPath
 from utilities.scripts.api_group import APIGroup
 from utilities.scripts.cli import cli
-from utilities.scripts.completion import dir_completion, file_completion
+from utilities.common.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
 
 MAX_LENGTH: int = config_file.get_commands("format-code", "length")

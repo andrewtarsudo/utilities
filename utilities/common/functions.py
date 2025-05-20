@@ -10,7 +10,6 @@ from typing import Any, Callable, Iterable
 
 from httpx import HTTPStatusError, InvalidURL, request, RequestError, Response, StreamError, URL
 from loguru import logger
-from prettyprinter import pformat
 from yaml.scanner import ScannerError
 
 from utilities.common.errors import FileReaderError, FileReaderTypeError, UpdateProjectIdError
@@ -355,7 +354,7 @@ class GitFile:
         try:
             with open(self.download_destination, "wb") as f:
                 response: Response = self.get_response().raise_for_status()
-                logger.debug(pformat(f"Запрос: {response.request.method} {response.request.url}"))
+                logger.debug(f"Запрос: {response.request.method} {response.request.url}")
 
                 for chunk in response.iter_bytes():
                     f.write(chunk)
