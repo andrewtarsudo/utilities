@@ -34,7 +34,14 @@ class FieldText:
     replacements: set[str] = {r"\.<br/?>", r"\.\s+", r"\.\s+\+\n"}
     pattern: str = "|".join(replacements)
 
-    __slots__ = ("_content", "_description_text", "_range_text", "_possible_values_text", "_default_text", "_type_text", "_notes_text")
+    __slots__ = (
+        "_content",
+        "_description_text",
+        "_range_text",
+        "_possible_values_text",
+        "_default_text",
+        "_type_text",
+        "_notes_text")
 
     def __init__(self, content: str):
         self._content: str = content
@@ -91,38 +98,6 @@ class FieldText:
     def stringify(self, attr: Attrs):
         _: str | None = self.getattr(attr)
         return f"<br>{_}" if _ is not None else ""
-
-    # def reorder_text(self):
-    #     _: str = sub(self.pattern, ".@@@", self._content)
-    #
-    #     parts: list[str] = _.split("@@@")
-    #
-    #     self._description_text = parts.pop(0)
-    #
-    #     for part in parts:
-    #         if part.startswith("Возможные значения"):
-    #             self._possible_values.append(part)
-    #             continue
-    #
-    #         m_range: Match = match(self.range_pattern, part)
-    #         m_type: Match = match(self.type_pattern, part)
-    #         m_default: Match = match(self.default_pattern, part)
-    #         m_possible_values: Match = match(self.possible_values_pattern, part)
-    #
-    #         if m_range:
-    #             self._range_text: str = m_range.group()
-    #
-    #         elif m_type:
-    #             self._type_text: str = m_type.group()
-    #
-    #         elif m_default:
-    #             self._default_text: str = m_default.group()
-    #
-    #         elif m_possible_values:
-    #             self._possible_values.append(part)
-    #
-    #         else:
-    #             self._notes_text.append(part)
 
     def __str__(self):
         return (
@@ -333,11 +308,11 @@ class TableRow(NamedTuple):
             return NotImplemented
 
     def __format__(self, format_spec):
-        if format_spec == "md":
+        if format_spec == ".md":
             cell_str: str = f" | ".join(map(str, self.table_cells))
             return f"| {cell_str} |"
 
-        elif format_spec == "adoc":
+        elif format_spec == ".adoc":
             cell_str: str = f" |".join(map(str, self.table_cells))
             return f"|{cell_str}"
 
@@ -363,6 +338,7 @@ class TableColumn(NamedTuple):
 
     def __getitem__(self, item) -> TableCell | list[TableCell]:
         if isinstance(item, int):
+            print(f"{item=}")
             return self.table_cells[item]
 
         elif isinstance(item, slice):
@@ -451,6 +427,7 @@ class Table:
         self._path: Path = Path(path).expanduser()
         self._lines: list[str] = lines
         self._table_cells: dict[TableCoordinate, TableCell] = {}
+        self.num_columns: int | None = None
 
     def __iter__(self) -> Iterator[str]:
         return iter(self._lines)
@@ -512,8 +489,8 @@ class Table:
         _occupied: set[TableCoordinate] = set()
 
         if self.table_type == ".adoc":
-            for number, match in enumerate(finditer(self.__class__.ADOC_PATTERN, self.content())):
-                if not match:
+            for number, m in enumerate(finditer(self.__class__.ADOC_PATTERN, self.content())):
+                if not m:
                     continue
 
                 shift: int = 0
@@ -531,13 +508,13 @@ class Table:
                         shift += 1
 
                 else:
-                    logger.error(f"Не удалось определить координаты ячейки {match.string}")
+                    logger.error(f"Не удалось определить координаты ячейки {m.string}")
                     self._table_cells = []
                     return
 
-                text: str = match.group(3).strip()
-                column_modifier: int = int(match.group(1)) if match.group(2) else 1
-                row_modifier: int = int(match.group(2)) if match.group(1) else 1
+                text: str = m.group(3).strip()
+                column_modifier: int = int(m.group(1)) if m.group(2) else 1
+                row_modifier: int = int(m.group(2)) if m.group(1) else 1
 
                 if (row_modifier, column_modifier) != (1, 1):
                     for row_offset, column_offset in product(range(row_modifier), range(column_modifier)):
@@ -581,12 +558,9 @@ class Table:
     def __len__(self):
         return len(self._lines)
 
-    @property
-    def num_columns(self) -> int:
+    def set_num_columns(self):
         """Gets the number of columns."""
-        print(Counter(self._lines[0].strip("|").strip()))
-        print(self._lines[0])
-        return Counter(self._lines[0].strip("|").strip()).get("|") + 1
+        self.num_columns = Counter(self._lines[0]).get("|") - 1
 
     @property
     def num_rows(self) -> int:
@@ -652,7 +626,8 @@ class Table:
 
             kwargs: dict[TableCoordinate, TableCell] = {cell.table_coordinate: cell for cell in iter(table_column)}
             self._table_cells.update(kwargs)
-            self._lines = list(map(str, self.iter_rows()))
+            self._lines = list(map(lambda x: format(x, self.table_type), self.iter_rows()))
+            self.num_columns += 1
 
         else:
             logger.error(f"Столбец должен быть в диапазоне 0-{self.num_columns}, но получено {table_column.column}")
@@ -773,6 +748,9 @@ class Table:
     def split_column(self, column: int | str, pattern: str | Pattern):
         new_column_cells: list[TableCell] = []
 
+        if isinstance(column, str):
+            column: int = self.get_index_by_name(column)
+
         for row, cell in enumerate(iter(self.get_column(column))):
             table_coordinate: TableCoordinate = TableCoordinate(row, column + 1)
             m: Match = search(pattern, cell.text)
@@ -793,6 +771,13 @@ class Table:
     @property
     def is_invalid(self):
         return self.num_columns < 5
+
+    def get_index_by_name(self, column: str):
+        if column in {*self.column_names}:
+            return self.column_names.index(column)
+
+        else:
+            raise ValueError
 
     def fix_config(self):
         parameter: TableColumn = self.get_column("Параметр")
@@ -846,7 +831,6 @@ class File:
         self.save(content)
 
 
-
 def find_tables(text: str) -> list[str]:
     """
     Finds all Markdown and AsciiDoc tables in the input text and returns them as a list of table strings.
@@ -862,7 +846,7 @@ def find_tables(text: str) -> list[str]:
         r'(?:^\s*\|.*\|\s*\n?)+',  # at least one row
         MULTILINE | VERBOSE
     )
-    tables += [match.group(0).strip() for match in md_pattern.finditer(text)]
+    tables += [m.group(0).strip() for m in md_pattern.finditer(text)]
 
     # Find AsciiDoc tables
     adoc_pattern = compile(
@@ -871,7 +855,7 @@ def find_tables(text: str) -> list[str]:
         r'^\s*\|===\s*$',  # table end
         MULTILINE | VERBOSE
     )
-    tables += [match.group(0).strip() for match in adoc_pattern.finditer(text)]
+    tables += [m.group(0).strip() for m in adoc_pattern.finditer(text)]
 
     return tables
 
@@ -930,8 +914,8 @@ def read_table(text: str) -> list[dict[str, str]]:
 
 
 def extract_type(description: str) -> Optional[str]:
-    match = search(r'Тип\s*--\s*(\w+)\.', description)
-    return match.group(1) if match else None
+    m = search(r'Тип\s*--\s*(\w+)\.', description)
+    return m.group(1) if m else None
 
 
 def remove_type_sentence(description: str) -> str:
@@ -1061,6 +1045,12 @@ if __name__ == '__main__':
     file: File = File(path)
     file.find_tables()
     for table in file._tables.values():
+        table.set_num_columns()
         table.define_cells()
         table.fix_config()
+        print(str(table))
+        print(table.num_columns)
+        print(table.column_names)
     file.update_tables()
+
+    print(file._content)
