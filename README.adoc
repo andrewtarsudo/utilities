@@ -186,6 +186,49 @@ $ {name} list-files "..\folder" --no-recursive
 В таком случае будет активирована ошибка `UsageError: Ошибка в задании команды: '<param>' не может использоваться одновременно с '<mutually exclusive params>'`.
 ====
 
+== Использование исходного кода
+
+Возможна также загрузка исходного кода и запуск оригинального исполняемого файла с помощью встроенного в операционную систему Python.
+На данный момент он включен в пакеты для всех операционных систем.
+
+Алгоритм действий:
+
+. Загрузить локально репозиторий https://gitlab.com/tech_writers_protei/utilities/[`tech_writers_protei/utilities/`].
+. Перейти в директорию `utilities/`.
+. В среде Python запустить файл `+__main__.py+`.
+
+* Windows:
++
+[source,shell]
+----
+$ git clone https://gitlab.com/tech_writers_protei/utilities/ --depth=1
+$ cd .\utilities
+$ pip install -r requirements.txt
+$ python .\__main__.py <command> <options>
+----
++
+[source,shell]
+----
+$ git clone https://gitlab.com/tech_writers_protei/utilities/ --depth=1
+$ cd ./utilities/
+$ pip install -r requirements.txt
+$ python3 ./__main__.py <command> <optioms>
+----
+
+=== Зависимости
+
+* Python: >= 3.8
+* certifi: >= 2025.1
+* click: >= 8.1
+* httpx: >= 0.28
+* loguru: >= 0.7
+* more-itertools: >= 10.6
+* pillow: >= 11.1
+* pip-system-certs: >= 4.0
+* python-frontmatter: >= 1.1
+* python-slugify: >= 8.0
+* pyyaml: >= 6.0
+
 == Некоторые рекомендации
 
 . В IDE есть встроенная консоль.

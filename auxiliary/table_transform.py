@@ -108,16 +108,16 @@ class Table:
                 col.index += 1
 
         # Insert the new column
-        new_column = TableColumn(index, header)
+        new_column: TableColumn = TableColumn(index, header)
         self.columns.insert(index, new_column)
 
         # Update rows to include the new column
         for row_idx, row in enumerate(self.rows):
-            content = header if row_idx == 0 and self.has_header else default_content
+            content: str = header if not row_idx and self.has_header else default_content
 
             # If this is the separator row, use appropriate format
             if row_idx == 1 and self.has_separator:
-                content = "-" * max(3, len(header))
+                content: str = "-" * max(3, len(header))
 
             row.insert_cell(index, content)
 
