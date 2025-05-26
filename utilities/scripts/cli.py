@@ -14,7 +14,6 @@ from click.termui import pause
 from click.types import BOOL
 from click.utils import echo
 from loguru import logger
-from yaml import safe_dump
 
 from utilities.common.config_file import config_file
 from utilities.common.custom_logger import LoggerConfiguration
@@ -190,6 +189,7 @@ def get_command() -> list[str]:
     return args
 
 
+# noinspection PyTypeChecker
 @group(
     cls=APIGroup,
     help="Набор скриптов для технических писателей")
@@ -245,11 +245,8 @@ def cli(debug: bool = False, update: bool = True):
         elif ctx.invoked_subcommand == "repair-links":
             logger_configuration.add_handler("result_file", "SUCCESS", logger_configuration.result_file_handler())
 
-        config_file_log: str = safe_dump(config_file, indent=2, width=120, sort_keys=True)
-        logger.debug(f"Файл конфигурации:\n{config_file_log}")
-
-        args_help_dict_log: str = safe_dump(args_help_dict, indent=2, width=120, sort_keys=True)
-        logger.debug(f"Файл описания аргументов:\n{args_help_dict_log}")
+        logger.debug(str(config_file))
+        logger.debug(f"Файл описания аргументов:\n{str(args_help_dict)}")
 
         env_var: Any = environ.get(ENV_VAR)
         logger.info(f"Переменная окружения: {ENV_VAR}={env_var}")

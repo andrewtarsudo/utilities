@@ -4,11 +4,10 @@ from typing import TypeAlias
 
 from click.utils import get_app_dir
 from loguru import logger
-from yaml import safe_dump
 
 from utilities.common.errors import ConfigFileGeneralKeyError, ConfigFileUpdateKeyError, FileReaderError
-from utilities.common.functions import file_reader_type
-from utilities.common.shared import BASE_PATH, ConfigType, FileType
+from utilities.common.functions import file_reader, file_reader_type, pretty_print
+from utilities.common.shared import BASE_PATH, ConfigType, FileType, StrPath
 
 GetCmdType: TypeAlias = (
         str | int | float | bool | list[str] | None |
@@ -23,6 +22,23 @@ class ConfigFile(dict):
     def __init__(self):
         kwargs: ConfigType = file_reader_type(self.path, "yaml")
         super().__init__(**kwargs)
+        self._is_user_config: bool = None
+        self._user_config: StrPath | None = None
+        self.read_user_configs()
+
+    def __str__(self):
+        system_config: str = file_reader(self.path, "string")
+        system_config_label: str = "Системная конфигурация:\n"
+        lines: list[str] = [system_config_label, system_config, "\n"]
+
+        if self._is_user_config:
+            user_config: str = file_reader(self.user_path, "string")
+            user_config_label: str = f"Пользовательская конфигурация ({self._user_config.as_posix()}):\n"
+
+            lines.append(user_config_label)
+            lines.append(user_config)
+
+        return pretty_print(lines)
 
     def read_user_configs(self):
         possible_user_configs: set[tuple[str, FileType]] = {
@@ -35,16 +51,26 @@ class ConfigFile(dict):
         for suffix, file_type in possible_user_configs:
             path: Path = Path(self.user_path.with_suffix(suffix))
 
-            try:
-                user_kwargs: ConfigType = file_reader_type(path, file_type)
+            if path.exists():
+                logger.debug(f"Обнаружен пользовательский конфигурационный файл {path.name}")
 
-                for k, v in user_kwargs.items():
-                    self[k] = v
+                try:
+                    user_kwargs: ConfigType = file_reader_type(path, file_type)
 
-                logger.debug(safe_dump(user_kwargs, indent=2, width=120, sort_keys=True))
+                    for k, v in user_kwargs.items():
+                        self[k] = v
 
-            except FileReaderError:
-                logger.debug(f"Пользовательский конфигурационный файл {path.name} не найден или не обработан")
+                    self._is_user_config = True
+                    self._user_config: Path = path
+                    break
+
+                except FileReaderError:
+                    logger.debug(f"Пользовательский конфигурационный файл {path.name} не обработан")
+                    self._is_user_config = False
+
+            else:
+                logger.debug(f"Пользовательский конфигурационный файл {path.name} не найден")
+                continue
 
     def get_commands(self, command: str, key: str = None) -> GetCmdType:
         if command is None:

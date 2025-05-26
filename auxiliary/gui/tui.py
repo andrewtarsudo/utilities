@@ -8,7 +8,7 @@ from textual.app import App, ComposeResult
 from textual.containers import Container, Grid
 from textual.screen import ModalScreen
 from textual.widget import Widget
-from textual.widgets import Button, Footer, Header, Input, Label, OptionList, Select, Static, Switch
+from textual.widgets import Button, Checkbox, Footer, Header, Input, Label, OptionList, Select, Static, Switch
 
 T = TypeVar('T')
 ClickParam: TypeAlias = Argument | Option

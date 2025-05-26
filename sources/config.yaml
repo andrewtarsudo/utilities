@@ -112,4 +112,4 @@ commands:
   generate-yaml:
     args: null
     dry_run: false
-    language: ru
+    language: "ru"

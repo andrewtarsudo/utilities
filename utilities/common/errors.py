@@ -185,3 +185,19 @@ class GenerateYamlMissingBranchError(GenerateYamlError):
 
 class GenerateYamlInvalidLevelError(GenerateYamlError):
     """Chapter level cannot be less than 1."""
+
+
+class TableError(BaseError):
+    """Base class for errors associated with the tables."""
+
+
+class TableKeyError(TableError):
+    """Line with the specified index has not been found."""
+
+
+class TableRowIndexError(TableColsError):
+    """Specified row index has not been found."""
+
+
+class TableRowInvalidIdentifierError(TableColsError):
+    """Specified column identifier has an invalid type."""

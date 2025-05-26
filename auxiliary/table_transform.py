@@ -5,33 +5,80 @@ from typing import Iterable, NamedTuple, Sequence
 
 from loguru import logger
 
+from utilities.common.errors import TableColsTableCoordinateInitError
 from utilities.common.functions import file_reader, file_writer, pretty_print
 from utilities.common.shared import StrPath
 
 
 class TableCoordinate(NamedTuple):
     row: int
-    col: int
+    column: int
+    
+    @property
+    def coord(self) -> tuple[int, int]:
+        return self.row, self.column
 
     def __str__(self) -> str:
-        return f"{self.row}, {self.col}"
+        return f"{self.row}, {self.column}"
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(row={self.row}, col={self.col})"
+        return f"{self.__class__.__name__}(row={self.row}, col={self.column})"
+    
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.coord == other.coord
+
+        else:
+            return NotImplemented
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            return self.coord != other.coord
+
+        else:
+            return NotImplemented
+
+    @classmethod
+    def as_element(cls, number: int, num_columns: int):
+        """Generates the coordinate from the set_table_cols index.
+
+        :param number: The set_table_cols cell index.
+        :type number: int
+        :param num_columns: The number of columns.
+        :type num_columns: int
+        """
+        if number >= 0 and num_columns > 0:
+            return cls(*divmod(number, num_columns))
+
+        else:
+            logger.error(
+                f"Индекс {number} и количество столбцов {num_columns} должны быть положительными")
+            raise TableColsTableCoordinateInitError
+
+    def shift(self, row_offset: int = 0, column_offset: int = 0):
+        """Generates the set_table_cols coordinates displaced from the given one.
+
+        :param row_offset: The number of rows to displace downwards. To displace upwards, use negative value.
+        :type row_offset: int (default: 0)
+        :param column_offset: The number of rows to displace to the right. To displace to the left, use negative value.
+        :type column_offset: int (default: 0)
+        :return: The new instance with the specified place in the set_table_cols grid.
+        """
+        return TableCoordinate(self.row + row_offset, self.column + column_offset)
 
 
 class TableCell:
-    def __init__(self, content: str, table_coordinate: TableCoordinate = None) -> None:
-        self._content: str = content
+    def __init__(self, text: str, table_coordinate: TableCoordinate = None) -> None:
+        self._text: str = text
         self._table_coordinate: TableCoordinate | None = table_coordinate
 
     @property
-    def content(self) -> str:
-        return self._content
+    def text(self) -> str:
+        return self._text
 
-    @content.setter
-    def content(self, value: str) -> None:
-        self._content = value
+    @text.setter
+    def text(self, value: str) -> None:
+        self._text = value
 
     @property
     def table_coordinate(self) -> TableCoordinate | None:
@@ -41,26 +88,34 @@ class TableCell:
     def table_coordinate(self, coord: TableCoordinate) -> None:
         self._table_coordinate = coord
 
-    def __str__(self) -> str:
-        return self._content
+    @property
+    def coord(self):
+        return self._table_coordinate.coord
 
-    def __repr__(self) -> str:
-        return f"TableCell(content={self._content!r}, coord={self._table_coordinate})"
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.coord == other.coord
 
-    def as_tuple(self):
-        return self._content, self._table_coordinate
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, TableCell):
-            return self.as_tuple() == other.as_tuple()
         else:
             return NotImplemented
 
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            return self.coord != other.coord
 
-    def __hash__(self) -> int:
-        return hash((self._content, self._table_coordinate))
+        else:
+            return NotImplemented
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}"
+            f"{self._table_coordinate.__class__.__name__}({self._table_coordinate})\n{self._text}")
+
+    def as_tuple(self):
+        return self._text, self._table_coordinate
+
+    def __hash__(self):
+        return hash(self._table_coordinate.coord)
 
 
 class TableRow:
@@ -165,7 +220,7 @@ def extract_match_from_text(text: str, pattern: Pattern) -> tuple[str, str]:
         return text, ""
 
 
-def split_cell_content(content: str) -> tuple[str, str]:
+def split_cell_text(content: str) -> tuple[str, str]:
     """Split 'X / Y' pattern, returns tuple (X, Y) or ('', '') if no match."""
     # Handle both "O/R" and "O /R" patterns
     m: Match = match(r"\s*(.*?)\s*/\s*(.*?)\s*$", content.strip())
@@ -265,7 +320,7 @@ class Table:
 
     def split_row(self, row_idx: int, delimiter: str = "|") -> None:
         original_row: TableRow = self._rows.pop(row_idx)
-        parts_list: list[list[str]] = [cell.content.split(delimiter) for cell in original_row]
+        parts_list: list[list[str]] = [cell.text.split(delimiter) for cell in original_row]
         max_parts: int = max(len(parts) for parts in parts_list)
 
         for i in range(max_parts):
@@ -282,7 +337,7 @@ class Table:
 
     def split_column(self, col_idx: int, delimiter: str = "|") -> None:
         self.normalize()
-        split_cells: list[list[str]] = [row[col_idx].content.split(delimiter) for row in self._rows]
+        split_cells: list[list[str]] = [row[col_idx].text.split(delimiter) for row in self._rows]
         max_parts: int = max(len(parts) for parts in split_cells)
 
         for offset in range(max_parts):
@@ -300,13 +355,13 @@ class Table:
         if not coordinates:
             return
 
-        contents: list[str] = [self._rows[coord.row][coord.col].content for coord in coordinates]
-        unified_content: str = " ".join(contents)
+        contents: list[str] = [self._rows[coord.row][coord.column].text for coord in coordinates]
+        unified_text: str = " ".join(contents)
         anchor: TableCoordinate = coordinates[0]
-        self._rows[anchor.row][anchor.col].content = unified_content
+        self._rows[anchor.row][anchor.column].text = unified_text
 
         for coord in coordinates[1:]:
-            self._rows[coord.row][coord.col].content = ""
+            self._rows[coord.row][coord.column].text = ""
 
     def fix_borders(self, fill_value: str = "") -> None:
         if not self._rows:
@@ -328,13 +383,13 @@ class Table:
             return ""
 
         lines: list[str] = []
-        header: str = "".join(("|", " | ".join(cell.content for cell in self.header_row), "|"))
+        header: str = "".join(("|", " | ".join(cell.text for cell in self.header_row), "|"))
         separator: str = "".join(("|", " | ".join("---" for _ in self.header_row), "|"))
         lines.append(header)
         lines.append(separator)
 
         for row in self._rows[1:]:
-            line: str = "".join(("|", " | ".join(cell.content for cell in row), "|"))
+            line: str = "".join(("|", " | ".join(cell.text for cell in row), "|"))
             lines.append(line)
 
         lines.append("")
@@ -359,7 +414,7 @@ class Table:
 
             if stripped_line.startswith("|"):
                 # Remove leading and trailing pipes, then split
-                content_part = stripped_line.strip("|")
+                content_part: str = stripped_line.strip("|")
                 parts: list[str] = [cell.strip() for cell in content_part.split("|")]
                 cells: list[TableCell] = []
 
@@ -398,9 +453,9 @@ class Table:
 
         for row in self._rows:
             if col_idx < len(row):  # Safety check
-                original_text: str = row[col_idx].content
+                original_text: str = row[col_idx].text
                 cleaned_text, extracted = extract_match_from_text(original_text, pattern)
-                row[col_idx].content = cleaned_text
+                row[col_idx].text = cleaned_text
                 extracted_values.append(extracted)
 
             else:
@@ -416,12 +471,12 @@ class Table:
 
         for row_idx in range(len(self._rows)):
             if row_idx < len(values):
-                cell_content: str = values[row_idx]
+                cell_text: str = values[row_idx]
 
             else:
-                cell_content: str = ""
+                cell_text: str = ""
 
-            cells.append(TableCell(cell_content))
+            cells.append(TableCell(cell_text))
 
         column: TableColumn = TableColumn(cells)
         self.insert_column(insert_idx, column)
@@ -441,23 +496,23 @@ class Table:
             return  # empty table guard
 
         try:
-            col_idx: int = next(i for i in range(len(self.header_row)) if self.header_row[i].content == header_name)
+            col_idx: int = next(i for i in range(len(self.header_row)) if self.header_row[i].text == header_name)
 
         except StopIteration:
             logger.warning(f"Header '{header_name}' not found in table")
             return  # header not found, do nothing
 
         # Extract split contents for all rows
-        split_contents: list[tuple[str, str]] = []
+        split_texts: list[tuple[str, str]] = []
 
         for row in self._rows:
             if len(row) > col_idx:
-                part1, part2 = split_cell_content(row[col_idx].content)
+                part1, part2 = split_cell_text(row[col_idx].text)
 
             else:
                 part1, part2 = "", ""
 
-            split_contents.append((part1, part2))
+            split_texts.append((part1, part2))
 
         # Remove original column cells (including header)
         for row in self._rows:
@@ -472,7 +527,7 @@ class Table:
                 row.insert_cell(col_idx + 1, TableCell(new_headers[1]))
 
             else:
-                part1, part2 = split_contents[row_idx]
+                part1, part2 = split_texts[row_idx]
                 row.insert_cell(col_idx, TableCell(part1))
                 row.insert_cell(col_idx + 1, TableCell(part2))
 
@@ -482,7 +537,7 @@ class Table:
         if not self._rows or not self.header_row:
             return  # Empty table guard
 
-        current_headers: list[str] = [cell.content for cell in self.header_row]
+        current_headers: list[str] = [cell.text for cell in self.header_row]
 
         # Create mapping from header name to column index
         header_to_index: dict[str, int] = {header: idx for idx, header in enumerate(current_headers)}
@@ -513,18 +568,18 @@ class Table:
 class MarkdownFile:
     def __init__(self, path: StrPath):
         self._path: Path = Path(path)
-        self._content: list[str] = []
+        self._text: list[str] = []
         self._tables: list[Table] = []
 
     def read(self):
-        self._content = file_reader(self._path, "lines")
+        self._text = file_reader(self._path, "lines")
 
     def __iter__(self):
         return iter(self._tables)
 
     def set_tables(self):
         """
-        Detect tables in _content.
+        Detect tables in _text.
         """
         current_table: list[str] = []
         in_table: bool = False
@@ -533,7 +588,7 @@ class MarkdownFile:
         header_pattern: Pattern = compile(r"^\s*\|(.+\|)+\s*$")
         separator_pattern: Pattern = compile(r"^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*$")
 
-        for i, line in enumerate(self._content):
+        for i, line in enumerate(self._text):
             stripped: str = line.strip()
 
             if in_table:
@@ -550,32 +605,32 @@ class MarkdownFile:
             else:
                 # Look for table header + separator line
                 if (header_pattern.match(line)
-                        and i + 1 < len(self._content)
-                        and separator_pattern.match(self._content[i + 1])):
+                        and i + 1 < len(self._text)
+                        and separator_pattern.match(self._text[i + 1])):
                     in_table: bool = True
                     start_idx: int = i
-                    current_table: list[str] = [line, self._content[i + 1]]
+                    current_table: list[str] = [line, self._text[i + 1]]
 
         # If file ends inside a table
         if in_table and current_table:
-            table: Table = Table.from_file(current_table, start_idx, len(self._content))
+            table: Table = Table.from_file(current_table, start_idx, len(self._text))
             self._tables.append(table)
 
     def update_table(self, table: Table):
         # Fixed: Remove lines in correct range
         for index in range(table.stop - 1, table.start - 1, -1):
-            if index < len(self._content):
-                self._content.pop(index)
+            if index < len(self._text):
+                self._text.pop(index)
 
         # Insert the updated table
-        if table.start <= len(self._content):
-            self._content.insert(table.start, str(table))
+        if table.start <= len(self._text):
+            self._text.insert(table.start, str(table))
 
         else:
-            self._content.append(str(table))
+            self._text.append(str(table))
 
     def save(self):
-        file_writer(self._path, self._content)
+        file_writer(self._path, self._text)
 
 
 if __name__ == '__main__':
