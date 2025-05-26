@@ -5,7 +5,7 @@ from typing import Iterator
 from loguru import logger
 from slugify.slugify import slugify
 
-from utilities.common.errors import LinkRepairFileInvalidTypeError, LinkRepairInvalidMatchError
+from utilities.common.errors import RepairLinksFileInvalidTypeError, RepairLinksInvalidMatchError
 from utilities.repair_links.file_dict import TextFile
 
 
@@ -16,11 +16,11 @@ def format_camel_case(match: Match) -> str:
     :type match: Match
     :return: The updated string converted to camelCase.
     :rtype: str
-    :raises: LinkRepairInvalidMatchError if the line does not have dashes or underlines in proper places.
+    :raises: RepairLinksInvalidMatchError if the line does not have dashes or underlines in proper places.
     """
     if not match:
         logger.error(f"В строке не найден паттерн {match.re.pattern}")
-        raise LinkRepairInvalidMatchError
+        raise RepairLinksInvalidMatchError
 
     else:
         return str(match.group(2).upper())
@@ -71,7 +71,7 @@ class InternalLinkInspector:
 
         else:
             logger.error(f"Файл должен быть типа TextFile, но получено {type(value).__name__}")
-            raise LinkRepairFileInvalidTypeError
+            raise RepairLinksFileInvalidTypeError
 
     def modified_anchor(self, anchor: str) -> str | None:
         """Gets the possible modified original anchor.

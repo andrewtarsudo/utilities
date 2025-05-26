@@ -18,7 +18,7 @@ from utilities.common.completion import doc_completion
     cls=SwitchArgsAPIGroup,
     help="Команда для корректного извлечения таблиц из файлов docx в формат Markdown")
 @argument(
-    "docx_file",
+    "docx",
     type=ClickPath(
         exists=True,
         file_okay=True,
@@ -27,7 +27,7 @@ from utilities.common.completion import doc_completion
         dir_okay=False),
     required=True,
     shell_complete=doc_completion,
-    metavar="DOCX_FILE")
+    metavar="DOCX")
 @option(
     "-p", "--parse", "tables_dir",
     type=ClickPath(
@@ -113,7 +113,7 @@ from utilities.common.completion import doc_completion
 @pass_context
 def convert_tables_command(
         ctx: Context,
-        docx_file: StrPath,
+        docx: StrPath,
         tables_dir: StrPath = "./tables/",
         temp_dir: StrPath = "./_temp/",
         remove: bool = False,
@@ -135,7 +135,7 @@ def convert_tables_command(
 
     line_formatter: LineFormatter = LineFormatter(remove_spaces, escape_chars)
 
-    core_document: CoreDocument = CoreDocument(docx_file, temp_dir)
+    core_document: CoreDocument = CoreDocument(docx, temp_dir)
     core_document.unarchive()
 
     xml_document: XmlDocument = XmlDocument(core_document, tables_dir)

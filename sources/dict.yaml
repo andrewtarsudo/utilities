@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 validate-yaml:
-  file_or_project: "Путь до файла PDF_*.yml или директории с такими файлами"
+  root: "Путь до файла PDF_*.yml или директории проекта"
 
 list-files:
-  root_dir: "Путь до директории"
+  root: "Путь до директории"
 
 get-terms:
   terms: "Перечень запрашиваемых аббревиатур"
 
 repair-links:
-  pathdir: "Путь до директории для обработки *.md- и *.adoc-файлов"
+  root: "Путь до директории проекта"
 
 convert-tables:
-  docx_file: "Путь до файла Word в формате *.docx или *.docm"
+  docx: "Путь до файла Word в формате *.docx или *.docm"
 
 filter-images:
-  project_dir: "Путь до директории проекта"
+  root: "Путь до директории проекта"
 
 inspect-updates:
   filename: "Путь до файла от корня для загрузки"
@@ -24,10 +24,10 @@ substitute:
   file_table: "Путь до файла с таблицей замен"
 
 check:
-  file_or_project: "Путь до файла PDF_*.yml или директории с такими файлами"
+  root: "Путь до файла PDF_*.yml или директории проекта"
 
 yaml:
-  file_or_project: "Путь до файла PDF_*.yml или директории с такими файлами"
+  root: "Путь до файла PDF_*.yml или директории проекта"
 
 generate-yaml:
-  project: "Путь до директории проекта"
+  root: "Путь до директории проекта"

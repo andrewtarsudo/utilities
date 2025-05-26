@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
+from typing import TypeAlias
 
 from click.utils import get_app_dir
 from loguru import logger
@@ -8,6 +9,10 @@ from yaml import safe_dump
 from utilities.common.errors import ConfigFileGeneralKeyError, ConfigFileUpdateKeyError, FileReaderError
 from utilities.common.functions import file_reader_type
 from utilities.common.shared import BASE_PATH, ConfigType, FileType
+
+GetCmdType: TypeAlias = (
+        str | int | float | bool | list[str] | None |
+        dict[str, dict[str, str | int | float | bool | list[str]]])
 
 
 class ConfigFile(dict):
@@ -41,15 +46,23 @@ class ConfigFile(dict):
             except FileReaderError:
                 logger.debug(f"Пользовательский конфигурационный файл {path.name} не найден или не обработан")
 
-    def get_commands(self, command: str, key: str) -> str | int | float | bool | list[str] | None:
+    def get_commands(self, command: str, key: str = None) -> GetCmdType:
         if command is None:
             return
 
-        try:
-            return self["commands"][command][key]
+        if key is None:
+            try:
+                return {**self["commands"][command], **self["commands"]["shared"]}
 
-        except (AttributeError, KeyError):
-            return self["commands"]["shared"][key]
+            except (AttributeError, KeyError):
+                return self["commands"]["shared"]
+
+        else:
+            try:
+                return self["commands"][command][key]
+
+            except (AttributeError, KeyError):
+                return self["commands"]["shared"][key]
 
     def get_general(self, key: str):
         try:

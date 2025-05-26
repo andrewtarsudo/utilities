@@ -29,13 +29,13 @@ include::partials/run.adoc[]
 [source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name} <PROJECT_DIR>
+{name} {script-name} <ROOT>
 -d/--dry-run | -o/--output FILE | -r/--recursive | -k/--keep-logs | --h/--help
 
   Команда для удаления неиспользуемых изображений
 
 Аргументы:
-  project_dir (*)                        Путь до директории проекта
+  root (*)                               Путь до директории проекта
 
 Опции:
   -d, --dry-run / -D, --no-dry-run       Флаг вывода некорректных ссылок на экран без изменения

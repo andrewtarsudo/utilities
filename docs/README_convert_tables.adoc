@@ -25,14 +25,14 @@ include::partials/run.adoc[]
 [source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name} <DOCX_FILE>
+{name} {script-name} <ROOT>
 -p/--parse DIR_TABLES | -t/--temp TEMP_DIR | -e/--escape | -r/--remove | --fix | --keep |
 -k/--keep-logs | --h/--help
 
   Команда для корректного извлечения таблиц из файлов docx в формат Markdown
 
 Аргументы:
-  docx_file (*)                          Путь до файла Word в формате *.docx или *.docm
+  root (*)                               Путь до файла Word в формате *.docx или *.docm
 
 Опции:
   -p, --parse DIR_TABLES                 Директория для таблиц. По умолчанию: ./tables/.

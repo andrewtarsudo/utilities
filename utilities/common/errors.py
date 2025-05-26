@@ -23,71 +23,71 @@ class TimerStoppedError(TimerError):
     """Timer has been already stopped."""
 
 
-class TermsError(BaseError):
-    """Base class for errors associated with the get_terms."""
+class GetTermsError(BaseError):
+    """Base class for errors associated with the get-terms."""
 
 
-class TermsAsciiDocFileTableRowIndexError(TermsError):
+class GetTermsAsciiDocFileTableRowIndexError(GetTermsError):
     """Invalid AsciiDocTable row index."""
 
 
-class TermsInvalidVersionError(TermsError):
+class GetTermsInvalidVersionError(GetTermsError):
     """File version has an invalid structure."""
 
 
-class TermsInvalidTermIndexError(TermsError):
+class GetTermsInvalidTermIndexError(GetTermsError):
     """Specified index is not found in the dictionary."""
 
 
-class TermsEmptyFileError(TermsError):
+class GetTermsEmptyFileError(GetTermsError):
     """Read file is empty."""
 
 
-class TermsInvalidTypeVersionError(TermsError):
+class GetTermsInvalidTypeVersionError(GetTermsError):
     """File version has an invalid type."""
 
 
-class LinkRepairError(BaseError):
-    """Base class for errors associated with the link-repair."""
+class RepairLinksError(BaseError):
+    """Base class for errors associated with the repair-links."""
 
 
-class LinkRepairTextFileInvalidPathError(LinkRepairError):
+class RepairLinksTextFileInvalidPathError(RepairLinksError):
     """Text file has an invalid extension."""
 
 
-class LinkRepairLineInvalidTypeError(LinkRepairError):
+class RepairLinksLineInvalidTypeError(RepairLinksError):
     """Line index type must be int and its value must be str."""
 
 
-class LinkRepairInvalidStorageAttributeError(LinkRepairError):
+class RepairLinksInvalidStorageAttributeError(RepairLinksError):
     """Storage attribute is not proper."""
 
 
-class LinkRepairInvalidFileDictAttributeError(LinkRepairError):
+class RepairLinksInvalidFileDictAttributeError(RepairLinksError):
     """FileDict attribute is not proper."""
 
 
-class LinkRepairFileInvalidTypeError(LinkRepairError):
+class RepairLinksFileInvalidTypeError(RepairLinksError):
     """File has an invalid type."""
 
 
-class LinkRepairInternalLinkAnchorError(LinkRepairError):
+class RepairLinksInternalLinkAnchorError(RepairLinksError):
     """Neither anchor nor internal link is found in file."""
 
 
-class LinkRepairInvalidMatchError(LinkRepairError):
+class RepairLinksInvalidMatchError(RepairLinksError):
     """Match item does not have enough match groups."""
 
 
-class LinkRepairFixerNoLinkError(LinkRepairError):
+class RepairLinksFixerNoLinkError(RepairLinksError):
     """LinkFixer instance has no specified link."""
 
 
-class LinkRepairInvalidHashCharIndexError(LinkRepairError):
+class RepairLinksInvalidHashCharIndexError(RepairLinksError):
     """Impossible hash symbol position in the string."""
 
 
-class LinkRepairMissingFileError(LinkRepairError):
+class RepairLinksMissingFileError(RepairLinksError):
     """File is not found."""
 
 
@@ -112,7 +112,7 @@ class FormatCodeNonIntegerLineLengthError(FormatCodeError):
 
 
 class TableColsError(BaseError):
-    """Base class for errors associated with the table-cols."""
+    """Base class for errors associated with the set-table-cols."""
 
 
 class TableColsTableBorderNotClosedError(TableColsError):

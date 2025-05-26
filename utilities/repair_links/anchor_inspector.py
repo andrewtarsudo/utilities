@@ -5,7 +5,7 @@ from typing import Iterable
 
 from loguru import logger
 
-from utilities.common.errors import LinkRepairFileInvalidTypeError, LinkRepairMissingFileError
+from utilities.common.errors import RepairLinksFileInvalidTypeError, RepairLinksMissingFileError
 from utilities.common.functions import file_reader, pretty_print
 from utilities.common.shared import separator
 from utilities.repair_links.const import FileLanguage, prepare_logging
@@ -42,11 +42,11 @@ class AnchorInspector:
 
             else:
                 logger.error(f"Не найден файл {item}", result=True)
-                raise LinkRepairMissingFileError
+                raise RepairLinksMissingFileError
 
         else:
             logger.error(f"Ключ {item} должен быть типа str, но получен {type(item).__name__}")
-            raise LinkRepairFileInvalidTypeError
+            raise RepairLinksFileInvalidTypeError
 
     def get(self, item):
         return self.__getitem__(item)

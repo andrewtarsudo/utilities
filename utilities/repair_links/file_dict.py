@@ -5,8 +5,8 @@ from typing import Iterable, Iterator, NamedTuple
 
 from loguru import logger
 
-from utilities.common.errors import LinkRepairInternalLinkAnchorError, LinkRepairLineInvalidTypeError, \
-    LinkRepairTextFileInvalidPathError
+from utilities.common.errors import RepairLinksInternalLinkAnchorError, RepairLinksLineInvalidTypeError, \
+    RepairLinksTextFileInvalidPathError
 from utilities.common.functions import file_reader
 from utilities.common.shared import ADOC_EXTENSION, EXTENSIONS, MD_EXTENSION, StrPath
 from utilities.repair_links.const import FileLanguage, prepare_logging
@@ -154,14 +154,14 @@ class TextFile(DirFile):
             return self._content[item]
 
         else:
-            raise LinkRepairLineInvalidTypeError(f"Тип должен быть int, но получен {type(item).__name__}")
+            raise RepairLinksLineInvalidTypeError(f"Тип должен быть int, но получен {type(item).__name__}")
 
     def __setitem__(self, key, value):
         if isinstance(key, int) and isinstance(value, str):
             self._content[key] = value
 
         else:
-            raise LinkRepairLineInvalidTypeError(
+            raise RepairLinksLineInvalidTypeError(
                 f"Тип ключа должен быть int, а value - str, но получены {type(key).__name__} и {type(value).__name__}")
 
     def __contains__(self, item):
@@ -213,14 +213,14 @@ class TextFile(DirFile):
         :type anchor: str or None
         :return: The internal links.
         :rtype: tuple[_InternalLink] or None
-        :raises: LinkRepairInternalLinkAnchorError if the anchor is found in neither internal link anchors.
+        :raises: RepairLinksInternalLinkAnchorError if the anchor is found in neither internal link anchors.
         """
         if anchor is None:
             return
 
         elif anchor not in self.iter_internal_link_anchors():
             logger.error(f"В файле {self.rel_path} не обнаружен ни якорь, ни ссылка {anchor}")
-            raise LinkRepairInternalLinkAnchorError
+            raise RepairLinksInternalLinkAnchorError
 
         else:
             return tuple(filter(lambda x: x.anchor == anchor, self._iter_internal_links()))
@@ -504,7 +504,7 @@ def get_file(root_dir: StrPath, full_path: StrPath) -> MdFile | AsciiDocFile:
         logger.error(
             f"Указан некорректный путь до файла Markdown или AsciiDoc:"
             f"\n{full_path}")
-        raise LinkRepairTextFileInvalidPathError
+        raise RepairLinksTextFileInvalidPathError
 
 
 # noinspection PyUnresolvedReferences

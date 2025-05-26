@@ -6,7 +6,8 @@ from typing import Iterable
 from loguru import logger
 from more_itertools import pairwise
 
-from utilities.common.errors import TermsAsciiDocFileTableRowIndexError, TermsEmptyFileError, TermsInvalidTermIndexError
+from utilities.common.errors import GetTermsAsciiDocFileTableRowIndexError, GetTermsEmptyFileError, \
+    GetTermsInvalidTermIndexError
 from utilities.common.functions import file_reader
 from utilities.common.shared import StrPath
 from utilities.get_terms.table import Coordinate, TableItem, Term
@@ -27,7 +28,7 @@ class AsciiDocTableTerms:
 
         if not _content or len(_content) < 6:
             logger.error(f"Файл {file_path} пуст")
-            raise TermsEmptyFileError
+            raise GetTermsEmptyFileError
 
         else:
             lines: list[str] = _content[6:-1]
@@ -68,7 +69,7 @@ class AsciiDocTableTerms:
 
             else:
                 logger.error(f"Термин с индексом {item} не найден")
-                raise TermsInvalidTermIndexError
+                raise GetTermsInvalidTermIndexError
 
         else:
             logger.debug(f"Термин {item} не найден")
@@ -132,7 +133,7 @@ class AsciiDocTableTerms:
     def _get_row(self, row_index: int) -> list[TableItem]:
         if row_index > self.max_row:
             logger.error(f"Индекс строки {row_index} превышает максимально возможное значение")
-            raise TermsAsciiDocFileTableRowIndexError
+            raise GetTermsAsciiDocFileTableRowIndexError
 
         else:
             return [v for k, v in self._items.items() if k.row_index == row_index]

@@ -9,7 +9,7 @@ from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
 from utilities.common.config_file import config_file
-from utilities.common.errors import LinkRepairInvalidFileDictAttributeError, LinkRepairInvalidStorageAttributeError
+from utilities.common.errors import RepairLinksInvalidFileDictAttributeError, RepairLinksInvalidStorageAttributeError
 from utilities.common.functions import file_reader, file_writer
 from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
 from utilities.repair_links.const import FileLanguage, prepare_logging
@@ -54,7 +54,7 @@ def has_no_required_files(path: StrPath) -> bool:
     cls=SwitchArgsAPIGroup,
     help="Команда для проверки и исправления ссылок в файлах документации")
 @argument(
-    "pathdir",
+    "root",
     type=ClickPath(
         file_okay=False,
         resolve_path=True,
@@ -62,7 +62,7 @@ def has_no_required_files(path: StrPath) -> bool:
         dir_okay=True),
     required=True,
     shell_complete=dir_completion,
-    metavar="PATHDIR")
+    metavar="ROOT")
 @option(
     "-a/-A", "--anchor/--no-anchor", "anchor_validation",
     type=BOOL,
@@ -128,7 +128,7 @@ def has_no_required_files(path: StrPath) -> bool:
 @pass_context
 def repair_links_command(
         ctx: Context,
-        pathdir: Path,
+        root: Path,
         dry_run: bool = False,
         no_result: bool = False,
         anchor_validation: bool = True,
@@ -137,26 +137,26 @@ def repair_links_command(
         keep_logs: bool = False):
     result_file_path: Path = Path.cwd().joinpath("results.txt")
 
-    if not validate_dir_path(pathdir):
-        logger.error(f"Путь {pathdir} не существует или указывает не на директорию")
+    if not validate_dir_path(root):
+        logger.error(f"Путь {root} не существует или указывает не на директорию")
         pause(PRESS_ENTER_KEY)
         ctx.exit(0)
 
-    if has_no_required_files(pathdir):
+    if has_no_required_files(root):
         logger.warning(
-            f"В директории {pathdir} не найдены файлы с расширением {MD_EXTENSION}, {ADOC_EXTENSION}")
+            f"В директории {root} не найдены файлы с расширением {MD_EXTENSION}, {ADOC_EXTENSION}")
         pause(PRESS_ENTER_KEY)
         ctx.exit(0)
 
-    _base_dir: Path = Path(pathdir).parent.parent.resolve()
+    _base_dir: Path = Path(root).parent.parent.resolve()
 
     # operate with Storage
-    storage: Storage = Storage(pathdir)
+    storage: Storage = Storage(root)
     storage.prepare()
 
     if storage is None:
         logger.error("Объект типа Storage не определен")
-        raise LinkRepairInvalidStorageAttributeError
+        raise RepairLinksInvalidStorageAttributeError
 
     logger.debug(prepare_logging(storage.dir_indexes.items()))
     logger.debug(prepare_logging(storage.dirindexes.items()))
@@ -164,12 +164,12 @@ def repair_links_command(
     logger.debug(prepare_logging(storage.non_text_files.items()))
 
     # operate with FileDict
-    file_dict: FileDict = FileDict(pathdir)
+    file_dict: FileDict = FileDict(root)
     file_dict + iter(storage)
 
     if file_dict is None:
         logger.error("Объект типа FileDict не определен")
-        raise LinkRepairInvalidFileDictAttributeError
+        raise RepairLinksInvalidFileDictAttributeError
 
     logger.debug(prepare_logging(file_dict.dict_files.items()))
 

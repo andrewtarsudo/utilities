@@ -458,13 +458,14 @@ def prepare_attributes(attrs: dict[str, Any] = None):
     help="Команда для генерации YAML-файла, используемого при сборке PDF",
     epilog=EPILOG_GENERATE_YAML)
 @argument(
-    "project",
+    "root",
     type=ClickPath(
         exists=True,
         file_okay=False,
         allow_dash=False,
         dir_okay=True),
     required=True,
+    metavar="ROOT",
     shell_complete=dir_completion)
 @option(
     "-t", "--title-page",

@@ -506,7 +506,7 @@ def validate_file(
     help="Команда для валидации YAML-файла, используемого при генерации PDF",
     epilog=EPILOG_VALIDATE_YAML)
 @argument(
-    "file_or_project",
+    "root",
     type=ClickPath(
         exists=True,
         file_okay=True,
@@ -562,7 +562,7 @@ def validate_file(
 @pass_context
 def validate_yaml_command(
         ctx: Context,
-        file_or_project: StrPath,
+        root: StrPath,
         output: StrPath = None,
         guess: bool = True,
         verbose: bool = False,
@@ -570,23 +570,23 @@ def validate_yaml_command(
     if is_windows():
         system("color")
 
-    file_or_project: Path = Path(file_or_project).expanduser()
+    root: Path = Path(root).expanduser()
 
     if output == "-":
         output: StrPath | None = None
 
-    if file_or_project.is_dir():
+    if root.is_dir():
         files: list[Path] = [
-            *file_or_project.glob("*.yml"),
-            *file_or_project.glob("*.yaml")]
+            *root.glob("*.yml"),
+            *root.glob("*.yaml")]
         file_beginnings: tuple[str, ...] = tuple(config_file.get_commands("validate-yaml", "file_beginnings"))
         yaml_files: list[Path] = [_ for _ in files if _.name.lower().startswith(file_beginnings)]
 
-    elif file_or_project.is_file():
-        yaml_files: list[Path] = [file_or_project]
+    elif root.is_file():
+        yaml_files: list[Path] = [root]
 
     else:
-        logger.error(f"Некорректное значение file_or_project: {file_or_project}, {type(file_or_project).__name__}")
+        logger.error(f"Некорректное значение root: {root}, {type(root).__name__}")
         raise ValueError
 
     if not yaml_files:

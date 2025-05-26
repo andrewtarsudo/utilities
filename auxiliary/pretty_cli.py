@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from pathlib import Path
 from typing import Iterable
 
 from loguru import logger
@@ -15,13 +14,18 @@ def from_file(file: StrPath):
     return content
 
 
-def normalize_lines(lines: Iterable[str] = None, *, separator: str = "\t\t", indent: int = 0, terminal_width: int | None = None):
+def split_line(line: str) -> tuple[str, ...]:
+    return tuple(line.strip().split(maxsplit=1))
+
+
+def normalize_lines(
+        lines: Iterable[str] = None, *,
+        separator: str = "\t\t",
+        indent: int = 0,
+        terminal_width: int | None = None):
     if lines is None:
         logger.error("Строки пусты")
         return
-
-    def split_line(line: str) -> tuple[str, ...]:
-        return tuple(line.strip().split(maxsplit=1))
 
     split_lines: list[tuple[str, ...]] = list(map(split_line, lines))
 

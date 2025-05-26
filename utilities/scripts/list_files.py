@@ -57,7 +57,7 @@ def add_prefix(prefix: str | None = None, values: Iterable[StrPath] = None):
     cls=SwitchArgsAPIGroup,
     help="Команда для вывода файлов в директории")
 @argument(
-    "root_dir",
+    "root",
     type=ClickPath(
         file_okay=False,
         resolve_path=True,
@@ -65,7 +65,7 @@ def add_prefix(prefix: str | None = None, values: Iterable[StrPath] = None):
         dir_okay=True),
     required=True,
     shell_complete=dir_completion,
-    metavar="ROOT_DIR")
+    metavar="ROOT")
 @option(
     "-d", "--ignored-dirs", "ignored_dirs",
     cls=MutuallyExclusiveOption,
@@ -229,7 +229,7 @@ def add_prefix(prefix: str | None = None, values: Iterable[StrPath] = None):
 @pass_context
 def list_files_command(
         ctx: Context,
-        root_dir: StrPath,
+        root: StrPath,
         ignored_dirs: Iterable[str] = None,
         all_dirs: bool = False,
         ignored_files: Iterable[str] = None,
@@ -245,7 +245,7 @@ def list_files_command(
         recursive: bool = True,
         auxiliary: bool = False,
         keep_logs: bool = False):
-    root_dir: Path = root_dir.expanduser()
+    root: Path = root.expanduser()
 
     if extensions is None and not all_extensions:
         extensions: set[str] | None = {MD_EXTENSION, ADOC_EXTENSION}
@@ -291,20 +291,20 @@ def list_files_command(
     else:
         language: str | None = ""  # No language suffix allowed
 
-    content_common_index: int = check_content_common(root_dir)
+    content_common_index: int = check_content_common(root)
 
     if no_prefix:
         prefix: str = ""
 
     elif prefix is None or prefix == "!None":
         if content_common_index >= 0:
-            prefix: str = f"  - {generate_base_root(root_dir, content_common_index)}/"
+            prefix: str = f"  - {generate_base_root(root, content_common_index)}/"
 
         else:
             prefix: str = "  - "
 
     logger.debug(
-        f"root_dir = {root_dir}"
+        f"root = {root}"
         f"\nignored_dirs = {ignored_dirs}"
         f"\nall_dirs = {all_dirs}"
         f"\nignored_files = {ignored_files}"
@@ -321,13 +321,13 @@ def list_files_command(
         f"\nauxiliary = {auxiliary}"
         f"\nkeep_logs = {keep_logs}")
 
-    if not root_dir.exists():
-        logger.warning(f"Директория {root_dir} не найдена")
+    if not root.exists():
+        logger.warning(f"Директория {root} не найдена")
         values: list[Path] | None = None
 
     else:
         values: list[Path] | None = walk_full(
-            root_dir,
+            root,
             ignored_dirs=ignored_dirs,
             ignored_files=ignored_files,
             extensions=extensions,
@@ -381,7 +381,7 @@ def get_files(
 
         listed_files: list[str] = ctx.invoke(
             list_files_command,
-            root_dir=directory,
+            root=directory,
             all_dirs=True,
             all_languages=all_languages,
             language=language,

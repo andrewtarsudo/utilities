@@ -31,14 +31,14 @@ include::partials/run.adoc[]
 [source,console,subs="attributes+"]
 ----
 Использование:
-{name} {script-name} <PROJECT>
+{name} {script-name} <ROOT>
 -t/--title-page <TITLE> | -v/--version <VERSION> | -d/--dry-run | -l/--language <LANG> |
 -a/--args <KEY>=<VALUE> | -k/--keep-logs | --h/--help
 
   Команда для генерации YAML-файла, используемого при сборке PDF
 
 Аргументы:
-  project (*)                            Путь до директории проекта
+  root (*)                               Путь до директории проекта
 
 Опции:
   -t, --title-page <TITLE> (*)           Название продукта, отображаемое на титульном листе

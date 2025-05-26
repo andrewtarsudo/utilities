@@ -412,8 +412,3 @@ def get_shell():
             continue
 
     return "cmd"
-
-
-if __name__ == '__main__':
-    files: list[Path] = walk_full(Path.cwd().joinpath(r"..\..\..\XGate\content\common"), extensions=[".md .adoc"])
-    pretty_print(files)

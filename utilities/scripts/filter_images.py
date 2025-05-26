@@ -75,7 +75,7 @@ class AsciiDocFile(File):
     cls=SwitchArgsAPIGroup,
     help="Команда для удаления неиспользуемых изображений")
 @argument(
-    "project_dir",
+    "root",
     type=ClickPath(
         file_okay=False,
         resolve_path=True,
@@ -83,7 +83,7 @@ class AsciiDocFile(File):
         dir_okay=True),
     required=True,
     shell_complete=dir_completion,
-    metavar="PROJECT_DIR")
+    metavar="ROOT")
 @option(
     "-d/-D", "--dry-run/--no-dry-run",
     type=BOOL,
@@ -133,29 +133,29 @@ class AsciiDocFile(File):
 @pass_context
 def filter_images_command(
         ctx: Context,
-        project_dir: StrPath,
+        root: StrPath,
         dry_run: bool = False,
         output: StrPath = None,
         recursive: bool = True,
         keep_logs: bool = False):
     messages: list[str] = []
 
-    project_dir: Path = Path(project_dir)
+    root: Path = Path(root)
     extensions: str = "png jpg jpeg bmp svg PNG JPG JPEG BMP SVG"
 
     images: list[StrPath] | None = get_files(
         ctx,
-        directory=project_dir,
+        directory=root,
         recursive=recursive,
         language=None,
         extensions=extensions)
 
     images_paths_names: dict[Path, str] = {
-        project_dir.joinpath(image): image.name for image in images}
+        root.joinpath(image): image.name for image in images}
 
     md_paths: list[StrPath] | None = get_files(
         ctx,
-        directory=project_dir,
+        directory=root,
         recursive=True,
         language=None,
         extensions="md")
@@ -163,7 +163,7 @@ def filter_images_command(
 
     adoc_paths: list[StrPath] | None = get_files(
         ctx,
-        directory=project_dir,
+        directory=root,
         recursive=True,
         language=None,
         extensions="adoc")
@@ -186,7 +186,7 @@ def filter_images_command(
         images_paths_names.pop(get_key_by_value(v, images_paths_names), None)
 
     if images_paths_names:
-        _: list[Path] = [unused_image.relative_to(project_dir) for unused_image in images_paths_names]
+        _: list[Path] = [unused_image.relative_to(root) for unused_image in images_paths_names]
         message: str = f"Неиспользуемые изображения:\n{pretty_print(_)}"
 
         messages.append(message)
@@ -196,7 +196,7 @@ def filter_images_command(
                 True: "Да",
                 False: "Нет"}
 
-            info: str = f"Директория {project_dir}, рекурсивно: {bool_convert.get(recursive)}\n"
+            info: str = f"Директория {root}, рекурсивно: {bool_convert.get(recursive)}\n"
             file_writer(Path(output), pretty_print((info, message)))
 
             messages.append(f"\nФайл {output} записан")

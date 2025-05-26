@@ -1,345 +1,624 @@
-#!/usr/bin/env python3
-import os
-import re
-import sys
+# -*- coding: utf-8 -*-
+from pathlib import Path
+from re import compile, Match, match, Pattern
+from typing import Iterable, NamedTuple, Sequence
+
+from loguru import logger
+
+from utilities.common.functions import file_reader, file_writer, pretty_print
+from utilities.common.shared import StrPath
 
 
-class TableCoordinate:
-    """Represents a coordinate in a table (row, column)."""
-
-    def __init__(self, row: int, column: int):
-        self.row = row
-        self.column = column
+class TableCoordinate(NamedTuple):
+    row: int
+    col: int
 
     def __str__(self) -> str:
-        return f"({self.row}, {self.column})"
+        return f"{self.row}, {self.col}"
 
     def __repr__(self) -> str:
-        return f"TableCoordinate(row={self.row}, column={self.column})"
+        return f"{self.__class__.__name__}(row={self.row}, col={self.col})"
 
 
 class TableCell:
-    """Represents a single cell in a table."""
+    def __init__(self, content: str, table_coordinate: TableCoordinate = None) -> None:
+        self._content: str = content
+        self._table_coordinate: TableCoordinate | None = table_coordinate
 
-    def __init__(self, content: str, coordinate: TableCoordinate):
-        self.content = content.strip()
-        self.coordinate = coordinate
+    @property
+    def content(self) -> str:
+        return self._content
+
+    @content.setter
+    def content(self, value: str) -> None:
+        self._content = value
+
+    @property
+    def table_coordinate(self) -> TableCoordinate | None:
+        return self._table_coordinate
+
+    @table_coordinate.setter
+    def table_coordinate(self, coord: TableCoordinate) -> None:
+        self._table_coordinate = coord
 
     def __str__(self) -> str:
-        return self.content
+        return self._content
 
     def __repr__(self) -> str:
-        return f"TableCell(content='{self.content}', coordinate={repr(self.coordinate)})"
+        return f"TableCell(content={self._content!r}, coord={self._table_coordinate})"
+
+    def as_tuple(self):
+        return self._content, self._table_coordinate
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, TableCell):
+            return self.as_tuple() == other.as_tuple()
+        else:
+            return NotImplemented
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+    def __hash__(self) -> int:
+        return hash((self._content, self._table_coordinate))
 
 
 class TableRow:
-    """Represents a row in a table."""
+    def __init__(self, cells: Iterable[TableCell] = None) -> None:
+        if cells is None:
+            cells: list[TableCell] = []
+        else:
+            cells: list[TableCell] = [*cells]
+        self._cells: list[TableCell] = cells
 
-    def __init__(self, index: int):
-        self.index = index
-        self.cells: list[TableCell] = []
+    def __len__(self) -> int:
+        return len(self._cells)
 
-    def add_cell(self, cell: TableCell) -> None:
-        self.cells.append(cell)
+    def __getitem__(self, index: int) -> TableCell:
+        return self._cells[index]
 
-    def insert_cell(self, index: int, content: str) -> None:
-        """Insert a new cell at the specified index."""
-        coord = TableCoordinate(self.index, index)
-        new_cell = TableCell(content, coord)
-        self.cells.insert(index, new_cell)
+    def insert_cell(self, index: int, cell: TableCell) -> None:
+        self._cells.insert(index, cell)
 
-    def get_cell(self, column_index: int) -> TableCell | None:
-        """Get cell at the specified column index."""
-        if 0 <= column_index < len(self.cells):
-            return self.cells[column_index]
-        return None
+    def remove_cell(self, index: int) -> None:
+        del self._cells[index]
+
+    def __iter__(self):
+        return iter(self._cells)
 
     def __str__(self) -> str:
-        return " | ".join(str(cell) for cell in self.cells)
+        return " | ".join(str(cell) for cell in self._cells)
 
     def __repr__(self) -> str:
-        return f"TableRow(index={self.index}, cells={len(self.cells)} cells)"
+        return f"{self.__class__.__name__}(cells={self._cells})"
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, self.__class__):
+            return self._cells == other._cells
+        else:
+            return NotImplemented
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+    def __hash__(self) -> int:
+        return hash(tuple(self._cells))
+
+    @property
+    def cells(self):
+        return self._cells
 
 
 class TableColumn:
-    """Represents a column in a table."""
+    def __init__(self, cells: Iterable[TableCell] = None) -> None:
+        if cells is None:
+            cells: list[TableCell] = []
 
-    def __init__(self, index: int, header: str = ""):
-        self.index = index
-        self.header = header
-        self.cells: list[TableCell] = []
+        else:
+            cells: list[TableCell] = [*cells]
 
-    def add_cell(self, cell: TableCell) -> None:
-        self.cells.append(cell)
+        self._cells: list[TableCell] = cells
+
+    def __len__(self) -> int:
+        return len(self._cells)
+
+    def __getitem__(self, index: int) -> TableCell:
+        return self._cells[index]
+
+    def insert_cell(self, index: int, cell: TableCell) -> None:
+        self._cells.insert(index, cell)
+
+    def remove_cell(self, index: int) -> None:
+        del self._cells[index]
+
+    def __iter__(self):
+        return iter(self._cells)
 
     def __str__(self) -> str:
-        return f"Column {self.index}: {self.header}"
+        return ".".join(str(cell) for cell in self._cells)
 
     def __repr__(self) -> str:
-        return f"TableColumn(index={self.index}, header='{self.header}', cells={len(self.cells)} cells)"
+        return f"{self.__class__.__name__}(cells={self._cells})"
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, self.__class__):
+            return self._cells == other._cells
+        else:
+            return NotImplemented
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+    def __hash__(self) -> int:
+        return hash(tuple(self._cells))
+
+
+def extract_match_from_text(text: str, pattern: Pattern) -> tuple[str, str]:
+    """Extract matched group and return cleaned text and extracted string or empty string."""
+    m: Match = pattern.search(text)
+
+    if m:
+        extracted: str = str(m.group(1).strip())
+        cleaned: str = pattern.sub("", text).strip()
+        return cleaned, extracted
+    else:
+        return text, ""
+
+
+def split_cell_content(content: str) -> tuple[str, str]:
+    """Split 'X / Y' pattern, returns tuple (X, Y) or ('', '') if no match."""
+    # Handle both "O/R" and "O /R" patterns
+    m: Match = match(r"\s*(.*?)\s*/\s*(.*?)\s*$", content.strip())
+
+    if m:
+        return str(m.group(1).strip()), str(m.group(2).strip())
+
+    else:
+        return "", ""
 
 
 class Table:
-    """Represents a table with rows and columns."""
+    def __init__(
+            self,
+            start: int,
+            stop: int,
+            rows: Iterable[TableRow] = None,
+            lines: Iterable[str] = None) -> None:
+        if rows is None:
+            rows: list[TableRow] = []
 
-    def __init__(self):
-        self.rows: list[TableRow] = []
-        self.columns: list[TableColumn] = []
-        self.has_header = False
-        self.has_separator = False
+        else:
+            rows: list[TableRow] = [*rows]
 
-    def add_row(self, row: TableRow) -> None:
-        self.rows.append(row)
+        if lines is None:
+            lines: list[str] = []
 
-        # Update columns based on this row
-        while len(self.columns) < len(row.cells):
-            self.columns.append(TableColumn(len(self.columns)))
+        else:
+            lines: list[str] = [*lines]
 
-        # Add cells to their respective columns
-        for col_idx, cell in enumerate(row.cells):
-            if col_idx < len(self.columns):
-                self.columns[col_idx].add_cell(cell)
+        self._rows: list[TableRow] = rows
+        self._lines: list[str] = lines
 
-    def add_column(self, index: int, header: str, default_content: str = "") -> None:
-        """Add a new column at the specified index."""
-        # Shift existing columns
-        for col in self.columns:
-            if col.index >= index:
-                col.index += 1
+        self.start: int = start
+        self.stop: int = stop
 
-        # Insert the new column
-        new_column: TableColumn = TableColumn(index, header)
-        self.columns.insert(index, new_column)
+    def normalize(self) -> None:
+        max_cols: int = max(len(row) for row in self._rows) if self._rows else 0
 
-        # Update rows to include the new column
-        for row_idx, row in enumerate(self.rows):
-            content: str = header if not row_idx and self.has_header else default_content
+        for r, row in enumerate(self._rows):
+            len_row: int = len(row)
 
-            # If this is the separator row, use appropriate format
-            if row_idx == 1 and self.has_separator:
-                content: str = "-" * max(3, len(header))
+            while len_row < max_cols:
+                row.insert_cell(len_row, TableCell("", TableCoordinate(r, len_row)))
+                len_row += 1
 
-            row.insert_cell(index, content)
+            for c in range(len(row)):
+                row[c].table_coordinate = TableCoordinate(r, c)
 
-    def parse_markdown_table(self, table_str: str) -> None:
-        """Parse a markdown table string into the Table object."""
-        lines = table_str.strip().split('\n')
+    def get_cell(self, row: int, column: int) -> TableCell:
+        return self._rows[row][column]
 
-        for row_idx, line in enumerate(lines):
-            row = TableRow(row_idx)
+    def get_column(self, column: int) -> TableColumn:
+        return TableColumn([row[column] for row in iter(self)])
 
-            # Skip empty lines
-            if not line.strip():
+    @property
+    def num_columns(self) -> int:
+        return max(len(row) for row in self._rows) if self._rows else 0
+
+    def insert_row(self, index: int, row: TableRow) -> None:
+        self.normalize()
+        expected_cols: int = self.num_columns
+
+        while len(row) < expected_cols:
+            row.insert_cell(len(row), TableCell(""))
+
+        for c in range(len(row)):
+            row[c].table_coordinate = TableCoordinate(index, c)
+
+        self._rows.insert(index, row)
+
+    def __iter__(self):
+        return iter(self._rows)
+
+    @property
+    def header_row(self) -> TableRow:
+        return self._rows[0]
+
+    def insert_column(self, index: int, column: TableColumn) -> None:
+        self.normalize()
+
+        for i in range(len(self._rows)):
+            cell: TableCell = column[i] if i < len(column) else TableCell("")
+            cell._table_coordinate = TableCoordinate(i, index)
+            self._rows[i].insert_cell(index, cell)
+
+    def swap_rows(self, i: int, j: int) -> None:
+        self._rows[i], self._rows[j] = self._rows[j], self._rows[i]
+        self.normalize()
+
+    def swap_columns(self, i: int, j: int) -> None:
+        for row in self._rows:
+            temp_cell = row[i]
+            row.cells[i] = row[j]
+            row.cells[j] = temp_cell
+        self.normalize()
+
+    def split_row(self, row_idx: int, delimiter: str = "|") -> None:
+        original_row: TableRow = self._rows.pop(row_idx)
+        parts_list: list[list[str]] = [cell.content.split(delimiter) for cell in original_row]
+        max_parts: int = max(len(parts) for parts in parts_list)
+
+        for i in range(max_parts):
+            cells: list[TableCell] = []
+
+            for parts in parts_list:
+                content: str = parts[i].strip() if i < len(parts) else ""
+                cells.append(TableCell(content))
+
+            new_row: TableRow = TableRow(cells)
+            self._rows.insert(row_idx + i, new_row)
+
+        self.normalize()
+
+    def split_column(self, col_idx: int, delimiter: str = "|") -> None:
+        self.normalize()
+        split_cells: list[list[str]] = [row[col_idx].content.split(delimiter) for row in self._rows]
+        max_parts: int = max(len(parts) for parts in split_cells)
+
+        for offset in range(max_parts):
+            for row_idx, row in enumerate(self._rows):
+                parts: list[str] = split_cells[row_idx]
+                content: str = parts[offset].strip() if offset < len(parts) else ""
+                row.insert_cell(col_idx + offset, TableCell(content))
+
+        for row in self._rows:
+            row.remove_cell(col_idx + max_parts)
+
+        self.normalize()
+
+    def unify_cells(self, coordinates: list[TableCoordinate]) -> None:
+        if not coordinates:
+            return
+
+        contents: list[str] = [self._rows[coord.row][coord.col].content for coord in coordinates]
+        unified_content: str = " ".join(contents)
+        anchor: TableCoordinate = coordinates[0]
+        self._rows[anchor.row][anchor.col].content = unified_content
+
+        for coord in coordinates[1:]:
+            self._rows[coord.row][coord.col].content = ""
+
+    def fix_borders(self, fill_value: str = "") -> None:
+        if not self._rows:
+            return
+
+        max_cols: int = self.num_columns
+
+        for r, row in enumerate(self._rows):
+            while len(row) < max_cols:
+                row.insert_cell(len(row), TableCell(fill_value, TableCoordinate(r, len(row))))
+
+            for column in range(len(row)):
+                row[column].table_coordinate = TableCoordinate(r, column)
+
+    def to_markdown(self) -> str:
+        self.normalize()
+
+        if not self._rows:
+            return ""
+
+        lines: list[str] = []
+        header: str = "".join(("|", " | ".join(cell.content for cell in self.header_row), "|"))
+        separator: str = "".join(("|", " | ".join("---" for _ in self.header_row), "|"))
+        lines.append(header)
+        lines.append(separator)
+
+        for row in self._rows[1:]:
+            line: str = "".join(("|", " | ".join(cell.content for cell in row), "|"))
+            lines.append(line)
+
+        lines.append("")
+        return pretty_print(lines)
+
+    @classmethod
+    def from_file(cls, content: str | list[str], start: int, stop: int):
+        if isinstance(content, str):
+            raw_lines: list[str] = content.strip().splitlines()
+
+        else:
+            raw_lines: list[str] = content
+
+        table_rows: list[TableRow] = []
+        row_counter: int = 0
+
+        for line in raw_lines:
+            stripped_line: str = line.strip()
+            # Skip empty lines and separator lines
+            if not stripped_line or "---" in stripped_line:
                 continue
 
-            # Process each cell in the row
-            cells = line.split('|')
+            if stripped_line.startswith("|"):
+                # Remove leading and trailing pipes, then split
+                content_part = stripped_line.strip("|")
+                parts: list[str] = [cell.strip() for cell in content_part.split("|")]
+                cells: list[TableCell] = []
 
-            # Skip empty first/last cell if it exists
-            start_idx = 1 if cells[0].strip() == '' else 0
-            end_idx = len(cells) - 1 if cells[-1].strip() == '' else len(cells)
+                for c, part in enumerate(parts):
+                    table_coordinate: TableCoordinate = TableCoordinate(row_counter, c)
+                    cells.append(TableCell(part, table_coordinate))
 
-            for col_idx, cell_content in enumerate(cells[start_idx:end_idx]):
-                coordinate = TableCoordinate(row_idx, col_idx)
-                cell = TableCell(cell_content, coordinate)
-                row.add_cell(cell)
+                table_rows.append(TableRow(cells))
+                row_counter += 1
 
-            self.add_row(row)
+        table = cls(start, stop, rows=table_rows, lines=raw_lines)
+        table.normalize()
+        return table
 
-        # Determine if the table has a header and separator
-        if len(self.rows) > 1:
-            self.has_header = True
+    def __str__(self) -> str:
+        return self.to_markdown()
 
-            # Check if second row is a separator
-            if len(self.rows) > 1:
-                is_separator = True
-                for cell in self.rows[1].cells:
-                    if not re.match(r'^[\s\-:]+$', cell.content):
-                        is_separator = False
-                        break
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(rows={len(self._rows)}, cols={self.num_columns})"
 
-                self.has_separator = is_separator
-
-    def parse_asciidoc_table(self, table_str: str) -> None:
-        """Parse an AsciiDoc table string into the Table object."""
-        lines = table_str.strip().split('\n')
-
-        # Skip |=== markers
-        data_lines = [line for line in lines if not line.strip() == '|===']
-
-        for row_idx, line in enumerate(data_lines):
-            row = TableRow(row_idx)
-
-            # Process each cell in the row
-            if line.startswith('|'):
-                cells = line.split('|')
-
-                # Skip the empty first cell from the split
-                for col_idx, cell_content in enumerate(cells[1:]):
-                    if cell_content.strip():
-                        coordinate = TableCoordinate(row_idx, col_idx)
-                        cell = TableCell(cell_content, coordinate)
-                        row.add_cell(cell)
-
-                self.add_row(row)
-
-        # In AsciiDoc, first row is typically the header
-        if self.rows:
-            self.has_header = True
-
-    def to_markdown_string(self) -> str:
-        """Convert the table to a markdown table string."""
-        result = []
-
-        for row_idx, row in enumerate(self.rows):
-            cell: TableCell
-            cells = [f" {cell.content} " for cell in row.cells]
-            line = '|' + '|'.join(cells) + '|'
-            result.append(line)
-
-        return '\n'.join(result)
-
-    def to_asciidoc_string(self) -> str:
-        """Convert the table to an AsciiDoc table string."""
-        result = ['|===']
-
-        for row in self.rows:
-            row_cells = []
-            for cell in row.cells:
-                row_cells.append(f"|{cell.content}")
-            result.append(''.join(row_cells))
-
-        result.append('|===')
-        return '\n'.join(result)
-
-
-class File:
-    """Represents a file with tables."""
-
-    def __init__(self, filename: str):
-        self.filename = filename
-        self.content = ""
-        self.tables: list[Table] = []
-        self.file_type = self._determine_file_type()
-
-    def _determine_file_type(self) -> str:
-        """Determine the file type based on extension."""
-        ext = os.path.splitext(self.filename)[1].lower()
-        if ext == '.md':
-            return 'markdown'
-        elif ext == '.adoc':
-            return 'asciidoc'
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, self.__class__):
+            return self._rows == other._rows
         else:
-            return 'unknown'
+            return NotImplemented
 
-    def read(self) -> bool:
-        """Read the file content."""
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+    def __hash__(self) -> int:
+        return hash(tuple(self._rows))
+
+    def extract_column_values(self, col_idx: int, pattern: Pattern) -> list[str]:
+        """Extracts matches from each cell in the column, cleans original cells, returns list of extracted strings."""
+        extracted_values: list[str] = []
+
+        for row in self._rows:
+            if col_idx < len(row):  # Safety check
+                original_text: str = row[col_idx].content
+                cleaned_text, extracted = extract_match_from_text(original_text, pattern)
+                row[col_idx].content = cleaned_text
+                extracted_values.append(extracted)
+
+            else:
+                extracted_values.append("")  # Empty if column doesn't exist
+
+        return extracted_values
+
+    def insert_column_with_values(self, insert_idx: int, values: Sequence[str]):
+        """Insert a new column at insert_idx with the given values."""
+        self.normalize()  # Ensure table is normalized first
+
+        cells: list[TableCell] = []
+
+        for row_idx in range(len(self._rows)):
+            if row_idx < len(values):
+                cell_content: str = values[row_idx]
+
+            else:
+                cell_content: str = ""
+
+            cells.append(TableCell(cell_content))
+
+        column: TableColumn = TableColumn(cells)
+        self.insert_column(insert_idx, column)
+
+    def extract_type_to_new_column(self, col_idx: int):
+        self.normalize()
+        pattern: Pattern = compile(r"Тип\s*[-–—]{1,2}\s*([^.\s]+)(?:\s*\.|\s|$)")
+
+        extracted_values: list[str] = self.extract_column_values(col_idx, pattern)
+        extracted_values[0] = "Тип"
+        self.insert_column_with_values(col_idx + 1, extracted_values)
+
+    def split_column_ompr(self, header_name: str = "OMPR", new_headers: Sequence[str] = ("O/M", "P/R")) -> None:
+        self.normalize()
+
+        if not self._rows or not self.header_row:
+            return  # empty table guard
+
         try:
-            with open(self.filename, 'r', encoding='utf-8') as f:
-                self.content = f.read()
-            return True
-        except Exception as e:
-            print(f"Error reading file {self.filename}: {str(e)}")
-            return False
+            col_idx: int = next(i for i in range(len(self.header_row)) if self.header_row[i].content == header_name)
 
-    def write(self, output_filename: str | None = None) -> bool:
-        """Write the file content to the specified file."""
-        if not output_filename:
-            name, ext = os.path.splitext(self.filename)
-            output_filename = f"{name}_modified{ext}"
+        except StopIteration:
+            logger.warning(f"Header '{header_name}' not found in table")
+            return  # header not found, do nothing
 
-        try:
-            with open(output_filename, 'w', encoding='utf-8') as f:
-                f.write(self.content)
-            print(f"File saved to {output_filename}")
-            return True
-        except Exception as e:
-            print(f"Error writing to file {output_filename}: {str(e)}")
-            return False
+        # Extract split contents for all rows
+        split_contents: list[tuple[str, str]] = []
 
-    def extract_tables(self) -> None:
-        """Extract tables from the file content."""
-        if self.file_type == 'markdown':
-            self._extract_markdown_tables()
-        elif self.file_type == 'asciidoc':
-            self._extract_asciidoc_tables()
+        for row in self._rows:
+            if len(row) > col_idx:
+                part1, part2 = split_cell_content(row[col_idx].content)
 
-    def _extract_markdown_tables(self) -> None:
-        """Extract markdown tables from the content."""
-        # Match markdown tables - starts with |, has multiple lines with |
-        md_table_pattern = r'\|.*\|[\r\n]+\|[\s\-:]*\|.*[\r\n]+(\|.*\|[\r\n]+)+'
+            else:
+                part1, part2 = "", ""
 
-        for match in re.finditer(md_table_pattern, self.content):
-            table = Table()
-            table.parse_markdown_table(match.group(0))
-            self.tables.append((match.span(), table))
+            split_contents.append((part1, part2))
 
-    def _extract_asciidoc_tables(self) -> None:
-        """Extract AsciiDoc tables from the content."""
-        # Match AsciiDoc tables - starts with |===, ends with |===
-        adoc_table_pattern = r'\|===[\s\S]*?\|==='
+        # Remove original column cells (including header)
+        for row in self._rows:
+            if len(row) > col_idx:
+                row.remove_cell(col_idx)
 
-        for match in re.finditer(adoc_table_pattern, self.content):
-            table = Table()
-            table.parse_asciidoc_table(match.group(0))
-            self.tables.append((match.span(), table))
+        # Insert two new columns at col_idx with new headers and split values
+        for row_idx, row in enumerate(self._rows):
+            # Insert new cells for part1 and part2
+            if not row_idx:  # header row
+                row.insert_cell(col_idx, TableCell(new_headers[0]))
+                row.insert_cell(col_idx + 1, TableCell(new_headers[1]))
 
-    def add_columns_to_tables(self, second_col_header: str, last_col_header: str, default_content: str = "---") -> None:
-        """Add columns to all tables in the file."""
-        # Process tables in reverse order to avoid position shifting issues
-        for i in range(len(self.tables) - 1, -1, -1):
-            span, table = self.tables[i]
+            else:
+                part1, part2 = split_contents[row_idx]
+                row.insert_cell(col_idx, TableCell(part1))
+                row.insert_cell(col_idx + 1, TableCell(part2))
 
-            # Add column as second position
-            table.add_column(1, second_col_header, default_content)
+        self.normalize()
 
-            # Add column at the end
-            table.add_column(len(table.columns), last_col_header, default_content)
+    def reorder_columns_by_names(self, new_order: Sequence[str]) -> None:
+        if not self._rows or not self.header_row:
+            return  # Empty table guard
 
-            # Update content with the modified table
-            if self.file_type == 'markdown':
-                table_str = table.to_markdown_string()
-            else:  # asciidoc
-                table_str = table.to_asciidoc_string()
+        current_headers: list[str] = [cell.content for cell in self.header_row]
 
-            self.content = self.content[:span[0]] + table_str + self.content[span[1]:]
+        # Create mapping from header name to column index
+        header_to_index: dict[str, int] = {header: idx for idx, header in enumerate(current_headers)}
 
+        # Determine new column order
+        new_indices: list[int] = []
+        remaining_indices: set[int] = set(range(len(current_headers)))
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: python table_column_adder.py <filename> [second_col_header] [last_col_header]")
-        print("Example: python table_column_adder.py document.md 'Status' 'Notes'")
-        return
+        # Process requested headers in order
+        for header in new_order:
+            if header in header_to_index:
+                col_idx: int = header_to_index[header]
+                new_indices.append(col_idx)
+                remaining_indices.discard(col_idx)
 
-    filename = sys.argv[1]
+        # Add remaining columns not specified in new_order
+        new_indices.extend(sorted(remaining_indices))
 
-    second_col_header = "New Column"
-    last_col_header = "Last Column"
+        # Reorder columns in each row
+        for row in self._rows:
+            original_cells: list[TableCell] = row.cells.copy()
+            row._cells = [original_cells[i] for i in new_indices]
 
-    if len(sys.argv) >= 3:
-        second_col_header = sys.argv[2]
-    if len(sys.argv) >= 4:
-        last_col_header = sys.argv[3]
-
-    file = File(filename)
-
-    if file.file_type == 'unknown':
-        print(f"Unsupported file extension. Please use .md or .adoc files.")
-        return
-
-    if not file.read():
-        return
-
-    file.extract_tables()
-
-    if not file.tables:
-        print(f"No tables found in {filename}")
-        return
-
-    file.add_columns_to_tables(second_col_header, last_col_header)
-    file.write()
-    print(f"Added columns to {len(file.tables)} tables.")
+        # Update coordinates after reordering
+        self.normalize()
 
 
-if __name__ == "__main__":
-    main()
+class MarkdownFile:
+    def __init__(self, path: StrPath):
+        self._path: Path = Path(path)
+        self._content: list[str] = []
+        self._tables: list[Table] = []
+
+    def read(self):
+        self._content = file_reader(self._path, "lines")
+
+    def __iter__(self):
+        return iter(self._tables)
+
+    def set_tables(self):
+        """
+        Detect tables in _content.
+        """
+        current_table: list[str] = []
+        in_table: bool = False
+        start_idx: int = -1
+
+        header_pattern: Pattern = compile(r"^\s*\|(.+\|)+\s*$")
+        separator_pattern: Pattern = compile(r"^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*$")
+
+        for i, line in enumerate(self._content):
+            stripped: str = line.strip()
+
+            if in_table:
+                if stripped == "" or (not stripped.startswith("|") and not header_pattern.match(line)):
+                    # End of current table
+                    if current_table:
+                        table: Table = Table.from_file(current_table, start_idx, i)
+                        self._tables.append(table)
+                        current_table: list[str] = []
+                    in_table: bool = False
+                else:
+                    # Continue collecting table lines
+                    current_table.append(line)
+            else:
+                # Look for table header + separator line
+                if (header_pattern.match(line)
+                        and i + 1 < len(self._content)
+                        and separator_pattern.match(self._content[i + 1])):
+                    in_table: bool = True
+                    start_idx: int = i
+                    current_table: list[str] = [line, self._content[i + 1]]
+
+        # If file ends inside a table
+        if in_table and current_table:
+            table: Table = Table.from_file(current_table, start_idx, len(self._content))
+            self._tables.append(table)
+
+    def update_table(self, table: Table):
+        # Fixed: Remove lines in correct range
+        for index in range(table.stop - 1, table.start - 1, -1):
+            if index < len(self._content):
+                self._content.pop(index)
+
+        # Insert the updated table
+        if table.start <= len(self._content):
+            self._content.insert(table.start, str(table))
+
+        else:
+            self._content.append(str(table))
+
+    def save(self):
+        file_writer(self._path, self._content)
+
+
+if __name__ == '__main__':
+    file: str = "./congestion.md"
+
+    try:
+        markdown_file: MarkdownFile = MarkdownFile(file)
+        markdown_file.read()
+        markdown_file.set_tables()
+
+        tables_found: list[Table] = list(markdown_file)
+
+        if not tables_found:
+            logger.warning("No tables found in the file")
+
+        else:
+            logger.info(f"Found {len(tables_found)} tables")
+
+        for item in reversed(tables_found):
+            logger.debug(f"Processing table from line {item.start} to {item.stop}")
+            logger.debug(f"Original table:\n{item}")
+            item.fix_borders()
+
+            item.normalize()
+            item.split_column_ompr()
+            logger.debug(f"After OMPR split:\n{item}")
+
+            item.extract_type_to_new_column(3)  # Column 3 should be the description column after split
+            logger.debug(f"After type extraction:\n{item}")
+
+            item.reorder_columns_by_names(["Параметр", "Описание", "Тип", "O/M", "P/R"])
+            item.insert_column(5, TableColumn())
+            item.get_cell(0, 5).content = "Версия"
+
+            markdown_file.update_table(item)
+
+        markdown_file.save()
+        logger.success(f"Файл {file} успешно обработан")
+
+    except FileNotFoundError:
+        logger.error(f"File {file} not found")
+        raise
+
+    except Exception as e:
+        logger.error(f"Error processing file {file}: {e}")
+        raise
