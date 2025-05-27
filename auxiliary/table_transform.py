@@ -1,121 +1,13 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
 from re import compile, Match, match, Pattern
-from typing import Iterable, NamedTuple, Sequence
+from typing import Iterable, Sequence
 
 from loguru import logger
 
-from utilities.common.errors import TableColsTableCoordinateInitError
+from auxiliary.table_items import Table, TableCell, TableCoordinate
 from utilities.common.functions import file_reader, file_writer, pretty_print
 from utilities.common.shared import StrPath
-
-
-class TableCoordinate(NamedTuple):
-    row: int
-    column: int
-    
-    @property
-    def coord(self) -> tuple[int, int]:
-        return self.row, self.column
-
-    def __str__(self) -> str:
-        return f"{self.row}, {self.column}"
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(row={self.row}, col={self.column})"
-    
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.coord == other.coord
-
-        else:
-            return NotImplemented
-
-    def __ne__(self, other):
-        if isinstance(other, self.__class__):
-            return self.coord != other.coord
-
-        else:
-            return NotImplemented
-
-    @classmethod
-    def as_element(cls, number: int, num_columns: int):
-        """Generates the coordinate from the set_table_cols index.
-
-        :param number: The set_table_cols cell index.
-        :type number: int
-        :param num_columns: The number of columns.
-        :type num_columns: int
-        """
-        if number >= 0 and num_columns > 0:
-            return cls(*divmod(number, num_columns))
-
-        else:
-            logger.error(
-                f"Индекс {number} и количество столбцов {num_columns} должны быть положительными")
-            raise TableColsTableCoordinateInitError
-
-    def shift(self, row_offset: int = 0, column_offset: int = 0):
-        """Generates the set_table_cols coordinates displaced from the given one.
-
-        :param row_offset: The number of rows to displace downwards. To displace upwards, use negative value.
-        :type row_offset: int (default: 0)
-        :param column_offset: The number of rows to displace to the right. To displace to the left, use negative value.
-        :type column_offset: int (default: 0)
-        :return: The new instance with the specified place in the set_table_cols grid.
-        """
-        return TableCoordinate(self.row + row_offset, self.column + column_offset)
-
-
-class TableCell:
-    def __init__(self, text: str, table_coordinate: TableCoordinate = None) -> None:
-        self._text: str = text
-        self._table_coordinate: TableCoordinate | None = table_coordinate
-
-    @property
-    def text(self) -> str:
-        return self._text
-
-    @text.setter
-    def text(self, value: str) -> None:
-        self._text = value
-
-    @property
-    def table_coordinate(self) -> TableCoordinate | None:
-        return self._table_coordinate
-
-    @table_coordinate.setter
-    def table_coordinate(self, coord: TableCoordinate) -> None:
-        self._table_coordinate = coord
-
-    @property
-    def coord(self):
-        return self._table_coordinate.coord
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.coord == other.coord
-
-        else:
-            return NotImplemented
-
-    def __ne__(self, other):
-        if isinstance(other, self.__class__):
-            return self.coord != other.coord
-
-        else:
-            return NotImplemented
-
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}"
-            f"{self._table_coordinate.__class__.__name__}({self._table_coordinate})\n{self._text}")
-
-    def as_tuple(self):
-        return self._text, self._table_coordinate
-
-    def __hash__(self):
-        return hash(self._table_coordinate.coord)
 
 
 class TableRow:
@@ -232,13 +124,9 @@ def split_cell_text(content: str) -> tuple[str, str]:
         return "", ""
 
 
-class Table:
-    def __init__(
-            self,
-            start: int,
-            stop: int,
-            rows: Iterable[TableRow] = None,
-            lines: Iterable[str] = None) -> None:
+class TableTransform(Table):
+    def __init__(self, start: int, stop: int, rows: Iterable[TableRow] = None, lines: Iterable[str] = None) -> None:
+        super().__init__(lines)
         if rows is None:
             rows: list[TableRow] = []
 
