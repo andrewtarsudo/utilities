@@ -69,7 +69,6 @@ class ConfigFile(dict):
                     self._is_user_config = False
 
             else:
-                logger.debug(f"Пользовательский конфигурационный файл {path.name} не найден")
                 continue
 
     def get_commands(self, command: str, key: str = None) -> GetCmdType:

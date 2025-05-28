@@ -98,6 +98,9 @@ def fix_path(line_no: int, path: Path, root: Path) -> str:
                 valid_name: str = matches[0]
                 valid_path: str = neighbours.get(valid_name)
 
+            else:
+                valid_path: str = f"# {rel_path}  (удалить или закомментировать)"
+
         # otherwise, just comment the line
         else:
             valid_path: str = f"# {rel_path}  (удалить или закомментировать)"

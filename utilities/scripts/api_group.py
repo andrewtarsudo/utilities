@@ -373,7 +373,7 @@ class APIGroup(Group):
     def __init__(self, aliases: set[str] = None, **attrs: Any):
         self.logging_config: LoggerConfiguration = custom_logging(
             name=self.__class__.__name__.lower(),
-            is_debug=attrs.get("debug", True))
+            is_debug=attrs.get("debug", False))
         kwargs: dict[str, bool] = {
             "invoke_without_command": True,
             "chain": False,

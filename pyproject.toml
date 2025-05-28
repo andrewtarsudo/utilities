@@ -1,6 +1,6 @@
 [project]
 name = "utilities"
-version = "2.2.0"
+version = "2.2.1"
 description = "Command line interface commands for technical writers"
 authors = [
   { name = "Andrew Tarasov", email = "tarasov-a@protei.ru" }
@@ -19,7 +19,6 @@ dependencies = [
   "python-frontmatter>=1.1",
   "python-slugify>=8.0",
   "pyyaml>=6.0",
-  "textual>=3.2.0",
 ]
 keywords = [
   "utilities",
