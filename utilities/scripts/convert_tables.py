@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
-from click.termui import style
 from click.types import BOOL, Path as ClickPath
 
+from utilities.common.completion import doc_completion
 from utilities.common.config_file import config_file
 from utilities.common.shared import HELP, StrPath
 from utilities.convert_tables.line_formatter import LineFormatter
 from utilities.convert_tables.xml_file import CoreDocument, XmlDocument
 from utilities.scripts.api_group import MutuallyExclusiveOption, SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
-from utilities.common.completion import doc_completion
 
 
 @cli.command(
@@ -79,8 +78,8 @@ from utilities.common.completion import doc_completion
     type=BOOL,
     help="\b\nФлаг удаления лишних пробелов и экранирования символов."
          "\nПо умолчанию: не задано, определяется параметрами"
-         f"\n{style('--escape', fg='magenta')} и {style('--remove', fg='magenta')}."
-         f"\nПриоритет выше, чем у опций {style('--escape', fg='magenta')} и {style('--remove', fg='magenta')}",
+         "\n'[magenta]--escape[/]' и '[magenta]--remove[/]'."
+         "\nПриоритет выше, чем у опций '[magenta]--escape[/]' и '[magenta]--remove[/]'",
     show_default=True,
     required=False,
     default=config_file.get_commands("convert-tables", "fix"))
@@ -91,8 +90,8 @@ from utilities.common.completion import doc_completion
     type=BOOL,
     help="\b\nФлаг извлечения текста без дополнительной обработки."
          "\nПо умолчанию: не задано, определяется параметрами"
-         f"\n{style('--escape', fg='magenta')} и {style('--remove', fg='magenta')}."
-         f"\nПриоритет выше, чем у опций {style('--escape', fg='magenta')} и {style('--remove', fg='magenta')}",
+         "\n'[magenta]--escape[/]' и '[magenta]--remove[/]'."
+         "\nПриоритет выше, чем у опций '[magenta]--escape[/]' и '[magenta]--remove[/]'",
     show_default=True,
     required=False,
     default=config_file.get_commands("convert-tables", "keep"))

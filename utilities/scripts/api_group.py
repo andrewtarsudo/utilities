@@ -8,7 +8,7 @@ from click.decorators import pass_context
 from click.formatting import HelpFormatter
 from click.globals import get_current_context
 from click.shell_completion import CompletionItem
-from click.termui import pause, style
+from click.termui import pause
 from loguru import logger
 from more_itertools import flatten
 from yaml import safe_dump
@@ -33,7 +33,7 @@ def prepare_option(value: str, *, prefix: bool = True, remove_suffix: str | None
     if remove_suffix is not None:
         value: str = value.removesuffix(remove_suffix)
 
-    return style(f'{int(prefix) * "--"}{value}', fg="magenta", bold=True)
+    return f'[bold magenta]{int(prefix) * "--"}{value}[/]'
 
 
 def wrap_line(line: str):
@@ -123,19 +123,19 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     if commands is not None and commands:
         commands_str: str = wrap_line(" | ".join(f"<{command}>" for command in sorted(commands)))
         formatter.write(
-            f"{style('Использование', fg='bright_cyan', bold=True)}:"
+            "[cyan]Использование:[/]"
             f"\n{name} {wrap_line(opts_str)}"
             f"\n{commands_str}\n")
 
     elif cmd.name != "help":
         formatter.write(
-            f"{style('Использование', fg='bright_cyan', bold=True)}:"
+            "[cyan]Использование:[/]"
             f"\n{name} {args_str}"
             f"\n{wrap_line(opts_str)}\n")
 
     else:
         formatter.write(
-            f"{style('Использование', fg='bright_cyan', bold=True)}:"
+            "[cyan]Использование:[/]"
             f"\n{name}\n")
 
 
@@ -169,7 +169,7 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
             option_help: str = option_help[:_required]
             _: str = f"{_} (*)"
 
-        return style(_, fg="cyan", bold=True), option_help
+        return f"[bold cyan]{_}[/]", option_help
 
     rows: list[tuple[str, str]] = []
 
@@ -181,12 +181,12 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
                 rows.append(rv)
 
         else:
-            rows.append((style("-h, --help", fg="cyan", bold=True), HELP))
+            rows.append(("[bold cyan]-h, --help[/]", HELP))
 
     if rows:
         formatter.width = MAX_CONTENT_WIDTH
 
-        with formatter.section(style("Опции", fg="blue", bold=True)):
+        with formatter.section("[bold blue]Опции[/]"):
             opt_names: list[str] = [item[0] for item in rows]
 
             col_spacing: int = COL_MAX - max(map(len, opt_names)) - 4
@@ -221,10 +221,10 @@ def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter
             for command in sorted(commands.values(), key=lambda x: x.name)
             if not command.hidden}
 
-        with formatter.section(style("Подкоманды", fg="green", bold=True)):
+        with formatter.section("[bold green]Подкоманды[/]"):
             rows: list[tuple[str, str]] = [
-                (style(v, fg="green", bold=True),
-                 style(k.help, fg="green", bold=True))
+                (f"[bold green]{v}[/]",
+                 f"[bold green]{k.help}[/]")
                 for k, v in dict_commands.items()]
 
             col_spacing: int = COL_MAX - 2 * max(map(len, dict_commands.values())) + 11
@@ -266,11 +266,11 @@ def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
 
     if args:
         formatter.width = MAX_CONTENT_WIDTH
-        asterisk: str = style("(*)", fg="red", bold=True)
+        asterisk: str = "[bold red](*)[/]"
 
         keys: list[str] = [item.removesuffix(".exe") for item in ctx.command_path.split(" ")]
         rows: list[tuple[str, str]] = [
-            (f"{style(arg.name, fg='cyan', bold=True)} {asterisk}",
+            (f"[bold cyan]{arg.name}[/] {asterisk}",
              args_help_dict.get_multiple_keys(keys=keys).get(arg.name))
             for arg in args]
 
@@ -279,7 +279,7 @@ def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
         col_spacing: int = COL_MAX - args_help_dict.max_key - max(map(len, args_names)) - 5
         col_max: int = MAX_CONTENT_WIDTH
 
-        with formatter.section(style("Аргументы", fg="blue", bold=True)):
+        with formatter.section("[bold blue]Аргументы[/]"):
             formatter.write_dl(rows, col_max, col_spacing)
 
 
@@ -390,6 +390,10 @@ class APIGroup(Group):
         self.__class__.aliases[self] = aliases
         self.config_file: ConfigFile = config_file
 
+    @property
+    def is_use_tui(self) -> bool:
+        return self.config_file.get_general("use_tui")
+
     def get_command(self, ctx: Context, cmd_name: str) -> Command | None:
         if cmd_name in self.list_commands(ctx):
             return self.commands.get(cmd_name, None)
@@ -427,12 +431,17 @@ class APIGroup(Group):
 
     def parse_args(self, ctx: Context, args: list[str]) -> list[str]:
         if args is None or not args:
-            logger.error(f"Для команды {ctx.command_path} не задано ни одного аргумента или опции")
-            logger.error(f"Для вызова справки используется\n{ctx.command_path} --help")
-            raise NoArgumentsOptionsError
+            if self.is_use_tui:
+                args.append("tui")
+                logger.debug("Команда была дополнена параметром tui")
 
-        else:
-            return super().parse_args(ctx, args)
+            else:
+                logger.debug("Вызов TUI отключен")
+                logger.error(f"Для команды {ctx.command_path} не задано ни одного аргумента или опции")
+                logger.error(f"Для вызова справки используется\n{ctx.command_path} --help")
+                raise NoArgumentsOptionsError
+
+        return super().parse_args(ctx, args)
 
     def invoke(self, ctx: Context) -> Any:
         for param in self.params:

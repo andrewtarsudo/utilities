@@ -19,6 +19,7 @@ dependencies = [
   "python-frontmatter>=1.1",
   "python-slugify>=8.0",
   "pyyaml>=6.0",
+  "trogon>=0.6.0",
 ]
 keywords = [
   "utilities",

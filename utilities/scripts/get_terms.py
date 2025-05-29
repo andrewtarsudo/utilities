@@ -110,7 +110,8 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["ascii_flag", "common_flag"],
-    help="\b\nФлаг вывода сокращения для добавления в файл Markdown.\nФормат: <abbr title=\"\"></abbr>",
+    help="\b\nФлаг вывода сокращения для добавления в файл Markdown."
+         "\nФормат: \<abbr title=\"\"\>\</abbr\>",
     show_default=True,
     required=False,
     default=config_file.get_commands("get-terms", "common_flag"))
@@ -119,7 +120,8 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["abbr_flag", "common_flag"],
-    help="\b\nФлаг вывода сокращения для добавления в файл AsciiDoc.\nФормат: pass:q[<abbr title=\"\"></abbr>]",
+    help="\b\nФлаг вывода сокращения для добавления в файл AsciiDoc."
+         "\nФормат: pass:q\[\<abbr title=\"\"\>\</abbr\>\]",
     show_default=True,
     required=False,
     default=config_file.get_commands("get-terms", "common_flag"))

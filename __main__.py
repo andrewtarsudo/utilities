@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from utilities.common.shared import PRESS_ENTER_KEY
 
 if __name__ == '__main__':
     from sys import hexversion
@@ -31,7 +31,16 @@ if __name__ == '__main__':
 
     from utilities.scripts.cli import cli
 
-    cli()
+    try:
+        cli()
+
+    except Exception as e:
+        from click.termui import echo, pause
+        from sys import exit
+
+        echo(f"Ошибка {e.__class__.__name__}, {e!s}")
+        pause(PRESS_ENTER_KEY)
+        exit(1)
 
     if faulthandler.is_enabled():
         faulthandler.disable()

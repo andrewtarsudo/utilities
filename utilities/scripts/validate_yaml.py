@@ -8,17 +8,16 @@ from typing import Any, get_args, get_origin, Iterable, Mapping
 
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
-from click.termui import style
 from click.types import BOOL, Path as ClickPath
 from click.utils import echo
 from loguru import logger
 
+from utilities.common.completion import file_dir_completion
 from utilities.common.config_file import config_file
 from utilities.common.functions import file_reader, file_reader_type, file_writer, is_windows, pretty_print, walk_full
 from utilities.common.shared import HELP, separator, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
-from utilities.common.completion import file_dir_completion
 
 _SETTINGS_NAMES: tuple[str, ...] = ("settings", "Settings")
 _RIGHTS_NAMES: tuple[str, ...] = ("rights", "Rights")
@@ -73,7 +72,7 @@ def fix_path(line_no: int, path: Path, root: Path) -> str:
     md_file: Path = path.with_suffix(".md")
     adoc_file: Path = path.with_suffix(".adoc")
 
-    common_part: str = f"{line_no:>4}  {style(rel_path, strikethrough=True)}"
+    common_part: str = f"{line_no:>4}  [strike]{rel_path}[/]"
 
     if md_file.exists(follow_symlinks=True):
         valid_path: str = rel(md_file, root)
@@ -105,7 +104,7 @@ def fix_path(line_no: int, path: Path, root: Path) -> str:
         else:
             valid_path: str = f"# {rel_path}  (удалить или закомментировать)"
 
-    suggestion: str = style(valid_path, fg="red", bold=True)
+    suggestion: str = f"[bold red]{valid_path}[/]"
     return f"{common_part} -> {suggestion}"
 
 
@@ -485,7 +484,7 @@ def validate_file(
 
         _path: str = path.relative_to(root).as_posix()
 
-        _line: str = style(f"{line_no + 1:>4}  {_path: <{max_length}}  {_status: >5}", bg=_color)
+        _line: str = f"[{_color}]{line_no + 1:>4}  {_path: <{max_length}}  {_status: >5}[/]"
         _lines.append(_line)
 
         if verbose or _status == "FAIL":
@@ -598,7 +597,7 @@ def validate_yaml_command(
     else:
         for yaml_file in yaml_files:
             yaml_file: Path = Path(yaml_file).expanduser().resolve()
-            echo(style(separator, fg="magenta"))
+            echo(f"[magenta]{separator}[/]")
             echo(f"Файл {yaml_file.name}:")
 
             content: dict[str, Any] = file_reader_type(yaml_file, "yaml")
@@ -614,13 +613,13 @@ def validate_yaml_command(
 
             if general_info.warnings:
                 _warnings: str = pretty_print(general_info.warnings)
-                echo(style("\nПредупреждения:", fg="bright_cyan", bold=True))
+                echo("\n[bold cyan]Предупреждения:[/]")
                 echo(_warnings)
                 logger.debug(_warnings)
 
             if guess and general_info.options:
                 _options: str = pretty_print(general_info.options)
-                echo(style("\nИсправления:", fg="bright_cyan", bold=True))
+                echo("\n[bold cyan]Исправления:[/]")
                 echo(_options)
                 logger.debug(_options)
 

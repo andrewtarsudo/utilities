@@ -7,6 +7,7 @@ general:
   col_max: 56
   max_content_width: 100
   terminal_width: 100
+  use_tui: true
 
 update:
   auto_update: true
