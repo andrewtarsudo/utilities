@@ -4,10 +4,11 @@ from pathlib import Path
 
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
-from click.termui import echo, pause
+from click.termui import pause
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 
+from utilities import echo
 from utilities.common.config_file import config_file
 from utilities.common.errors import RepairLinksInvalidFileDictAttributeError, RepairLinksInvalidStorageAttributeError
 from utilities.common.functions import file_reader, file_writer

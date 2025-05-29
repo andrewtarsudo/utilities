@@ -78,8 +78,8 @@ from utilities.scripts.cli import cli
     type=BOOL,
     help="\b\nФлаг удаления лишних пробелов и экранирования символов."
          "\nПо умолчанию: не задано, определяется параметрами"
-         "\n'[magenta]--escape[/]' и '[magenta]--remove[/]'."
-         "\nПриоритет выше, чем у опций '[magenta]--escape[/]' и '[magenta]--remove[/]'",
+         "\n'[magenta]--escape[/magenta]' и '[magenta]--remove[/magenta]'."
+         "\nПриоритет выше, чем у опций '[magenta]--escape[/magenta]' и '[magenta]--remove[/magenta]'",
     show_default=True,
     required=False,
     default=config_file.get_commands("convert-tables", "fix"))
@@ -90,8 +90,8 @@ from utilities.scripts.cli import cli
     type=BOOL,
     help="\b\nФлаг извлечения текста без дополнительной обработки."
          "\nПо умолчанию: не задано, определяется параметрами"
-         "\n'[magenta]--escape[/]' и '[magenta]--remove[/]'."
-         "\nПриоритет выше, чем у опций '[magenta]--escape[/]' и '[magenta]--remove[/]'",
+         "\n'[magenta]--escape[/magenta]' и '[magenta]--remove[/magenta]'."
+         "\nПриоритет выше, чем у опций '[magenta]--escape[/magenta]' и '[magenta]--remove[/magenta]'",
     show_default=True,
     required=False,
     default=config_file.get_commands("convert-tables", "keep"))

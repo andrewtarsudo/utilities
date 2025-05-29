@@ -6,13 +6,13 @@ from click.core import Context
 from click.decorators import help_option, option, pass_context
 from click.termui import style
 from click.types import BOOL, Path as ClickPath
-from click.utils import echo
 from loguru import logger
 
+from utilities import echo
 from utilities.common.config_file import config_file
 from utilities.common.functions import file_reader, is_windows, pretty_print
 from utilities.common.shared import HELP, separator, StrPath
-from utilities.scripts.api_group import APIGroup
+from utilities.scripts.api_group import APIGroup, ConditionalOption
 from utilities.scripts.cli import cli
 from utilities.common.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
@@ -74,6 +74,8 @@ def file_inspection(path: str, is_color: bool = True):
         resolve_path=True,
         allow_dash=False,
         dir_okay=False),
+    cls=ConditionalOption,
+    conditional=["directory"],
     help="\b\nФайл для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
@@ -88,6 +90,8 @@ def file_inspection(path: str, is_color: bool = True):
         resolve_path=True,
         allow_dash=False,
         dir_okay=True),
+    cls=ConditionalOption,
+    conditional=["files"],
     help="Директория для обработки",
     multiple=False,
     required=False,

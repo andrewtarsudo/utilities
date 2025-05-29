@@ -6,9 +6,9 @@ from click.core import Context, Parameter
 from click.decorators import argument, help_option, option, pass_context
 from click.termui import pause
 from click.types import BOOL
-from click.utils import echo
 from loguru import logger
 
+from utilities import echo
 from utilities.common.config_file import config_file
 from utilities.common.functions import file_reader, pretty_print
 from utilities.common.shared import BASE_PATH, HELP, PRESS_ENTER_KEY

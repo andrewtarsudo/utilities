@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from click.core import Context
 from click.decorators import pass_context
-from click.termui import echo
 
+from utilities import echo
 from utilities.scripts.api_group import format_full_help, NoArgsAPIGroup
 from utilities.scripts.cli import cli
 

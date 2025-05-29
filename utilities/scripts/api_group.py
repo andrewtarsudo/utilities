@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+from functools import partial
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Iterable, Mapping
+from typing import Any, ClassVar, Iterable, Mapping
 
-from click.core import Argument, Command, Context, echo, Group, Option, Parameter, UsageError
+from click.core import Argument, Command, Context, Group, Option, Parameter
+from click.exceptions import UsageError
 from click.decorators import pass_context
 from click.formatting import HelpFormatter
 from click.globals import get_current_context
@@ -13,6 +15,7 @@ from loguru import logger
 from more_itertools import flatten
 from yaml import safe_dump
 
+from utilities import echo
 from utilities.common.config_file import config_file, ConfigFile
 from utilities.common.custom_logger import custom_logging, LoggerConfiguration
 from utilities.common.errors import BaseError, CommandNotFoundError, NoArgumentsOptionsError
@@ -33,7 +36,7 @@ def prepare_option(value: str, *, prefix: bool = True, remove_suffix: str | None
     if remove_suffix is not None:
         value: str = value.removesuffix(remove_suffix)
 
-    return f'[bold magenta]{int(prefix) * "--"}{value}[/]'
+    return f'[bold magenta]{int(prefix) * "--"}{value}[/bold magenta]'
 
 
 def wrap_line(line: str):
@@ -123,19 +126,19 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     if commands is not None and commands:
         commands_str: str = wrap_line(" | ".join(f"<{command}>" for command in sorted(commands)))
         formatter.write(
-            "[cyan]Использование:[/]"
+            "[cyan]Использование:[/cyan]"
             f"\n{name} {wrap_line(opts_str)}"
             f"\n{commands_str}\n")
 
     elif cmd.name != "help":
         formatter.write(
-            "[cyan]Использование:[/]"
+            "[cyan]Использование:[/cyan]"
             f"\n{name} {args_str}"
             f"\n{wrap_line(opts_str)}\n")
 
     else:
         formatter.write(
-            "[cyan]Использование:[/]"
+            "[cyan]Использование:[/cyan]"
             f"\n{name}\n")
 
 
@@ -169,7 +172,7 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
             option_help: str = option_help[:_required]
             _: str = f"{_} (*)"
 
-        return f"[bold cyan]{_}[/]", option_help
+        return f"[bold cyan]{_}[/bold cyan]", option_help
 
     rows: list[tuple[str, str]] = []
 
@@ -181,12 +184,12 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
                 rows.append(rv)
 
         else:
-            rows.append(("[bold cyan]-h, --help[/]", HELP))
+            rows.append(("[bold cyan]-h, --help[/bold cyan]", HELP))
 
     if rows:
         formatter.width = MAX_CONTENT_WIDTH
 
-        with formatter.section("[bold blue]Опции[/]"):
+        with formatter.section("[bold blue]Опции[/bold blue]"):
             opt_names: list[str] = [item[0] for item in rows]
 
             col_spacing: int = COL_MAX - max(map(len, opt_names)) - 4
@@ -221,10 +224,10 @@ def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter
             for command in sorted(commands.values(), key=lambda x: x.name)
             if not command.hidden}
 
-        with formatter.section("[bold green]Подкоманды[/]"):
+        with formatter.section("[bold green]Подкоманды[/bold green]"):
             rows: list[tuple[str, str]] = [
-                (f"[bold green]{v}[/]",
-                 f"[bold green]{k.help}[/]")
+                (f"[bold green]{v}[/bold green]",
+                 f"[bold green]{k.help}[/bold green]")
                 for k, v in dict_commands.items()]
 
             col_spacing: int = COL_MAX - 2 * max(map(len, dict_commands.values())) + 11
@@ -266,11 +269,11 @@ def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
 
     if args:
         formatter.width = MAX_CONTENT_WIDTH
-        asterisk: str = "[bold red](*)[/]"
+        asterisk: str = "[bold red](*)[/bold red]"
 
         keys: list[str] = [item.removesuffix(".exe") for item in ctx.command_path.split(" ")]
         rows: list[tuple[str, str]] = [
-            (f"[bold cyan]{arg.name}[/] {asterisk}",
+            (f"[bold cyan]{arg.name}[/bold cyan] {asterisk}",
              args_help_dict.get_multiple_keys(keys=keys).get(arg.name))
             for arg in args]
 
@@ -279,7 +282,7 @@ def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
         col_spacing: int = COL_MAX - args_help_dict.max_key - max(map(len, args_names)) - 5
         col_max: int = MAX_CONTENT_WIDTH
 
-        with formatter.section("[bold blue]Аргументы[/]"):
+        with formatter.section("[bold blue]Аргументы[/bold blue]"):
             formatter.write_dl(rows, col_max, col_spacing)
 
 
@@ -332,12 +335,12 @@ def print_version(ctx: Context, param: Parameter, value: Any):
         return
 
     echo(f"Версия {get_version()}")
-    # pause(PRESS_ENTER_KEY)
+    pause(PRESS_ENTER_KEY)
     ctx.exit(0)
 
 
 class APIGroup(Group):
-    aliases: dict[Command, set[str]] = {}
+    aliases: ClassVar[dict[Command, set[str]]] = {}
 
     @classmethod
     def all_alias_names(cls) -> set[str]:
@@ -432,7 +435,7 @@ class APIGroup(Group):
     def parse_args(self, ctx: Context, args: list[str]) -> list[str]:
         if args is None or not args:
             if self.is_use_tui:
-                args.append("tui")
+                args: list[str] = ["tui"]
                 logger.debug("Команда была дополнена параметром tui")
 
             else:
@@ -553,3 +556,45 @@ class MutuallyExclusiveOption(Option):
             ctx.max_content_width = MAX_CONTENT_WIDTH
 
             return super().handle_parse_result(ctx, opts, args)
+
+
+class ConditionalOption(Option):
+    def __init__(self, *args, **kwargs):
+        self.conditional: tuple[str, ...] = tuple(kwargs.pop("conditional", ()))
+
+        _help: str = kwargs.get("help", "")
+
+        if self.conditional:
+            prepare: partial = partial(prepare_option, prefix=False)
+
+            exclusive_options: str = ", ".join(map(prepare, self.conditional))
+
+            _: dict[str, str] = {
+                "help": (
+                    f"{_help}.\n"
+                    f"Примечание. Этот параметр или хотя бы один из \n"
+                    f"{exclusive_options} должен быть задан")}
+            kwargs.update(_)
+
+        super().__init__(*args, **kwargs)
+
+    def handle_parse_result(
+            self,
+            ctx: Context,
+            opts: Mapping[str, Any],
+            args: Iterable[str]) -> tuple[Any, list[str]]:
+        if set(self.conditional).intersection(opts):
+            args: list[str] = [*args]
+            ctx.terminal_width = TERMINAL_WIDTH
+            ctx.max_content_width = MAX_CONTENT_WIDTH
+
+            return super().handle_parse_result(ctx, opts, args)
+
+        else:
+            prepare: partial = partial(prepare_option, prefix=False)
+
+            conditional_options: str = ", ".join(map(prepare, self.conditional))
+
+            raise UsageError(
+                f"Ошибка в задании команды: `{self.name}` или хотя бы один из "
+                f"`{conditional_options}` должен быть задан.")

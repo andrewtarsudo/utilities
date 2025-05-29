@@ -4,14 +4,14 @@ from typing import Iterable
 
 from click.core import Context
 from click.decorators import help_option, option, pass_context
-from click.termui import echo
 from click.types import BOOL, Path as ClickPath
 from loguru import logger
 from PIL import Image
 
+from utilities import echo
 from utilities.common.config_file import config_file
 from utilities.common.shared import HELP, separator, StrPath
-from utilities.scripts.api_group import APIGroup
+from utilities.scripts.api_group import APIGroup, ConditionalOption
 from utilities.scripts.cli import cli
 from utilities.common.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
@@ -62,6 +62,8 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
         resolve_path=True,
         allow_dash=False,
         dir_okay=False),
+    cls=ConditionalOption,
+    conditional=["directory"],
     help="\b\nФайл для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
@@ -75,6 +77,8 @@ def duplicate_image(file: StrPath, dry_run: bool = False) -> StrPath:
         resolve_path=True,
         allow_dash=False,
         dir_okay=True),
+    cls=ConditionalOption,
+    conditional=["files"],
     help="Директория для обработки",
     multiple=False,
     required=False,

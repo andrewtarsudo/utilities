@@ -12,12 +12,10 @@ from click.decorators import group, help_option, option
 from click.globals import get_current_context
 from click.termui import pause
 from click.types import BOOL
-from click.utils import echo
 from loguru import logger
-from textual.css.query import NoMatches
-from textual.markup import MarkupError
 from trogon.trogon import tui
 
+from utilities import echo
 from utilities.common.config_file import config_file
 from utilities.common.custom_logger import LoggerConfiguration
 from utilities.common.errors import BaseError
@@ -291,7 +289,7 @@ def cli(debug: bool = False, update: bool = True):
             check_updates()
             logger.success("Исполняемый файл обновлен")
 
-    except BaseError | MarkupError | NoMatches | OSError | FileNotFoundError as e:
+    except BaseError | OSError as e:
         logger.error(f"Ошибка {e.__class__.__name__}, {e!s}")
         pause(PRESS_ENTER_KEY)
         sys.exit(1)

@@ -11,7 +11,7 @@ from utilities.common.config_file import config_file
 from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatCodeNonPositiveLineLengthError
 from utilities.common.functions import file_reader, file_writer, pretty_print
 from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, StrPath
-from utilities.scripts.api_group import APIGroup
+from utilities.scripts.api_group import APIGroup, ConditionalOption
 from utilities.scripts.cli import cli
 from utilities.common.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
@@ -31,6 +31,8 @@ MAX_LENGTH: int = config_file.get_commands("format-code", "length")
         resolve_path=True,
         allow_dash=False,
         dir_okay=False),
+    cls=ConditionalOption,
+    conditional=["directory"],
     help="\b\nФайлы для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
@@ -44,6 +46,8 @@ MAX_LENGTH: int = config_file.get_commands("format-code", "length")
         resolve_path=True,
         allow_dash=False,
         dir_okay=True),
+    cls=ConditionalOption,
+    conditional=["files"],
     help="Директория для обработки",
     multiple=False,
     required=False,

@@ -12,6 +12,7 @@ from utilities.common.config_file import config_file
 from utilities.common.errors import FileReaderTypeError
 from utilities.common.functions import file_reader, file_reader_type, file_writer
 from utilities.common.shared import FileType, HELP, StrPath
+from utilities.scripts.api_group import ConditionalOption
 from utilities.scripts.cli import APIGroup, cli
 from utilities.scripts.list_files import get_files
 
@@ -62,6 +63,8 @@ def substitute(replace_table: Mapping[str, str], file: StrPath, dry_run: bool = 
         resolve_path=True,
         allow_dash=False,
         dir_okay=False),
+    cls=ConditionalOption,
+    conditional=["directory"],
     help="\b\nФайл для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
@@ -74,6 +77,8 @@ def substitute(replace_table: Mapping[str, str], file: StrPath, dry_run: bool = 
         resolve_path=True,
         allow_dash=False,
         dir_okay=True),
+    cls=ConditionalOption,
+    conditional=["files"],
     help="Директория для обработки",
     multiple=False,
     required=False,

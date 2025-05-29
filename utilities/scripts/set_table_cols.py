@@ -9,7 +9,7 @@ from loguru import logger
 from utilities.common.config_file import config_file
 from utilities.common.functions import file_reader
 from utilities.common.shared import HELP, StrPath
-from utilities.scripts.api_group import APIGroup
+from utilities.scripts.api_group import APIGroup, ConditionalOption
 from utilities.scripts.cli import cli
 from utilities.common.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
@@ -32,6 +32,8 @@ MIN_COLUMN: int = config_file.get_commands("set-table-cols", "min_column")
         resolve_path=True,
         allow_dash=False,
         dir_okay=False),
+    cls=ConditionalOption,
+    conditional=["directory"],
     help="\b\nФайл для обработки. Может использоваться несколько раз",
     multiple=True,
     required=False,
@@ -45,6 +47,8 @@ MIN_COLUMN: int = config_file.get_commands("set-table-cols", "min_column")
         resolve_path=True,
         allow_dash=False,
         dir_okay=True),
+    cls=ConditionalOption,
+    conditional=["files"],
     help="Директория для обработки",
     multiple=False,
     required=False,

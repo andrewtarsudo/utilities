@@ -6,9 +6,9 @@ from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
 from click.termui import pause
 from click.types import BOOL, Path as ClickPath, STRING
-from click.utils import echo
 from loguru import logger
 
+from utilities import echo
 from utilities.common.config_file import config_file
 from utilities.common.functions import is_windows, pretty_print, walk_full
 from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, PRESS_ENTER_KEY, StrPath
