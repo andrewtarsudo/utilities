@@ -18,7 +18,8 @@ from yaml import safe_dump
 from utilities import echo
 from utilities.common.config_file import config_file, ConfigFile
 from utilities.common.custom_logger import custom_logging, LoggerConfiguration
-from utilities.common.errors import BaseError, CommandNotFoundError, NoArgumentsOptionsError
+from utilities.common.errors import BaseError, CommandNotFoundError, ConditionalOptionError, \
+    MutuallyExclusiveOptionError, NoArgumentsOptionsError
 from utilities.common.functions import get_version, is_windows, pretty_print
 from utilities.common.shared import HELP, PRESS_ENTER_KEY
 from utilities.scripts.args_help_dict import args_help_dict
@@ -546,9 +547,10 @@ class MutuallyExclusiveOption(Option):
         if set(self.mutually_exclusive).intersection(opts) and self.name in opts:
             exclusive_options: str = ", ".join(map(prepare_option, self.mutually_exclusive))
 
-            raise UsageError(
+            logger.error(
                 f"Ошибка в задании команды: `{self.name}` не может использоваться одновременно с "
                 f"`{exclusive_options}`.")
+            raise MutuallyExclusiveOptionError
 
         else:
             args: list[str] = [*args]
@@ -571,9 +573,9 @@ class ConditionalOption(Option):
 
             _: dict[str, str] = {
                 "help": (
-                    f"{_help}.\n"
-                    f"Примечание. Этот параметр или хотя бы один из \n"
-                    f"{exclusive_options} должен быть задан")}
+                    f"{_help}."
+                    f"\nПримечание. Этот параметр или хотя бы один из "
+                    f"\n{exclusive_options} должен быть задан")}
             kwargs.update(_)
 
         super().__init__(*args, **kwargs)
@@ -595,6 +597,7 @@ class ConditionalOption(Option):
 
             conditional_options: str = ", ".join(map(prepare, self.conditional))
 
-            raise UsageError(
+            logger.error(
                 f"Ошибка в задании команды: `{self.name}` или хотя бы один из "
                 f"`{conditional_options}` должен быть задан.")
+            raise ConditionalOptionError

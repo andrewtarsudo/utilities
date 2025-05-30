@@ -14,8 +14,9 @@ from loguru import logger
 from utilities import echo
 from utilities.common.completion import file_dir_completion
 from utilities.common.config_file import config_file
+from utilities.common.errors import ValidateYamlBaseError
 from utilities.common.functions import file_reader, file_reader_type, file_writer, is_windows, pretty_print, walk_full
-from utilities.common.shared import HELP, separator, StrPath
+from utilities.common.shared import ADOC_EXTENSION, EXTENSIONS, HELP, MD_EXTENSION, separator, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
 
@@ -69,8 +70,8 @@ def fix_path(line_no: int, path: Path, root: Path) -> str:
     rel_path: str = rel(path, root)
     file_name: str = path.stem
 
-    md_file: Path = path.with_suffix(".md")
-    adoc_file: Path = path.with_suffix(".adoc")
+    md_file: Path = path.with_suffix(MD_EXTENSION)
+    adoc_file: Path = path.with_suffix(ADOC_EXTENSION)
 
     common_part: str = f"{line_no:>4}  [strike]{rel_path}[/strike]"
 
@@ -116,7 +117,7 @@ def all_files(root: Path, language: str):
         content_common_dir,
         ignored_dirs=["images"],
         language=language,
-        extensions=[".md", ".adoc"],
+        extensions=EXTENSIONS,
         root=root)
 
 
@@ -327,7 +328,8 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
                     title: dict[str, str | bool] = section.get("title", {})
 
                     if title is None or not title:
-                        general_info.warnings.append(f"В разделе {name} объявлена секция title, хотя она пуста")
+                        general_info.warnings.append(
+                            f"В разделе {name} объявлена секция title, хотя она пуста")
                         __is_ok: bool = False
 
                     else:
@@ -361,7 +363,7 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
                             elif level < 0 or level > 9:
                                 general_info.messages.append(
                                     f"Значение ключа '{name}::title::level' должно быть "
-                                    f"целым неотрицательным числом в диапазоне [0-9], "
+                                    "целым неотрицательным числом в диапазоне [0-9], "
                                     f"но получено {level}")
                                 __is_ok: bool = False
 
@@ -374,7 +376,8 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
                     index = section.get("index")
 
                     if index is None or not index:
-                        general_info.warnings.append(f"В разделе {name} объявлена секция index, хотя она пуста")
+                        general_info.warnings.append(
+                            f"В разделе {name} объявлена секция index, хотя она пуста")
                         __is_ok: bool = False
 
                     elif not isinstance(index, list):
@@ -399,7 +402,8 @@ def inspect_sections(content: Mapping[str, Any], verbose: bool):
                     files = section.get("files")
 
                     if files is None or not files:
-                        general_info.warnings.append(f"В разделе {name} объявлена секция files, хотя она пуста")
+                        general_info.warnings.append(
+                            f"В разделе {name} объявлена секция files, хотя она пуста")
 
                     elif not isinstance(files, list):
                         general_info.warnings.append(
@@ -477,7 +481,7 @@ def validate_file(
             "color": "red"}}
 
     for line_no, path in paths.items():
-        _result: bool = path.exists() and path.as_posix().endswith(("md", "adoc"))
+        _result: bool = path.exists() and path.as_posix().endswith(EXTENSIONS)
 
         _status: str = _DICT_RESULTS[_result]["status"]
         _color: str = _DICT_RESULTS[_result]["color"]
@@ -589,7 +593,7 @@ def validate_yaml_command(
 
     else:
         logger.error(f"Некорректное значение root: {root}, {type(root).__name__}")
-        raise ValueError
+        raise ValidateYamlBaseError
 
     if not yaml_files:
         logger.warning("Не найдены подходящие файлы в указанной директории или указанный файл не является YAML")

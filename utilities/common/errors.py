@@ -11,6 +11,14 @@ class InvalidPythonVersion(BaseError):
     """Installed Python version is outdated."""
 
 
+class MutuallyExclusiveOptionError(BaseError):
+    """Command contains mutually exclusive options."""
+
+
+class ConditionalOptionError(BaseError):
+    """Command contains none of the conditional options."""
+
+
 class TimerError(BaseError):
     """Base class for errors associated with the timer."""
 
@@ -201,3 +209,7 @@ class TableRowIndexError(TableColsError):
 
 class TableRowInvalidIdentifierError(TableColsError):
     """Specified column identifier has an invalid type."""
+
+
+class ValidateYamlBaseError(BaseError):
+    """Base class for errors associated with the validate-yaml."""
