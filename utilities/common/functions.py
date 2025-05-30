@@ -2,7 +2,6 @@
 from base64 import b64decode
 from functools import cache
 from io import UnsupportedOperation
-from json import JSONDecodeError
 from os import getenv, scandir
 from pathlib import Path
 from sys import platform
@@ -10,7 +9,8 @@ from typing import Any, Callable, Iterable
 
 from httpx import HTTPStatusError, InvalidURL, request, RequestError, Response, StreamError, URL
 from loguru import logger
-from yaml.scanner import ScannerError
+from orjson import JSONDecodeError
+from strictyaml.ruamel.error import MarkedYAMLError
 
 from utilities.common.errors import FileReaderError, FileReaderTypeError, UpdateProjectIdError
 from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath
@@ -98,18 +98,18 @@ def file_writer(path: StrPath, content: str | Iterable[str], *, encoding: str = 
         raise
 
 
-def file_reader_type(path: StrPath, file_type: FileType):
+def file_reader_type(path: StrPath, file_type: FileType, **kwargs):
     suffix: str = Path(path).suffix
 
     if file_type == "json":
-        from json import load as load_file
+        from orjson import loads as load_file
 
         if suffix not in (".json", ".json5"):
             logger.error(f"Файл {path.name} должен иметь расширение .json или .json5, но получено {suffix}")
             raise FileReaderTypeError
 
     elif file_type == "yaml":
-        from yaml import safe_load as load_file
+        from strictyaml import load as load_file
 
         if suffix not in (".yml", ".yaml"):
             logger.error(f"Файл {path.name} должен иметь расширение .json или .json5, но получено {suffix}")
@@ -128,7 +128,7 @@ def file_reader_type(path: StrPath, file_type: FileType):
 
     try:
         with open(path, "rb") as f:
-            content: dict[str, Any] = load_file(f)
+            content: dict[str, Any] = load_file(f, **kwargs)
 
         return content
 
@@ -151,7 +151,7 @@ def file_reader_type(path: StrPath, file_type: FileType):
         logger.error(f"{e.__class__.__name__}: не поддерживаемая операция с файлом {path}: {e.strerror}")
         raise FileReaderError
 
-    except ScannerError as e:
+    except MarkedYAMLError as e:
         logger.error(
             f"{e.__class__.__name__}: ошибка обработки файла {e.context_mark.name}"
             f"\nв символе {e.context_mark.line + 1}:{e.context_mark.column + 1}")
@@ -269,8 +269,8 @@ def pretty_print(values: Iterable[StrPath] = None):
     if values is None or not values:
         return ""
 
-    elif isinstance(values, str):
-        return f"{values}"
+    elif isinstance(values, str) or hasattr(values, "__str__"):
+        return f"{values!s}"
 
     else:
         return "\n".join(map(lambda x: str(x).strip(), values))

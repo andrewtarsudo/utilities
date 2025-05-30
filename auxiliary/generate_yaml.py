@@ -6,7 +6,8 @@ from typing import ForwardRef, Iterable
 
 # noinspection PyProtectedMember
 from frontmatter import load, Post
-from yaml import safe_dump
+from strictyaml.representation import YAML
+from strictyaml.parser import as_document
 
 from utilities.common.shared import EXTENSIONS, INDEX_STEMS, StrPath
 
@@ -370,7 +371,8 @@ class FolderStorage:
         self._text_folders.sort()
 
     def to_yaml(self):
-        safe_dump([_tf.to_dict() for _tf in self._text_folders], allow_unicode=True)
+        folder_yaml: YAML = as_document([_tf.to_dict() for _tf in self._text_folders])
+        return folder_yaml.as_yaml()
 
     def walk_dirs(self, base_path: str | Path = None):
         if base_path is None:
@@ -391,15 +393,3 @@ class FolderStorage:
             tree[path] = [Path(filename) for filename in filenames]
 
         self._tree = tree
-
-
-if __name__ == '__main__':
-    root: Path = Path("../../DRA")
-    WithFrontMatter.root = root
-
-    folder_storage: FolderStorage = FolderStorage(root.joinpath("content/common"))
-    folder_storage.walk_dirs(root)
-
-    folder_storage.sort()
-    data: list[dict] = [v.to_dict() for v in folder_storage.text_folders]
-    print(safe_dump(data, stdout, indent=2, allow_unicode=True))

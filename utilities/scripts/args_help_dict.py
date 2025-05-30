@@ -2,15 +2,21 @@
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from strictyaml.scalar import Str
+from strictyaml.compound import Map, MapPattern
+
 from utilities.common.config_file import config_file
 from utilities.common.functions import file_reader_type, pretty_print
 from utilities.common.shared import BASE_PATH
 
 
 class ArgsHelpDict(dict):
-    def __init__(self):
+    def __init__(self, schema: MapPattern = None):
+        if schema is None:
+            schema: MapPattern = MapPattern(Str(), Map({Str(): Str()}))
+
         config_path: Path = BASE_PATH.joinpath(config_file.get_general("config_path"))
-        content: dict[str, dict[str, str]] = file_reader_type(config_path, "yaml")
+        content: dict[str, dict[str, str]] = file_reader_type(config_path, "yaml", schema=schema)
 
         super().__init__()
         self.update(**content)

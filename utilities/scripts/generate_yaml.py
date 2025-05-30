@@ -8,7 +8,8 @@ from click.types import BOOL, Choice, Path as ClickPath, STRING
 # noinspection PyProtectedMember
 from frontmatter import load, Post
 from loguru import logger
-from yaml import dump
+from strictyaml.representation import YAML
+from strictyaml.parser import as_document
 
 from utilities.common.completion import dir_completion, language_completion
 from utilities.common.config_file import config_file
@@ -368,8 +369,9 @@ class YAMLConfig(NamedTuple):
         return to_yaml(self.to_dict())
 
 
-def to_yaml(kwargs):
-    return dump(kwargs, indent=2, allow_unicode=True, sort_keys=False)
+def to_yaml(kwargs: object):
+    yaml: YAML = as_document(kwargs)
+    return yaml.as_yaml()
 
 
 def has_content(filepath: StrPath) -> bool:

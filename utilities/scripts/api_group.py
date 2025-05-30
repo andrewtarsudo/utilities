@@ -13,7 +13,8 @@ from click.shell_completion import CompletionItem
 from click.termui import pause
 from loguru import logger
 from more_itertools import flatten
-from yaml import safe_dump
+from strictyaml.representation import YAML
+from strictyaml.parser import as_document
 
 from utilities import echo
 from utilities.common.config_file import config_file, ConfigFile
@@ -478,14 +479,11 @@ class APIGroup(Group):
             return super().resolve_command(ctx, args)
 
         except UsageError as e:
+            config: YAML = as_document(e.ctx.to_info_dict())
             logger.error("Ошибка обработки команды")
             logger.debug(
                 f"Параметры команд:"
-                f"\n{safe_dump(
-                    e.ctx.to_info_dict(),
-                    indent=2,
-                    width=120,
-                    sort_keys=True)}")
+                f"\n{config.as_yaml()}")
             raise CommandNotFoundError
 
 
