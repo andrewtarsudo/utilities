@@ -84,7 +84,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     callback=print_file,
     default=config_file.get_commands("get-terms", "common_flag"))
 @option(
-    "-r", "--readme", "readme_flag",
+    "-r", "--src", "readme_flag",
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["full_flag", "all_flag", "samples_flag", "info_flag"],
@@ -110,7 +110,8 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["ascii_flag", "common_flag"],
-    help="\b\nФлаг вывода сокращения для добавления в файл Markdown.\nФормат: <abbr title=\"\"></abbr>",
+    help="\b\nФлаг вывода сокращения для добавления в файл Markdown."
+         "\nФормат: <abbr title=\"\"></abbr>",
     show_default=True,
     required=False,
     default=config_file.get_commands("get-terms", "common_flag"))
@@ -119,7 +120,8 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["abbr_flag", "common_flag"],
-    help="\b\nФлаг вывода сокращения для добавления в файл AsciiDoc.\nФормат: pass:q[<abbr title=\"\"></abbr>]",
+    help="\b\nФлаг вывода сокращения для добавления в файл AsciiDoc."
+         "\nФормат: pass:q[<abbr title=\"\"></abbr>]",
     show_default=True,
     required=False,
     default=config_file.get_commands("get-terms", "common_flag"))
@@ -208,7 +210,7 @@ def get_terms_command(
             result: str = pretty_print(map(lambda x: x.abbr(), terms_print))
 
         elif ascii_flag:
-            result: str = pretty_print(map(lambda x: x.adoc(), terms_print))
+            result: str = pretty_print(map(lambda x: x.ascii_doc(), terms_print))
 
         elif common_flag:
             result: str = pretty_print(map(lambda x: x.formatted(), terms_print))

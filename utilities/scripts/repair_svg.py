@@ -11,7 +11,7 @@ from loguru import logger
 
 from utilities.common.config_file import config_file
 from utilities.common.shared import HELP, StrPath
-from utilities.scripts.api_group import APIGroup
+from utilities.scripts.api_group import APIGroup, ConditionalOption
 from utilities.scripts.cli import cli
 from utilities.common.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
@@ -30,6 +30,8 @@ from utilities.scripts.list_files import get_files
         allow_dash=False,
         dir_okay=False),
     help="\b\nФайл для обработки. Может использоваться несколько раз",
+    cls=ConditionalOption,
+    conditional=["directory"],
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
@@ -43,6 +45,8 @@ from utilities.scripts.list_files import get_files
         allow_dash=False,
         dir_okay=True),
     help="Директория для обработки",
+    cls=ConditionalOption,
+    conditional=["files"],
     multiple=False,
     required=False,
     metavar="DIR",

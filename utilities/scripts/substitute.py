@@ -12,6 +12,7 @@ from utilities.common.config_file import config_file
 from utilities.common.errors import FileReaderTypeError
 from utilities.common.functions import file_reader, file_reader_type, file_writer
 from utilities.common.shared import FileType, HELP, StrPath
+from utilities.scripts.api_group import ConditionalOption
 from utilities.scripts.cli import APIGroup, cli
 from utilities.scripts.list_files import get_files
 
@@ -63,6 +64,8 @@ def substitute(replace_table: Mapping[str, str], file: StrPath, dry_run: bool = 
         allow_dash=False,
         dir_okay=False),
     help="\b\nФайл для обработки. Может использоваться несколько раз",
+    cls=ConditionalOption,
+    conditional=["directory"],
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
@@ -83,8 +86,9 @@ def substitute(replace_table: Mapping[str, str], file: StrPath, dry_run: bool = 
     "--dry-run/--no-dry-run",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг вывода изменений файлов без их изменения.\n"
-         "По умолчанию: False, файлы перезаписываются",
+    help="\b\nФлаг вывода изменений файлов без"
+         "\nнепосредственной их модификации."
+         "\nПо умолчанию: False, файлы перезаписываются",
     show_default=True,
     required=False,
     default=config_file.get_commands("substitute", "dry_run"))

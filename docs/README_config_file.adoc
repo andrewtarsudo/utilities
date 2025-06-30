@@ -30,9 +30,6 @@ NOTE: В исполняемый файл уже вшит конфигураци�
 * TOML: .toml
 
 .Параметры конфигурации
-
-.Параметры конфигурации
-
 [options="header",width="100%",cols="21%,42%,10%,27%"]
 |===
 |Параметр |Описание |Тип |По умолчанию
@@ -412,7 +409,7 @@ commands:
   get-terms:
     sources: "sources/"
     info_file: "help.txt"
-    readme_file: "readme.txt"
+    readme_file: "src.txt"
     samples_file: "samples.txt"
     project_id: 57022544
     terms_file: terms.adoc

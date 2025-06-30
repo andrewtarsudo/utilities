@@ -50,3 +50,5 @@ flake8.txt
 vulture.txt
 _temp/
 .qodo/
+_docs/
+pyment/

@@ -71,7 +71,8 @@ def add_prefix(prefix: str | None = None, values: Iterable[StrPath] = None):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_dirs"],
     type=STRING,
-    help="\b\nПеречень игнорируемых директорий. Может использоваться \nнесколько раз."
+    help="\b\nПеречень игнорируемых директорий. Может использоваться"
+         "\nнесколько раз."
          "\nПо умолчанию: _temp_folder, _temp_storage, private",
     multiple=True,
     required=False,
@@ -84,7 +85,8 @@ def add_prefix(prefix: str | None = None, values: Iterable[StrPath] = None):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["ignored_dirs"],
     type=BOOL,
-    help="\b\nФлаг обработки всех директорий. По умолчанию: False",
+    help="\b\nФлаг обработки всех директорий."
+         "\nПо умолчанию: False",
     multiple=False,
     required=False,
     show_default=True,
@@ -144,7 +146,8 @@ def add_prefix(prefix: str | None = None, values: Iterable[StrPath] = None):
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["all_languages"],
     type=STRING,
-    help="\b\nЯзык файлов.\nПо умолчанию: \"\", выводятся файлы на всех языках",
+    help="\b\nЯзык файлов."
+         "\nПо умолчанию: \"\", выводятся файлы на всех языках",
     multiple=False,
     required=False,
     metavar="LANG",

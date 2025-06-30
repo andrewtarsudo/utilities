@@ -102,7 +102,8 @@ class AsciiDocFile(File):
         resolve_path=True,
         allow_dash=True,
         dir_okay=False),
-    help="\b\nФайл для записи вывода. По умолчанию: вывод в консоль",
+    help="\b\nФайл для записи вывода."
+         "\nПо умолчанию: вывод в консоль",
     multiple=False,
     required=False,
     metavar="FILE",

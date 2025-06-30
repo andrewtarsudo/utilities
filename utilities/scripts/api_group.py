@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
+from functools import partial
 from pathlib import Path
 from shutil import rmtree
 from typing import Any, Iterable, Mapping
 
-from click.core import Argument, Command, Context, echo, Group, Option, Parameter, UsageError
+from click.core import Argument, Command, Context, echo, Group, Option, Parameter
 from click.decorators import pass_context
+from click.exceptions import UsageError
 from click.formatting import HelpFormatter
 from click.globals import get_current_context
 from click.shell_completion import CompletionItem
 from click.termui import pause, style
 from loguru import logger
 from more_itertools import flatten
-from yaml import safe_dump
 
 from utilities.common.config_file import config_file, ConfigFile
 from utilities.common.custom_logger import custom_logging, LoggerConfiguration
-from utilities.common.errors import BaseError, CommandNotFoundError, NoArgumentsOptionsError
+from utilities.common.errors import BaseError, CommandNotFoundError, ConditionalOptionError, \
+    MutuallyExclusiveOptionError, NoArgumentsOptionsError
 from utilities.common.functions import get_version, is_windows, pretty_print
-from utilities.common.shared import HELP, PRESS_ENTER_KEY
+from utilities.common.shared import HELP, MyYAML, PRESS_ENTER_KEY
 from utilities.scripts.args_help_dict import args_help_dict
 
 COL_MAX: int = config_file.get_general("col_max")
@@ -80,7 +82,10 @@ def clear_logs(ctx: Context, result: Any, **kwargs):
     ctx.exit(0)
 
 
-def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
+def format_usage(
+        cmd: Command,
+        ctx: Context,
+        formatter: HelpFormatter) -> None:
     args: list[str] = []
     opts: list[str] = []
 
@@ -139,7 +144,10 @@ def format_usage(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
             f"\n{name}\n")
 
 
-def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
+def format_options(
+        cmd: Command,
+        ctx: Context,
+        formatter: HelpFormatter) -> None:
     def modify_help_record(parameter: Parameter):
         if isinstance(parameter, Argument):
             return None
@@ -179,6 +187,7 @@ def format_options(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None
 
             if rv is not None:
                 rows.append(rv)
+                rows.append(("", ""))
 
         else:
             rows.append((style("-h, --help", fg="cyan", bold=True), HELP))
@@ -203,7 +212,10 @@ def join_names(cmd: Command, aliases: dict[Command, set[str]]):
     return f"{cmd.name}{names}"
 
 
-def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter = None) -> None:
+def format_epilog(
+        cmd: Command,
+        parent: Context = None,
+        formatter: HelpFormatter = None) -> None:
     if parent is None:
         parent: Context = get_current_context()
 
@@ -233,7 +245,10 @@ def format_epilog(cmd: Command, parent: Context = None, formatter: HelpFormatter
             formatter.write_dl(rows, col_max, col_spacing)
 
 
-def format_help(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
+def format_help(
+        cmd: Command,
+        ctx: Context,
+        formatter: HelpFormatter) -> None:
     format_usage(cmd, ctx, formatter)
     cmd.format_help_text(ctx, formatter)
     format_args(cmd, ctx, formatter)
@@ -241,7 +256,10 @@ def format_help(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
     format_epilog(cmd, ctx, formatter)
 
 
-def format_full_help(cmd: Command, ctx: Context, formatter: HelpFormatter) -> None:
+def format_full_help(
+        cmd: Command,
+        ctx: Context,
+        formatter: HelpFormatter) -> None:
     format_usage(cmd, ctx, formatter)
     cmd.format_help_text(ctx, formatter)
     format_args(cmd, ctx, formatter)
@@ -259,7 +277,10 @@ def format_full_help(cmd: Command, ctx: Context, formatter: HelpFormatter) -> No
 
 
 # noinspection PyTypeChecker
-def format_args(cmd: Command, ctx: Context, formatter: HelpFormatter):
+def format_args(
+        cmd: Command,
+        ctx: Context,
+        formatter: HelpFormatter):
     args: list[Argument] = [
         param for param in cmd.get_params(ctx)
         if isinstance(param, Argument)]
@@ -332,7 +353,7 @@ def print_version(ctx: Context, param: Parameter, value: Any):
         return
 
     echo(f"Версия {get_version()}")
-    # pause(PRESS_ENTER_KEY)
+    pause(PRESS_ENTER_KEY)
     ctx.exit(0)
 
 
@@ -437,7 +458,9 @@ class APIGroup(Group):
     def invoke(self, ctx: Context) -> Any:
         for param in self.params:
             if isinstance(param, Option) and param.default:
-                param.default = self.config_file.get_commands(ctx.invoked_subcommand, param.name)
+                param.default = self.config_file.get_commands(
+                    ctx.invoked_subcommand,
+                    param.name)
 
         try:
             super().invoke(ctx)
@@ -460,19 +483,26 @@ class APIGroup(Group):
 
         return [*commands, *params]
 
-    def resolve_command(self, ctx: Context, args: list[str]) -> tuple[str | None, Command | None, list[str]]:
+    def resolve_command(
+            self,
+            ctx: Context,
+            args: list[str]) -> tuple[str | None, Command | None, list[str]]:
         try:
             return super().resolve_command(ctx, args)
 
         except UsageError as e:
+            from ruamel.yaml.main import YAML
+
+            yaml: MyYAML = MyYAML(typ="safe")
+            ctx_info: str = yaml.dump(
+                e.ctx.to_info_dict(),
+                indent=2,
+                width=120)
+
             logger.error("Ошибка обработки команды")
             logger.debug(
                 f"Параметры команд:"
-                f"\n{safe_dump(
-                    e.ctx.to_info_dict(),
-                    indent=2,
-                    width=120,
-                    sort_keys=True)}")
+                f"\n{ctx_info}")
             raise CommandNotFoundError
 
 
@@ -519,9 +549,9 @@ class MutuallyExclusiveOption(Option):
 
             _: dict[str, str] = {
                 "help": (
-                    f"{_help}.\n"
-                    f"Примечание. Не может использоваться одновременно с \n"
-                    f"{exclusive_options}")}
+                    f"{_help}."
+                    f"\nПримечание. Не может использоваться одновременно с "
+                    f"\n{exclusive_options}")}
             kwargs.update(_)
 
         super().__init__(*args, **kwargs)
@@ -534,9 +564,10 @@ class MutuallyExclusiveOption(Option):
         if set(self.mutually_exclusive).intersection(opts) and self.name in opts:
             exclusive_options: str = ", ".join(map(prepare_option, self.mutually_exclusive))
 
-            raise UsageError(
+            logger.error(
                 f"Ошибка в задании команды: `{self.name}` не может использоваться одновременно с "
                 f"`{exclusive_options}`.")
+            raise MutuallyExclusiveOptionError
 
         else:
             args: list[str] = [*args]
@@ -544,3 +575,45 @@ class MutuallyExclusiveOption(Option):
             ctx.max_content_width = MAX_CONTENT_WIDTH
 
             return super().handle_parse_result(ctx, opts, args)
+
+
+class ConditionalOption(Option):
+    def __init__(self, *args, **kwargs):
+        self.conditional: tuple[str, ...] = tuple(kwargs.pop("conditional", ()))
+
+        _help: str = kwargs.get("help", "")
+
+        if self.conditional:
+            prepare: partial = partial(prepare_option, prefix=False)
+
+            exclusive_options: str = ", ".join(map(prepare, self.conditional))
+
+            _: dict[str, str] = {
+                "help": (
+                    f"{_help}."
+                    f"\nПримечание. Этот параметр или хотя бы один из"
+                    f"\n{exclusive_options} должен быть задан")}
+            kwargs.update(_)
+
+        super().__init__(*args, **kwargs)
+
+    def handle_parse_result(
+            self,
+            ctx: Context,
+            opts: Mapping[str, Any],
+            args: Iterable[str]) -> tuple[Any, list[str]]:
+        if set(self.conditional).intersection(opts):
+            args: list[str] = [*args]
+            ctx.terminal_width = TERMINAL_WIDTH
+            ctx.max_content_width = MAX_CONTENT_WIDTH
+
+            return super().handle_parse_result(ctx, opts, args)
+
+        else:
+            prepare: partial = partial(prepare_option, prefix=False)
+            conditional_options: str = ", ".join(map(prepare, self.conditional))
+
+            logger.error(
+                f"Ошибка в задании команды: `{self.name}` или хотя бы один из "
+                f"`{conditional_options}` должен быть задан.")
+            raise ConditionalOptionError

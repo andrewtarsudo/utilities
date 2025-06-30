@@ -14,12 +14,6 @@ def parse_version(file: StrPath) -> str | None:
     return file_reader(file, "string") if Path(file).exists() else None
 
 
-def compare_versions(version_file: StrPath, basic_version_file: StrPath):
-    v1: str = parse_version(version_file)
-    v2: str = parse_version(basic_version_file)
-    return v1 == v2
-
-
 class GitManager:
     TEMPORARY: Path = Path(get_app_dir("utilities"))
     TEMPORARY_TERMS: Path = TEMPORARY.joinpath("terms")

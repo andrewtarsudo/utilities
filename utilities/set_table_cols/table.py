@@ -185,7 +185,7 @@ class Table:
         """Gets the number of columns."""
         return Counter(self[0]).get("|")
 
-    def get_column_item(self, column: int | str) -> TableColumn:
+    def get_column_item(self, column: int | str) -> TableColumn | None:
         """Gets the set_table_cols column as TableColumn instance."""
         if isinstance(column, int):
             if 0 <= column < self.num_columns:

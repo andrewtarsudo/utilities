@@ -31,22 +31,21 @@ TEMP_COMMAND_FILE: Path = Path(config_file.get_update("temp_command_file")).expa
 
 def set_env(*, timeout: float | None = 15.0):
     root_dir: Path = BASE_PATH
-
     shell_exe: str = get_shell()
 
     if is_windows():
         exe: str = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-        file: str = str(root_dir.joinpath("sources/set_env.ps1").resolve().absolute())
+        file: str = str(root_dir.joinpath("updates/set_env.ps1").resolve().absolute())
         command: list[str] = [exe, "-File", file]
         shell: bool = True
 
     elif is_macos():
-        file: str = str(root_dir.joinpath("sources/set_env.zsh").resolve().absolute())
+        file: str = str(root_dir.joinpath("updates/set_env.zsh").resolve().absolute())
         command: list[str] = [shell_exe, file]
         shell: bool = False
 
     else:
-        file: str = str(root_dir.joinpath("sources/set_env.sh").resolve().absolute())
+        file: str = str(root_dir.joinpath("updates/set_env.sh").resolve().absolute())
         command: list[str] = [shell_exe, file]
         shell: bool = False
 
@@ -243,7 +242,10 @@ def cli(debug: bool = False, update: bool = True):
             ctx.exit(0)
 
         elif ctx.invoked_subcommand == "repair-links":
-            logger_configuration.add_handler("result_file", "SUCCESS", logger_configuration.result_file_handler())
+            logger_configuration.add_handler(
+                "result_file",
+                "SUCCESS",
+                logger_configuration.result_file_handler())
 
         logger.debug(str(config_file))
         logger.debug(f"Файл описания аргументов:\n{str(args_help_dict)}")

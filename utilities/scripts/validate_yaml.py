@@ -14,8 +14,9 @@ from click.utils import echo
 from loguru import logger
 
 from utilities.common.config_file import config_file
+from utilities.common.errors import ValidateYamlBaseError
 from utilities.common.functions import file_reader, file_reader_type, file_writer, is_windows, pretty_print, walk_full
-from utilities.common.shared import HELP, separator, StrPath
+from utilities.common.shared import ADOC_EXTENSION, EXTENSIONS, HELP, MD_EXTENSION, separator, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
 from utilities.common.completion import file_dir_completion
@@ -70,8 +71,8 @@ def fix_path(line_no: int, path: Path, root: Path) -> str:
     rel_path: str = rel(path, root)
     file_name: str = path.stem
 
-    md_file: Path = path.with_suffix(".md")
-    adoc_file: Path = path.with_suffix(".adoc")
+    md_file: Path = path.with_suffix(MD_EXTENSION)
+    adoc_file: Path = path.with_suffix(ADOC_EXTENSION)
 
     common_part: str = f"{line_no:>4}  {style(rel_path, strikethrough=True)}"
 
@@ -117,7 +118,7 @@ def all_files(root: Path, language: str):
         content_common_dir,
         ignored_dirs=["images"],
         language=language,
-        extensions=[".md", ".adoc"],
+        extensions=EXTENSIONS,
         root=root)
 
 
@@ -478,14 +479,14 @@ def validate_file(
             "color": "red"}}
 
     for line_no, path in paths.items():
-        _result: bool = path.exists() and path.as_posix().endswith(("md", "adoc"))
+        _result: bool = path.exists() and path.as_posix().endswith(EXTENSIONS)
 
         _status: str = _DICT_RESULTS[_result]["status"]
         _color: str = _DICT_RESULTS[_result]["color"]
 
         _path: str = path.relative_to(root).as_posix()
 
-        _line: str = style(f"{line_no + 1:>4}  {_path: <{max_length}}  {_status: >5}", bg=_color)
+        _line: str = style(f"{line_no + 1: >4}  {_path: <{max_length}}  {_status: >5}", bg=_color)
         _lines.append(_line)
 
         if verbose or _status == "FAIL":
@@ -525,7 +526,8 @@ def validate_file(
         resolve_path=True,
         allow_dash=True,
         dir_okay=False),
-    help="\b\nФайл для записи вывода. По умолчанию: вывод в консоль",
+    help="\b\nФайл для записи вывода."
+         "\nПо умолчанию: вывод в консоль",
     multiple=False,
     required=False,
     metavar="FILE",
@@ -590,7 +592,7 @@ def validate_yaml_command(
 
     else:
         logger.error(f"Некорректное значение root: {root}, {type(root).__name__}")
-        raise ValueError
+        raise ValidateYamlBaseError
 
     if not yaml_files:
         logger.warning("Не найдены подходящие файлы в указанной директории или указанный файл не является YAML")

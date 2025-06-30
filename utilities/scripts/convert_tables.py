@@ -3,6 +3,7 @@ from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
 from click.termui import style
 from click.types import BOOL, Path as ClickPath
+from loguru import logger
 
 from utilities.common.config_file import config_file
 from utilities.common.shared import HELP, StrPath
@@ -35,7 +36,8 @@ from utilities.common.completion import doc_completion
         resolve_path=True,
         allow_dash=False,
         dir_okay=True),
-    help="\b\nДиректория для таблиц. По умолчанию: ./tables/."
+    help="\b\nДиректория для сохранения файлов с таблицами."
+         "\nПо умолчанию: ./tables/."
          "\nЕсли не существует, то будет создана",
     multiple=False,
     required=False,
@@ -49,7 +51,8 @@ from utilities.common.completion import doc_completion
         resolve_path=True,
         allow_dash=False,
         dir_okay=True),
-    help="\b\nВременная директория. По умолчанию: ./_temp/."
+    help="\b\nВременная директория для работы с файлом."
+         "\nПо умолчанию: ./_temp/."
          "\nЕсли не существует, то будет создана",
     multiple=False,
     required=False,
@@ -137,6 +140,8 @@ def convert_tables_command(
 
     core_document: CoreDocument = CoreDocument(docx, temp_dir)
     core_document.unarchive()
+
+    logger.info(f"Файл {core_document.file.name} успешно разархивирован")
 
     xml_document: XmlDocument = XmlDocument(core_document, tables_dir)
     xml_document.read()

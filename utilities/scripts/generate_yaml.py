@@ -8,14 +8,13 @@ from click.types import BOOL, Choice, Path as ClickPath, STRING
 # noinspection PyProtectedMember
 from frontmatter import load, Post
 from loguru import logger
-from yaml import dump
 
 from utilities.common.completion import dir_completion, language_completion
 from utilities.common.config_file import config_file
 from utilities.common.errors import GenerateYamlInvalidLevelError, GenerateYamlMissingAttributeError, \
     GenerateYamlMissingBranchError, GenerateYamlMissingIndexFileError
 from utilities.common.functions import pretty_print
-from utilities.common.shared import EXTENSIONS, HELP, INDEX_STEMS, StrPath
+from utilities.common.shared import EXTENSIONS, HELP, INDEX_STEMS, MyYAML, StrPath
 from utilities.scripts.api_group import SwitchArgsAPIGroup
 from utilities.scripts.cli import cli
 
@@ -28,7 +27,7 @@ EPILOG_GENERATE_YAML: str = (
     "\n:toc: true"
     "\n:chapter-signifier!:"
     "\n"
-    "\nfigure-caption: Рисунок/Figure"
+    "\n:figure-caption: Рисунок/Figure"
     "\n:table-caption: Таблица/Table"
     "\n:toc-title: Содержание/Contents"
     "\n:title-logo-image: images/logo<_en>.svg[top=4%,align=right,pdfwidth=3cm]"
@@ -83,7 +82,7 @@ class Branch:
         self._weight: int | None = None
 
     @property
-    def relpath(self):
+    def relpath(self) -> str:
         return self._path.relative_to(self.__class__.root).as_posix()
 
     def to_dict(self) -> dict[str, Any]:
@@ -304,16 +303,25 @@ class YAMLConfig(NamedTuple):
                 "toc-title": "Contents",
                 "title-logo-image": "images/logo_en.svg[top=4%,align=right,pdfwidth=3cm]"}
 
+        outlinelevels: int = kwargs.get(
+            "outlinelevels",
+            config_file.get_commands("generate-yaml", "outlinelevels"))
+        sectnumlevels: int = kwargs.get(
+            "sectnumlevels",
+            config_file.get_commands("generate-yaml", "sectnumlevels"))
+        toclevels: int = kwargs.get(
+            "toclevels",
+            config_file.get_commands("generate-yaml", "toclevels"))
+
         main_attributes: dict[str, str | int | bool] = {
             "doctype": "book",
-            "outlinelevels": 4,
-            "sectnumlevels": 4,
-            "toclevels": 3,
+            "outlinelevels": outlinelevels,
+            "sectnumlevels": sectnumlevels,
+            "toclevels": toclevels,
             "toc": True,
             "chapter-signifier": False,
             "title-page": kwargs.get("title-page"),
-            "version": kwargs.get("version")
-        }
+            "version": kwargs.get("version")}
 
         settings: dict[str, str | int | bool] = {}
         settings.update(lang_attributes)
@@ -369,7 +377,8 @@ class YAMLConfig(NamedTuple):
 
 
 def to_yaml(kwargs):
-    return dump(kwargs, indent=2, allow_unicode=True, sort_keys=False)
+    yaml: MyYAML = MyYAML(typ="safe")
+    return yaml.dump(kwargs, indent=2, allow_unicode=True)
 
 
 def has_content(filepath: StrPath) -> bool:
@@ -423,10 +432,6 @@ def find_index(directory: StrPath, language: str):
     else:
         logger.debug(f"В директории {directory} не найдены файлы index.*/_index.*")
         raise GenerateYamlMissingIndexFileError
-
-
-def prepare_title(title: str):
-    return title.replace(" ", "_")
 
 
 def prepare_attributes(attrs: dict[str, Any] = None):
@@ -493,9 +498,12 @@ def prepare_attributes(attrs: dict[str, Any] = None):
     default=config_file.get_commands("generate-yaml", "dry_run"))
 @option(
     "-l", "--language", "language",
-    type=Choice(["ru", "en", "fr"]),
-    help="\b\nИспользуемый язык в файлах."
-         "\nВозможные значения: ru, en, fr. По умолчанию: ru",
+    type=Choice(
+        ["ru", "en", "fr"]
+    ),
+    help="\b\nЯзык файлов, используемый как постфикс."
+         "\nВозможные значения: ru, en, fr."
+         "\nПо умолчанию: ru",
     multiple=False,
     required=False,
     metavar="<LANG>",
@@ -507,7 +515,7 @@ def prepare_attributes(attrs: dict[str, Any] = None):
     type=STRING,
     help="\b\nДополнительные параметры AsciiDoc, добавляемые к файлу, "
          "\nили изменяющие значения по умолчанию."
-         "\nПо умолчанию: null",
+         "\nПо умолчанию: пусто",
     multiple=True,
     required=False,
     metavar="<KEY>=<VALUE>",
@@ -563,7 +571,8 @@ def generate_yaml_command(
     yaml_config.set_legal_info()
     yaml_config.subdirs.update(**tree.to_yaml())
 
-    output: Path = project.joinpath(f"PDF_{prepare_title(title_page)}.yml")
+    pdf_name: str = title_page.replace(" ", "_")
+    output: Path = project.joinpath(f"PDF_{pdf_name}.yml")
 
     yaml_config.write(output, not dry_run)
 

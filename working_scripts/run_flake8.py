@@ -1,11 +1,23 @@
 # -*- coding: utf-8 -*-
+from os import chdir
+from pathlib import Path
 
-def run_flake8_command():
-    from pathlib import Path
+
+def run_flake8_command(root: str | Path = None):
     from subprocess import CalledProcessError, CompletedProcess, run
     from sys import platform
 
-    file: Path = Path(__file__).parent.joinpath("flake8.txt")
+    if root is None:
+        root: Path = Path.cwd().resolve()
+
+    else:
+        root: Path = Path(root).expanduser().resolve()
+
+    chdir(root)
+
+    print(f"root = {root}")
+
+    file: Path = root.joinpath("flake8.txt")
     file.unlink(missing_ok=True)
     file.touch(exist_ok=True)
 
@@ -20,10 +32,10 @@ def run_flake8_command():
         "__main__.py",
         "utilities/common/",
         "utilities/convert_tables/",
+        "utilities/get_terms/,"
         "utilities/repair_links/",
         "utilities/scripts/",
-        "utilities/set_table_cols/",
-        "utilities/get_terms/"]
+        "utilities/set_table_cols/"]
 
     shell: bool = platform.startswith("win")
 
@@ -56,8 +68,8 @@ def run_flake8_command():
         raise
 
     else:
-        print(f"Итоговый файл {file.as_posix()} записан")
+        print(f"Отчет flake8 записан в файл {file.as_posix()}")
 
 
 if __name__ == '__main__':
-    run_flake8_command()
+    run_flake8_command("../")

@@ -4,8 +4,9 @@ from pathlib import Path
 
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
-from click.termui import echo, pause
+from click.termui import pause
 from click.types import BOOL, Path as ClickPath
+from click.utils import echo
 from loguru import logger
 
 from utilities.common.config_file import config_file
@@ -67,8 +68,8 @@ def has_no_required_files(path: StrPath) -> bool:
     "-a/-A", "--anchor/--no-anchor", "anchor_validation",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг поиска повторяющихся якорей.\n"
-         "По умолчанию: True, дублирующийся якори обрабатываются",
+    help="\b\nФлаг поиска повторяющихся якорей."
+         "\nПо умолчанию: True, дублирующиеся якори обрабатываются",
     show_default=True,
     required=False,
     default=config_file.get_commands("repair-links", "anchor_validation"))
@@ -76,8 +77,8 @@ def has_no_required_files(path: StrPath) -> bool:
     "-d/-D", "--dry-run/--no-dry-run",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг вывода некорректных ссылок на экран без изменения"
-         "\nфайлов."
+    help="\b\nФлаг вывода некорректных ссылок на экран без"
+         "\nнепосредственного изменения файлов."
          "\nПо умолчанию: False, файлы перезаписываются",
     show_default=True,
     required=False,
@@ -87,8 +88,8 @@ def has_no_required_files(path: StrPath) -> bool:
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг удаления файла с результатами работы скрипта по"
-         "\nзавершении работы в штатном режиме.\n"
-         "По умолчанию: False, файл сохраняется",
+         "\nзавершении работы в штатном режиме."
+         "\nПо умолчанию: False, файл сохраняется",
     show_default=True,
     required=False,
     default=config_file.get_commands("repair-links", "no_result"))
@@ -96,8 +97,8 @@ def has_no_required_files(path: StrPath) -> bool:
     "-s/-S", "--separate/--together", "separate_languages",
     type=BOOL,
     is_flag=True,
-    help="\b\nФлаг раздельной обработки файлов на различных языках.\n"
-         "По умолчанию: True, файлы обрабатываются отдельно",
+    help="\b\nФлаг раздельной обработки файлов на различных языках."
+         "\nПо умолчанию: True, файлы обрабатываются отдельно",
     show_default=True,
     required=False,
     default=config_file.get_commands("repair-links", "separate_languages"))

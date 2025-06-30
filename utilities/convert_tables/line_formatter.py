@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from re import sub
-from typing import MutableSequence
+from typing import Mapping, MutableSequence
 
 from loguru import logger
 
@@ -8,7 +8,10 @@ from utilities.common.errors import ConvertTablesEmptyLinesError
 
 
 class LineFormatter:
-    def __init__(self, remove_spaces: bool, escape_chars: bool):
+    def __init__(self, remove_spaces: bool, escape_chars: bool, patterns: Mapping[str, str] = None):
+        if patterns is None:
+            patterns: dict[str, str] = {}
+
         self._remove_spaces: bool = remove_spaces
         self._escape_chars: bool = escape_chars
         self._patterns: dict[str, dict[str, str]] = {
@@ -18,6 +21,7 @@ class LineFormatter:
             "escape_chars": {
                 r"([*-_])": r"\\\1",
                 r"<(?!/?br>|/?sub>|/?sup>)([^<>]*)(?<!<br)>": r"\\<\1\\>"}}
+        self._patterns.update(**patterns)
 
     def __str__(self):
         _convert_bool: dict[bool, str] = {

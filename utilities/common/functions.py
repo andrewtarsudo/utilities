@@ -10,7 +10,7 @@ from typing import Any, Callable, Iterable
 
 from httpx import HTTPStatusError, InvalidURL, request, RequestError, Response, StreamError, URL
 from loguru import logger
-from yaml.scanner import ScannerError
+from ruamel.yaml.scanner import ScannerError
 
 from utilities.common.errors import FileReaderError, FileReaderTypeError, UpdateProjectIdError
 from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath
@@ -109,11 +109,16 @@ def file_reader_type(path: StrPath, file_type: FileType):
             raise FileReaderTypeError
 
     elif file_type == "yaml":
-        from yaml import safe_load as load_file
+        from utilities.common.shared import MyYAML
+
+        yaml: MyYAML = MyYAML(typ="safe")
+        load_file = yaml.load
 
         if suffix not in (".yml", ".yaml"):
             logger.error(f"Файл {path.name} должен иметь расширение .json или .json5, но получено {suffix}")
             raise FileReaderTypeError
+
+        options: dict[str, Any]
 
     elif file_type == "toml":
         from tomllib import load as load_file
@@ -191,21 +196,17 @@ def check_path(
     if extensions is not None and extensions and path.suffix not in {*extensions, }:
         return False
 
-    # Check language (if provided)
     if language is not None:
-        suffixes: list[str] = path.suffixes  # e.g., ['.en', '.md'] for 'file.en.md'
+        suffixes: list[str] = path.suffixes
 
-        # Case 1: Language is specified (e.g., "en")
         if language:
-            # Look for ".en" in suffixes (but not ".en.txt")
             if f".{language}" not in suffixes:
                 return False
 
-        # Case 2: Language is empty (expect no language suffix)
         elif any(len(suffix) == 3 and suffix[1:].isalpha() for suffix in suffixes):
             return False
 
-    return True  # Passed all checks
+    return True
 
 
 def walk_full(
@@ -411,4 +412,5 @@ def get_shell():
         else:
             continue
 
-    return "cmd"
+    else:
+        return "cmd"

@@ -3,11 +3,12 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Iterator
 # noinspection PyProtectedMember
-from xml.etree.ElementTree import Element, parse, register_namespace
+from xml.etree.ElementTree import Element, parse, ParseError, register_namespace
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from loguru import logger
 
+from utilities.common.errors import ConvertTablesInvalidFileError
 from utilities.common.shared import StrPath
 from utilities.common.functions import file_writer
 from utilities.convert_tables.line_formatter import LineFormatter
@@ -67,7 +68,15 @@ class XmlFile(UnzippedFile):
         self.content: Element = parse(self.full_path).getroot()
 
     def read(self):
-        self.content = parse(self.full_path).getroot()
+        try:
+            self.content = parse(self.full_path).getroot()
+
+        except ParseError as e:
+            logger.error(
+                f"Ошибка {e.__class__.__name__}: не удалось обработать"
+                f"\n{e.text}\n"
+                f"Место {e.filename}:{e.lineno}:{e.offset} .. {e.end_lineno}:{e.end_offset}")
+            raise ConvertTablesInvalidFileError
 
     def get_children_elements(self, tag: str) -> list[Element]:
         return list(self.content.iter(fqdn(tag)))

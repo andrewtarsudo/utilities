@@ -173,10 +173,10 @@ class LoggerConfiguration:
     @property
     def log_folder(self) -> Path:
         if self._is_debug:
-            return config_file.get_general("debug_log_folder").parent
+            return Path(config_file.get_general("debug_log_folder")).expanduser().parent
 
         else:
-            return config_file.get_general("log_path").parent
+            return Path(config_file.get_general("log_path")).expanduser().parent
 
     def stream_handler(self) -> dict[str, Any] | None:
         """Specifies the stream handler.
@@ -229,6 +229,7 @@ class LoggerConfiguration:
             logging_level: str = self._handlers.get("file_rotating", "DEBUG")
             log_path: str = (
                 Path(config_file.get_general("log_path"))
+                .expanduser()
                 .joinpath(f"{self._file_name}_{logging_level.lower()}.log")
                 .as_posix())
 

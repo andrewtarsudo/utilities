@@ -1,6 +1,6 @@
 [project]
 name = "utilities"
-version = "2.2.1"
+version = "2.2.2"
 description = "Command line interface commands for technical writers"
 authors = [
   { name = "Andrew Tarasov", email = "tarasov-a@protei.ru" }
@@ -18,7 +18,7 @@ dependencies = [
   "pip-system-certs>=4.0",
   "python-frontmatter>=1.1",
   "python-slugify>=8.0",
-  "pyyaml>=6.0",
+  "ruamel-yaml>=0.18",
 ]
 keywords = [
   "utilities",
@@ -37,6 +37,7 @@ dev = [
   "flake8>=7.1",
   "mypy>=1.15",
   "pyinstaller>=6.12",
+  "pyment>=0.3",
   "pytest>=8.3",
   "vulture>=2.14",
 ]
@@ -55,7 +56,8 @@ dev-dependencies = [
   "mypy",
   "pyinstaller",
   "pytest",
-  "vulture"
+  "vulture",
+  "pyment"
 ]
 
 [tool.vulture]

@@ -31,10 +31,6 @@ class GetTermsAsciiDocFileTableRowIndexError(GetTermsError):
     """Invalid AsciiDocTable row index."""
 
 
-class GetTermsInvalidVersionError(GetTermsError):
-    """File version has an invalid structure."""
-
-
 class GetTermsInvalidTermIndexError(GetTermsError):
     """Specified index is not found in the dictionary."""
 
@@ -43,8 +39,12 @@ class GetTermsEmptyFileError(GetTermsError):
     """Read file is empty."""
 
 
-class GetTermsInvalidTypeVersionError(GetTermsError):
-    """File version has an invalid type."""
+class MutuallyExclusiveOptionError(BaseError):
+    """Command contains mutually exclusive options."""
+
+
+class ConditionalOptionError(BaseError):
+    """Command contains none of the conditional options."""
 
 
 class RepairLinksError(BaseError):
@@ -97,6 +97,10 @@ class ConvertTablesError(BaseError):
 
 class ConvertTablesEmptyLinesError(ConvertTablesError):
     """Lines to format is not specified."""
+
+
+class ConvertTablesInvalidFileError(ConvertTablesError):
+    """Failed to parse the specified file."""
 
 
 class FormatCodeError(BaseError):
@@ -201,3 +205,7 @@ class TableRowIndexError(TableColsError):
 
 class TableRowInvalidIdentifierError(TableColsError):
     """Specified column identifier has an invalid type."""
+
+
+class ValidateYamlBaseError(BaseError):
+    """Base class for errors associated with the validate-yaml."""

@@ -11,7 +11,7 @@ from utilities.common.config_file import config_file
 from utilities.common.errors import FormatCodeNonIntegerLineLengthError, FormatCodeNonPositiveLineLengthError
 from utilities.common.functions import file_reader, file_writer, pretty_print
 from utilities.common.shared import ADOC_EXTENSION, HELP, MD_EXTENSION, StrPath
-from utilities.scripts.api_group import APIGroup
+from utilities.scripts.api_group import APIGroup, ConditionalOption
 from utilities.scripts.cli import cli
 from utilities.common.completion import dir_completion, file_completion
 from utilities.scripts.list_files import get_files
@@ -32,6 +32,8 @@ MAX_LENGTH: int = config_file.get_commands("format-code", "length")
         allow_dash=False,
         dir_okay=False),
     help="\b\nФайлы для обработки. Может использоваться несколько раз",
+    cls=ConditionalOption,
+    conditional=["directory"],
     multiple=True,
     required=False,
     metavar="FILE ... FILE",
@@ -45,6 +47,8 @@ MAX_LENGTH: int = config_file.get_commands("format-code", "length")
         allow_dash=False,
         dir_okay=True),
     help="Директория для обработки",
+    cls=ConditionalOption,
+    conditional=["files"],
     multiple=False,
     required=False,
     metavar="DIR",
@@ -53,7 +57,8 @@ MAX_LENGTH: int = config_file.get_commands("format-code", "length")
 @option(
     "-l", "--length",
     type=INT,
-    help=f"\b\nМаксимальная длина строки. По умолчанию: {MAX_LENGTH}"
+    help=f"\b\nМаксимальная длина строки."
+         f"\nПо умолчанию: {MAX_LENGTH}"
          f"\nПримечание. Должно быть целым положительным числом",
     multiple=False,
     required=False,

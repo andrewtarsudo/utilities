@@ -200,7 +200,8 @@ class AsciiDocFile:
                                 f"в таблице {table.name} файла {self._path}")
 
                 table_analyser._column_parameters = [
-                    table_column.column_parameters() for table_column in table.iter_column_items()]
+                    table_column.column_parameters()
+                    for table_column in table.iter_column_items()]
                 table_analyser._table_id = f"{self._path.name}, {table.name}"
                 table_analyser.adjust()
                 table_analyser.inspect_valid()

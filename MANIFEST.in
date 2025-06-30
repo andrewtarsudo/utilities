@@ -7,4 +7,3 @@ graft sources
 graft updates
 include LICENSE
 include MANIFEST.in
-graft stubs

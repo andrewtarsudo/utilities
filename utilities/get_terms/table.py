@@ -61,7 +61,7 @@ class Term(NamedTuple):
         return f"<abbr title=\"{self.full}\">{self.short}</abbr>"
 
     @check_bool
-    def adoc(self) -> str:
+    def ascii_doc(self) -> str:
         return f":{self.short.lower()}: pass:[<abbr title=\"{self.full}\">{self.short}</abbr>]"
 
     @check_bool

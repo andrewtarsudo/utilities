@@ -331,7 +331,7 @@ command-line-interface table-cols
 
 Использование:
 command-line-interface get_terms <TERMS>
--a/--all | -f/--full | -i/--info | -r/--readme | -s/--samples | --abbr | --ascii | --common |
+-a/--all | -f/--full | -i/--info | -r/--src | -s/--samples | --abbr | --ascii | --common |
 --keep-logs/-k | --h/--help
 
   Команда для вывода расшифровки аббревиатур
@@ -342,19 +342,19 @@ command-line-interface get_terms <TERMS>
 Опции:
   -a, --all                              Флаг вывода всех сокращений.
                                          Примечание. Не может использоваться одновременно с 
-                                         --full-flag, --readme-flag, --samples-flag
+                                         --full-flag, --src-flag, --samples-flag
   -f, --full                             Флаг вывода всех сокращений с их расшифровками.
                                          Примечание. Не может использоваться одновременно с 
-                                         --all-flag, --readme-flag, --samples-flag
+                                         --all-flag, --src-flag, --samples-flag
   -i, --info                             Флаг вывода полного руководства.
                                          Примечание. Не может использоваться одновременно с 
-                                         --full-flag, --all-flag, --samples-flag, --readme-flag
-  -r, --readme                           Флаг вывода полного руководства.
+                                         --full-flag, --all-flag, --samples-flag, --src-flag
+  -r, --src                           Флаг вывода полного руководства.
                                          Примечание. Не может использоваться одновременно с 
                                          --full-flag, --all-flag, --samples-flag, --info-flag
   -s, --samples                          Флаг вывода примеров использования.
                                          Примечание. Не может использоваться одновременно с 
-                                         --full-flag, --readme-flag, --all-flag, --info-flag
+                                         --full-flag, --src-flag, --all-flag, --info-flag
   --abbr                                 Флаг вывода сокращения для добавления в файл Markdown.
                                          Формат: <abbr title=""></abbr>.
                                          Примечание. Не может использоваться одновременно с 

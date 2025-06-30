@@ -74,7 +74,7 @@ commands:
   get-terms:
     sources: "sources/"
     info_file: "help.txt"
-    readme_file: "readme.txt"
+    readme_file: "src.txt"
     samples_file: "samples.txt"
     project_id: 57022544
     terms_file: "terms.adoc"
@@ -113,3 +113,6 @@ commands:
     args: null
     dry_run: false
     language: "ru"
+    outlinelevels: 4
+    sectnumlevels: 4
+    toclevels: 3
