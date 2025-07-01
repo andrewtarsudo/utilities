@@ -1,7 +1,7 @@
 general:
   separator: "===================================================================================================="
-  debug_log_folder: "_logs/cli_debug.log"
-  log_path: "~/Desktop/_logs/cli_debug.log"
+  debug_log_folder: "./_logs/"
+  log_path: "~/Desktop/_logs/"
   config_path: "sources/dict.yaml"
   temp_dir: "~/_temp/"
   col_max: 56

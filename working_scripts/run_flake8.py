@@ -32,7 +32,7 @@ def run_flake8_command(root: str | Path = None):
         "__main__.py",
         "utilities/common/",
         "utilities/convert_tables/",
-        "utilities/get_terms/,"
+        "utilities/get_terms/",
         "utilities/repair_links/",
         "utilities/scripts/",
         "utilities/set_table_cols/"]

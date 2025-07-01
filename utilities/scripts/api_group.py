@@ -490,7 +490,6 @@ class APIGroup(Group):
             return super().resolve_command(ctx, args)
 
         except UsageError as e:
-            from ruamel.yaml.main import YAML
 
             yaml: MyYAML = MyYAML(typ="safe")
             ctx_info: str = yaml.dump(

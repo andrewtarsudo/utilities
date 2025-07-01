@@ -14,6 +14,6 @@ if __name__ == '__main__':
     delete_pycache_command(".")
     run_vulture_command(".")
     run_flake8_command(".")
-    # make_readme_command()
-    # run_pyment_command()
+    # make_readme_command(".")
+    # run_pyment_command(".")
     run_pyinstaller_command(".")
