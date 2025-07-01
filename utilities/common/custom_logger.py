@@ -3,20 +3,28 @@ import logging
 from logging import basicConfig, Handler, LogRecord
 from pathlib import Path
 # noinspection PyProtectedMember
-from sys import __stderr__, _getframe, __stdout__
+from sys import __stderr__, __stdout__, _getframe
 from types import FrameType
-from typing import Any, Literal, NamedTuple, Type
+from typing import Any, Callable, Literal, NamedTuple, TextIO, Type
 from warnings import simplefilter
 
 from loguru import logger
 
 from utilities.common.config_file import config_file
-from utilities.common.errors import BaseError
+from utilities.common.errors import BaseError, LoggerInitError
+from utilities.common.shared import StrPath
 
 HandlerType: Type[str] = Literal["stream", "file_rotating", "result_file"]
 LoggingLevel: Type[str] = Literal["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"]
 ColorLevel: Type[str] = Literal["red", "fg #FF7518", "green", "magenta", "light-green", "cyan"]
 StyleLevel: Type[str] = Literal["bold", "italic", "underline", "normal"]
+
+COLORED_FORMAT: str = " | ".join(
+    ("<green>{time:DD-MMM-YYYY HH:mm:ss}</green>::<level>{level.name}</level>",
+     "<cyan>{module}</cyan>::<cyan>{function}</cyan>",
+     "<cyan>{file.name}</cyan>::<cyan>{name}</cyan>::<cyan>{line}</cyan>",
+     "\n<level>{message}</level>"))
+USER_FORMAT: str = "<level>{message}</level>"
 
 
 class LevelColorStyle(NamedTuple):
@@ -122,6 +130,7 @@ def _to_stream(record: dict) -> bool:
     """
     min_level: int = 20 if not record["extra"].get("debug") else 10
     max_level: int = 30
+
     return (
             min_level <= record["level"].no < max_level
             and record["name"] != "logging"
@@ -136,155 +145,104 @@ def _to_result(record: dict) -> bool:
     return record["extra"].get("result") is True
 
 
-class LoggerConfiguration:
-    """
-    The loguru logger configuration instance.
-
-    Attributes
-    ----------
-    _file_name : str
-        The name of the log file.
-    _handlers : dict[str, str]
-        The logger handlers.
-
-    """
-    COLORED_FORMAT: str = " | ".join(
-        ("<green>{time:DD-MMM-YYYY HH:mm:ss}</green>::<level>{level.name}</level>",
-         "<cyan>{module}</cyan>::<cyan>{function}</cyan>",
-         "<cyan>{file.name}</cyan>::<cyan>{name}</cyan>::<cyan>{line}</cyan>",
-         "\n<level>{message}</level>"))
-    USER_FORMAT: str = "<level>{message}</level>"
-
-    def __init__(
-            self,
-            file_name: str,
-            handlers: dict[HandlerType, LoggingLevel] = None, *,
-            is_debug: bool = False):
-        if not is_debug:
-            simplefilter("ignore")
-
-        if handlers is None:
-            handlers: dict[HandlerType, LoggingLevel] = {}
-
-        self._file_name: str = file_name
-        self._handlers: dict[str, str] = handlers
-        self._is_debug: bool = is_debug
-
-    @property
-    def log_folder(self) -> Path:
-        if self._is_debug:
-            return Path(config_file.get_general("debug_log_folder")).expanduser().parent
-
-        else:
-            return Path(config_file.get_general("log_path")).expanduser().parent
-
-    def stream_handler(self) -> dict[str, Any] | None:
-        """Specifies the stream handler.
-
-        Handles KeyError.
-        """
-        try:
-            logging_level: str | None = self._handlers.get("stream", "INFO")
-
-            return {
-                "sink": __stdout__,
-                "level": logging_level,
-                "format": self.__class__.USER_FORMAT,
+def set_handler(handler_type: HandlerType, **kwargs):
+    match handler_type:
+        case "stream":
+            handler: dict[str, TextIO | StrPath | bool | Callable] = {
                 "colorize": True,
-                "filter": _to_stream,
                 "backtrace": False,
                 "diagnose": False}
 
-        except KeyError as e:
-            print(f"{e.__class__.__name__}, {str(e)}")
-            return None
-
-    def stderr_handler(self) -> dict[str, Any] | None:
-        """Specifies the stream handler.
-
-        Handles KeyError.
-        """
-        try:
-            logging_level: str | None = self._handlers.get("stderr", "INFO")
-
-            return {
-                "sink": __stderr__,
-                "level": logging_level,
-                "format": self.__class__.USER_FORMAT,
-                "colorize": True,
-                "filter": _to_stderr,
-                "backtrace": False,
-                "diagnose": False}
-
-        except KeyError as e:
-            print(f"{e.__class__.__name__}, {str(e)}")
-            return None
-
-    def rotating_file_handler(self) -> dict[str, Any] | None:
-        """Specifies the rotating file handler.
-
-        Handles KeyError.
-        """
-        try:
-            logging_level: str = self._handlers.get("file_rotating", "DEBUG")
-            log_path: str = (
-                Path(config_file.get_general("log_path"))
-                .expanduser()
-                .joinpath(f"{self._file_name}_{logging_level.lower()}.log")
-                .as_posix())
-
-            return {
-                "sink": log_path,
-                "level": logging_level,
-                "format": self.__class__.COLORED_FORMAT,
+        case "file_rotating":
+            handler: dict[str, TextIO | StrPath | bool | Callable] = {
                 "colorize": False,
                 "diagnose": True,
                 "backtrace": True,
                 "rotation": "2 MB",
-                "mode": "a",
+                "mode": "w",
                 "encoding": "utf-8",
                 "catch": True}
 
-        except KeyError as e:
-            print(f"{e.__class__.__name__}, {str(e)}")
-            return None
-
-    def result_file_handler(self):
-        try:
-            logging_level: str = "SUCCESS"
-            log_path: str = Path.cwd().joinpath("results.txt").as_posix()
-
-            return {
-                "sink": log_path,
-                "level": logging_level,
-                "format": self.__class__.USER_FORMAT,
-                "filter": _to_result,
+        case "result_file":
+            handler: dict[str, TextIO | StrPath | bool | Callable] = {
                 "colorize": False,
-                "diagnose": True,
-                "backtrace": True,
-                "mode": "a",
+                "diagnose": False,
+                "backtrace": False,
+                "mode": "w",
                 "encoding": "utf-8",
-                "catch": True}
+                "catch": False}
 
-        except KeyError as e:
-            print(f"{e.__class__.__name__}, {str(e)}")
-            return None
+        case _:
+            raise LoggerInitError
 
-    def add_handler(self, name: str, logger_level: LoggingLevel, handler: dict[str, Any] = None):
-        if handler is None:
-            return
-
-        else:
-            self._handlers[name] = logger_level
-            logger.add(**handler)
+    handler.update(**kwargs)
+    return handler
 
 
-# noinspection PyTypeChecker
-def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = False):
+def stream_handler(level: LoggingLevel = "INFO") -> dict[str, Any] | None:
+    """Specifies the stream handler.
+
+    Handles KeyError.
+    """
+    kwargs: dict[str, TextIO | str | Callable | bool] = {
+        "sink": __stdout__,
+        "level": level,
+        "format": USER_FORMAT,
+        "filter": _to_stream}
+
+    return set_handler("stream", **kwargs)
+
+
+def stderr_handler(level: LoggingLevel = "WARNING") -> dict[str, Any] | None:
+    """Specifies the stream handler."""
+    kwargs: dict[str, TextIO | str | Callable | bool] = {
+        "sink": __stderr__,
+        "level": level,
+        "format": USER_FORMAT,
+        "filter": _to_stderr,
+        "diagnose": True}
+
+    return set_handler("stream", **kwargs)
+
+
+def rotating_file_handler(sink: str = None) -> dict[str, Any] | None:
+    """Specifies the rotating file handler."""
+    level: LoggingLevel = "DEBUG"
+
+    if sink is None:
+        sink: str = (
+            Path(config_file.get_general("log_path"))
+            .expanduser()
+            .resolve()
+            .joinpath(f"utilities_{level.lower()}.log")
+            .as_posix())
+
+    kwargs: dict[str, StrPath] = {
+        "level": level,
+        "sink": sink,
+        "format": COLORED_FORMAT}
+
+    return set_handler("file_rotating", **kwargs)
+
+
+def result_file_handler(sink: str = None):
+    level: LoggingLevel = "SUCCESS"
+
+    if sink is None:
+        sink: str = Path.cwd().joinpath("results.txt").as_posix()
+
+    kwargs: dict[str, StrPath | Callable] = {
+        "sink": sink,
+        "level": level,
+        "format": USER_FORMAT,
+        "filter": _to_result}
+
+    return set_handler("result_file", **kwargs)
+
+
+def custom_logging(*, is_debug: bool = False, result_file: bool = False):
     """Specifies the loguru Logger.
 
-    :param name: The log file name.
-    :type name: str
     :param is_debug: The flag to use the debug mode.
     :type is_debug: bool, default=False
     :param result_file: Flag to use results.txt file.
@@ -299,24 +257,10 @@ def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = Fal
     else:
         stream_level: LoggingLevel = "DEBUG"
 
-    handlers: dict[HandlerType, LoggingLevel] = {
-        "stream": stream_level,
-        "file_rotating": "DEBUG",
-        "stderr": "WARNING"}
-
-    file_name: str = name
-
-    # specify the handlers
-    logger_configuration: LoggerConfiguration = LoggerConfiguration(file_name, handlers, is_debug=is_debug)
-    stderr_handler: dict[str, Any] = logger_configuration.stderr_handler()
-    stream_handler: dict[str, Any] = logger_configuration.stream_handler()
-    rotating_file_handler: dict[str, Any] = logger_configuration.rotating_file_handler()
-
-    handlers: list[dict[str, Any]] = [stderr_handler, stream_handler, rotating_file_handler]
+    handlers: list[dict[str, Any]] = [stream_handler(stream_level), stderr_handler(), rotating_file_handler()]
 
     if result_file:
-        result_file_handler: dict[str, Any] = logger_configuration.result_file_handler()
-        handlers.append(result_file_handler)
+        handlers.append(result_file_handler())
 
     logger.configure(handlers=handlers)
 
@@ -332,4 +276,7 @@ def custom_logging(name: str, *, is_debug: bool = False, result_file: bool = Fal
 
     logger.catch(level="DEBUG", exclude=BaseError, reraise=False)
 
-    return logger_configuration
+
+def add_handler(handler_type: HandlerType, **kwargs):
+    handler: dict[str, Any] = set_handler(handler_type, **kwargs)
+    logger.add(**handler)

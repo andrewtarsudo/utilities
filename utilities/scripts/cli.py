@@ -16,11 +16,11 @@ from click.utils import echo
 from loguru import logger
 
 from utilities.common.config_file import config_file
-from utilities.common.custom_logger import LoggerConfiguration
+from utilities.common.custom_logger import add_handler, custom_logging
 from utilities.common.errors import BaseError
 from utilities.common.functions import file_reader, file_reader_type, file_writer, get_shell, get_version, GitFile, \
     is_macos, is_windows
-from utilities.common.shared import BASE_PATH, EXE_FILE, HELP, PRESS_ENTER_KEY, StrPath
+from utilities.common.shared import BASE_PATH, EXE_FILE, HELP, PRESS_ENTER_KEY, ScriptVersion, StrPath
 from utilities.scripts.api_group import APIGroup, get_full_help, print_version
 from utilities.scripts.args_help_dict import args_help_dict
 
@@ -34,7 +34,8 @@ def set_env(*, timeout: float | None = 15.0):
     shell_exe: str = get_shell()
 
     if is_windows():
-        exe: str = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+        drive: str = BASE_PATH.drive
+        exe: str = r"%s\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" % drive
         file: str = str(root_dir.joinpath("updates/set_env.ps1").resolve().absolute())
         command: list[str] = [exe, "-File", file]
         shell: bool = True
@@ -109,13 +110,15 @@ def compare_versions(project_id: int):
 
     else:
         content: dict[str, Any] = file_reader_type(git_file.download_destination, "toml")
-        latest_version: str = content.get("project").get("version")
-        logger.debug(f"Последняя версия: {latest_version}")
+        latest: str = content.get("project").get("version")
+        latest_version: ScriptVersion = ScriptVersion.from_string(latest)
+        logger.debug(f"Последняя версия: {latest_version!s}")
 
-        current_version: str = get_version()
+        current: str = get_version()
+        current_version: ScriptVersion = ScriptVersion.from_string(current)
         logger.debug(f"Текущая версия: {current_version}")
 
-        return current_version == latest_version
+        return current_version >= latest_version
 
 
 def update_exe(exe_file_name: str, project_id: int, **kwargs):
@@ -193,7 +196,7 @@ def get_command() -> list[str]:
     cls=APIGroup,
     help="Набор скриптов для технических писателей")
 @option(
-    "--debug",
+    "--debug", "debug",
     type=BOOL,
     is_flag=True,
     help="\b\nФлаг активации режима отладки."
@@ -224,11 +227,12 @@ def get_command() -> list[str]:
     help=HELP,
     is_eager=True)
 def cli(debug: bool = False, update: bool = True):
+    custom_logging(is_debug=debug)
+
     try:
         ctx: Context = get_current_context()
         ctx.ensure_object(dict)
         ctx.obj = {"debug": debug}
-        logger_configuration: LoggerConfiguration = getattr(ctx.command, "logging_config")
 
         if ctx.invoked_subcommand is None:
             echo("Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help")
@@ -242,16 +246,13 @@ def cli(debug: bool = False, update: bool = True):
             ctx.exit(0)
 
         elif ctx.invoked_subcommand == "repair-links":
-            logger_configuration.add_handler(
-                "result_file",
-                "SUCCESS",
-                logger_configuration.result_file_handler())
+            add_handler("result_file")
 
         logger.debug(str(config_file))
         logger.debug(f"Файл описания аргументов:\n{str(args_help_dict)}")
 
         env_var: Any = environ.get(ENV_VAR)
-        logger.info(f"Переменная окружения: {ENV_VAR}={env_var}")
+        logger.debug(f"Переменная окружения: {ENV_VAR}={env_var}")
 
         config_var: bool = config_file.get_update("auto_update")
         logger.debug(f"Параметр автообновления в командах по умолчанию: {config_var}")
@@ -269,7 +270,7 @@ def cli(debug: bool = False, update: bool = True):
         elif env_update is None:
             logger.debug("Автообновление отключено на уровне системы")
 
-        elif update:
+        elif not update:
             logger.debug("Автообновление отключено на уровне общей команды")
 
         elif not env_update:

@@ -84,7 +84,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     callback=print_file,
     default=config_file.get_commands("get-terms", "common_flag"))
 @option(
-    "-r", "--src", "readme_flag",
+    "-r", "--readme", "readme_flag",
     is_flag=True,
     cls=MutuallyExclusiveOption,
     mutually_exclusive=["full_flag", "all_flag", "samples_flag", "info_flag"],

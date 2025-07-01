@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
 import sys
-from typing import Any, Literal, Type, TypeAlias
+from typing import Any, Literal, NamedTuple, Type, TypeAlias
 
 from ruamel.yaml.compat import StringIO
 from ruamel.yaml.main import YAML
@@ -45,3 +45,72 @@ class MyYAML(YAML):
 
         if inefficient:
             return stream.getvalue()
+
+
+class ScriptVersion(NamedTuple):
+    epoch: int
+    major: int
+    minor: int
+    
+    @classmethod
+    def from_string(cls, value: str):
+        """Create ScriptVersion from version string.
+        Raises ValueError if string format is invalid."""
+        try:
+            parts: list[str] = value.split(".", 2)
+
+            if len(parts) != 3:
+                raise ValueError("Version string must contain exactly 3 parts")
+
+            return cls(*map(int, parts))
+
+        except ValueError as e:
+            raise ValueError(f"Invalid version string '{value}': {e}") from None
+    
+    def __str__(self) -> str:
+        return f"{self.epoch}.{self.major}.{self.minor}"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}<{self._asdict()}>"
+    
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        else:
+            return tuple(self) == tuple(other)
+    
+    def __ne__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        else:
+            return tuple(self) != tuple(other)
+    
+    def __lt__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        else:
+            return tuple(self) < tuple(other)
+    
+    def __gt__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        else:
+            return tuple(self) > tuple(other)
+    
+    def __le__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        else:
+            return tuple(self) <= tuple(other)
+    
+    def __ge__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        else:
+            return tuple(self) >= tuple(other)

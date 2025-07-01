@@ -209,3 +209,7 @@ class TableRowInvalidIdentifierError(TableColsError):
 
 class ValidateYamlBaseError(BaseError):
     """Base class for errors associated with the validate-yaml."""
+
+
+class LoggerInitError(BaseError):
+    """Failed to initiate loguru logger."""

@@ -74,7 +74,7 @@ commands:
   get-terms:
     sources: "sources/"
     info_file: "help.txt"
-    readme_file: "src.txt"
+    readme_file: "readme.txt"
     samples_file: "samples.txt"
     project_id: 57022544
     terms_file: "terms.adoc"
@@ -89,21 +89,21 @@ commands:
     common_flag: true
 
   validate-yaml:
-    cutoff: 0.75
+    cutoff: 0.8
     guess: true
     file_beginnings:
       - "protei"
       - "pdf"
 
   check:
-    cutoff: 0.75
+    cutoff: 0.8
     guess: true
     file_beginnings:
       - "protei"
       - "pdf"
 
   yaml:
-    cutoff: 0.75
+    cutoff: 0.8
     guess: true
     file_beginnings:
       - "protei"
