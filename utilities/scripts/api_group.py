@@ -393,7 +393,7 @@ class APIGroup(Group):
 
     def __init__(self, aliases: set[str] = None, **attrs: Any):
         self.logging_config: LoggerConfiguration = custom_logging(
-            name=self.__class__.__name__.lower(),
+            name="tw_utilities.log",
             is_debug=attrs.get("debug", False))
         kwargs: dict[str, bool] = {
             "invoke_without_command": True,
@@ -424,7 +424,6 @@ class APIGroup(Group):
 
     def format_help(self, ctx: Context, formatter: HelpFormatter) -> None:
         format_help(self, ctx, formatter)
-        # self.format_epilog(ctx, formatter)
 
     def format_usage(self, ctx: Context, formatter: HelpFormatter) -> None:
         format_usage(self, ctx, formatter)
