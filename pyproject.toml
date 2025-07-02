@@ -16,9 +16,10 @@ dependencies = [
   "more-itertools>=10.6",
   "pillow>=11.1",
   "pip-system-certs>=4.0",
+  "psutil>=7.0",
   "python-frontmatter>=1.1",
   "python-slugify>=8.0",
-  "ruamel-yaml>=0.18",
+  "ruamel.yaml>=0.18",
 ]
 keywords = [
   "utilities",

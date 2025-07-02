@@ -51,7 +51,7 @@ class ScriptVersion(NamedTuple):
     epoch: int
     major: int
     minor: int
-    
+
     @classmethod
     def from_string(cls, value: str):
         """Create ScriptVersion from version string.
@@ -66,48 +66,48 @@ class ScriptVersion(NamedTuple):
 
         except ValueError as e:
             raise ValueError(f"Invalid version string '{value}': {e}") from None
-    
+
     def __str__(self) -> str:
         return f"{self.epoch}.{self.major}.{self.minor}"
 
     def __repr__(self):
         return f"{self.__class__.__name__}<{self._asdict()}>"
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
 
         else:
             return tuple(self) == tuple(other)
-    
+
     def __ne__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
 
         else:
             return tuple(self) != tuple(other)
-    
+
     def __lt__(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
 
         else:
             return tuple(self) < tuple(other)
-    
+
     def __gt__(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
 
         else:
             return tuple(self) > tuple(other)
-    
+
     def __le__(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
 
         else:
             return tuple(self) <= tuple(other)
-    
+
     def __ge__(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented

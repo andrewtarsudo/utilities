@@ -20,11 +20,8 @@ if __name__ == '__main__':
 
     from io import TextIOWrapper
     from sys import stdout
-    from utilities.common.functions import get_shell
 
-    shell: str = get_shell()
-
-    encoding: str = "cp1251" if shell in ("powershell", "pwsh") else "utf-8"
+    encoding: str = "utf-8"
 
     if isinstance(stdout, TextIOWrapper):
         stdout.reconfigure(encoding=encoding)

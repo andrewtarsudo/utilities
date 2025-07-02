@@ -213,3 +213,7 @@ class ValidateYamlBaseError(BaseError):
 
 class LoggerInitError(BaseError):
     """Failed to initiate loguru logger."""
+
+
+class ShellUnknownError(BaseError):
+    """Failed to determine the operating system and command line shell."""

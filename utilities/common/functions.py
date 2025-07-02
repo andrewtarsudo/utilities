@@ -3,16 +3,17 @@ from base64 import b64decode
 from functools import cache
 from io import UnsupportedOperation
 from json import JSONDecodeError
-from os import getenv, scandir
+from os import getppid, scandir
 from pathlib import Path
 from sys import platform
 from typing import Any, Callable, Iterable
 
 from httpx import HTTPStatusError, InvalidURL, request, RequestError, Response, StreamError, URL
 from loguru import logger
+from psutil import Process
 from ruamel.yaml.scanner import ScannerError
 
-from utilities.common.errors import FileReaderError, FileReaderTypeError, UpdateProjectIdError
+from utilities.common.errors import FileReaderError, FileReaderTypeError, ShellUnknownError, UpdateProjectIdError
 from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath
 
 
@@ -239,7 +240,7 @@ def walk_full(
         ignored_files: set[str] = set(ignored_files)
 
     if extensions:
-        extensions: set[str] | None = {f".{extension.lstrip(".")}" for extension in extensions}
+        extensions: set[str] | None = set(f".{extension.lstrip('.')}" for extension in extensions)
 
     else:
         extensions: set[str] | None = None
@@ -391,26 +392,32 @@ class GitFile:
         return self._content
 
 
-def get_shell():
-    dict_shell: dict[str, tuple[str, str]] = {
-        "win": ("COMSPEC", "cmd"),
-        "darwin": ("SHELL", "zsh"),
-        "linux": ("SHELL", "bash")}
+def get_shell(base_process: Process = None) -> str:
+    if base_process is None:
+        base_process: Process = Process(getppid())
 
-    for k, v in dict_shell.items():
-        if platform.startswith(k):
-            env_variable, default_shell = v
-
-            full_path_shell: str | None = getenv(env_variable)
-
-            if full_path_shell is None:
-                return default_shell
-
-            else:
-                return Path(full_path_shell).stem
+    while base_process:
+        if base_process.name() in ("cmd.exe", "cmd", "powershell.exe", "pwsh", "pwsh.exe", "bash", "zsh", "sh", "fish"):
+            name: str = base_process.name()
+            break
 
         else:
-            continue
+            return get_shell(base_process.parent())
 
     else:
-        return "cmd"
+        logger.error("Не удалось определить операционную систему и оболочку командной строки")
+        raise ShellUnknownError
+
+    shell_names: dict[str, str] = {
+        "cmd.exe": "cmd",
+        "cmd": "cmd",
+        "powershell": "pwsh",
+        "powershell.exe": "pwsh",
+        "pwsh": "pwsh",
+        "pwsh.exe": "pwsh",
+        "bash": "bash",
+        "zsh": "zsh",
+        "sh": "sh",
+        "fish": "fish"}
+
+    return shell_names.get(name)

@@ -163,6 +163,7 @@ def add_prefix(prefix: str | None = None, values: Iterable[StrPath] = None):
     multiple=False,
     required=False,
     show_default=True,
+    is_flag=True,
     default=config_file.get_commands("list-files", "all_languages"))
 @option(
     "-i/-I", "--ignore-index/--keep-index", "ignore_index",
@@ -283,16 +284,16 @@ def list_files_command(
         ignored_dirs: set[str] = {"_temp_folder", "temp_folder", "private", "_temp_dir", "temp_dir"}
 
     if all_languages:
-        language: str | None = None  # Disable language filtering
+        language: str | None = None
 
-    elif language:
-        language: str | None = language.lower()
-
-    elif language.lower() == "ru":
+    elif language is not None and language.lower() == "ru":
         language: str | None = ""
 
+    elif language is not None:
+        language: str | None = language.lower()
+
     else:
-        language: str | None = ""  # No language suffix allowed
+        language: str | None = ""
 
     content_common_index: int = check_content_common(root)
 

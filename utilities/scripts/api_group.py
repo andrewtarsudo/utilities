@@ -15,7 +15,6 @@ from loguru import logger
 from more_itertools import flatten
 
 from utilities.common.config_file import config_file, ConfigFile
-from utilities.common.custom_logger import custom_logging
 from utilities.common.errors import BaseError, CommandNotFoundError, ConditionalOptionError, \
     MutuallyExclusiveOptionError, NoArgumentsOptionsError
 from utilities.common.functions import get_version, is_windows, pretty_print
@@ -56,9 +55,7 @@ def clear_logs(ctx: Context, result: Any, **kwargs):
     result_file: Path = ctx.obj.get("result_file", None)
 
     log_path: Path = Path(config_file.get_general("log_path")).parent
-    echo(f"log_path = {log_path}")
     debug_log_folder: Path = Path(config_file.get_general("debug_log_folder")).parent
-    echo(f"debug_log_folder = {debug_log_folder}")
 
     logger.debug(
         f"Версия: {get_version()}\n"
@@ -74,12 +71,11 @@ def clear_logs(ctx: Context, result: Any, **kwargs):
         rmtree(log_path, ignore_errors=True)
 
     elif not debug:
-        echo(f"Папка с логами: {log_path}")
+        echo(f"\nПапка с логами: {log_path}\n")
 
     else:
-        echo(f"Папка с логами: {debug_log_folder}")
+        echo(f"\nПапка с логами: {debug_log_folder}\n")
 
-    echo(f"temp_dir = {config_file.get_general("temp_dir")}")
     rmtree(config_file.get_general("temp_dir"), ignore_errors=True)
     input(PRESS_ENTER_KEY)
     ctx.exit(0)

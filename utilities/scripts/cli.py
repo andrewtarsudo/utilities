@@ -35,7 +35,7 @@ def set_env(*, timeout: float | None = 15.0):
 
     if is_windows():
         drive: str = BASE_PATH.drive
-        exe: str = r"%s\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" % drive
+        exe: str = rf"{drive}\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
         file: str = str(root_dir.joinpath("updates/set_env.ps1").resolve().absolute())
         command: list[str] = [exe, "-File", file]
         shell: bool = True

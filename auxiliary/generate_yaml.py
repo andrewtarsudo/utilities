@@ -107,7 +107,7 @@ class TextFile(WithFrontMatter):
             return self.weight < other.weight
 
         else:
-            return self.title < other._title
+            return self.title < other.title
 
     def __le__(self, other):
         if self._compare(other):
@@ -120,7 +120,7 @@ class TextFile(WithFrontMatter):
             return self.weight < other.weight
 
         else:
-            return self.title <= other._title
+            return self.title <= other.title
 
     def __gt__(self, other):
         if self._compare(other):
@@ -133,7 +133,7 @@ class TextFile(WithFrontMatter):
             return self.weight > other.weight
 
         else:
-            return self.title > other._title
+            return self.title > other.title
 
     def __ge__(self, other):
         if self._compare(other):
@@ -146,7 +146,7 @@ class TextFile(WithFrontMatter):
             return self.weight > other.weight
 
         else:
-            return self.title >= other._title
+            return self.title >= other.title
 
     @property
     def is_index(self):
