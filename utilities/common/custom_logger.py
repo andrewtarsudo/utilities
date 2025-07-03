@@ -184,7 +184,7 @@ def stream_handler(level: LoggingLevel = "INFO") -> dict[str, Any] | None:
 
     Handles KeyError.
     """
-    kwargs: dict[str, TextIO | str | Callable | bool] = {
+    kwargs: dict[str, Any] = {
         "sink": __stdout__,
         "level": level,
         "format": USER_FORMAT,
@@ -195,7 +195,7 @@ def stream_handler(level: LoggingLevel = "INFO") -> dict[str, Any] | None:
 
 def stderr_handler(level: LoggingLevel = "WARNING") -> dict[str, Any] | None:
     """Specifies the stream handler."""
-    kwargs: dict[str, TextIO | str | Callable | bool] = {
+    kwargs: dict[str, Any] = {
         "sink": __stderr__,
         "level": level,
         "format": USER_FORMAT,
