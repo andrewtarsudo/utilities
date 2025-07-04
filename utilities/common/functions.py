@@ -5,6 +5,7 @@ from io import UnsupportedOperation
 from json import JSONDecodeError
 from os import getppid, scandir
 from pathlib import Path
+from subprocess import run
 from sys import platform
 from typing import Any, Callable, Iterable
 
@@ -396,9 +397,13 @@ def get_shell(base_process: Process = None) -> str:
     if base_process is None:
         base_process: Process = Process(getppid())
 
+    counter: int = 0
+
     while base_process:
-        if base_process.name() in ("cmd.exe", "cmd", "powershell.exe", "pwsh", "pwsh.exe", "bash", "zsh", "sh", "fish"):
-            name: str = base_process.name()
+        counter += 1
+        name: str = base_process.name()
+
+        if name in ("cmd.exe", "cmd", "powershell.exe", "pwsh", "pwsh.exe", "bash", "zsh", "sh", "fish"):
             break
 
         else:

@@ -29,6 +29,22 @@ TEMP_DIR: Path = Path(config_file.get_update("temp_dir")).expanduser()
 TEMP_COMMAND_FILE: Path = Path(config_file.get_update("temp_command_file")).expanduser()
 
 
+def inspect_auto_update():
+    if is_windows():
+        local_file: Path = Path(environ.get("LOCALAPPDATA")).joinpath("_tw_utilities_update")
+
+    else:
+        local_file: Path = Path(environ.get("HOME")).joinpath("local/_tw_utilities_update")
+
+    if local_file.exists():
+        return False
+
+    env_value: str = environ.get("_TW_UTILITIES_UPDATE")
+
+    if not convert_value(env_value):
+        return False
+
+
 def set_env(*, timeout: float | None = 15.0):
     root_dir: Path = BASE_PATH
     shell_exe: str = get_shell()
