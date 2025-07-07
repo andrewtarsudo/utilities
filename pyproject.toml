@@ -1,6 +1,6 @@
 [project]
 name = "utilities"
-version = "2.2.2"
+version = "2.2.3"
 description = "Command line interface commands for technical writers"
 authors = [
   { name = "Andrew Tarasov", email = "tarasov-a@protei.ru" }
@@ -75,7 +75,6 @@ exclude = [
   "sources/*",
   "tests/*",
   "themes/*",
-  "updates/*",
   "working_scripts/*"
 ]
 make_whitelist = true

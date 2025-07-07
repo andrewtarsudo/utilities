@@ -3,7 +3,6 @@ from os import environ, execv
 from pathlib import Path
 from shutil import which
 from string import Template
-from subprocess import CalledProcessError, run, TimeoutExpired
 import sys
 from typing import Any, Iterable
 
@@ -18,8 +17,8 @@ from loguru import logger
 from utilities.common.config_file import config_file
 from utilities.common.custom_logger import add_handler, custom_logging
 from utilities.common.errors import BaseError
-from utilities.common.functions import file_reader, file_reader_type, file_writer, get_shell, get_version, GitFile, \
-    is_macos, is_windows
+from utilities.common.functions import file_reader, file_reader_type, file_writer, get_version, GitFile, \
+    is_windows
 from utilities.common.shared import BASE_PATH, EXE_FILE, HELP, PRESS_ENTER_KEY, ScriptVersion, StrPath
 from utilities.scripts.api_group import APIGroup, get_full_help, print_version
 from utilities.scripts.args_help_dict import args_help_dict
@@ -29,91 +28,44 @@ TEMP_DIR: Path = Path(config_file.get_update("temp_dir")).expanduser()
 TEMP_COMMAND_FILE: Path = Path(config_file.get_update("temp_command_file")).expanduser()
 
 
-def inspect_auto_update():
+def check_env() -> bool:
+    """Checks the environment variable _TW_UTILITIES_UPDATE."""
+    FALSE: tuple[str, ...] = ("0", "false", "no", "off")
+    env_var: str | None = environ.get("_TW_UTILITIES_UPDATE", None)
+
+    if env_var is None:
+        return True
+
+    env_var: str = env_var.lower()
+
+    if env_var in FALSE:
+        return False
+
+    else:
+        return True
+
+
+def check_file() -> bool:
+    """Checks if the specified file exists. """
     if is_windows():
         local_file: Path = Path(environ.get("LOCALAPPDATA")).joinpath("_tw_utilities_update")
 
     else:
         local_file: Path = Path(environ.get("HOME")).joinpath("local/_tw_utilities_update")
 
-    if local_file.exists():
-        return False
+    statuses: dict[bool, str] = {
+        True: "найден",
+        False: "не найден"}
 
-    env_value: str = environ.get("_TW_UTILITIES_UPDATE")
+    update: bool = local_file.exists()
 
-    if not convert_value(env_value):
-        return False
-
-
-def set_env(*, timeout: float | None = 15.0):
-    root_dir: Path = BASE_PATH
-    shell_exe: str = get_shell()
-
-    if is_windows():
-        drive: str = BASE_PATH.drive
-        exe: str = rf"{drive}\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-        file: str = str(root_dir.joinpath("updates/set_env.ps1").resolve().absolute())
-        command: list[str] = [exe, "-File", file]
-        shell: bool = True
-
-    elif is_macos():
-        file: str = str(root_dir.joinpath("updates/set_env.zsh").resolve().absolute())
-        command: list[str] = [shell_exe, file]
-        shell: bool = False
-
-    else:
-        file: str = str(root_dir.joinpath("updates/set_env.sh").resolve().absolute())
-        command: list[str] = [shell_exe, file]
-        shell: bool = False
-
-    try:
-        Path(file).chmod(0o775)
-        run(command, shell=shell, timeout=timeout).check_returncode()
-
-    except CalledProcessError as e:
-        logger.error(
-            f"Не удалось задать переменную {ENV_VAR} и обновить оболочку."
-            f"\nВывод команды: {e.stdout}\nВывод ошибки: {e.stderr}\nКоманда: {e.cmd}")
-        raise
-
-    except TimeoutExpired as e:
-        logger.error(
-            f"Не удалось задать переменную {ENV_VAR} и обновить оболочку за время {timeout:.0f} секунд."
-            f"\nВывод команды: {e.output}")
-        set_env(timeout=None)
-        raise
-
-    else:
-        logger.debug(f"Задана переменная {ENV_VAR}")
+    logger.debug(f"Файл {local_file} {statuses.get(update)}")
+    return not update
 
 
-def convert_value(value: int | str | bool):
-    TRUE: tuple[str, ...] = ("1", "true", "yes", "on")
-    FALSE: tuple[str, ...] = ("0", "false", "no", "off")
-
-    if value is None:
-        return True
-
-    _value: str = str(value).lower()
-
-    if _value == "-1":
-        return None
-
-    elif _value in TRUE:
-        return True
-
-    elif _value in FALSE:
-        logger.success(f"{ENV_VAR} = {value}")
-        return False
-
-    else:
-        logger.debug(f"Значение {value} недопустимо")
-        logger.error(
-            f"Переменной {ENV_VAR} можно задать одно из следующих значений:"
-            f"\n{TRUE} для активации автообновления;"
-            f"\n{FALSE} для отключения автообновления.")
-
-        return True
+def check_config_file() -> bool:
+    """Checks the value in the configuration file."""
+    return config_file.get_update("auto_update")
 
 
 def compare_versions(project_id: int):
@@ -139,6 +91,7 @@ def compare_versions(project_id: int):
 
 def update_exe(exe_file_name: str, project_id: int, **kwargs):
     executable_file: GitFile = GitFile(exe_file_name, project_id, **kwargs)
+    echo("Обновление исполняемого файла...")
     executable_file.download()
 
     return executable_file.download_destination
@@ -186,7 +139,7 @@ def check_updates(**kwargs):
         exe_file_name: str = "bin/tw_utilities"
         executable: str = "python3"
 
-    new_file: Path = update_exe(exe_file_name, **kwargs)
+    new_file: Path = update_exe(exe_file_name, config_file.get_update("project_id"), **kwargs)
     runner_exe: Path = activate_runner(old_file=EXE_FILE, new_file=new_file)
 
     python: str = which(executable)
@@ -267,33 +220,16 @@ def cli(debug: bool = False, update: bool = True):
         logger.debug(str(config_file))
         logger.debug(f"Файл описания аргументов:\n{str(args_help_dict)}")
 
-        env_var: Any = environ.get(ENV_VAR)
-        logger.debug(f"Переменная окружения: {ENV_VAR}={env_var}")
-
         config_var: bool = config_file.get_update("auto_update")
         logger.debug(f"Параметр автообновления в командах по умолчанию: {config_var}")
 
-        if env_var is None:
-            env_update: bool = True
-            set_env()
+        checked_file: bool = check_file()
+        checked_env: bool = check_env()
+        checked_config_file: bool = check_config_file()
+        checked_command: bool = update
 
-        else:
-            env_update: bool | None = convert_value(env_var)
-
-        if not config_var:
-            logger.debug("Автообновление отключено на уровне конфигурационного файла")
-
-        elif env_update is None:
-            logger.debug("Автообновление отключено на уровне системы")
-
-        elif not update:
-            logger.debug("Автообновление отключено на уровне общей команды")
-
-        elif not env_update:
-            logger.info(
-                "Автообновление отключено."
-                f"\nЧтобы включить, необходимо задать переменной {ENV_VAR} значение:"
-                "\n1 / \"1\" / \"True\" / true / \"yes\" / \"on\" в любом регистре.\n")
+        if any(value is False for value in (checked_file, checked_env, checked_config_file, checked_command)):
+            logger.info("Автообновление отключено")
 
         elif compare_versions(config_file.get_update("project_id")):
             logger.info("Версия актуальна")

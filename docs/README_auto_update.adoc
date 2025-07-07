@@ -12,34 +12,18 @@
 
 В версии 2.1.0 добавлено автоматическое обновление исполняемого файла.
 
-Основной алгоритм работы:
+Проверяются:
 
-. Проверяется наличие переменной окружения `_TW_UTILITIES_UPDATE`.
-+
-* Если переменная окружения не найдена, то:
-+
-[arabic]
-. Добавляется переменная окружения `_TW_UTILITIES_UPDATE`.
-. Присваивается значение 1.
-. Выполняется переход к загрузке файла.
-+
-* Если переменная окружения найдена, то:
-+
-. Задается текущая версия на основе `pyproject.toml::project::version`.
-. Отправляется запрос на `gitlab.com/tech_writers_protei/utilities/` на получение файла `pyproject.toml`.
-+
-* Если запрос неудачен, то далее скрипт выполняет основную команду.
-* Если запрос удачен, то:
-+
-. Из загруженного файла считывается версия, `version`.
-. Сравниваются значения.
-+
-* Если значения равны, то далее скрипт выполняет основную команду.
-* Если значения не равны, то:
-+
-. Загружается новый исполняемый файл из репозитория.
-. Новый файл заменяет старый.
-. Далее скрипт выполняет основную команду.
+* переменная окружения `_TW_UTILITIES_UPDATE`;
+* значение `auto_update` в конфигурационном файле;
+* наличие файла:
+** `%LOCALAPPDATA%/_tw_utilities_update` для Windows;
+** `$HOME/local/_tw_utilities_update` для *nix;
+* опция `-u/--update`/`-U/--no-update` в команде.
+
+Если выполнено хотя бы одно из условий, то автообновление отключено.
+
+Иначе осуществляется проверка текущей версии скрипта и последней версии на git в проекте https://gitlab.com/tech_writers_protei/utilities/[tech_writers_protei/utilities/].
 
 == Переменная _TW_UTILITIES_UPDATE
 
@@ -69,6 +53,7 @@
 +
 [source,powershell]
 ----
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force;
 [Environment]::SetEnvironmentVariable("_TW_UTILITIES_UPDATE", "0", "User");
 RefreshEnv.cmd;
 ----
@@ -96,8 +81,19 @@ $ tw_utilities --no-update <command> <options>
 ----
 +
 . Разорвать соединение с Интернетом, чтобы запросы к репозиторию git были неуспешными.
-
-[CAUTION]
-Для самых наблюдательных: если задать _TW_UTILITIES_UPDATE = -1, то напоминание не будет отображаться в консоли, а скрипт не будет пытаться обновиться.
-Может быть полезно, если запускается много скриптов подряд, поскольку в этом случае игнорируется вся проверка и сравнение версий, а также загрузка файла.
-Это ускорит и упростит запуск, а также вывод консоли будет почище.
+. Создать пустой файл:
++
+* Windows:
++
+[source,powershell]
+----
+$filePath = Join-Path $env:LOCALAPPDATA "_tw_utilities_update"
+New-Item -ItemType File -Path "$env:LOCALAPPDATA\_tw_utilities_update" -Force | Out-Null
+----
++
+*nix:
++
+[source,shell]
+----
+$ touch $HOME/local/_tw_utilities_update
+----

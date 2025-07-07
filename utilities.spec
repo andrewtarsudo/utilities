@@ -9,7 +9,7 @@ a = Analysis(
     ['__main__.py'],
     pathex=['./utilities'],
     binaries=binaries,
-    datas=[('LICENSE', '.'), ('MANIFEST.in', '.'), ('pyproject.toml', '.'), ('sources/', './sources/'), ('utilities/', './utilities/'), ('updates/', './updates/')],
+    datas=[('LICENSE', '.'), ('MANIFEST.in', '.'), ('pyproject.toml', '.'), ('sources/', './sources/'), ('utilities/', './utilities/')],
     hiddenimports=['loguru', 'ruamel.yaml', 'more_itertools', 'click', 'slugify', 'PIL', 'certifi', 'httpx', 'frontmatter', 'psutil'],
     hookspath=[],
     hooksconfig={},
