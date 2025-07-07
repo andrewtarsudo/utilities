@@ -3,6 +3,7 @@ from os import environ, execv
 from pathlib import Path
 from shutil import which
 from string import Template
+from subprocess import run
 import sys
 from typing import Any, Iterable
 
@@ -160,6 +161,10 @@ def get_command() -> list[str]:
     return args
 
 
+def run_command(args):
+    run(args, capture_output=True, shell=is_windows())
+
+
 # noinspection PyTypeChecker
 @group(
     cls=APIGroup,
@@ -220,9 +225,6 @@ def cli(debug: bool = False, update: bool = True):
         logger.debug(str(config_file))
         logger.debug(f"Файл описания аргументов:\n{str(args_help_dict)}")
 
-        config_var: bool = config_file.get_update("auto_update")
-        logger.debug(f"Параметр автообновления в командах по умолчанию: {config_var}")
-
         checked_file: bool = check_file()
         checked_env: bool = check_env()
         checked_config_file: bool = check_config_file()
@@ -240,6 +242,8 @@ def cli(debug: bool = False, update: bool = True):
             args.insert(1, "--no-update")
             record_command(args)
             check_updates()
+
+            run_command(args)
             logger.success("Исполняемый файл обновлен")
 
     except BaseError as e:

@@ -12,9 +12,7 @@ exclude =
     tests/,
     themes/,
     venv/,
-    .venv/,
-    generate_executable.py,
-    run_flake8.py
+    .venv/
 format = pylint
 show-source = True
 hang-closing = False

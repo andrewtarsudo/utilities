@@ -600,10 +600,15 @@ def validate_yaml_command(
     else:
         for yaml_file in yaml_files:
             yaml_file: Path = Path(yaml_file).expanduser().resolve()
-            echo(style(separator, fg="magenta"))
-            echo(f"Файл {yaml_file.name}:")
 
             content: dict[str, Any] = file_reader_type(yaml_file, "yaml")
+
+            if content.get("project", None) is not None:
+                logger.debug(f"Файл {yaml_file} проигнорирован")
+                continue
+
+            echo(style(f"\n{separator}\n", fg="magenta"))
+            echo(f"Файл {yaml_file.name}:")
 
             inspect_settings(content, verbose)
             inspect_legal(content, verbose)
@@ -636,6 +641,8 @@ def validate_yaml_command(
                 logger.success("Проблемы с парамерами разделов не обнаружены\n")
 
             general_info.clear()
+
+    echo(style(f"\n{separator}", fg="magenta"))
 
     if output is not None:
         echo(f"Файл с результатами: {output.resolve()}")

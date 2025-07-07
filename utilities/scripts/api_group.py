@@ -358,7 +358,6 @@ def print_version(ctx: Context, param: Parameter, value: Any):
 
 class APIGroup(Group):
     aliases: dict[Command, set[str]] = {}
-    is_logger_active: bool = False
 
     @classmethod
     def all_alias_names(cls) -> set[str]:
