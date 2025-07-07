@@ -1,6 +1,6 @@
 [project]
 name = "utilities"
-version = "2.2.3"
+version = "2.2.1"
 description = "Command line interface commands for technical writers"
 authors = [
   { name = "Andrew Tarasov", email = "tarasov-a@protei.ru" }
