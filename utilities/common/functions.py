@@ -3,18 +3,16 @@ from base64 import b64decode
 from functools import cache
 from io import UnsupportedOperation
 from json import JSONDecodeError
-from os import getppid, scandir
+from os import scandir
 from pathlib import Path
-from subprocess import run
 from sys import platform
 from typing import Any, Callable, Iterable
 
 from httpx import HTTPStatusError, InvalidURL, request, RequestError, Response, StreamError, URL
 from loguru import logger
-from psutil import Process
 from ruamel.yaml.scanner import ScannerError
 
-from utilities.common.errors import FileReaderError, FileReaderTypeError, ShellUnknownError, UpdateProjectIdError
+from utilities.common.errors import FileReaderError, FileReaderTypeError, UpdateProjectIdError
 from utilities.common.shared import BASE_PATH, FileType, ReaderMode, StrPath
 
 
@@ -391,38 +389,3 @@ class GitFile:
     @property
     def content(self):
         return self._content
-
-
-def get_shell(base_process: Process = None) -> str:
-    if base_process is None:
-        base_process: Process = Process(getppid())
-
-    counter: int = 0
-
-    while base_process:
-        counter += 1
-        name: str = base_process.name()
-
-        if name in ("cmd.exe", "cmd", "powershell.exe", "pwsh", "pwsh.exe", "bash", "zsh", "sh", "fish"):
-            break
-
-        else:
-            return get_shell(base_process.parent())
-
-    else:
-        logger.error("Не удалось определить операционную систему и оболочку командной строки")
-        raise ShellUnknownError
-
-    shell_names: dict[str, str] = {
-        "cmd.exe": "cmd",
-        "cmd": "cmd",
-        "powershell": "pwsh",
-        "powershell.exe": "pwsh",
-        "pwsh": "pwsh",
-        "pwsh.exe": "pwsh",
-        "bash": "bash",
-        "zsh": "zsh",
-        "sh": "sh",
-        "fish": "fish"}
-
-    return shell_names.get(name)
