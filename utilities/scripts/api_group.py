@@ -48,11 +48,16 @@ def wrap_line(line: str):
 
 # noinspection PyUnusedLocal
 @pass_context
-def clear_logs(ctx: Context, result: Any, **kwargs):
+def clear_logs(ctx: Context, **kwargs):
     keep_logs: bool = ctx.obj.get("keep_logs", False)
     debug: bool = ctx.obj.get("debug", False)
     no_result: bool = ctx.obj.get("no_result", False)
     result_file: Path = ctx.obj.get("result_file", None)
+
+    general_temp_dir: str = Path(config_file.get_general("temp_dir")).expanduser().as_posix()
+    update_temp_dir: str = Path(config_file.get_update("temp_dir")).expanduser().as_posix()
+    rmtree(general_temp_dir, ignore_errors=True)
+    rmtree(update_temp_dir, ignore_errors=True)
 
     log_path: Path = Path(config_file.get_general("log_path")).parent
     debug_log_folder: Path = Path(config_file.get_general("debug_log_folder")).parent
@@ -518,14 +523,20 @@ class TermsAPIGroup(APIGroup):
             args: list[str] = []
 
         else:
-            args: list[str] = [
-                value.upper()
-                if not value.startswith("-")
-                else value
-                for value in args]
+            options: list[str] = []
+            non_options: list[str] = []
 
-            if all(not x.startswith("-") for x in args):
-                args.insert(0, '--common')
+            for arg in args:
+                if not arg.startswith("-"):
+                    non_options.append(arg.upper())
+
+                else:
+                    options.append(arg)
+
+            if not options:
+                options.append("--common")
+
+            args: list[str] = [*options, *non_options]
 
         return super().parse_args(ctx, args)
 

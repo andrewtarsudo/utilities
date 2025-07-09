@@ -187,7 +187,7 @@ def repair_links_command(
             languages: list[FileLanguage] = [FileLanguage.RU]
 
         else:
-            languages: list[FileLanguage] = [FileLanguage.RU_EN]
+            languages: list[FileLanguage] = [FileLanguage.RU_EN_FR]
 
         for language in languages:
             anchor_inspector.inspect_inside_file(language)

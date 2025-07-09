@@ -61,7 +61,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     show_default=True,
     required=False,
     is_eager=True,
-    default=config_file.get_commands("get-terms", "common_flag"))
+    default=config_file.get_commands("get-terms", "all_flag"))
 @option(
     "-f", "--full", "full_flag",
     is_flag=True,
@@ -71,7 +71,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     show_default=True,
     required=False,
     is_eager=True,
-    default=config_file.get_commands("get-terms", "common_flag"))
+    default=config_file.get_commands("get-terms", "full_flag"))
 @option(
     "-i", "--info", "info_flag",
     is_flag=True,
@@ -82,7 +82,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     required=False,
     is_eager=True,
     callback=print_file,
-    default=config_file.get_commands("get-terms", "common_flag"))
+    default=config_file.get_commands("get-terms", "info_flag"))
 @option(
     "-r", "--readme", "readme_flag",
     is_flag=True,
@@ -93,7 +93,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     required=False,
     is_eager=True,
     callback=print_file,
-    default=config_file.get_commands("get-terms", "common_flag"))
+    default=config_file.get_commands("get-terms", "readme_flag"))
 @option(
     "-s", "--samples", "samples_flag",
     is_flag=True,
@@ -104,7 +104,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
     required=False,
     is_eager=True,
     callback=print_file,
-    default=config_file.get_commands("get-terms", "common_flag"))
+    default=config_file.get_commands("get-terms", "samples_flag"))
 @option(
     "--abbr", "abbr_flag",
     is_flag=True,
@@ -114,7 +114,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
          "\nФормат: <abbr title=\"\"></abbr>",
     show_default=True,
     required=False,
-    default=config_file.get_commands("get-terms", "common_flag"))
+    default=config_file.get_commands("get-terms", "abbr_flag"))
 @option(
     "--ascii", "ascii_flag",
     is_flag=True,
@@ -124,7 +124,7 @@ def print_file(ctx: Context, param: Parameter, value: Any):
          "\nФормат: pass:q[<abbr title=\"\"></abbr>]",
     show_default=True,
     required=False,
-    default=config_file.get_commands("get-terms", "common_flag"))
+    default=config_file.get_commands("get-terms", "ascii_flag"))
 @option(
     "--common", "common_flag",
     is_flag=True,
