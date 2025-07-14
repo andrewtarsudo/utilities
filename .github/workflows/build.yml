@@ -19,9 +19,13 @@ jobs:
           uv sync --dev
           uv pip install pyinstaller
       - name: Build with PyInstaller
-        run: uv run pyinstaller --noconfirm utilities.exe.spec
+        run: uv run pyinstaller --noconfirm --distpath github_exe/ utilities.exe.spec
+      - name: Print EXE path
+        run: |
+          echo "Built EXE file:"
+          find github_exe -name "*.exe" -exec realpath {} \;
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
           name: tw_utilities.exe
-          path: bin/
+          path: github_exe/
