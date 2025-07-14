@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from os import environ, execv
 from pathlib import Path
-from shutil import which
+from shutil import rmtree, which
 from string import Template
 from subprocess import run
 import sys
@@ -21,7 +21,7 @@ from utilities.common.errors import BaseError
 from utilities.common.functions import file_reader, file_reader_type, file_writer, get_version, GitFile, \
     is_windows
 from utilities.common.shared import BASE_PATH, EXE_FILE, HELP, PRESS_ENTER_KEY, ScriptVersion, StrPath
-from utilities.scripts.api_group import APIGroup, get_full_help, print_version
+from utilities.scripts.api_group import APIGroup, clear_logs, get_full_help, print_version
 from utilities.scripts.args_help_dict import args_help_dict
 
 ENV_VAR: str = config_file.get_update("env_var")
@@ -32,18 +32,9 @@ TEMP_COMMAND_FILE: Path = Path(config_file.get_update("temp_command_file")).expa
 def check_env() -> bool:
     """Checks the environment variable _TW_UTILITIES_UPDATE."""
     FALSE: tuple[str, ...] = ("0", "false", "no", "off")
-    env_var: str | None = environ.get("_TW_UTILITIES_UPDATE", None)
+    env_var: str = environ.get("_TW_UTILITIES_UPDATE", "1")
 
-    if env_var is None:
-        return True
-
-    env_var: str = env_var.lower()
-
-    if env_var in FALSE:
-        return False
-
-    else:
-        return True
+    return env_var in FALSE
 
 
 def check_file() -> bool:
@@ -205,8 +196,11 @@ def cli(debug: bool = False, update: bool = True):
 
     try:
         ctx: Context = get_current_context()
+        ctx.call_on_close(clear_logs)
         ctx.ensure_object(dict)
         ctx.obj = {"debug": debug}
+
+        logger.debug(f"Вызванная команда: {" ".join(sys.argv[:])}")
 
         if ctx.invoked_subcommand is None:
             echo("Не указана ни одна из доступных команд. Для вызова справки используется опция -h / --help")
@@ -223,7 +217,7 @@ def cli(debug: bool = False, update: bool = True):
             add_handler("result_file")
 
         logger.debug(str(config_file))
-        logger.debug(f"Файл описания аргументов:\n{str(args_help_dict)}")
+        logger.debug(f"\nФайл описания аргументов:\n{str(args_help_dict)}")
 
         checked_file: bool = check_file()
         checked_env: bool = check_env()
@@ -231,22 +225,28 @@ def cli(debug: bool = False, update: bool = True):
         checked_command: bool = update
 
         if any(value is False for value in (checked_file, checked_env, checked_config_file, checked_command)):
-            logger.info("Автообновление отключено")
+            logger.info(
+                f"\nФайл в ~/: {checked_file}"
+                f"\nПеременная окружения: {checked_env}"
+                f"\nЗначение в конфигурационном файле: {checked_config_file}"
+                f"\nОпция команды: {checked_command}")
+            logger.warning("\nАвтообновление отключено\n")
 
         elif compare_versions(config_file.get_update("project_id")):
-            logger.info("Версия актуальна")
+            logger.success("\nВерсия актуальна\n")
 
         else:
             args: list[str] = sys.argv[:]
-            args[0]: str = str(EXE_FILE.resolve().absolute())
-            args.insert(1, "--no-update")
             record_command(args)
             check_updates()
-
             run_command(args)
-            logger.success("Исполняемый файл обновлен")
+            logger.success("\nИсполняемый файл обновлен\n")
 
     except BaseError as e:
+        general_temp_dir: Path = Path(config_file.get_general("temp_dir")).expanduser().as_posix()
+        update_temp_dir: Path = Path(config_file.get_update("temp_dir")).expanduser().as_posix()
+        rmtree(general_temp_dir, ignore_errors=True)
+        rmtree(update_temp_dir, ignore_errors=True)
         logger.error(f"Ошибка {e.__class__.__name__}")
         pause(PRESS_ENTER_KEY)
         sys.exit(1)

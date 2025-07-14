@@ -9,7 +9,8 @@ class FileLanguage(Enum):
     """Class to represent the file language."""
     RU = "russian"
     EN = "english"
-    RU_EN = "russian+english"
+    FR = "french"
+    RU_EN_FR = "russian+english+french"
 
     def __str__(self):
         return f"{self._value_}"
