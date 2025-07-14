@@ -48,11 +48,11 @@ def wrap_line(line: str):
 
 # noinspection PyUnusedLocal
 @pass_context
-def clear_logs(ctx: Context, **kwargs):
+def clear_logs(ctx):
     keep_logs: bool = ctx.obj.get("keep_logs", False)
     debug: bool = ctx.obj.get("debug", False)
     no_result: bool = ctx.obj.get("no_result", False)
-    result_file: Path = ctx.obj.get("result_file", None)
+    result_file: Path | None = ctx.obj.get("result_file", None)
 
     general_temp_dir: str = Path(config_file.get_general("temp_dir")).expanduser().as_posix()
     update_temp_dir: str = Path(config_file.get_update("temp_dir")).expanduser().as_posix()
@@ -61,11 +61,6 @@ def clear_logs(ctx: Context, **kwargs):
 
     log_path: Path = Path(config_file.get_general("log_path")).parent
     debug_log_folder: Path = Path(config_file.get_general("debug_log_folder")).parent
-
-    logger.debug(
-        f"Версия: {get_version()}\n"
-        f"Команда: {ctx.command_path}\n"
-        f"Параметры: {ctx.params}")
 
     logger.remove()
 
@@ -82,8 +77,7 @@ def clear_logs(ctx: Context, **kwargs):
         echo(f"\nПапка с логами: {debug_log_folder}\n")
 
     rmtree(config_file.get_general("temp_dir"), ignore_errors=True)
-    input(PRESS_ENTER_KEY)
-    ctx.exit(0)
+    # input(PRESS_ENTER_KEY)
 
 
 def format_usage(
@@ -398,8 +392,7 @@ class APIGroup(Group):
     def __init__(self, aliases: set[str] = None, **attrs: Any):
         kwargs: dict[str, bool] = {
             "invoke_without_command": True,
-            "chain": False,
-            "result_callback": clear_logs}
+            "chain": False}
         attrs.update(kwargs)
 
         context_settings: dict[str, str] = {
