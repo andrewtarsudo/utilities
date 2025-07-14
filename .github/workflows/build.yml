@@ -19,7 +19,7 @@ jobs:
           uv sync --dev
           uv pip install pyinstaller
       - name: Build with PyInstaller
-        run: pyinstaller --noconfirm utilities.exe.spec
+        run: uv run pyinstaller --noconfirm utilities.exe.spec
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
