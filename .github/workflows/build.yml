@@ -25,9 +25,3 @@ jobs:
         with:
           name: tw_utilities.exe
           path: github_exe/
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: github_exe/*.exe
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
