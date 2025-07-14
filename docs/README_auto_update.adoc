@@ -14,14 +14,21 @@
 
 Проверяются:
 
-* переменная окружения `_TW_UTILITIES_UPDATE`;
-* значение `auto_update` в конфигурационном файле;
+* переменная окружения `_TW_UTILITIES_UPDATE = 0` (по умолчанию отсутствует, далее `_TW_UTILITIES_UPDATE = 1`);
+* значение `auto_update = 0` в конфигурационном файле (по умолчанию `auto_update = 1`, не корректируется пользователем);
 * наличие файла:
 ** `%LOCALAPPDATA%/_tw_utilities_update` для Windows;
 ** `$HOME/local/_tw_utilities_update` для *nix;
-* опция `-u/--update`/`-U/--no-update` в команде.
+* опция `-U/--no-update` в команде (по умолчанию `--update`).
 
 Если выполнено хотя бы одно из условий, то автообновление отключено.
+
+Если ничего не менять, то по умолчанию автообновление включено.
+
+Пользователь может изменить это поведение:
+
+* задав `_TW_UTILITIES_UPDATE = 0` для переменной окружения любой области доступности: подходит как для локального пользователя, так и глобально;
+* создав файл по вышеуказанному пути соответственно операционной системе, при этом содержимое полностью игнорируется, поскольку даже наличие доступа к файлу не проверяется, тем более не открывается.
 
 Иначе осуществляется проверка текущей версии скрипта и последней версии на git в проекте https://gitlab.com/tech_writers_protei/utilities/[tech_writers_protei/utilities/].
 
@@ -29,13 +36,6 @@
 
 Возможные значения:
 
-* Активация:
-+
-** 1
-** "1"
-** yes
-** on
-+
 * Деактивация:
 +
 ** 0
@@ -71,7 +71,7 @@ $ source ~/.bashrc
 +
 [source,powershell]
 ----
-.\tw_utilities.exe  --no-update <command> <options>
+$ .\tw_utilities.exe --no-update <command> <options>
 ----
 * ++*++nix:
 +
@@ -88,7 +88,7 @@ $ tw_utilities --no-update <command> <options>
 [source,powershell]
 ----
 $filePath = Join-Path $env:LOCALAPPDATA "_tw_utilities_update"
-New-Item -ItemType File -Path "$env:LOCALAPPDATA\_tw_utilities_update" -Force | Out-Null
+New-Item -ItemType File -Path $filePath -Force | Out-Null
 ----
 +
 *nix:
