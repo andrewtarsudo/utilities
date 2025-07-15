@@ -2,16 +2,199 @@
 from itertools import product
 from pathlib import Path
 from sys import stdout
-from typing import ForwardRef, Iterable
+from typing import Any, ClassVar, ForwardRef, Iterable, Mapping, NamedTuple, Self
 
 # noinspection PyProtectedMember
 from frontmatter import load, Post
+from loguru import logger
 from yaml import safe_dump
 
+from utilities.common.functions import file_reader
 from utilities.common.shared import EXTENSIONS, INDEX_STEMS, StrPath
 
 RecursiveDict = ForwardRef("RecursiveDict")
 RecursiveDict.__forward_arg__ = "dict[Path, list[Path | RecursiveDict]]"
+
+
+# noinspection PyTypeChecker
+class FrontMatter(NamedTuple):
+    title: str
+    weight: int
+    draft: bool = False
+
+    def __key(self) -> tuple[int, str]:
+        return self.weight, self.title
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() == other.__key()
+
+        else:
+            return NotImplemented
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() != other.__key()
+
+        else:
+            return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() < other.__key()
+
+        else:
+            return NotImplemented
+
+    def __le__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() <= other.__key()
+
+        else:
+            return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() > other.__key()
+
+        else:
+            return NotImplemented
+
+    def __ge__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() >= other.__key()
+
+        else:
+            return NotImplemented
+
+    @classmethod
+    def from_dict(cls, __dict: Mapping[str, Any]):
+        try:
+            title: str = __dict.get("title")
+            weight: int = int(__dict.get("weight"))
+            draft: bool = __dict.get("draft", False)
+
+            return cls(title, weight, draft)
+
+        except KeyError:
+            logger.error(f"Отсутствуют обязательные атрибуты")
+            raise
+
+        except ValueError:
+            logger.error(f"Значение weight нельзя привести к типу int")
+
+
+class File:
+    def __init__(self, path: StrPath):
+        self._path: Path = Path(path)
+        self._frontmatter: FrontMatter | None = None
+
+    def is_index(self):
+        return self._path.name.startswith(("index", "_index"))
+
+    def is_text(self):
+        return self._path.suffix in EXTENSIONS
+
+    def set_frontmatter(self):
+        try:
+            post: Post = load(str(self._path))
+            fm: FrontMatter = FrontMatter.from_dict(**post.metadata)
+
+            self._frontmatter = fm
+
+        except (AttributeError, ValueError):
+            logger.error("Файл некорректен, поэтому проигнорирован")
+
+    def __bool__(self):
+        return self._frontmatter is not None
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._path == other._path
+
+        else:
+            return NotImplemented
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            return self._path != other._path
+
+        else:
+            return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, self.__class__) and bool(self) and bool(other):
+            return self._frontmatter < other._frontmatter
+
+        else:
+            return NotImplemented
+
+    def __le__(self, other):
+        if isinstance(other, self.__class__) and bool(self) and bool(other):
+            return self._frontmatter <= other._frontmatter
+
+        else:
+            return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, self.__class__) and bool(self) and bool(other):
+            return self._frontmatter > other._frontmatter
+
+        else:
+            return NotImplemented
+
+    def __ge__(self, other):
+        if isinstance(other, self.__class__) and bool(self) and bool(other):
+            return self._frontmatter >= other._frontmatter
+
+        else:
+            return NotImplemented
+
+
+class BranchDict(dict):
+    pass
+
+
+class Branch:
+    root: ClassVar[Path]
+
+    branch_dict: BranchDict = BranchDict()
+
+    def __init__(self, path: StrPath):
+        self._path = Path(path)
+        self._index_file: File | None = None
+        self._files: list[File] = []
+        self._subs: list[Self] = []
+        self._parent: Self = None
+
+        self.__class__.branch_dict[self._path] = self
+
+    def set_files(self):
+        for file_path in filter(lambda x: x.suffix in EXTENSIONS, self._path.iterdir()):
+            file: File = File(file_path)
+            file.set_frontmatter()
+
+            if file.is_index():
+                self._index_file = file
+
+            else:
+                self._files.append(file)
+
+    def __len__(self):
+        return len(self._files) + int(self._index_file is not None)
+
+    def __bool__(self):
+        return self._index_file is not None and not len(self._files)
+
+    @property
+    def relpath(self):
+        return self._path.relative_to(self.root)
+
+    @property
+    def level(self):
+        return len(self.relpath.parts)
+
+
 
 
 class WithFrontMatter:

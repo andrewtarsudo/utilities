@@ -2,12 +2,14 @@
 from pathlib import Path
 from typing import Any, NamedTuple, Optional
 
+from click import echo
 from click.core import Context
 from click.decorators import argument, help_option, option, pass_context
 from click.types import BOOL, Choice, Path as ClickPath, STRING
 # noinspection PyProtectedMember
 from frontmatter import load, Post
 from loguru import logger
+from yaml.scanner import ScannerError
 
 from utilities.common.completion import dir_completion, language_completion
 from utilities.common.config_file import config_file
@@ -45,7 +47,9 @@ class Frontmatter(NamedTuple):
 
     # noinspection PyTypeChecker
     @classmethod
-    def parse_frontmatter(cls, filepath: StrPath, root: StrPath) -> Optional['Frontmatter']:
+    def parse_frontmatter(cls, filepath: StrPath, root: StrPath):
+        logger.debug(f"Разбор frontmatter файла {filepath}")
+
         try:
             post: Post = load(str(filepath))
             draft: bool = post.get("draft", False)
@@ -59,11 +63,18 @@ class Frontmatter(NamedTuple):
             filename: str = filepath.relative_to(root).as_posix()
             path: str = filepath.as_posix()
 
+            logger.debug(f"title = {title}\nweight = {weight}\ndraft = {draft}")
+
             return cls(weight, title, filename, path, draft)
 
         except OSError:
-            logger.debug(f"В файле {filepath} отсутствует frontmatter")
-            return None
+            logger.error(f"В файле {filepath} отсутствует frontmatter")
+            return
+
+        except ScannerError as e:
+            logger.error(f"Ошибка разбора frontmatter файла {filepath}")
+            logger.error(f"Место ошибки: {e.context_mark.line}:{e.context_mark.index}")
+            return
 
     def __str__(self):
         return pretty_print([f"{k} = {v}" for k, v in self._asdict().items()])
@@ -73,17 +84,17 @@ class Branch:
     """Class to represent a directory branch in the tree."""
     root: Path
 
-    def __init__(self, path: Path) -> None:
-        self._path: Path = path
+    def __init__(self, path: StrPath) -> None:
+        self._path: Path = Path(path)
         self._index: list[str] = []
         self._title: dict[str, Any] = {}
         self._files: list[str] = []
         self._subdirs: dict[str, 'Branch'] = {}
         self._weight: Optional[int] = None
 
-    # @property
-    # def relpath(self) -> str:
-    #     return self._path.relative_to(self.__class__.root).as_posix()
+    @property
+    def relpath(self) -> str:
+        return self._path.relative_to(self.__class__.root).as_posix()
 
     def to_dict(self) -> dict[str, Any]:
         result: dict[str, Any] = {}
@@ -160,14 +171,6 @@ class Branch:
         return flat
 
     @property
-    def relpath(self) -> str:
-        """Safe relative path calculation with fallback."""
-        try:
-            return str(self._path.relative_to(self.__class__.root))
-        except ValueError:
-            return str(self._path)
-
-    @property
     def path(self) -> Path:
         return self._path
 
@@ -199,12 +202,13 @@ class Tree:
     def __init__(self, root: Path) -> None:
         self._root: Path = root
         self._branches: dict[str, Branch] = {}
-        self._current_branch: Optional[Branch] = None
-        self._current_dir: Optional[Path] = None
+        self._current_branch: Branch | None = None
+        self._current_dir: Path | None = None
 
     def get_directory_weight(self) -> 'Tree':
         try:
             filepath: Path = find_index(self._current_dir, self.__class__.language)
+            logger.debug(f"Директория {self._current_dir.as_posix()}\nФайл index: {filepath.as_posix()}")
 
         except GenerateYamlMissingIndexFileError:
             raise GenerateYamlMissingBranchError
@@ -225,13 +229,15 @@ class Tree:
 
                 if level < 1:
                     logger.error(
-                        f"Для директории {self._current_dir} получено значение "
+                        f"Для директории {self._current_dir.as_posix()} получено значение "
                         f"level = {level}"
                         f"\nЭто означает, что директория находится не в директории content/common, "
                         f"в связи с чем и была проигнорирована")
                     raise GenerateYamlInvalidLevelError
 
                 self._current_branch.title["level"] = level
+
+                logger.debug(f"level: {level}")
 
             return self
 
@@ -240,7 +246,7 @@ class Tree:
             if not is_valid_file(filepath, self.__class__.language):
                 continue
 
-            front_matter: Optional[Frontmatter] = Frontmatter.parse_frontmatter(filepath, self._root)
+            front_matter: Frontmatter | None = Frontmatter.parse_frontmatter(filepath, self._root)
 
             if front_matter:
                 self._current_branch.files.append(front_matter.filename)
@@ -251,22 +257,28 @@ class Tree:
                 (Frontmatter.parse_frontmatter(self._root.joinpath(x), self._root)).weight,
                 (Frontmatter.parse_frontmatter(self._root.joinpath(x), self._root)).title.lower()))
 
+        logger.debug(f"Файлы в директории:\n{pretty_print(self._current_branch.files)}")
+
         return self
 
     def process_subdirectories(self) -> 'Tree':
         subdirs: list[Path] = sorted(self._current_dir.iterdir())
 
+        logger.debug(f"Содержимое директории {self._current_dir.as_posix()}:\n{pretty_print(subdirs)}")
+
         for subdir in subdirs:
             if subdir.is_dir():
-                sub_branch: Optional[Branch] = self.generate_branch(subdir)
+                sub_branch: Branch | None = self.generate_branch(subdir)
 
                 if sub_branch:
                     self._current_branch.subdirs[sub_branch.path.name] = sub_branch
+
                 else:
                     # Handle case where directory only has index file
                     try:
                         index_file: Path = find_index(subdir, self.__class__.language)
-                        front_matter: Optional[Frontmatter] = Frontmatter.parse_frontmatter(index_file, self._root)
+                        logger.debug(f"Директория {subdir}\nФайл index: {index_file.as_posix()}")
+                        front_matter: Frontmatter | None = Frontmatter.parse_frontmatter(index_file, self._root)
 
                         if front_matter:
                             self._current_branch.files.append(front_matter.filename)
@@ -276,16 +288,19 @@ class Tree:
 
         return self
 
-    def generate_branch(self, dirpath: StrPath, branch: Optional[Branch] = None) -> Optional[Branch]:
+    def generate_branch(self, dirpath: StrPath, branch: Branch = None) -> Branch | None:
         if branch is None:
-            branch = Branch(Path(dirpath))
+            branch: Branch = Branch(dirpath)
 
         self._current_dir = Path(dirpath)
         self._current_branch = branch
 
+        logger.debug(f"Генерация ветки для директории {self._current_dir.as_posix()}")
+
         try:
             # First check if this directory has only an index file
-            index_file: Path = find_index(self._current_dir, self.__class__.language)
+            index_file: Path | None = find_index(self._current_dir, self.__class__.language)
+            logger.debug(f"Директория {self._current_dir.as_posix()}\nФайл index: {index_file.as_posix()}")
 
             if index_file is None:
                 return None
@@ -298,8 +313,10 @@ class Tree:
             if len(content_files) == 1:
                 return None
 
+            logger.debug(f"Ветка директории {self._current_dir.as_posix()}")
+
             # Otherwise proceed with normal branch generation
-            branch = (
+            branch: Branch = (
                 self
                 .get_directory_weight()
                 .process_files()
@@ -314,9 +331,13 @@ class Tree:
         except (GenerateYamlMissingBranchError, GenerateYamlInvalidLevelError):
             return None
 
-    def build(self) -> None:
+        except AttributeError as e:
+            logger.error(f"Объект {e.obj} типа {type(e.obj).__name__} не имеет атрибута {e.name}")
+            logger.info(f"Директория {self._current_dir.as_posix()}")
+
+    def build(self):
         """Build the complete tree structure"""
-        root_branch: Optional[Branch] = self.generate_branch(self._root)
+        root_branch: Branch | None = self.generate_branch(self._root)
 
         if root_branch:
             self._branches = root_branch.subdirs
@@ -393,10 +414,13 @@ class YAMLConfig(NamedTuple):
     def set_legal_info(self) -> None:
         if self.language == "ru":
             value: str = "Юридическая информация"
+
         else:
             value: str = "Legal Information"
 
-        index_file: str = find_index(self.root.joinpath("content/common"), self.language).as_posix()
+        legal_info_file: Path = self.root.joinpath("content/common")
+        index_file: str = find_index(legal_info_file, self.language).as_posix()
+        logger.debug(f"Директория: {legal_info_file}\nФайл index: {index_file}")
         title_files: bool = False
 
         rights: dict[str, list[str] | dict[str, str | bool]] = {
@@ -417,8 +441,10 @@ class YAMLConfig(NamedTuple):
         if is_execute:
             file_writer(output, str(self))
             logger.success(f"Записан файл {Path(output).resolve()}")
+
         else:
             logger.warning("Файл не был записан согласно используемым опциям в команде")
+            echo(str(self))
 
     def to_dict(self) -> dict[str, Any]:
         return {
