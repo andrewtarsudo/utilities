@@ -1,24 +1,20 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-from typing import Any, NamedTuple, Optional
+from typing import Any, ClassVar, Mapping, NamedTuple, Self
 
-from click import echo
-from click.core import Context
-from click.decorators import argument, help_option, option, pass_context
-from click.types import BOOL, Choice, Path as ClickPath, STRING
+from click import argument, BOOL, Choice, Context, echo, help_option, option, pass_context, STRING
 # noinspection PyProtectedMember
 from frontmatter import load, Post
 from loguru import logger
-from yaml.scanner import ScannerError
+
+
+from click import Path as ClickPath
 
 from utilities.common.completion import dir_completion, language_completion
 from utilities.common.config_file import config_file
-from utilities.common.errors import GenerateYamlInvalidLevelError, GenerateYamlMissingAttributeError, \
-    GenerateYamlMissingBranchError, GenerateYamlMissingIndexFileError
-from utilities.common.functions import file_writer, pretty_print
-from utilities.common.shared import EXTENSIONS, HELP, INDEX_STEMS, MyYAML, StrPath
-from utilities.scripts.api_group import SwitchArgsAPIGroup
-from utilities.scripts.cli import cli
+from utilities.common.errors import GenerateYamlMissingAttributeError
+from utilities.common.shared import EXTENSIONS, HELP, MyYAML, StrPath
+from utilities.scripts import cli, SwitchArgsAPIGroup
 
 EPILOG_GENERATE_YAML: str = (
     "\b\nЗначения атрибутов AsciiDoc по умолчанию, добавляемые в файл:"
@@ -37,317 +33,410 @@ EPILOG_GENERATE_YAML: str = (
     "\b\nДопускается добавлять любые атрибуты, в том числе и пользовательские.")
 
 
-class Frontmatter(NamedTuple):
-    """Class to represent the file frontmatter metadata."""
-    weight: int
+# noinspection PyTypeChecker
+class FrontMatter(NamedTuple):
     title: str
-    filename: str
-    path: str
+    weight: int
     draft: bool = False
 
-    # noinspection PyTypeChecker
+    def __key(self) -> tuple[int, str]:
+        return self.weight, self.title
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() == other.__key()
+
+        else:
+            return NotImplemented
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() != other.__key()
+
+        else:
+            return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() < other.__key()
+
+        else:
+            return NotImplemented
+
+    def __le__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() <= other.__key()
+
+        else:
+            return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() > other.__key()
+
+        else:
+            return NotImplemented
+
+    def __ge__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() >= other.__key()
+
+        else:
+            return NotImplemented
+
     @classmethod
-    def parse_frontmatter(cls, filepath: StrPath, root: StrPath):
-        logger.debug(f"Разбор frontmatter файла {filepath}")
-
+    def from_dict(cls, __dict: Mapping[str, Any]):
         try:
-            post: Post = load(str(filepath))
-            draft: bool = post.get("draft", False)
+            title: str = __dict.get("title")
+            weight: int = int(__dict.get("weight"))
+            draft: bool = __dict.get("draft", False)
 
-            if not post.metadata or draft:
-                return None
+            return cls(title, weight, draft)
 
-            filepath: Path = Path(filepath)
-            weight: int = int(str(post.get("weight")))
-            title: str = str(post.get("title"))
-            filename: str = filepath.relative_to(root).as_posix()
-            path: str = filepath.as_posix()
+        except KeyError:
+            logger.error(f"Отсутствуют обязательные атрибуты")
+            raise
 
-            logger.debug(f"title = {title}\nweight = {weight}\ndraft = {draft}")
+        except ValueError:
+            logger.error(f"Значение weight нельзя привести к типу int")
 
-            return cls(weight, title, filename, path, draft)
+        except TypeError:
+            logger.error(f"Некорректное значение атрибута")
 
-        except OSError:
-            logger.error(f"В файле {filepath} отсутствует frontmatter")
-            return
 
-        except ScannerError as e:
-            logger.error(f"Ошибка разбора frontmatter файла {filepath}")
-            logger.error(f"Место ошибки: {e.context_mark.line}:{e.context_mark.index}")
-            return
+class File:
+    def __init__(self, path: StrPath):
+        self._path: Path = Path(path)
+        self._frontmatter: FrontMatter | None = None
+        self._content: str | None = None
+
+    def is_index(self):
+        return self._path.name.startswith(("index", "_index"))
+
+    def is_text(self):
+        return self._path.suffix in EXTENSIONS
+
+    def set_params(self):
+        try:
+            post: Post = load(str(self._path))
+            fm: FrontMatter = FrontMatter.from_dict(post.metadata)
+            content: str = post.content
+
+            self._frontmatter = fm
+            self._content = content
+
+        except (AttributeError, ValueError):
+            logger.error("Файл некорректен, поэтому проигнорирован")
+
+    def __bool__(self):
+        return self._frontmatter is not None
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._path == other._path
+
+        else:
+            return NotImplemented
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            return self._path != other._path
+
+        else:
+            return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, self.__class__) and bool(self) and bool(other):
+            return self._frontmatter < other._frontmatter
+
+        else:
+            return NotImplemented
+
+    def __le__(self, other):
+        if isinstance(other, self.__class__) and bool(self) and bool(other):
+            return self._frontmatter <= other._frontmatter
+
+        else:
+            return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, self.__class__) and bool(self) and bool(other):
+            return self._frontmatter > other._frontmatter
+
+        else:
+            return NotImplemented
+
+    def __ge__(self, other):
+        if isinstance(other, self.__class__) and bool(self) and bool(other):
+            return self._frontmatter >= other._frontmatter
+
+        else:
+            return NotImplemented
+
+    def is_empty(self):
+        return not self._content
+
+    def relpath(self, root: Path):
+        return self._path.resolve().relative_to(root.resolve())
+
+    @property
+    def language(self):
+        suffixes: list[str] = self._path.suffixes
+
+        if len(suffixes) > 1:
+            return suffixes[0]
+
+        else:
+            return "ru"
+
+    @property
+    def frontmatter(self):
+        return self._frontmatter
+
+
+class BranchDict(dict):
+    pass
+
+
+class BranchParameters(NamedTuple):
+    name: str
+    title: str | None
+    level: int | None
+    index: list[str] = []
+    files: list[str] = []
+
+    def to_dict(self):
+        dict_parameters: dict[str, Any] = {}
+
+        if self.title is not None:
+            dict_parameters["title"] = self.title
+
+        if self.level is not None:
+            dict_parameters["level"] = self.level
+
+        if self.index:
+            dict_parameters["index"] = self.index
+
+        if self.files:
+            dict_parameters["files"] = self.files
+
+        return dict_parameters
 
     def __str__(self):
-        return pretty_print([f"{k} = {v}" for k, v in self._asdict().items()])
+        my_yaml: MyYAML = MyYAML()
+        my_yaml.dump(self.to_dict())
 
 
 class Branch:
-    """Class to represent a directory branch in the tree."""
-    root: Path
+    root: ClassVar[Path]
+    language: ClassVar[str]
 
-    def __init__(self, path: StrPath) -> None:
-        self._path: Path = Path(path)
-        self._index: list[str] = []
-        self._title: dict[str, Any] = {}
-        self._files: list[str] = []
-        self._subdirs: dict[str, 'Branch'] = {}
-        self._weight: Optional[int] = None
+    branch_dict: BranchDict = BranchDict()
 
-    @property
-    def relpath(self) -> str:
-        return self._path.relative_to(self.__class__.root).as_posix()
+    def __init__(self, path: StrPath):
+        self._path = Path(path)
+        self._index_file: File | None = None
+        self._files: list[File] = []
+        self._subs: list[Self] = []
+        self._parent: Self = None
 
-    def to_dict(self) -> dict[str, Any]:
-        result: dict[str, Any] = {}
+        self.__files_inside: list[Path] = []
+        self.__dirs_inside: list[Path] = []
 
-        if self._index:
-            result["index"] = self._index
+        self.__class__.branch_dict[self._path] = self
 
-        if self._title:
-            result["title"] = self._title
+    def set_inside(self):
+        for item in self._path.iterdir():
+            if item.is_file() and item.suffix in EXTENSIONS:
+                self.__files_inside.append(item)
 
-        if self._files:
-            result["files"] = sorted(self._files)
+            elif item.is_dir():
+                self.__dirs_inside.append(item)
 
-        if self._subdirs:
-            # Sort subdirs by weight (None last), then by name
-            sorted_subdirs = sorted(
-                self._subdirs.items(),
-                key=lambda item: (
-                    -1 if item[1].weight is None else item[1].weight,
-                    item[0].lower()))
-            result["subdirs"] = {k: v.to_dict() for k, v in sorted_subdirs}
+            else:
+                pass
 
-        return result
+    def set_files(self):
+        for file_path in self.__files_inside:
+            file: File = File(file_path)
 
-    def __str__(self):
-        lines: list[str] = [f"{self.__class__.__name__}: {self._path}"]
-        lines.extend([f"{k} = {v}" for k, v in self.to_dict().items()])
-        return pretty_print(lines)
-
-    def flatten(self) -> dict[str, dict[str, Any]]:
-        """Iterative directory flattening with cycle detection."""
-        flat: dict[str, dict[str, Any]] = {}
-        stack: list[Branch] = [self]
-        visited: set[Path] = set()
-
-        while stack:
-            current = stack.pop()
-            real_path = current.path.resolve()
-
-            # Skip already visited directories (cycle detection)
-            if real_path in visited:
+            if file.language != self.__class__.language:
                 continue
-            visited.add(real_path)
 
-            # Process current directory
-            current_data: dict[str, Any] = {}
-            if current._index:
-                current_data["index"] = current._index
-            if current._files:
-                current_data["files"] = sorted(current._files)
-            if current._title:
-                current_data["title"] = current._title
+            file.set_params()
 
-            if current_data:
-                try:
-                    rel_path = str(current.path.relative_to(self.root))
-                    flat[rel_path] = current_data
-                except ValueError:
-                    # Fallback for paths outside root
-                    flat[str(current.path)] = current_data
+            if not bool(file):
+                continue
 
-            # Add subdirectories to stack (sorted by weight then name)
-            stack.extend(
-                sorted(
-                    current._subdirs.values(),
-                    key=lambda b: (
-                        -1 if b.weight is None else b.weight,
-                        b.path.name.lower()
-                    ),
-                    reverse=True  # Reverse for correct processing order
-                )
-            )
+            elif file.is_index():
+                self._index_file = file
 
-        return flat
+            else:
+                self._files.append(file)
+
+    def set_parent(self):
+        if self._path.resolve() != self.__class__.root.resolve():
+            self._parent = self._path.parent
+
+    def __len__(self):
+        return len(self._files) + int(self._index_file is not None)
+
+    def __bool__(self):
+        return self._index_file is not None and not len(self._files)
 
     @property
-    def path(self) -> Path:
-        return self._path
+    def relpath(self):
+        return self._path.resolve().relative_to(self.root.resolve())
 
     @property
-    def title(self) -> dict[str, Any]:
-        return self._title
+    def level(self):
+        return len(self.relpath.parts)
 
-    @property
-    def files(self) -> list[str]:
-        return self._files
+    def __add__(self, other):
+        if isinstance(other, File):
+            self._files.append(other)
 
-    @property
-    def index(self) -> list[str]:
-        return self._index
-
-    @property
-    def subdirs(self) -> dict[str, 'Branch']:
-        return self._subdirs
-
-    @property
-    def weight(self) -> Optional[int]:
-        return self._weight
-
-
-class Tree:
-    """Class to represent the complete directory tree."""
-    language: str
-
-    def __init__(self, root: Path) -> None:
-        self._root: Path = root
-        self._branches: dict[str, Branch] = {}
-        self._current_branch: Branch | None = None
-        self._current_dir: Path | None = None
-
-    def get_directory_weight(self) -> 'Tree':
-        try:
-            filepath: Path = find_index(self._current_dir, self.__class__.language)
-            logger.debug(f"Директория {self._current_dir.as_posix()}\nФайл index: {filepath.as_posix()}")
-
-        except GenerateYamlMissingIndexFileError:
-            raise GenerateYamlMissingBranchError
+        elif isinstance(other, self.__class__):
+            self._subs.append(other)
 
         else:
-            front_matter: Optional[Frontmatter] = Frontmatter.parse_frontmatter(filepath, self._root)
+            return NotImplemented
 
-            if front_matter:
-                self._current_branch._weight = front_matter.weight
+    @property
+    def no_index_file(self):
+        return self._index_file is None
 
-                if has_content(filepath):
-                    self._current_branch.index.append(front_matter.filename)
-                else:
-                    self._current_branch.title["value"] = front_matter.title
+    def set_subs(self):
+        for item in self.__dirs_inside:
+            branch: Branch = Branch(item.resolve())
+            branch.set_inside()
+            branch.set_parent()
+            branch.set_files()
+            branch.set_subs()
 
-                # +1 because compare not file but parent dir, -2 because content/common/ are taken into account
-                level: int = len(Path(self._current_branch.relpath).parts) + 1 - 2
-
-                if level < 1:
-                    logger.error(
-                        f"Для директории {self._current_dir.as_posix()} получено значение "
-                        f"level = {level}"
-                        f"\nЭто означает, что директория находится не в директории content/common, "
-                        f"в связи с чем и была проигнорирована")
-                    raise GenerateYamlInvalidLevelError
-
-                self._current_branch.title["level"] = level
-
-                logger.debug(f"level: {level}")
-
-            return self
-
-    def process_files(self) -> 'Tree':
-        for filepath in self._current_dir.iterdir():
-            if not is_valid_file(filepath, self.__class__.language):
+            if branch.no_index_file:
+                del self.__class__.branch_dict[branch._path]
                 continue
 
-            front_matter: Frontmatter | None = Frontmatter.parse_frontmatter(filepath, self._root)
-
-            if front_matter:
-                self._current_branch.files.append(front_matter.filename)
-
-        # Sort files by weight then title
-        self._current_branch.files.sort(
-            key=lambda x: (
-                (Frontmatter.parse_frontmatter(self._root.joinpath(x), self._root)).weight,
-                (Frontmatter.parse_frontmatter(self._root.joinpath(x), self._root)).title.lower()))
-
-        logger.debug(f"Файлы в директории:\n{pretty_print(self._current_branch.files)}")
-
-        return self
-
-    def process_subdirectories(self) -> 'Tree':
-        subdirs: list[Path] = sorted(self._current_dir.iterdir())
-
-        logger.debug(f"Содержимое директории {self._current_dir.as_posix()}:\n{pretty_print(subdirs)}")
-
-        for subdir in subdirs:
-            if subdir.is_dir():
-                sub_branch: Branch | None = self.generate_branch(subdir)
-
-                if sub_branch:
-                    self._current_branch.subdirs[sub_branch.path.name] = sub_branch
-
-                else:
-                    # Handle case where directory only has index file
-                    try:
-                        index_file: Path = find_index(subdir, self.__class__.language)
-                        logger.debug(f"Директория {subdir}\nФайл index: {index_file.as_posix()}")
-                        front_matter: Frontmatter | None = Frontmatter.parse_frontmatter(index_file, self._root)
-
-                        if front_matter:
-                            self._current_branch.files.append(front_matter.filename)
-
-                    except GenerateYamlMissingIndexFileError:
-                        continue
-
-        return self
-
-    def generate_branch(self, dirpath: StrPath, branch: Branch = None) -> Branch | None:
-        if branch is None:
-            branch: Branch = Branch(dirpath)
-
-        self._current_dir = Path(dirpath)
-        self._current_branch = branch
-
-        logger.debug(f"Генерация ветки для директории {self._current_dir.as_posix()}")
-
-        try:
-            # First check if this directory has only an index file
-            index_file: Path | None = find_index(self._current_dir, self.__class__.language)
-            logger.debug(f"Директория {self._current_dir.as_posix()}\nФайл index: {index_file.as_posix()}")
-
-            if index_file is None:
-                return None
-
-            content_files: list[Path] = [
-                *filter(
-                    lambda x: is_valid_file(x, self.language),
-                    self._current_dir.iterdir())]
-            # If only index file exists and no other content files
-            if len(content_files) == 1:
-                return None
-
-            logger.debug(f"Ветка директории {self._current_dir.as_posix()}")
-
-            # Otherwise proceed with normal branch generation
-            branch: Branch = (
-                self
-                .get_directory_weight()
-                .process_files()
-                .process_subdirectories()
-                ._current_branch)
-
-            if branch.index or branch.files or branch.subdirs:
-                return branch
             else:
-                return None
+                self + branch
 
-        except (GenerateYamlMissingBranchError, GenerateYamlInvalidLevelError):
-            return None
+    def to_parameters(self):
+        if self._index_file.is_empty():
+            title: str | None = ""
 
-        except AttributeError as e:
-            logger.error(f"Объект {e.obj} типа {type(e.obj).__name__} не имеет атрибута {e.name}")
-            logger.info(f"Директория {self._current_dir.as_posix()}")
+        else:
+            title: str | None = None
 
-    def build(self):
-        """Build the complete tree structure"""
-        root_branch: Branch | None = self.generate_branch(self._root)
+        if self.level > 2:
+            level: int | None = self.level
 
-        if root_branch:
-            self._branches = root_branch.subdirs
+        else:
+            level: int | None = None
 
-    def to_yaml(self) -> dict[str, dict[str, Any]]:
-        """Save the flattened tree structure to YAML"""
-        root_branch: Branch = Branch(self._root)
-        root_branch.subdirs.update(self._branches)
+        if self._index_file is not None:
+            index: list[str] = [self._index_file.relpath(self.__class__.root).as_posix()]
 
-        return root_branch.flatten()
+        else:
+            index: list[str] = []
+
+        if self._files is not None:
+            files: list[str] = list(map(lambda x: x.relpath(self.__class__.root).as_posix(), self._files))
+
+        else:
+            files: list[str] = []
+
+        name: str = self.relpath.as_posix()
+
+        return BranchParameters(name, title, level, index, files)
+
+    @classmethod
+    def get_root(cls) -> Self:
+        for path, branch in cls.branch_dict.items():
+            if path == cls.root:
+                return branch
+
+    @property
+    def index_file(self):
+        return self._index_file
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._path == other._path
+
+        else:
+            return NotImplemented
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            return self._path != other._path
+
+        else:
+            return NotImplemented
+
+    @property
+    def weight(self):
+        return self._index_file.frontmatter.weight
+
+    def __key(self):
+        return self.level, self.weight
+
+    def __lt__(self, other):
+        if isinstance(other, self.__class__) and not self.no_index_file and not other.no_index_file:
+            return self.weight < other.weight
+
+        else:
+            return NotImplemented
+
+    def __le__(self, other):
+        if isinstance(other, self.__class__) and not self.no_index_file and not other.no_index_file:
+            return self.weight <= other.weight
+
+        else:
+            return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, self.__class__) and not self.no_index_file and not other.no_index_file:
+            return self.weight > other.weight
+
+        else:
+            return NotImplemented
+
+    def __ge__(self, other):
+        if isinstance(other, self.__class__) and not self.no_index_file and not other.no_index_file:
+            return self.weight >= other.weight
+
+        else:
+            return NotImplemented
+
+    @property
+    def path(self):
+        return self._path
+
+
+def generate_branches(path: StrPath | None = None):
+    branch: Branch = Branch(path)
+    branch.set_inside()
+    branch.set_parent()
+    branch.set_files()
+    branch.set_subs()
+
+    branches: list[Branch] = sorted(filter(lambda x: not x.no_index_file, Branch.branch_dict.values()))
+    return {branch.relpath.as_posix(): branch.to_parameters().to_dict() for branch in branches}
+
+
+def to_str(path: StrPath | None = None):
+    generate_branches(path)
+
+    branches: list[Branch] = sorted(Branch.branch_dict.values())
+
+    branch_params: list[BranchParameters] = list(map(lambda x: x.to_params(), branches))
+    return "\n".join(map(str, branch_params))
+
+
+def to_yaml(kwargs: dict[str, Any]) -> str:
+    yaml: MyYAML = MyYAML(typ="safe")
+    return yaml.dump(kwargs)
 
 
 class YAMLConfig(NamedTuple):
@@ -372,6 +461,7 @@ class YAMLConfig(NamedTuple):
                 "table-caption": "Таблица",
                 "toc-title": "Содержание",
                 "title-logo-image": "images/logo.svg[top=4%,align=right,pdfwidth=3cm]"}
+
         else:
             lang_attributes: dict[str, str | int | bool] = {
                 "figure-caption": "Figure",
@@ -419,7 +509,9 @@ class YAMLConfig(NamedTuple):
             value: str = "Legal Information"
 
         legal_info_file: Path = self.root.joinpath("content/common")
-        index_file: str = find_index(legal_info_file, self.language).as_posix()
+        branch = Branch(legal_info_file)
+        branch.set_files()
+        index_file: str = "_index.md"
         logger.debug(f"Директория: {legal_info_file}\nФайл index: {index_file}")
         title_files: bool = False
 
@@ -435,16 +527,16 @@ class YAMLConfig(NamedTuple):
 
         logger.debug(f"Раздел rights:\n{to_yaml(self.rights)}")
 
-    def write(self, output: StrPath, is_execute: bool = True) -> None:
-        logger.success(f"Конфигурационный файл:\n{str(self)}")
-
-        if is_execute:
-            file_writer(output, str(self))
-            logger.success(f"Записан файл {Path(output).resolve()}")
-
-        else:
-            logger.warning("Файл не был записан согласно используемым опциям в команде")
-            echo(str(self))
+    # def write(self, output: StrPath, is_execute: bool = True) -> None:
+    #     logger.success(f"Конфигурационный файл:\n{str(self)}")
+    #
+    #     if is_execute:
+    #         file_writer(output, str(self))
+    #         logger.success(f"Записан файл {Path(output).resolve()}")
+    #
+    #     else:
+    #         logger.warning("Файл не был записан согласно используемым опциям в команде")
+    #         echo(str(self))
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -456,65 +548,7 @@ class YAMLConfig(NamedTuple):
         return to_yaml(self.to_dict())
 
 
-def to_yaml(kwargs: dict[str, Any]) -> str:
-    yaml: MyYAML = MyYAML(typ="safe")
-    return yaml.dump(kwargs)
-
-
-def has_content(filepath: StrPath) -> bool:
-    try:
-        post: Post = load(str(filepath))
-        return bool(post.content.strip())
-    except OSError:
-        return False
-
-
-def is_valid_file(filepath: Path, language: str) -> bool:
-    if not filepath.is_file():
-        return False
-
-    if filepath.stem in INDEX_STEMS or filepath.stem.startswith((".", "_")):
-        return False
-
-    if language == "ru":
-        is_language: bool = filepath.suffixes[0] in EXTENSIONS
-    else:
-        is_language: bool = filepath.suffixes[0] == language
-
-    return filepath.suffix in EXTENSIONS and is_language
-
-
-def find_index(directory: StrPath, language: str, strict: bool = False) -> Path | None:
-    directory: Path = Path(directory)
-
-    if language == "ru":
-        files: list[str] = [
-            "_index.md",
-            "_index.adoc",
-            "index.md",
-            "index.adoc"]
-    else:
-        files: list[str] = [
-            f"_index.{language}.md",
-            f"_index.{language}.adoc",
-            f"index.{language}.md",
-            f"index.{language}.adoc"]
-
-    for file in files:
-        index_file: Path = directory.joinpath(file)
-
-        if index_file.exists():
-            return index_file
-
-    if strict:
-        logger.debug(f"В директории {directory} не найдены файлы index.*/_index.*")
-        raise GenerateYamlMissingIndexFileError
-
-    else:
-        return
-
-
-def prepare_attributes(attrs: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+def prepare_attributes(attrs: dict[str, Any] | None = None) -> dict[str, Any]:
     if attrs is None:
         attrs = {}
 
@@ -636,21 +670,22 @@ def generate_yaml_command(
 
         kwargs.update(attrs)
 
-    root: Path = Path(root)
-    Branch.root = root
-    Tree.language = language
+    Branch.root = Path(root)
+    root: Path = Path(root).joinpath("content/common")
+    Branch.language = language
 
-    tree: Tree = Tree(root.joinpath("content/common/"))
-    tree.build()
+    branches_yaml: dict[str, Any] = generate_branches(root)
 
     yaml_config: YAMLConfig = YAMLConfig(language, root)
     yaml_config.set_settings(**kwargs)
     yaml_config.set_legal_info()
-    yaml_config.subdirs.update(**tree.to_yaml())
+    yaml_config.subdirs.update(branches_yaml)
 
     yaml_name: str = title_page.replace(" ", "_")
     output: Path = root.joinpath(f"PDF_{yaml_name}.yml")
 
-    yaml_config.write(output, not dry_run)
+    echo(yaml_config.to_dict(), None)
+
+    echo(str(yaml_config))
 
     ctx.obj["keep_logs"] = keep_logs

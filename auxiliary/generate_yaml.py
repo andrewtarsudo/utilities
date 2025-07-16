@@ -2,7 +2,7 @@
 from pathlib import Path
 from typing import Any, ClassVar, Mapping, NamedTuple, Self
 
-from click import argument, BOOL, Choice, Context, help_option, option, pass_context, STRING
+from click import argument, BOOL, Choice, Context, echo, help_option, option, pass_context, STRING
 # noinspection PyProtectedMember
 from frontmatter import load, Post
 from loguru import logger
@@ -221,6 +221,7 @@ class BranchParameters(NamedTuple):
 
 class Branch:
     root: ClassVar[Path]
+    language: ClassVar[str]
 
     branch_dict: BranchDict = BranchDict()
 
@@ -250,6 +251,10 @@ class Branch:
     def set_files(self):
         for file_path in self.__files_inside:
             file: File = File(file_path)
+
+            if file.language != self.__class__.language:
+                continue
+
             file.set_params()
 
             if not bool(file):
@@ -355,9 +360,7 @@ def generate_branches(path: StrPath | None = None):
     branch.set_subs()
 
     branches: list[Branch] = sorted(Branch.branch_dict.values())
-    branch_params: list[BranchParameters] = list(map(lambda x: x.to_params(), branches))
-
-    return list(map(str, branch_params))
+    return dict(map(lambda x: x.to_params(), branches))
 
 
 def to_str(path: StrPath | None = None):
@@ -483,6 +486,26 @@ class YAMLConfig(NamedTuple):
         return to_yaml(self.to_dict())
 
 
+def prepare_attributes(attrs: dict[str, Any] | None = None) -> dict[str, Any]:
+    if attrs is None:
+        attrs = {}
+
+    for key, value in attrs.items():
+        key = key.strip()
+        value = value.strip()
+
+        if value.isnumeric():
+            attrs[key] = int(value)
+        elif value.lower() == "true":
+            attrs[key] = True
+        elif value.lower() == "false":
+            attrs[key] = False
+        else:
+            attrs[key] = value
+
+    return attrs
+
+
 @cli.command(
     "generate-yaml",
     cls=SwitchArgsAPIGroup,
@@ -587,19 +610,18 @@ def generate_yaml_command(
 
     root: Path = Path(root)
     Branch.root = root
-    Tree.language = language
+    Branch.language = language
 
-    tree: Tree = Tree(root.joinpath("content/common/"))
-    tree.build()
+    branches_yaml: dict[str, Any] = generate_branches(root)
 
     yaml_config: YAMLConfig = YAMLConfig(language, root)
     yaml_config.set_settings(**kwargs)
     yaml_config.set_legal_info()
-    yaml_config.subdirs.update(**tree.to_yaml())
+    yaml_config.subdirs.update(branches_yaml)
 
     yaml_name: str = title_page.replace(" ", "_")
     output: Path = root.joinpath(f"PDF_{yaml_name}.yml")
 
-    yaml_config.write(output, not dry_run)
+    echo(str(yaml_config))
 
     ctx.obj["keep_logs"] = keep_logs
