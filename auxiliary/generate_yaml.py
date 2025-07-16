@@ -373,7 +373,7 @@ def to_str(path: StrPath | None = None):
 
 
 def to_yaml(kwargs: dict[str, Any]) -> str:
-    yaml: MyYAML = MyYAML(typ="safe")
+    yaml: MyYAML = MyYAML(typ="rt")
     return yaml.dump(kwargs)
 
 

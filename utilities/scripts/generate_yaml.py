@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from bisect import bisect_right
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, ClassVar, Mapping, NamedTuple, Self
 
@@ -207,12 +209,16 @@ class BranchParameters(NamedTuple):
 
     def to_dict(self):
         dict_parameters: dict[str, Any] = {}
+        title_parameters: dict[str, Any] = {}
 
         if self.title is not None:
-            dict_parameters["title"] = self.title
+            title_parameters["title"] = self.title
 
         if self.level is not None:
-            dict_parameters["level"] = self.level
+            title_parameters["level"] = self.level
+
+        if title_parameters:
+            dict_parameters["title"] = title_parameters
 
         if self.index:
             dict_parameters["index"] = self.index
@@ -413,6 +419,19 @@ class Branch:
     def path(self):
         return self._path
 
+    def subs_weights(self):
+        return sorted(branch.weight for branch in self._subs)
+
+    def split_files(self):
+        weights: dict[int, File] = {file.frontmatter.weight: file for file in self._files}
+        groups: dict = defaultdict(list)
+
+        for value in weights:
+            index = bisect_right(self.subs_weights(), value)
+            groups[index].append(weights[value])
+
+        return dict(groups)
+
 
 def generate_branches(path: StrPath | None = None):
     branch: Branch = Branch(path)
@@ -435,7 +454,7 @@ def to_str(path: StrPath | None = None):
 
 
 def to_yaml(kwargs: dict[str, Any]) -> str:
-    yaml: MyYAML = MyYAML(typ="safe")
+    yaml: MyYAML = MyYAML(typ="rt")
     return yaml.dump(kwargs)
 
 
