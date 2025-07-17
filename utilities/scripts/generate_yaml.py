@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
-from bisect import bisect_right
-from collections import defaultdict
 from pathlib import Path
-from typing import Any, ClassVar, Mapping, NamedTuple, Self
+from typing import Any, ClassVar, Iterable, Mapping, NamedTuple, Self
 
-from click import argument, BOOL, Choice, Context, echo, help_option, option, pass_context, STRING
+from click import argument, BOOL, Choice, Context, echo, help_option, option, pass_context, Path as ClickPath, STRING
 # noinspection PyProtectedMember
 from frontmatter import load, Post
 from loguru import logger
-
-
-from click import Path as ClickPath
 
 from utilities.common.completion import dir_completion, language_completion
 from utilities.common.config_file import config_file
@@ -33,6 +28,21 @@ EPILOG_GENERATE_YAML: str = (
     "\n:title-logo-image: images/logo<_en>.svg[top=4%,align=right,pdfwidth=3cm]"
     "\n"
     "\b\nДопускается добавлять любые атрибуты, в том числе и пользовательские.")
+
+
+# def is_none(attr: str):
+#     def wrapper(func):
+#         @wraps(func)
+#         def inner(obj, *args, **kwargs):
+#             if getattr(obj, attr) is not None or not hasattr(obj, attr):
+#                 return
+#
+#             else:
+#                 return func(obj, *args, **kwargs)
+#
+#         return inner
+#
+#     return wrapper
 
 
 # noinspection PyTypeChecker
@@ -197,7 +207,13 @@ class File:
 
 
 class BranchDict(dict):
-    pass
+    def remove_branch(self, value):
+        for k, v in self.items():
+            if v == value:
+                del self[k]
+
+        else:
+            logger.warning(f"Ветка {value!s}")
 
 
 class BranchParameters(NamedTuple):
@@ -239,17 +255,37 @@ class Branch:
 
     branch_dict: BranchDict = BranchDict()
 
-    def __init__(self, path: StrPath):
+    def __init__(
+            self,
+            path: StrPath, *,
+            files: Iterable[File] = None,
+            branches: Iterable[Self] = None,
+            parent: Self | None = None):
+        if files is None:
+            files: list[File] = []
+
+        else:
+            files: list[File] = [*files]
+
+        if branches is None:
+            branches: list[Self] = []
+
+        else:
+            branches: list[Self] = [*branches]
+
         self._path = Path(path)
         self._index_file: File | None = None
-        self._files: list[File] = []
-        self._subs: list[Self] = []
-        self._parent: Self = None
+        self._files: list[File] = files
+        self._subs: list[Self] = branches
+        self._parent: Self | None = parent
 
         self.__files_inside: list[Path] = []
         self.__dirs_inside: list[Path] = []
 
         self.__class__.branch_dict[self._path] = self
+
+    def __str__(self):
+        return f"Ветка {self._path!s}"
 
     def set_inside(self):
         for item in self._path.iterdir():
@@ -262,6 +298,9 @@ class Branch:
             else:
                 pass
 
+        logger.info(f"Files:\n{self.__files_inside!s}\nBranches:\n{self.__dirs_inside!s}")
+
+    # @is_none("_files")
     def set_files(self):
         for file_path in self.__files_inside:
             file: File = File(file_path)
@@ -280,9 +319,14 @@ class Branch:
             else:
                 self._files.append(file)
 
+        logger.info(f"Files:\n{self._files!s}")
+
+    # @is_none("_parent")
     def set_parent(self):
         if self._path.resolve() != self.__class__.root.resolve():
             self._parent = self._path.parent
+
+        logger.info(f"Parent: {self._parent!s}")
 
     def __len__(self):
         return len(self._files) + int(self._index_file is not None)
@@ -296,7 +340,7 @@ class Branch:
 
     @property
     def level(self):
-        return len(self.relpath.parts)
+        return len(self.relpath.parts) - 1
 
     def __add__(self, other):
         if isinstance(other, File):
@@ -305,6 +349,15 @@ class Branch:
         elif isinstance(other, self.__class__):
             self._subs.append(other)
 
+        elif isinstance(other, Iterable):
+            _files: list[File] = list(filter(lambda x: isinstance(x, File), other))
+            files: set[File] = set(_files + self._files)
+            self._files = sorted(files)
+
+            _branches: list[Self] = list(filter(lambda x: isinstance(x, self.__class__), other))
+            branches: set[Self] = set(_branches + self._subs)
+            self._subs.extend(branches)
+
         else:
             return NotImplemented
 
@@ -312,6 +365,7 @@ class Branch:
     def no_index_file(self):
         return self._index_file is None
 
+    # @is_none("_subs")
     def set_subs(self):
         for item in self.__dirs_inside:
             branch: Branch = Branch(item.resolve())
@@ -320,16 +374,19 @@ class Branch:
             branch.set_files()
             branch.set_subs()
 
-            if branch.no_index_file:
+            if branch.no_index_file and not branch._files:
+                logger.info(f"Ветка {branch._path} проигнорирована")
                 del self.__class__.branch_dict[branch._path]
                 continue
 
             else:
                 self + branch
 
+        logger.info(f"Branches:\n{self._subs!s}")
+
     def to_parameters(self):
         if self._index_file.is_empty():
-            title: str | None = ""
+            title: str | None = self._index_file.frontmatter.title
 
         else:
             title: str | None = None
@@ -340,7 +397,7 @@ class Branch:
         else:
             level: int | None = None
 
-        if self._index_file is not None:
+        if self._index_file is not None and not self._index_file.is_empty():
             index: list[str] = [self._index_file.relpath(self.__class__.root).as_posix()]
 
         else:
@@ -368,20 +425,20 @@ class Branch:
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self._path == other._path
+            return self._path, self._files, self._subs == other._path, other._files, other._subs
 
         else:
             return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
-            return self._path != other._path
+            return self._path, self._files, self._subs != other._path, other._files, other._subs
 
         else:
             return NotImplemented
 
     @property
-    def weight(self):
+    def weight(self) -> int:
         return self._index_file.frontmatter.weight
 
     def __key(self):
@@ -419,18 +476,58 @@ class Branch:
     def path(self):
         return self._path
 
-    def subs_weights(self):
+    def get_sub(self, index: int) -> Self:
+        return self._subs[index]
+
+    def subs_weights(self) -> list[int]:
         return sorted(branch.weight for branch in self._subs)
 
-    def split_files(self):
-        weights: dict[int, File] = {file.frontmatter.weight: file for file in self._files}
-        groups: dict = defaultdict(list)
-
-        for value in weights:
-            index = bisect_right(self.subs_weights(), value)
-            groups[index].append(weights[value])
-
-        return dict(groups)
+    # def split_files(self) -> dict[int, list[File]]:
+    #     weights: dict[int, File] = {file.frontmatter.weight: file for file in self._files}
+    #     groups: dict[int, list[File]] = defaultdict(list)
+    #
+    #     for value in weights:
+    #         index: int = bisect_right(self.subs_weights(), value)
+    #         groups[index].append(weights[value])
+    #
+    #     return dict(groups)
+    #
+    # def split_into_branches(self):
+    #     grouped_files: dict[int, list[File]] = self.split_files()
+    #
+    #     if not grouped_files:
+    #         logger.info(f"В ветке {self._path} нет необходимости разделять")
+    #         return
+    #
+    #     new_branches: list[Branch] = []
+    #
+    #     for index, files in grouped_files.items():
+    #         # Create a branch with separated files
+    #         file_branch = Branch(
+    #             path=self._path,
+    #             files=files,
+    #             parent=self._parent
+    #         )
+    #         new_branches.append(file_branch)
+    #
+    #         # Add the corresponding sub-branch from original subs if it exists
+    #         if index < len(self._subs):
+    #             sub_branch = self._subs[index]
+    #             wrapped_sub = Branch(
+    #                 path=sub_branch._path,
+    #                 branches=[sub_branch],
+    #                 parent=file_branch
+    #             )
+    #             new_branches.append(wrapped_sub)
+    #
+    #     # Remove the original branch and its sub-branches from the dictionary
+    #     del self.__class__.branch_dict[self._path]
+    #     for sub in self._subs:
+    #         self.__class__.branch_dict.remove_branch(sub)
+    #
+    #     # Add new branches to the dictionary
+    #     for branch in new_branches:
+    #         self.__class__.branch_dict[branch._path] = branch
 
 
 def generate_branches(path: StrPath | None = None):
