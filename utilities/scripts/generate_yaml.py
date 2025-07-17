@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from bisect import bisect_right
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, ClassVar, Iterable, Mapping, NamedTuple, Self
 
@@ -7,6 +9,7 @@ from click import argument, BOOL, Choice, Context, echo, help_option, option, pa
 from frontmatter import load, Post
 from loguru import logger
 
+from common.functions import file_writer
 from utilities.common.completion import dir_completion, language_completion
 from utilities.common.config_file import config_file
 from utilities.common.errors import GenerateYamlMissingAttributeError
@@ -28,21 +31,6 @@ EPILOG_GENERATE_YAML: str = (
     "\n:title-logo-image: images/logo<_en>.svg[top=4%,align=right,pdfwidth=3cm]"
     "\n"
     "\b\nДопускается добавлять любые атрибуты, в том числе и пользовательские.")
-
-
-# def is_none(attr: str):
-#     def wrapper(func):
-#         @wraps(func)
-#         def inner(obj, *args, **kwargs):
-#             if getattr(obj, attr) is not None or not hasattr(obj, attr):
-#                 return
-#
-#             else:
-#                 return func(obj, *args, **kwargs)
-#
-#         return inner
-#
-#     return wrapper
 
 
 # noinspection PyTypeChecker
@@ -121,6 +109,9 @@ class File:
         self._path: Path = Path(path)
         self._frontmatter: FrontMatter | None = None
         self._content: str | None = None
+
+    def __hash__(self):
+        return hash(self._path)
 
     def is_index(self):
         return self._path.name.startswith(("index", "_index"))
@@ -300,7 +291,6 @@ class Branch:
 
         logger.info(f"Files:\n{self.__files_inside!s}\nBranches:\n{self.__dirs_inside!s}")
 
-    # @is_none("_files")
     def set_files(self):
         for file_path in self.__files_inside:
             file: File = File(file_path)
@@ -321,7 +311,6 @@ class Branch:
 
         logger.info(f"Files:\n{self._files!s}")
 
-    # @is_none("_parent")
     def set_parent(self):
         if self._path.resolve() != self.__class__.root.resolve():
             self._parent = self._path.parent
@@ -365,7 +354,6 @@ class Branch:
     def no_index_file(self):
         return self._index_file is None
 
-    # @is_none("_subs")
     def set_subs(self):
         for item in self.__dirs_inside:
             branch: Branch = Branch(item.resolve())
@@ -374,8 +362,8 @@ class Branch:
             branch.set_files()
             branch.set_subs()
 
-            if branch.no_index_file and not branch._files:
-                logger.info(f"Ветка {branch._path} проигнорирована")
+            if branch.no_index_file and not branch._files and not branch._subs:
+                logger.debug(f"Ветка {branch._path} проигнорирована")
                 del self.__class__.branch_dict[branch._path]
                 continue
 
@@ -472,82 +460,86 @@ class Branch:
         else:
             return NotImplemented
 
+    def __sub__(self, other):
+        if isinstance(other, File):
+            self._files.remove(other)
+
+        elif isinstance(other, self.__class__):
+            self._subs.remove(other)
+
+        elif isinstance(other, Iterable):
+            for item in other:
+                self.__sub__(item)
+
+        else:
+            logger.debug(f"Невозможно удалить {other} типа {type(other).__name__}")
+
     @property
     def path(self):
         return self._path
 
-    def get_sub(self, index: int) -> Self:
-        return self._subs[index]
+    def split_files(self) -> dict[int, list[File]]:
+        if not self._subs:
+            logger.debug("No sub-branches found, returning empty dict")
+            return {}
 
-    def subs_weights(self) -> list[int]:
-        return sorted(branch.weight for branch in self._subs)
+        subs_weights: list[int] = sorted(branch.weight for branch in self._subs)
+        weights: dict[File, int] = {file: file.frontmatter.weight for file in self._files}
+        groups: dict[int, list[File]] = defaultdict(list)
 
-    # def split_files(self) -> dict[int, list[File]]:
-    #     weights: dict[int, File] = {file.frontmatter.weight: file for file in self._files}
-    #     groups: dict[int, list[File]] = defaultdict(list)
-    #
-    #     for value in weights:
-    #         index: int = bisect_right(self.subs_weights(), value)
-    #         groups[index].append(weights[value])
-    #
-    #     return dict(groups)
-    #
-    # def split_into_branches(self):
-    #     grouped_files: dict[int, list[File]] = self.split_files()
-    #
-    #     if not grouped_files:
-    #         logger.info(f"В ветке {self._path} нет необходимости разделять")
-    #         return
-    #
-    #     new_branches: list[Branch] = []
-    #
-    #     for index, files in grouped_files.items():
-    #         # Create a branch with separated files
-    #         file_branch = Branch(
-    #             path=self._path,
-    #             files=files,
-    #             parent=self._parent
-    #         )
-    #         new_branches.append(file_branch)
-    #
-    #         # Add the corresponding sub-branch from original subs if it exists
-    #         if index < len(self._subs):
-    #             sub_branch = self._subs[index]
-    #             wrapped_sub = Branch(
-    #                 path=sub_branch._path,
-    #                 branches=[sub_branch],
-    #                 parent=file_branch
-    #             )
-    #             new_branches.append(wrapped_sub)
-    #
-    #     # Remove the original branch and its sub-branches from the dictionary
-    #     del self.__class__.branch_dict[self._path]
-    #     for sub in self._subs:
-    #         self.__class__.branch_dict.remove_branch(sub)
-    #
-    #     # Add new branches to the dictionary
-    #     for branch in new_branches:
-    #         self.__class__.branch_dict[branch._path] = branch
+        for k, v in weights.items():
+            index: int = bisect_right(subs_weights, v)
+            groups[index].append(k)
+
+        return dict(groups[1:])
+
+    def split_into_branches(self):
+        grouped_files: dict[int, list[File]] = self.split_files()
+
+        logger.error(f"{grouped_files=!s}")
+
+        if not grouped_files:
+            logger.info(f"В ветке {self._path} нет необходимости разделять")
+            return
+
+        # Remove files that will be moved to sub-branches
+        for files in grouped_files.values():
+            self - files
+
+        # Create sub-branches with sequential naming
+        for seq_num, (index, files) in enumerate(grouped_files.items(), 1):
+            # Sequential sub-path naming
+            sub_path = self._path.joinpath(f"section_{seq_num}")
+
+            # Create the sub-branch
+            sub_branch = Branch(
+                path=sub_path,
+                files=files,
+                parent=self)
+
+            # Add to current branch and register globally
+            self + sub_branch
+            self.__class__.branch_dict[sub_path] = sub_branch
+
+            logger.debug(f"Создана ветка {sub_path} с {len(files)} файлами")
+
+    def prepare(self):
+        self.set_inside()
+        self.set_parent()
+        self.set_files()
+        self.set_subs()
+        self.split_into_branches()
+
+        for branch in self._subs:
+            branch.prepare()
 
 
 def generate_branches(path: StrPath | None = None):
     branch: Branch = Branch(path)
-    branch.set_inside()
-    branch.set_parent()
-    branch.set_files()
-    branch.set_subs()
+    branch.prepare()
 
     branches: list[Branch] = sorted(filter(lambda x: not x.no_index_file, Branch.branch_dict.values()))
     return {branch.relpath.as_posix(): branch.to_parameters().to_dict() for branch in branches}
-
-
-def to_str(path: StrPath | None = None):
-    generate_branches(path)
-
-    branches: list[Branch] = sorted(Branch.branch_dict.values())
-
-    branch_params: list[BranchParameters] = list(map(lambda x: x.to_params(), branches))
-    return "\n".join(map(str, branch_params))
 
 
 def to_yaml(kwargs: dict[str, Any]) -> str:
@@ -643,16 +635,16 @@ class YAMLConfig(NamedTuple):
 
         logger.debug(f"Раздел rights:\n{to_yaml(self.rights)}")
 
-    # def write(self, output: StrPath, is_execute: bool = True) -> None:
-    #     logger.success(f"Конфигурационный файл:\n{str(self)}")
-    #
-    #     if is_execute:
-    #         file_writer(output, str(self))
-    #         logger.success(f"Записан файл {Path(output).resolve()}")
-    #
-    #     else:
-    #         logger.warning("Файл не был записан согласно используемым опциям в команде")
-    #         echo(str(self))
+    def write(self, output: StrPath, is_execute: bool = True) -> None:
+        logger.success(f"Конфигурационный файл:\n{str(self)}")
+
+        if is_execute:
+            file_writer(output, str(self))
+            logger.success(f"Записан файл {Path(output).resolve()}")
+
+        else:
+            logger.warning("Файл не был записан согласно используемым опциям в команде")
+            echo(str(self))
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -798,9 +790,9 @@ def generate_yaml_command(
     yaml_config.subdirs.update(branches_yaml)
 
     yaml_name: str = title_page.replace(" ", "_")
-    output: Path = root.joinpath(f"PDF_{yaml_name}.yml")
 
-    echo(yaml_config.to_dict(), None)
+    output: Path = root.joinpath(f"PDF_{yaml_name}.yml")
+    yaml_config.write(output, not dry_run)
 
     echo(str(yaml_config))
 
