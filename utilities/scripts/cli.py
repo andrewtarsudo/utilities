@@ -34,7 +34,7 @@ def check_env() -> bool:
     FALSE: tuple[str, ...] = ("0", "false", "no", "off")
     env_var: str = environ.get("_TW_UTILITIES_UPDATE", "1")
 
-    return env_var in FALSE
+    return env_var not in FALSE
 
 
 def check_file() -> bool:
@@ -196,9 +196,10 @@ def cli(debug: bool = False, update: bool = True):
 
     try:
         ctx: Context = get_current_context()
-        ctx.call_on_close(clear_logs)
         ctx.ensure_object(dict)
         ctx.obj = {"debug": debug}
+
+        ctx.call_on_close(clear_logs)
 
         logger.debug(f"Вызванная команда: {" ".join(sys.argv[:])}")
 

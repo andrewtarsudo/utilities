@@ -41,7 +41,14 @@ class MyYAML(YAML):
             inefficient: bool = True
             stream = StringIO()
 
-        YAML.dump(self, data, stream, **kwargs)
+        self.indent(mapping=2, sequence=2, offset=2)
+        self.width = 200
+        self.encoding = "utf-8"
+        self.preserve_quotes = True
+        self.default_flow_style = False
+        self.line_break = "\n"
+
+        YAML.dump(self, data, stream)
 
         if inefficient:
             return stream.getvalue()
