@@ -4,17 +4,21 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, ClassVar, Iterable, Mapping, NamedTuple, Self
 
-from click import argument, BOOL, Choice, Context, echo, help_option, option, pass_context, Path as ClickPath, STRING
+from click.core import Context
+from click.decorators import argument, help_option, option, pass_context
+from click.types import BOOL, Choice, Path as ClickPath, STRING
+from click.utils import echo
 # noinspection PyProtectedMember
 from frontmatter import load, Post
 from loguru import logger
 
-from common.functions import file_writer
 from utilities.common.completion import dir_completion, language_completion
 from utilities.common.config_file import config_file
 from utilities.common.errors import GenerateYamlMissingAttributeError
+from utilities.common.functions import file_writer
 from utilities.common.shared import EXTENSIONS, HELP, MyYAML, StrPath
-from utilities.scripts import cli, SwitchArgsAPIGroup
+from utilities.scripts.api_group import SwitchArgsAPIGroup
+from utilities.scripts.cli import cli
 
 EPILOG_GENERATE_YAML: str = (
     "\b\nЗначения атрибутов AsciiDoc по умолчанию, добавляемые в файл:"
